@@ -1,0 +1,46 @@
+{{#setTitleI18n}}emapic_index_title{{/setTitleI18n}}
+        <div id="fb-root"></div>
+        <script>(function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/{{#__}}facebook_language{{/__}}/sdk.js#xfbml=1&version=v2.5";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+		<div {{^user}}class="intro-front"{{/user}} id="intro">
+			<div class="text-center" id="intro-title">
+				<img class="img-responsive center-block" src="/images/logo-intro.svg" alt="intro-logo" />
+			</div>
+		</div>
+		<div class="" id="intro-bar">
+			<div class="col-xs-4 col-xs-push-4 text-center" id="intro-arrow">
+				<a class="" href="javascript:void()" onclick="on_arrow_click()"><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span></a>
+			</div>
+			<div class="col-xs-4 col-xs-push-4 text-right" id="intro-access">
+				{{^user}}
+					<a class="hidden-xs" href="/login"><button type="button" class="btn btn-default btn-lg">{{#__}}login_to_emapic{{/__}}</button></a>
+					<a class="visible-xs" href="/login"><button type="button" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-log-in" aria-hidden="true"></span></button></a>
+				{{/user}}
+			</div>
+		</div>
+
+		<div id="lema">
+		<div class="container">
+			<div class="jumbotron row">
+				<img class="img-responsive center-block" id="marker-what-icon" src="/images/intro-marker.png" alt="emapic marker" />
+				<h2>{{#__}}map_your_opinions{{/__}}</h2>
+				<p class="col-md-8 col-md-push-2 text-center">{{#__}}map_your_opinions_desc{{/__}}</p>
+			</div>
+		</div>
+		</div>
+
+{{#yield-scripts}}
+<script type="text/javascript">
+    onInitContactsExpand();
+    $('#intro').height(window.innerHeight - 70);
+    $('#intro').css('min-height', 350);
+    $('#intro-title').css('padding-top', (window.innerHeight - 70) / 4);
+</script>
+{{/yield-scripts}}

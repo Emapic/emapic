@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="{{web_locale}}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="IE=10">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fav and touch icons -->
+    <link rel="shortcut icon" href="/images/favicon.png"/>
+    <link rel="apple-touch-icon" href="/images/touch-icon.png" />
+
+    <title>{{title}}</title>
+
+    <!-- No-js warning -->
+    <noscript>
+        <link rel="stylesheet" type="text/css" href="/stylesheets/no-js.css">
+        <div id="no-js">
+            {{#__}}js_mandatory_alert{{/__}}
+        </div>
+    </noscript>
+
+    <!-- Bootstrap Styles -->
+    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+
+    <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
+    <script type="text/javascript">
+        window.cookieconsent_options = {"message":"{{#__}}cookies_message_body{{/__}}","dismiss":"{{#__}}cookies_dismiss{{/__}}","learnMore":"{{#__}}cookies_learn_more{{/__}}","domain":"localhost","link":"/legal_terms#cookie-policy","theme":"light-floating"};
+    </script>
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
+    <!-- End Cookie Consent plugin -->

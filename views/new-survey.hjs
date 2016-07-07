@@ -1,0 +1,11 @@
+{{#setTitleI18n}}new_survey_title{{/setTitleI18n}}
+
+{{#yield-header}}
+<h2>{{#__}}new_survey{{/__}} <small>/ {{user.login}}</small></h2>
+{{/yield-header}}
+
+{{#yield-styles}}
+{{/yield-styles}}
+
+{{#yield-scripts}}
+{{/yield-scripts}}

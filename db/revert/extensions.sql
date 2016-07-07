@@ -1,0 +1,11 @@
+-- Revert emapic:extensions from pg
+
+BEGIN;
+
+DROP TEXT SEARCH CONFIGURATION IF EXISTS es;
+
+DROP EXTENSION IF EXISTS unaccent;
+
+DROP EXTENSION IF EXISTS postgis;
+
+COMMIT;

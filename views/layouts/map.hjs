@@ -1,0 +1,6 @@
+{{> map_header}}
+<!-- MODALS ------------------------------------------------------>
+{{> map_geoposwarn}}
+{{> map_geoposresult}}
+{{{yield}}}
+{{> map_footer}}

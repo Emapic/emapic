@@ -1,0 +1,34 @@
+<script type="text/javascript">
+    registerI18n('js_anonymous_user', '{{#__}}js_anonymous_user{{/__}}');
+    registerI18n('js_zoom_in', '{{#__}}js_zoom_in{{/__}}');
+    registerI18n('js_zoom_out', '{{#__}}js_zoom_out{{/__}}');
+    registerI18n('js_disable_clustering', '{{#__}}js_disable_clustering{{/__}}');
+    registerI18n('js_total_votes_region', '{{#__}}js_total_votes_region{{/__}}');
+    registerI18n('js_total_votes_country', '{{#__}}js_total_votes_country{{/__}}');
+    registerI18n('js_positive_votes', '{{#__}}js_positive_votes{{/__}}');
+    registerI18n('js_negative_votes', '{{#__}}js_negative_votes{{/__}}');
+    registerI18n('js_total_votes', '{{#__}}js_total_votes{{/__}}');
+    registerI18n('js_see_only_positive_votes', '{{#__}}js_see_only_positive_votes{{/__}}');
+    registerI18n('js_see_only_negative_votes', '{{#__}}js_see_only_negative_votes{{/__}}');
+    registerI18n('js_see_only_votes', '{{#__}}js_see_only_votes{{/__}}');
+    registerI18n('js_see_all_votes', '{{#__}}js_see_all_votes{{/__}}');
+    registerI18n('js_see_my_position', '{{#__}}js_see_my_position{{/__}}');
+    registerI18n('js_see_my_country', '{{#__}}js_see_my_country{{/__}}');
+    registerI18n('js_see_per_country', '{{#__}}js_see_per_country{{/__}}');
+    registerI18n('js_see_whole_world', '{{#__}}js_see_whole_world{{/__}}');
+    registerI18n('js_most_voted', '{{#__}}js_most_voted{{/__}}');
+    registerI18n('js_all', '{{#__}}js_all{{/__}}');
+    registerI18n('js_see_country', '{{#__}}js_see_country{{/__}}');
+    registerI18n('js_country_of_origin', '{{#__}}js_country_of_origin{{/__}}');
+    registerI18n('js_%_positive_votes', '{{#__}}js_%_positive_votes{{/__}}');
+    registerI18n('js_full_date_format', '{{#__}}js_full_date_format{{/__}}');
+    registerI18n('js_week_format', '{{#__}}js_week_format{{/__}}');
+    registerI18n('js_day', '{{#__}}js_day{{/__}}');
+    registerI18n('js_week', '{{#__}}js_week{{/__}}');
+    registerI18n('js_month', '{{#__}}js_month{{/__}}');
+    registerI18n('js_year', '{{#__}}js_year{{/__}}');
+    registerI18n('js_open_legal_terms_another_tab', '{{#__}}js_open_legal_terms_another_tab{{/__}}');
+    registerI18n('js_emapic_legal_terms', '{{#__}}js_emapic_legal_terms{{/__}}');
+    registerI18n('js_geolocate', '{{#__}}js_geolocate{{/__}}');
+    registerI18n('js_geolocate_text', '{{#__}}js_geolocate_text{{/__}}');
+</script>

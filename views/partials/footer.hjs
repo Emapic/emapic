@@ -1,0 +1,44 @@
+
+    <!-- Footer -->
+    <div id="footer">
+			<div class="container text-center">
+				<div class="col-xs-12 col-sm-5 col-sm-offset-4" id="footer-emapic-desc">
+					<h5>{{#__}}powered_by{{/__}} <a class="logos" href="/"><img class="" src="/images/emapic_descriptor.svg" title="Emapic" alt="desc Emapic" /></a></h5>
+				</div>
+				<div class="col-xs-12 col-sm-3 pull-right" id="carto-ets-udc">
+					<a class="logos" href="http://www.udc.es/"><img src="/images/simbolo_UDC.svg" title="Universidade da Coruña" alt="simbolo UDC" /></a>
+					<a class="logos" href="http://caminos.udc.es/"><img src="/images/logo_ETSCaminosAC.svg" title="ETS Caminos, Canales y Puertos de A Coruña" alt="logo Caminos" /></a>
+					<a class="logos" href="http://cartolab.udc.es"><img src="/images/logo_cartolab.svg" title="Laboratorio de Ingeniería Cartográfica" alt="logo Cartolab" /></a>
+				</div>
+			</div>
+		</div>
+
+    <!-- JS -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.8.0/validator.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mouse0270-bootstrap-notify/3.0.2/bootstrap-notify.min.js"></script>
+
+    <script type="text/javascript" src="/libs/date.format.min.js"></script>
+    <script type="text/javascript" src="/javascripts/emapic_index.js"></script>
+    <script type="text/javascript" src="/javascripts/emapic_utils.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('[data-toggle="tooltip"], .bs-tooltip').tooltip();
+            $('.date-to-locale').each(function(i, element) {
+                var el = $(element);
+                var date = new Date(el.attr('date'));
+                el.html(date.format('{{#__}}js_full_date_format{{/__}}'));
+            });
+        });
+    {{#success}}
+        notifications.push("{{{success}}}");
+    {{/success}}
+    {{#error}}
+        errors.push("{{{error}}}");
+    {{/error}}
+    </script>
+    {{{yield-scripts}}}
+</body>
+</html>

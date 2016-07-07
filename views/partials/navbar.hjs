@@ -1,0 +1,43 @@
+<nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+        {{^user}}
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menu-navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        {{/user}}
+        {{#user}}
+            <div class="visible-xs">
+                {{> user_menubar}}
+            </div>
+        {{/user}}
+        <a class="navbar-brand" href="/"><img src="/images/logo.svg" alt="Emapic"/></a>
+        <div class="dropdown pull-left language-selector">
+          <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span><img src="/images/languages-flags/{{web_locale}}.png"/></span>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" onclick="setLocale('es');"><img src="/images/languages-flags/es.png"/></a></li>
+            <li><a href="#" onclick="setLocale('en');"><img src="/images/languages-flags/en.png"/></a></li>
+          </ul>
+        </div>
+    </div>
+
+    <div class="collapse navbar-collapse" id="menu-navbar">
+        <ul class="nav navbar-nav pull-right">
+            {{^user}}
+                <li><a href="/surveys/list">{{#__}}gallery{{/__}}</a></li>
+                <li><a href="/signup">{{#__}}signup{{/__}}</a></li>
+                <li><a href="/login"><button type="button" class="btn btn-primary">{{#__}}login{{/__}}</button></a></li>
+            {{/user}}
+            {{#user}}
+                {{> user_menubar}}
+            {{/user}}
+        </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container -->
+</nav>

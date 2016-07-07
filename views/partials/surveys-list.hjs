@@ -1,0 +1,122 @@
+<div class="col-xs-12">
+<ul class="surveys-list">
+        {{#surveys}}
+        <li>
+            <div class="panel panel-default">
+                <div class="survey-panel-header">
+                    {{#date_opened}}
+                        <span class="badge survey-active-dates {{^active}}survey-closed {{/active}}pull-left" data-toggle="tooltip" data-placement="right" title="{{#active}}{{#__}}tooltip_survey_opened_date{{/__}}{{/active}}{{^active}}{{#__}}tooltip_survey_closed_date{{/__}}{{/active}}">
+                            <span class="opened-date date-to-locale"  date="{{date_opened}}"></span>
+                        {{#date_closed}}
+                            <span> - </span>
+                            <span class="closed-date date-to-locale" date="{{date_closed}}"></span>
+                        {{/date_closed}}
+                        </span>
+                    {{/date_opened}}
+                </div>
+                <div class="panel-body">
+                    <a href="/survey/{{encr_id}}">
+                        <img class="hide-small survey-list-thumbnail" src="/thumbnails/survey/small/{{encr_id}}"></img>
+                    </a>
+                    <div id="survey-descrip">
+                        <h4>
+                            <a id="survey-title" href="/survey/{{encr_id}}">{{title}}</a>
+                            {{^active}}
+                            {{#already_opened}}
+                            <span class="badge status">{{#__}}closed{{/__}}</span>
+                            {{/already_opened}}
+                            {{/active}}
+                            {{#description}}
+                            <p><small>{{ description }}</small></p>
+                            {{/description}}
+                        </h4>
+                        {{#tags}}
+                        <div class="glyphicon glyphicon-tag"></div>
+                        {{#tags_array}}
+                        <a href="/surveys/tag/{{ . }}" class="badge tag">{{ . }}</a>
+                        {{/tags_array}}
+                        {{/tags}}
+                    </div>
+                </div>
+                <div class="panel-footer-with-author">
+                    <div class="survey-list-author">
+                        <div class="avatar pull-left">
+                            <span></span>
+                            <a href="/surveys/user/{{owner.login}}">
+                                <img src="/avatar/{{owner.login}}"></img>
+                            </a>
+                        </div>
+                        <a href="/surveys/user/{{owner.login}}">
+                            <span class="login">{{owner.display_name}}</span>
+                        </a>
+                    </div>
+                    <div class="panel-footer">
+                        {{#active}}
+                        <div class="pull-left">
+                            <a href="/survey/{{encr_id}}">
+                                <button class="btn btn-default btn-md" id="view-survey-btn" data-toggle="tooltip" data-placement="bottom" title="{{#__}}survey{{/__}}">
+                                    <span class="glyphicon glyphicon-play"></span>
+                                </button>
+                            </a>
+                        </div>
+                        
+                        {{#public_results}}
+                        <div class="pull-left">
+                            <a href="/survey/{{encr_id}}/results">
+                                <button class="btn btn-default btn-md" id="results-btn" data-toggle="tooltip" data-placement="bottom" title="{{#__}}results{{/__}}">
+                                    <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+                                </button>
+                            </a>
+                        </div>
+                        {{/public_results}}
+                        {{/active}}
+                        {{^active}}
+                        <div class="pull-left">
+                            <a href="/survey/{{encr_id}}/results">
+                                <button class="btn btn-default btn-md" id="results-btn" data-toggle="tooltip" data-placement="bottom" title="{{#__}}results{{/__}}">
+                                    <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+                                </button>
+                            </a>
+                        </div>
+                        {{/active}}
+                        <div class="dropdown pull-left">
+                            <button class="btn btn-default btn-md dropdown-toggle bs-tooltip" type="button" id="share-url-btn" survey-id="{{encr_id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-placement="right" title="{{#__}}share{{/__}}">
+                                <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
+                            </button>
+                            <ul class="dropdown-menu share-url" aria-labelledby="share-url-btn">
+                                <input class="share-url-box" onclick="this.select();" value="{{web_host}}/survey/{{encr_id}}"/>
+                                <div class="social-btns">
+                                    <a href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u={{#encodeURIComponent}}{{web_host}}/survey/{{encr_id}}{{/encodeURIComponent}}&display=popup&src=share_button" target="_blank">
+                                        <span class="share-sq fa fa-facebook-official">
+                                        </span>
+                                    </a>
+                                    <a href="https://twitter.com/intent/tweet?text={{#encodeURIComponent}}{{title}}{{/encodeURIComponent}}&tw_p=tweetbutton&url={{#encodeURIComponent}}{{web_host}}/survey/{{encr_id}}{{/encodeURIComponent}}" target="_blank">
+                                        <span class="share-sq fa fa-twitter">
+                                        </span>
+                                    </a>
+                                    <a href="https://plus.google.com/share?url={{#encodeURIComponent}}{{web_host}}/survey/{{encr_id}}{{/encodeURIComponent}}" target="_blank">
+                                        <span class="share-sq fa fa-google-plus">
+                                        </span>
+                                    </a>
+                                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{#encodeURIComponent}}{{web_host}}/survey/{{encr_id}}{{/encodeURIComponent}}" target="_blank">
+                                        <span class="share-sq fa fa-linkedin">
+                                        </span>
+                                    </a>
+                                </div>
+                            </ul>
+                        </div>
+
+                        <div class="pull-right">
+                            <label class="badge counter">{{nr_votes}}<span class="hide-small"> {{#__}}survey_answers_footer{{/__}}</span><span class="show-small hide-extrasmall"> {{#__}}survey_answers_footer_abb{{/__}}</span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+        {{/surveys}}
+</ul>
+</div>
+
+<div class="col-xs-12">
+    {{{ pagination }}}
+</div>

@@ -1,0 +1,180 @@
+    {{#yield-styles}}
+    <link rel="stylesheet" href="/libs/spectrum/spectrum.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.css"/>
+    {{/yield-styles}}
+
+    <div class="container content">
+
+    <!-- Modal -->
+    <div id="question-selector" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title">{{#__}}choose_question_type{{/__}}</h2>
+          </div>
+          <div class="modal-body">
+              <div id="question-type-list" class="btn-group-vertical">
+                <div id="question-type-list-radio-group" class="input-group">
+                  <span class="input-group-addon">
+                    <input autocomplete="off" id="question-type-list-radio" type="radio" name="question-type" value="list-radio" checked>
+                  </span>
+                  <div class="form-control question-type-item">
+                      <div>
+                          <label for="question-type-list-radio">
+                            <h3>{{#__}}question_type_list_radio_title{{/__}}</h3>
+                          </label>
+                          <a data-toggle="collapse" data-target="#question-type-list-radio-body" data-parent="#question-type-list" aria-expanded="false" aria-controls="question-type-list-radio-body"><span class="glyphicon glyphicon-chevron-down pull-right"></span></a>
+                      </div>
+                      <div id="question-type-list-radio-body" class="question-type-body collapse">
+                          <label for="question-type-list-radio">
+                            <p class="question-type-description">{{#__}}question_type_list_radio_description{{/__}}</p>
+                            <h4>{{#__}}question_type_legend_title{{/__}}</h4>
+                            <p class="question-type-legend">{{#__}}question_type_list_radio_legend{{/__}}</p>
+                          </label>
+                      </div>
+                  </div>
+                </div>
+                <div id="question-type-text-answer-group" role="tab" class="input-group">
+                  <span class="input-group-addon">
+                    <input autocomplete="off" id="question-type-text-answer" type="radio" name="question-type" value="text-answer">
+                  </span>
+                  <div class="form-control question-type-item">
+                      <div>
+                          <label for="question-type-text-answer">
+                            <h3>{{#__}}question_type_text_answer_title{{/__}}</h3>
+                          </label>
+                          <a data-toggle="collapse" data-target="#question-type-text-answer-body" data-parent="#question-type-list" aria-expanded="false" aria-controls="question-type-text-answer-body"><span class="glyphicon glyphicon-chevron-down pull-right"></span></a>
+                      </div>
+                      <div id="question-type-text-answer-body" class="question-type-body collapse">
+                          <label for="question-type-text-answer">
+                            <p class="question-type-description">{{#__}}question_type_text_answer_description{{/__}}</p>
+                            <h4>{{#__}}question_type_legend_title{{/__}}</h4>
+                            <p class="question-type-legend">{{#__}}question_type_text_answer_legend{{/__}}</p>
+                          </label>
+                      </div>
+                  </div>
+                </div>
+                <div id="question-type-explanatory-text-group" role="tab" class="input-group">
+                  <span class="input-group-addon">
+                    <input autocomplete="off" id="question-type-explanatory-text" type="radio" name="question-type" value="explanatory-text">
+                  </span>
+                  <div class="form-control question-type-item">
+                      <div>
+                          <label for="question-type-explanatory-text">
+                            <h3>{{#__}}question_type_explanatory_text_title{{/__}}</h3>
+                          </label>
+                          <a data-toggle="collapse" data-target="#question-type-explanatory-text-body" data-parent="#question-type-list" aria-expanded="false" aria-controls="question-type-explanatory-text-body"><span class="glyphicon glyphicon-chevron-down pull-right"></span></a>
+                      </div>
+                      <div id="question-type-explanatory-text-body" class="question-type-body collapse">
+                          <label for="question-type-explanatory-text">
+                            <p class="question-type-description">{{#__}}question_type_explanatory_text_description{{/__}}</p>
+                          </label>
+                      </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">{{#__}}cancel{{/__}}</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="Javascript:addSelectedNewQuestion();return false;">{{#__}}accept{{/__}}</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+        <div class="col-xs-12">
+            {{{yield-header}}}
+        </div>
+
+        <div class="col-xs-12">
+            <form class="form-horizontal" data-toggle="validator" role="form" id="survey-form" method="post" autocomplete="off" enctype="multipart/form-data">
+                <input type="hidden" name="survey_id" value="{{survey.id}}"/>
+
+                <div class="col-xs-12" id="inputs-container">
+                    <h3>{{#__}}survey{{/__}}</h3>
+                    <div class="form-group form-group-sm">
+                        <label class="col-md-4 control-label" for="survey_title">{{#__}}title{{/__}}:</label>
+                        <div class="col-md-4">
+                            <input spellcheck="true" class="form-control" required maxlength="150" type="text" name="survey_title" data-error="{{#__}}type_a_title{{/__}}" value="{{survey.title}}">
+                            <div class="help-block with-errors"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_title{{/__}}"></span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-md-4 control-label" for="survey_description">{{#__}}description{{/__}}:</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" maxlength="500" type="text" name="survey_description">{{survey.description}}</textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_description{{/__}}"></span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label class="col-md-4 control-label" for="survey_tags">{{#__}}tags{{/__}}:</label>
+                        <div class="col-md-4">
+                            <input spellcheck="true" class="form-control" maxlength="150" type="text" name="survey_tags" placeholder="{{#__}}placeholder_new_survey_tags{{/__}}" value="{{survey.tags_string}}">
+                        </div>
+                        <div class="col-md-4">
+                            <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_tags{{/__}}"></span>
+                        </div>
+                    </div>
+                    <h4>{{#__}}additional_options{{/__}}</h4>
+                        <div class="form-group form-group-sm">
+                            <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-6 col-md-offset-3 form-checkbox-line">
+                                <div class="col-xs-2 col-md-2">
+                                    <input id="multiple_answer" class="form-control" type="checkbox" name="multiple_answer" {{#survey.multiple_answer}}checked{{/survey.multiple_answer}}>
+                                </div>
+                                <div class="col-xs-8 col-sm-7 col-md-8">
+                                    <label class="control-label adi-opts-label text-left" for="multiple_answer">{{#__}}multiple_answer{{/__}}</label>
+                                </div>
+                                <div class="col-xs-2 col-md-2">
+                                    <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="{{#__}}help_tooltip_new_survey_multiple_answer{{/__}}"></span>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-6 col-md-offset-3 form-checkbox-line">
+                                <div class="col-xs-2 col-md-2">
+                                    <input id="public_results" class="form-control" type="checkbox" name="public_results" {{#survey}}{{#public_results}}checked{{/public_results}}{{/survey}}{{^survey}}checked{{/survey}}>
+                                </div>
+                                <div class="col-xs-8 col-sm-7 col-md-8">
+                                    <label class="control-label adi-opts-label text-left" for="public_results">{{#__}}public_results{{/__}}</label>
+                                </div>
+                                <div class="col-xs-2 col-md-2">
+                                    <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="{{#__}}help_tooltip_new_survey_public_results{{/__}}"></span>
+                                </div>
+                            </div>
+                            {{#is_admin}}
+                            <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-6 col-md-offset-3 form-checkbox-line">
+                                <div class="col-xs-2 col-md-2">
+                                    <input id="dont_list" class="form-control" type="checkbox" name="dont_list" {{#survey.dont_list}}checked{{/survey.dont_list}}>
+                                </div>
+                                <div class="col-xs-8 col-sm-7 col-md-8">
+                                    <label class="control-label adi-opts-label text-left" for="dont_list">{{#__}}dont_list{{/__}}</label>
+                                </div>
+                                <div class="col-xs-2 col-md-2">
+                                    <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="{{#__}}help_tooltip_new_survey_dont_list{{/__}}"></span>
+                                </div>
+                            </div>
+                            {{/is_admin}}
+                        </div>
+                </div>
+
+                <div class="col-xs-12" id="questions-section">
+                    <h3>{{#__}}questions{{/__}}</h3>
+                    <div id="questions"></div>
+                </div>
+
+                <div class="col-xs-12 form-group form-group-sm">
+                    <a href="Javascript:void(0)" data-toggle="modal" data-target="#question-selector"><button class="btn btn-primary pull-left"><span class="glyphicon glyphicon-plus"></span> {{#__}}add_question{{/__}}</button></a>
+                </div>
+                <a class="col-xs-12 col-sm-4 col-sm-offset-1 btn btn-danger btn-lg survey-form-btn" href="/surveys/own">{{#__}}cancel{{/__}}</a>
+                <button id="save-survey-btn" type="submit" class="col-xs-12 col-sm-4 col-sm-offset-2 btn btn-primary btn-lg survey-form-btn">{{#__}}save_survey{{/__}}</button>
+
+            </form>
+        </div>
+
+    </div> <!-- /content -->

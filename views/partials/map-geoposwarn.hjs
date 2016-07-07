@@ -1,0 +1,68 @@
+    <div class="modal" id="geoposwarn" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">{{#__}}geoposwarning_title{{/__}}</h4>
+          </div>
+          <div class="modal-body">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h4 class="panel-title">
+                        <a role="button"{{#user}} class="collapsed"{{/user}} data-toggle="collapse" href="#collapseGeolocation" aria-expanded="true" aria-controls="collapseOne">
+                            {{#__}}geoposwarning_emapic_geopositioning{{/__}}
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseGeolocation" class="panel-collapse collapse{{^user}} in{{/user}}" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+                        <p>{{#__}}geoposwarning_emapic_geopositioning_body_1{{/__}}</p>
+                        <p>{{#__}}geoposwarning_emapic_geopositioning_body_2{{/__}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h4 class="panel-title">
+                        <a role="button"{{^user}} class="collapsed"{{/user}} data-toggle="collapse" href="#collapseOptions" aria-expanded="true" aria-controls="collapseOne">
+                            {{#__}}geoposwarning_options{{/__}}
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseOptions" class="panel-collapse collapse{{#user}} in{{/user}}" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+                        {{#user}}
+                        <p>{{#__}}geoposwarning_options_header_logged{{/__}}</p>
+                        <ul>
+                            <li>{{#__}}geoposwarning_options_auto_title{{/__}}<p>{{#__}}geoposwarning_options_auto_body_logged{{/__}}</p></li>
+                            <li>{{#__}}geoposwarning_options_default_position_title{{/__}}<p>{{#__}}geoposwarning_options_default_position_body{{/__}}</p></li>
+                            <li>{{#__}}geoposwarning_options_manual_title{{/__}}<p>{{#__}}geoposwarning_options_manual_body_logged{{/__}}</p></li>
+                        </ul>
+                        {{/user}}
+                        {{^user}}
+                        <p>{{#__}}geoposwarning_options_header_non_logged{{/__}}</p>
+                        <ul>
+                            <li>{{#__}}geoposwarning_options_manual_title{{/__}}<p>{{#__}}geoposwarning_options_manual_body_non_logged{{/__}}</p></li>
+                            <li>{{#__}}geoposwarning_options_auto_title{{/__}}<p>{{#__}}geoposwarning_options_auto_body_non_logged{{/__}}</p></li>
+                        </ul>
+                        <p>{{#__}}geoposwarning_options_footer_non_logged{{/__}}</p>
+                        {{/user}}
+                    </div>
+                </div>
+            </div>
+			<div id="browser-loc-howto">
+				<h5 class="text-right"><a href="https://translate.google.com/translate?sl=en&tl=es&js=y&prev=_t&hl=es&ie=UTF-8&u=https%3A%2F%2Fwaziggle.com%2FBrowserAllow.aspx&edit-text=&act=url" target="_blank">{{#__}}geoposwarning_allow_browser_howto{{/__}}</a></h5>
+			</div>
+          </div>
+          <div class="modal-footer">
+            {{#user}}
+            <button id="dismiss-btn" type="button" class="col-xs-12 btn btn-danger" data-dismiss="modal">{{#__}}dont_use_geolocation{{/__}}</button>
+            <button id="relocate-btn" type="button" class="col-xs-12 btn btn-primary" onclick="getApiLocation()">{{#__}}retry{{/__}}</button>
+            {{/user}}
+            {{^user}}
+            <button id="dismiss-btn" type="button" class="col-xs-12 col-md-5 btn btn-default" data-dismiss="modal">{{#__}}locate_manually{{/__}}</button>
+            <button id="relocate-btn" type="button" class="col-xs-12 col-md-5 pull-right btn btn-primary" onclick="getApiLocation()">{{#__}}locate_automatically{{/__}}</button>
+            {{/user}}
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>

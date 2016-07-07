@@ -1,0 +1,23 @@
+
+    <script src="/libs/date.format.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.9/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.7/crossfilter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.0.0-beta.30/dc.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mouse0270-bootstrap-notify/3.0.2/bootstrap-notify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jScrollPane/2.0.22/script/jquery.jscrollpane.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.2/leaflet.js"></script>
+    <script src="/libs/leaflet/js/L.Control.Sidebar.js"></script>
+    <script src="/libs/leaflet/js/L.Control.SelectQuestion.js"></script>
+
+    <script src="/javascripts/emapic_utils.js"></script>
+    {{> i18n_emapic_viewer }}
+    <script src="/javascripts/geoapi.js"></script>
+    <script src="/javascripts/emapic_main.js"></script>
+    {{{yield-scripts}}}
+
+</body>
+</html>

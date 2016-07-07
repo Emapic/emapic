@@ -1,0 +1,12 @@
+{{#setTitleI18n}}surveys_title{{/setTitleI18n}}
+
+<div class="container content" id="galery">
+
+
+	<div class="col-xs-12 list-complex-header">
+		<h2 class="col-xs-12">{{#__}}tagged_surveys{{/__}} <small>/ {{tag}}</small></h2>
+	</div>
+
+    {{> surveys_list}}
+
+</div> <!-- /content -->

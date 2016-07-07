@@ -1,0 +1,36 @@
+    <!-- POPUPS ------------------------------------------------------>
+    <div id="popup-form">
+        <form role='form'>
+            <h4>{{#__}}emapic_experience_title{{/__}}</h4>
+            <div class='row'>
+                <div class='form-group'>
+                    <label for='emapic_experience_geolocation_result'>{{#__}}emapic_experience_geolocation_precision{{/__}}:</label>
+                    <select class="form-control" id="emapic_experience_geolocation_result">
+                        <option value="null"></option>
+                        <option value="exact">{{#__}}emapic_experience_geolocation_precision_exact{{/__}}</option>
+                        <option value="approx">{{#__}}emapic_experience_geolocation_precision_approx{{/__}}</option>
+                        <option value="far">{{#__}}emapic_experience_geolocation_precision_far{{/__}}</option>
+                        <option value="didnt_work">{{#__}}emapic_experience_geolocation_precision_didntwork{{/__}}</option>
+                    </select>
+                </div>
+                <div class='form-group'>
+                    <label for='emapic_experience_final_position_reason'>{{#__}}emapic_experience_geolocation_real_position_marker{{/__}}:</label>
+                    <select class="form-control" id="emapic_experience_final_position_reason">
+                        <option value="null"></option>
+                        <option value="same">{{#__}}emapic_experience_geolocation_real_position_marker_same{{/__}}</option>
+                        <option value="want_another_position">{{#__}}emapic_experience_geolocation_real_position_marker_want_another{{/__}}</option>
+                        <option value="near_dont_want_exact">{{#__}}emapic_experience_geolocation_real_position_marker_near{{/__}}</option>
+                        <option value="far_dont_want_exact">{{#__}}emapic_experience_geolocation_real_position_marker_far{{/__}}</option>
+                        <option value="other">{{#__}}emapic_experience_geolocation_real_position_marker_other{{/__}}</option>
+                    </select>
+                </div>
+                <div class='form-group'>
+                    <label for='emapic_experience_comments'>{{#__}}comments{{/__}}:</label>
+                    <textarea class="form-control" id="emapic_experience_comments"></textarea>
+                </div>
+            </div>
+        </form>
+        <div class='row text-center'>
+            <button type='submit' class='btn btn-success' onclick='submitMarkerPopupData()'>{{#__}}end_survey{{/__}}</button>
+        </div>
+    </div>

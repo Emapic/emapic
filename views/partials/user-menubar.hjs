@@ -1,0 +1,17 @@
+
+<li class="dropdown pull-right" id="menuLoggedIn">
+    <a class="dropdown-toggle" href="#" data-toggle="dropdown" id="navLogin"><button type="button" class="btn btn-primary btn-sm">
+        <span class="hidden-xs">{{user.login}}</span>
+        <img class="user-avatar-sm" src="/avatar" />
+    </button></a>
+    <ul class="dropdown-menu" role="menu">
+        <li><a href="/dashboard"><span class="glyphicon glyphicon-home"></span> {{#__}}dashboard{{/__}}</a></li>
+        <li><a href="/surveys/new"><span class="glyphicon glyphicon-plus"></span> {{#__}}create_new_survey{{/__}}</a></li>
+        <li><a href="/surveys/own"><span class="glyphicon glyphicon-edit"></span> {{#__}}own_surveys{{/__}}</a></li>
+        <li><a href="/surveys/answered"><span class="glyphicon glyphicon-check"></span> {{#__}}answered_surveys{{/__}}</a></li>
+        <li><a href="/surveys/list"><span class="glyphicon glyphicon-list"></span> {{#__}}published_surveys{{/__}}</a></li>
+        <li role="separator" class="divider"></li>
+        <li><a href="/profile"><span class="glyphicon glyphicon-user"></span> {{#__}}profile{{/__}}</a></li>
+        <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> {{#__}}logout{{/__}}</a></li>
+    </ul>
+</li>

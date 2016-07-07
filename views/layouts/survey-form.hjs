@@ -1,0 +1,6 @@
+{{> header}}
+{{> navbar}}
+{{{yield}}}
+{{> survey_form}}
+{{> footer}}
+{{> survey_form_scripts}}

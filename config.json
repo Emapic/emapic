@@ -1,0 +1,48 @@
+{
+    "app": {
+        "searchEngineLang": "es",
+        "emapicOpinionFreq": "0",
+        "surveyIdEncr": {
+            "factor": 917000000,
+            "base": 62
+        }
+    },
+    "db": {
+        "host": "localhost",
+        "port": "5432",
+        "database": "emapic",
+        "user": "emapic",
+        "password": "emapic"
+    },
+    "oAuth": {
+        "google": {
+            "clientID": "dumb",
+            "clientSecret": "dumb"
+        },
+        "facebook": {
+            "clientID": "dumb",
+            "clientSecret": "dumb"
+        }
+    },
+    "server": {
+        "domain": "localhost:3000",
+        "ipaddr": "127.0.0.1",
+        "httpsport": "3000",
+        "httpport": "3001",
+        "secrets": {
+            "cookie": "4ZBIwmMCq15K+MelM=+EsxNc4bsxGYQNtDhEjDpJ11JP",
+            "session": "w2Bopk5tFe34uNqoc5sf90ge18K8RfrUCx0aJqBD"
+        },
+        "ssl": {
+            "key":  "./test-key.key",
+            "cert": "./test-cert.crt"
+        }
+    },
+    "smtp": {
+        "host": "dumb",
+        "port": "dumb",
+        "from": "dumb",
+        "user": "dumb",
+        "pass": "dumb"
+    }
+}

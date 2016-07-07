@@ -1,0 +1,64 @@
+{{#setTitleI18n}}user_dashboard_title{{/setTitleI18n}}
+
+<style>
+
+</style>
+
+<div class="container content">
+
+	<div class="col-xs-12">
+		<h2>{{#__}}welcome{{/__}} {{user.display_name}}!</h2>
+	</div>
+
+	<div class="col-xs-12 col-sm-5 col-md-4 dashboard-content" id="dashboard-user-desc">
+		<div class="avatar-wrapper">
+			<img class="img-responsive img-thumbnail user-avatar" src="/avatar"></img>
+		</div>
+		<a href="/profile"><button class="btn btn-primary"><span class="glyphicon glyphicon-pencil"></span> {{#__}}edit_profile{{/__}}</button></a>
+		<h2>{{#user.name}}
+                {{user.display_name}}
+            {{/user.name}}
+            <big><p>{{user.login}}</p></big>
+			<p>{{#__}}joined{{/__}} <span class="joined-date" date="{{user.join_date}}"></span></p>
+		</h2>
+		<div class="btn-group" role="group" id="dashboard-user-stats">
+			<a href="/surveys/answered"><button class="btn btn-default btn-lg">{{ans_count}}<p>{{#__}}answered{{/__}}</p></button></a>
+			<a href="/surveys/own"><button class="btn btn-default btn-lg">{{cre_count}}<p>{{#__}}published{{/__}}</p></button></a>
+			<a href="/surveys/new"><button id="btn-new-survey" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-plus"></span><p>{{#__}}new{{/__}}</p></button></a>
+		</div>
+	</div>
+
+	<div class="col-xs-12 col-sm-7 col-md-8 dashboard-content" id="dashboard-recent-list">
+        <h4>{{#__}}answered_recent{{/__}}:</h4>
+        <hr>
+		<ul class="surveys-list answered-surveys-list">
+			{{#answered}}
+			<li>
+                <a id="survey-title" href="/survey/{{survey.encr_id}}/results">{{survey.title}}</a>
+                <div class="col-xs-12">
+                {{#survey.description}}
+                    <span><small>{{survey.description}}</small></span>
+                </div>
+                {{/survey.description}}
+			</li>
+            <hr class="col-xs-12">
+			{{/answered}}
+		</ul>
+        <h6><a href="/surveys/answered">{{#__}}see_all{{/__}}</a></h6>
+	</div>
+
+	</div>
+
+</div> <!-- /content -->
+
+{{#yield-scripts}}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.joined-date').each(function(i, element) {
+            var el = $(element);
+            var date = new Date(el.attr('date'));
+            el.html(date.toLocaleDateString());
+        });
+    });
+</script>
+{{/yield-scripts}}

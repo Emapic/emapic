@@ -1,0 +1,539 @@
+{{#yield-scripts}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.4.4/randomColor.min.js"></script>
+<script src="/libs/spectrum/spectrum.js"></script>
+<script type="text/javascript">
+
+    // Workaround for having the validator check that the survey has any questions
+    $().validator.prototype.constructor.Constructor.prototype.isIncomplete = function () {
+        function fieldIncomplete() {
+          return this.type === 'checkbox' ? !this.checked                                   :
+                 this.type === 'radio'    ? !$('[name="' + this.name + '"]:checked').length :
+                                            $.trim(this.value) === '';
+        }
+        return ($('div.question-group:not(.not-question)').length === 0) || !!this.$element.find(':input[required]:enabled').filter(fieldIncomplete).length;
+    };
+
+    var questionsMap
+        {{#questionsMap}}
+        = {{{questionsMap}}}
+        {{/questionsMap}},
+        spectrumOptions = {
+            preferredFormat: "hex",
+            showInput: true,
+            showPaletteOnly: true,
+            togglePaletteOnly: true,
+            showSelectionPalette: true,
+            localStorageKey: "spectrum.newSurvey", // Any Spectrum with the same string will share selection
+            maxSelectionSize: 8,
+            hideAfterPaletteSelect:true,
+            showInitial: true,
+            showInput: true,
+            chooseText: "{{#__}}js_spectrum_choose{{/__}}",
+            cancelText: "{{#__}}js_spectrum_cancel{{/__}}",
+            togglePaletteMoreText: "{{#__}}js_spectrum_more{{/__}}",
+            togglePaletteLessText: "{{#__}}js_spectrum_less{{/__}}",
+            palette: [
+                ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
+                ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
+                ["#f4cccc","#fce5cd","#fff2cc","#d9ead3","#d0e0e3","#cfe2f3","#d9d2e9","#ead1dc"],
+                ["#ea9999","#f9cb9c","#ffe599","#b6d7a8","#a2c4c9","#9fc5e8","#b4a7d6","#d5a6bd"],
+                ["#e06666","#f6b26b","#ffd966","#93c47d","#76a5af","#6fa8dc","#8e7cc3","#c27ba0"],
+                ["#c00","#e69138","#f1c232","#6aa84f","#45818e","#3d85c6","#674ea7","#a64d79"],
+                ["#900","#b45f06","#bf9000","#38761d","#134f5c","#0b5394","#351c75","#741b47"],
+                ["#600","#783f04","#7f6000","#274e13","#0c343d","#073763","#20124d","#4c1130"]
+            ]
+        };
+
+    $(function() {
+        var questionsDrake = dragula([document.getElementById('questions')], {
+            moves: function (el, container, handle) {
+                return $(handle).hasClass('question-handle');
+            }
+        });
+        questionsDrake.on('drag', function(el, source) {
+            $(el).find('.question-handle').addClass('grabbing');
+            collapsePanel(el);
+        });
+        questionsDrake.on('dragend', function(el) {
+            $(el).find('.question-handle').removeClass('grabbing');
+            renameQuestions($('.question-group'));
+        });
+        $('#survey-form').validator();
+        $(document).on('click', 'div.panel-heading[data-toggle="collapse"]', function(e){
+            $(this).parent().find('.panel-body').toggleClass('collapse');
+            $(this).find('span').toggleClass('glyphicon-chevron-up');
+            $(this).find('span').toggleClass('glyphicon-chevron-down');
+        });
+        $(".question-type-body").on("hide.bs.collapse", function(evt) {
+            var chevron = $(evt.target).parent().find('span.glyphicon-chevron-up');
+            chevron.removeClass('glyphicon-chevron-up');
+            chevron.addClass('glyphicon-chevron-down');
+        });
+        $(".question-type-body").on("show.bs.collapse", function(evt) {
+            var chevron = $(evt.target).parent().find('span.glyphicon-chevron-down');
+            chevron.removeClass('glyphicon-chevron-down');
+            chevron.addClass('glyphicon-chevron-up');
+            $('#question-type-list .collapse.in').collapse('hide');
+        });
+        $('.spectrum').spectrum(spectrumOptions);
+         if (questionsMap) {
+			populateQuestions();
+            $('#survey-form').validator('validate');
+         }
+    });
+    function collapsePanel(el) {
+        $(el).find('.panel-body').addClass('collapse');
+        $(el).find('span.glyphicon-chevron-up').addClass('glyphicon-chevron-down').removeClass('glyphicon-chevron-up');
+    }
+    function responsesImgChanged(input) {
+        var $this = $(input),
+            $parent = $this.parent().parent().parent().parent();
+        if ($this.is(':checked')) {
+            $parent.find('#answers .answer-img-group input').prop('disabled', false);
+            if ($parent.find('#answer_other input[type="checkbox"]').is(':checked')) {
+                $parent.find('#answer_other .answer-img-group input').prop('disabled', false);
+            }
+            $parent.find('.answer-img-group').show();
+        } else {
+            $parent.find('.answer-img-group').hide();
+            if ($parent.find('#answer_other input[type="checkbox"]').is(':checked')) {
+                $parent.find('#answer_other .answer-img-group input').prop('disabled', true);
+            }
+            $parent.find('#answers .answer-img-group input').prop('disabled', true);
+        }
+    }
+    function responsesOtherChanged(input) {
+        var $this = $(input),
+            $parent = $this.parent().parent();
+        if ($this.is(':checked')) {
+            $parent.find('input:not([type="checkbox"]):not(.spectrum)').prop('disabled', false);
+            $parent.find('input.spectrum').spectrum("enable");
+            if ($parent.parent().find('.answer-img-group').is(':visible')) {
+                $parent.parent().find('.answer-img-group input').prop('disabled', false);
+            }
+        } else {
+            $parent.find('input:not([type="checkbox"]):not(.spectrum)').prop('disabled', true);
+            $parent.find('input.spectrum').spectrum("disable");
+            if ($parent.parent().find('.answer-img-group').is(':visible')) {
+                $parent.parent().find('.answer-img-group input').prop('disabled', true);
+            }
+        }
+    }
+    function populateQuestions() {
+		for (var i = 0, len = questionsMap.length; i<len; i++) {
+			populateQuestion(i + 1, questionsMap[i]);
+		}
+    }
+    function populateQuestion(qstn, questionMap) {
+        switch (questionMap.type) {
+            case 'list-radio':
+                if (!$('#qstn_' + qstn).length) {
+                    addNewQuestion(questionMap.type);
+                }
+                $('input[name="question_' + qstn + '"]').val(questionMap.question);
+                for (var i = 0, len = questionMap.answers.length; i<len; i++) {
+                    populateOption(qstn, i + 1, questionMap.answers[i], questionMap.type);
+                }
+                break;
+            case 'text-answer':
+                if (!$('#qstn_' + qstn).length) {
+                    addNewQuestion(questionMap.type);
+                }
+                $('input[name="question_' + qstn + '"]').val(questionMap.question);
+                break;
+            case 'explanatory-text':
+                if (!$('#qstn_' + qstn).length) {
+                    addNewQuestion(questionMap.type);
+                }
+                $('textarea[name="question_' + qstn + '"]').val(questionMap.question);
+                break;
+        }
+    }
+    function populateOption(qstn, ansr, answerMap, qstnType) {
+        switch (qstnType) {
+            case 'list-radio':
+                // If order is -1, it means it's an 'Other' option.
+                // 'Other' options are always last in the array, which means dealing
+                // with them this way won't mess with the rest of the options' order
+                if (answerMap.order != -1) {
+                    if (!$('#answer_' + qstn + '_' + ansr).length) {
+                        var answ = $('#qstn_' + qstn + ' #answers div.answer-group').length + 1;
+                        addNewOptionEffective(qstn, answ, answerMap.answer, answerMap.legend, answerMap.imageUrl, answerMap.id);
+                    } else {
+                        $('input[name="id_' + qstn + '_' + ansr + '"]').val(answerMap.id);
+                        $('input[name="option_' + qstn + '_' + ansr + '"]').val(answerMap.answer);
+                        $('input[name="option_' + qstn + '_' + ansr + '_color"]').spectrum("set", answerMap.legend);
+                        if (answerMap.imageUrl != null) {
+                            $('input[type="checkbox"][name="responses_img_' + qstn + '"]').prop("checked",true).trigger("change");
+                            var $img = $('#answer_' + qstn + '_' + ansr + ' .answer-img');
+                            $img.css('background-image', "url('" + answerMap.imageUrl + "')");
+                            $('input[type="file"][name="img_' + qstn + '_' + ansr + '"]').removeAttr('required');
+                            $('#answer_' + qstn + '_' + ansr + ' .answer-img-container').show();
+                        }
+                    }
+                } else {
+                    $('input[name="responses_' + qstn + '_other"]').prop("checked", true).trigger("change");
+                    $('input[name="id_' + qstn + '_other"]').val(answerMap.id);
+                    $('input[name="option_' + qstn + '_other"]').val(answerMap.answer);
+                    $('input[name="option_' + qstn + '_other_color"]').spectrum("set", answerMap.legend);
+                    if (answerMap.imageUrl != null) {
+                        $('input[type="checkbox"][name="responses_img_' + qstn + '"]').prop("checked",true).trigger("change");
+                        var $img = $('#answer_' + qstn + '_other .answer-img');
+                        $img.css('background-image', "url('" + answerMap.imageUrl + "')");
+                        $('input[type="file"][name="img_' + qstn + '_other"]').removeAttr('required');
+                        $('#answer_' + qstn + '_other .answer-img-container').show();
+                    }
+                }
+                break;
+            case 'text-answer':
+            case 'explanatory-text':
+                break;
+        }
+    }
+    function addNewOption(btn) {
+        var qstn = parseInt($(btn).parents('div.question-group').attr('id').split('_')[1]);
+        var nrAnswers = $(btn).parents('div.question-group').find('#answers div.answer-group').length;
+        if ((nrAnswers != 8) || confirm('{{#__}}confirm_more_options{{/__}}')) {
+            addNewOptionEffective(qstn, nrAnswers+1, '', randomColor(), null, null);
+            $('#survey-form').find('input[type="submit"], button[type="submit"]').addClass('disabled');
+        }
+    }
+    function addNewOptionEffective(qstn, answ, value, legend, imageUrl, id) {
+        addNewOptionHtml(qstn, answ, value, legend, imageUrl, id);
+        $('[data-toggle="tooltip"]').tooltip();
+        $('#qstn_' + qstn + ' #answers').find('button.delete-survey-answer').prop('disabled', false);
+    }
+    function addSelectedNewQuestion() {
+        var selected = $("#question-selector input[type='radio'][name='question-type']:checked");
+        if (selected.length > 0) {
+            addNewQuestion(selected.val());
+        }
+    }
+    function addNewQuestion(type) {
+        $('.panel-body').addClass('collapse');
+        $('.panel-heading span').removeClass('glyphicon-chevron-up');
+        $('.panel-heading span').addClass('glyphicon-chevron-down');
+        addNewQuestionHtml($('div.question-group').length + 1, type);
+        $('#questions > .panel > .panel-body').last().removeClass('collapse');
+        $('[data-toggle="tooltip"]').tooltip();
+        $('#survey-form').find('input[type="submit"], button[type="submit"]').addClass('disabled');
+    }
+    function addNewQuestionHtml(qstn, type) {
+        switch (type) {
+            case 'list-radio':
+                $('#questions').append('\
+                    <div class="panel panel-default question-group" id="qstn_' + qstn + '">\
+                        <input type="hidden" name="question_type_' + qstn + '" value="' + type + '"/>\
+                        <div class="panel-heading" data-toggle="collapse">\
+                            <div class="question-handle glyphicon glyphicon-move"></div><a>{{#__}}question{{/__}} ' + qstn + ' - {{#__}}question_type_list_radio_title{{/__}}<span class="glyphicon glyphicon-chevron-up pull-right"></span></a>\
+                        </div>\
+                        <div class="panel-body collapse">\
+                            <div class="form-group form-group-sm">\
+                                <div class="col-xs-12">\
+                                    <h4><label>{{#__}}question{{/__}}</label>\
+                                        <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_question{{/__}}"></span>\
+                                        <button class="btn btn-danger pull-right delete-survey-question" onclick="deleteQuestion(this)" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_question{{/__}}">\
+                                            <span class="glyphicon glyphicon-trash"></span>\
+                                        </button>\
+                                    </h4>\
+                                </div>\
+                                <div class="col-xs-12 col-md-4 col-md-offset-4">\
+                                    <input spellcheck="true" class="form-control" type="text" required maxlength="150" name="question_' + qstn + '" data-error="{{#__}}type_a_question{{/__}}" >\
+                                    <div class="help-block with-errors"></div>\
+                                </div>\
+                            </div>\
+                            \
+                            <div id="answers">\
+                            \
+                                <div id="answers-title" class="form-group form-group-sm">\
+                                    <div class="col-xs-12">\
+                                        <h4><label>{{#__}}answers{{/__}}</label>\
+                                            <span class="glyphicon glyphicon-question-sign help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_answers{{/__}}"></span>\
+                                        </h4>\
+                                    </div>\
+                                </div>\
+                                <div class="col-xs-12 form-group form-group-sm form-checkbox-line">\
+                                    <div class="col-xs-2 col-md-1 col-sm-offset-2 col-md-offset-3">\
+                                        <input id="responses_img_' + qstn + '" class="form-control" type="checkbox" onchange="responsesImgChanged(this)" name="responses_img_' + qstn + '" {{#responses_img}}checked{{/responses_img}}>\
+                                    </div>\
+                                    <div class="col-xs-8 col-sm-4 col-md-4">\
+                                        <label class="control-label" for="responses_img_' + qstn + '">{{#__}}responses_image{{/__}}:</label>\
+                                    </div>\
+                                    <div class="col-xs-2 col-md-1">\
+                                        <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_responses_image{{/__}}"></span>\
+                                    </div>\
+                                </div>\
+                                <div id="answer_groups">\
+                                    <div class="answer-group col-xs-12 form-horizontal" id="answer_' + qstn + '_1">\
+                                        <div class="form-group">\
+                                            <input type="hidden" name="id_' + qstn + '_1"/>\
+                                            <label class="col-xs-12 col-sm-3 text-right control-label">\
+                                                <button class="btn btn-danger delete-survey-answer" disabled onclick="deleteOption(this)" data-placement="top" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_answer{{/__}}">\
+                                                    <span class="glyphicon glyphicon-trash"></span>\
+                                                </button>\
+                                                <div class="answer-handle glyphicon glyphicon-move"></div>\
+                                                <span>{{#__}}option{{/__}} 1:</span>\
+                                            </label>\
+                                            <div class="col-xs-12 col-sm-6 form-group-sm">\
+                                                <input spellcheck="true" class="form-control" required type="text" required maxlength="150" name="option_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" >\
+                                                <div class="help-block with-errors"></div>\
+                                            </div>\
+                                            <div class="col-xs-12 col-sm-3 form-group">\
+                                                <input type="text" name="option_' + qstn + '_1_color" class="spectrum form-control" value="' + randomColor() + '">\
+                                            </div>\
+                                        </div>\
+                                        <div class="form-group answer-img-group" style="display: none;">\
+                                            <div class="col-xs-12 col-md-2 col-md-offset-1"><div class="answer-img-container" style="display:none;"><div class="answer-img pull-left"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
+                                            <label class="col-xs-12 col-md-2 text-right control-label">{{#__}}image{{/__}}:</label>\
+                                            <div class="col-xs-12 col-md-7">\
+                                                <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" />\
+                                                <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
+                                            </div>\
+                                        </div>\
+                                    </div>\
+                                    <div class="answer-group col-xs-12 form-horizontal" id="answer_' + qstn + '_2">\
+                                        <div class="form-group">\
+                                            <input type="hidden" name="id_' + qstn + '_2"/>\
+                                            <label class="col-xs-12 col-sm-3 text-right control-label">\
+                                                <button class="btn btn-danger delete-survey-answer" disabled onclick="deleteOption(this)" data-placement="top" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_answer{{/__}}">\
+                                                    <span class="glyphicon glyphicon-trash"></span>\
+                                                </button>\
+                                                <div class="answer-handle glyphicon glyphicon-move"></div>\
+                                                <span>{{#__}}option{{/__}} 2:</span>\
+                                            </label>\
+                                            <div class="col-xs-12 col-sm-6 form-group-sm">\
+                                                <input spellcheck="true" class="form-control" required type="text" required maxlength="150" name="option_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" >\
+                                                <div class="help-block with-errors"></div>\
+                                            </div>\
+                                            <div class="col-xs-12 col-sm-3 form-group">\
+                                                <input type="text" name="option_' + qstn + '_2_color" class="spectrum form-control" value="' + randomColor() + '">\
+                                            </div>\
+                                        </div>\
+                                        <div class="form-group answer-img-group" style="display: none;">\
+                                            <div class="col-xs-12 col-md-2 col-md-offset-1"><div class="answer-img-container" style="display:none;"><div class="answer-img pull-left"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
+                                            <label class="col-xs-12 col-md-2 text-right control-label">{{#__}}image{{/__}}:</label>\
+                                            <div class="col-xs-12 col-md-7">\
+                                                <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" />\
+                                                <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
+                                            </div>\
+                                        </div>\
+                                    </div>\
+                                </div>\
+                            \
+                            </div>\
+                            \
+                            <div class="col-xs-12 text-center form-group form-group-sm">\
+                                <a href="Javascript:void(0)" class="btn btn-default btn-md" onclick="Javascript:addNewOption(this);return false;"><span class="glyphicon glyphicon-plus"></span> {{#__}}add_option{{/__}}</a>\
+                            </div>\
+                            \
+                            <div id="answer_other">\
+                                <div id="answer_' + qstn + '_other" class="answer-group col-xs-12 form-horizontal">\
+                                    <div class="form-group">\
+                                        <input disabled type="hidden" name="id_' + qstn + '_other"/>\
+                                        <label class="col-xs-12 col-sm-3 control-label">\
+                                            <span class="glyphicon glyphicon-question-sign help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title=\'{{#__}}help_tooltip_option_other_answer{{/__}}\'></span>\
+                                            <input type="checkbox" name="responses_' + qstn + '_other" onchange="responsesOtherChanged(this)">\
+                                            <span>{{#__}}option_other{{/__}}:</span>\
+                                        </label>\
+                                        <div class="col-xs-12 col-sm-6 form-group-sm">\
+                                            <input spellcheck="true" class="form-control" required maxlength="150" disabled type="text" value="{{#__}}option_other_default_value{{/__}}" name="option_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}">\
+                                            <div class="help-block with-errors"></div>\
+                                        </div>\
+                                        <div class="col-xs-12 col-sm-3 form-group">\
+                                            <input type="text" name="option_' + qstn + '_other_color" disabled class="spectrum form-control" value="#000000">\
+                                        </div>\
+                                    </div>\
+                                    <div class="form-group answer-img-group" style="display: none;">\
+                                        <div class="col-xs-12 col-sm-2 col-sm-offset-1"><div class="answer-img-container" style="display:none;"><div class="answer-img pull-left"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
+                                        <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
+                                        <div class="col-xs-12 col-sm-7">\
+                                            <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}" />\
+                                            <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
+                                        </div>\
+                                    </div>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </div>');
+                $("#qstn_" + qstn + " .spectrum").spectrum(spectrumOptions);
+                var optionsDrake = dragula([$('#qstn_' + qstn + ' #answer_groups')[0]], {
+                    moves: function (el, container, handle) {
+                        return $(handle).hasClass('answer-handle');
+                    }
+                });
+                optionsDrake.on('drag', function(el, source) {
+                    $(el).find('.answer-handle').addClass('grabbing');
+                });
+                optionsDrake.on('dragend', function(el) {
+                    $(el).find('.answer-handle').removeClass('grabbing');
+                    renameOptions($(el).parent().find('.answer-group'));
+                });
+                break;
+            case 'text-answer':
+                $('#questions').append('\
+                    <div class="panel panel-default question-group" id="qstn_' + qstn + '">\
+                        <input type="hidden" name="question_type_' + qstn + '" value="' + type + '"/>\
+                        <div class="panel-heading" data-toggle="collapse">\
+                            <div class="question-handle glyphicon glyphicon-move"></div><a>{{#__}}question{{/__}} ' + qstn + ' - {{#__}}question_type_text_answer_title{{/__}}<span class="glyphicon glyphicon-chevron-up pull-right"></span></a>\
+                        </div>\
+                        <div class="panel-body collapse">\
+                            <div class="form-group form-group-sm">\
+                                <div class="col-xs-12">\
+                                    <h4><label>{{#__}}question{{/__}}</label>\
+                                        <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_question{{/__}}"></span>\
+                                        <button class="btn btn-danger pull-right delete-survey-question" onclick="deleteQuestion(this)" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_question{{/__}}">\
+                                            <span class="glyphicon glyphicon-trash"></span>\
+                                        </button>\
+                                    </h4>\
+                                </div>\
+                                <div class="col-xs-12 col-md-4 col-md-offset-4">\
+                                    <input spellcheck="true" class="form-control" type="text" required maxlength="150" name="question_' + qstn + '" data-error="{{#__}}type_a_question{{/__}}" >\
+                                    <div class="help-block with-errors"></div>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </div>');
+                break;
+            case 'explanatory-text':
+                $('#questions').append('\
+                    <div class="panel panel-default question-group not-question" id="qstn_' + qstn + '">\
+                        <input type="hidden" name="question_type_' + qstn + '" value="' + type + '"/>\
+                        <div class="panel-heading" data-toggle="collapse">\
+                            <div class="question-handle glyphicon glyphicon-move"></div><a>{{#__}}question{{/__}} ' + qstn + ' - {{#__}}question_type_explanatory_text_title{{/__}}<span class="glyphicon glyphicon-chevron-up pull-right"></span></a>\
+                        </div>\
+                        <div class="panel-body collapse">\
+                            <div class="form-group form-group-sm">\
+                                <div class="col-xs-12">\
+                                    <h4><label>{{#__}}text{{/__}}</label>\
+                                        <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_explanatory_text{{/__}}"></span>\
+                                        <button class="btn btn-danger pull-right delete-survey-question" onclick="deleteQuestion(this)" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_question{{/__}}">\
+                                            <span class="glyphicon glyphicon-trash"></span>\
+                                        </button>\
+                                    </h4>\
+                                </div>\
+                                <div class="col-xs-12 col-md-8 col-md-offset-2">\
+                                    <textarea spellcheck="true" class="form-control" type="text" required maxlength="1000" name="question_' + qstn + '" data-error="{{#__}}type_a_text{{/__}}"></textarea>\
+                                    <div class="help-block with-errors"></div>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </div>');
+                break;
+        }
+    }
+    function addNewOptionHtml(qstn, answ, value, legend, imageUrl, id) {
+        var responses_img = $('input[name="responses_img_' + qstn + '"]').is(':checked');
+        $('#qstn_' + qstn + ' #answer_groups').append('\
+            <div class="answer-group col-xs-12 form-horizontal" id="answer_' + qstn + '_' + answ + '">\
+                <div class="form-group">\
+                    <input type="hidden" name="id_' + qstn + '_' + answ + '" ' + (id != null ? 'value="' + id + '"' : '') + '/>\
+                    <label class="col-xs-12 col-sm-3 text-right control-label">\
+                        <button class="btn btn-danger delete-survey-answer" onclick="deleteOption(this)" data-placement="top" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_answer{{/__}}">\
+                            <span class="glyphicon glyphicon-trash"></span>\
+                        </button>\
+                        <div class="answer-handle glyphicon glyphicon-move"></div>\
+                        <span>{{#__}}option{{/__}} ' + answ + ':</span>\
+                    </label>\
+                    <div class="col-xs-12 col-sm-6 form-group-sm">\
+                        <input spellcheck="true" class="form-control" type="text" required maxlength="150" name="option_' + qstn + '_' + answ + '" data-error="{{#__}}type_an_option{{/__}}" value="' + value + '">\
+                        <div class="help-block with-errors"></div>\
+                    </div>\
+                    <div class="col-xs-12 col-sm-3 form-group">\
+                        <input type="text" value="' + legend + '" name="option_' + qstn + '_' + answ + '_color" class="spectrum form-control">\
+                    </div>\
+                </div>\
+                <div class="form-group answer-img-group"' + (responses_img ? '' : ' style="display: none;"' ) + '>\
+                    <div class="col-xs-12 col-md-2 col-md-offset-1">' +
+                    (imageUrl != null ? '<div class="answer-img-container"><div class="answer-img pull-left" style="background-image: url(\'' + imageUrl + '\');"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div>' : '') +
+                    '</div>\
+                    <label class="col-xs-12 col-md-2 text-right control-label">{{#__}}image{{/__}}:</label>\
+                    <div class="col-xs-12 col-md-7">\
+                        <input class="form-control" ' + (imageUrl ? '' : 'required ' ) + (responses_img ? '' : 'disabled ' ) + 'type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_' + answ + '" />\
+                        <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
+                    </div>\
+                </div>\
+            </div>');
+        $("#answer_" + qstn + "_" + answ + " .spectrum").spectrum(spectrumOptions);
+    }
+    function deleteQuestion(btn) {
+        if (confirm('{{#__}}delete_survey_question_confirmation{{/__}}')) {
+            deleteQuestionEffective($(btn).parents('div.panel'));
+            $('#survey-form').validator('validate');
+        }
+    }
+    function deleteQuestionEffective($qstn) {
+        var postSiblings = $qstn.nextAll();
+        $qstn.remove();
+        renameQuestions(postSiblings);
+    }
+    function renameQuestions($qstns) {
+        for (var i = 0, len = $qstns.length; i<len; i++) {
+            var $qstn = $($qstns[i]);
+            var oldNr = parseInt($qstn.attr('id').split('_')[1]);
+            var newNr = $qstn.index() + 1;
+            updateQuestionComponentAttr($qstn, 'id', newNr);
+            var $heading = $qstn.find('div.panel-heading a');
+            var headingText = $heading.html();
+            $heading.html(headingText.replace('{{#__}}question{{/__}} ' + oldNr, '{{#__}}question{{/__}} ' + newNr));
+            $qstn.find('input, textarea').each(function(idx, el) {
+                updateQuestionComponentAttr($(el), 'name', newNr);
+            });
+        }
+    }
+    function updateQuestionComponentAttr($el, attr, nr) {
+        var comps = $el.attr(attr).split('_');
+        var i, len = comps.length;
+        for (i = 0; i<len; i++) {
+            if (!isNaN(comps[i])) {
+                break;
+            }
+        }
+        if (i) {
+            comps[i] = nr;
+            $el.attr(attr, comps.join('_'));
+        }
+    }
+    function deleteOption(btn) {
+        var $answers = $(btn).parents('#answers');
+        var nrAnswers = $answers.find('div.answer-group').length;
+        if (nrAnswers > 2 && confirm('{{#__}}delete_survey_answer_confirmation{{/__}}')) {
+            deleteOptionEffective($(btn).parents('div.answer-group'));
+            $('#survey-form').validator('validate');
+            if (nrAnswers == 3) {
+                $answers.find('button.delete-survey-answer').prop('disabled', true);
+            }
+        }
+    }
+    function deleteOptionEffective($answ) {
+        var next = $answ.nextAll();
+        $answ.remove();
+        renameOptions(next);
+    }
+    function renameOptions($answs) {
+        for (var i = 0, len = $answs.length; i<len; i++) {
+            var $answ = $($answs[i]);
+            var newNr = $answ.index() + 1;
+            updateOptionComponentAttr($answ, 'id', newNr);
+            var $heading = $answ.find('div.form-group > label > span');
+            $heading.text('{{#__}}option{{/__}} ' + newNr + ':');
+            $answ.find('input, textarea').each(function(idx, el) {
+                updateOptionComponentAttr($(el), 'name', newNr);
+            });
+        }
+    }
+    function updateOptionComponentAttr($el, attr, nr) {
+        var comps = $el.attr(attr).split('_');
+        var i, len = comps.length;
+        for (i = 0; i<len; i++) {
+            if (!isNaN(comps[i])) {
+                break;
+            }
+        }
+        if (i && (len > i) && !isNaN(comps[i+1])) {
+            comps[i+1] = nr;
+            $el.attr(attr, comps.join('_'));
+        }
+    }
+</script>
+{{/yield-scripts}}

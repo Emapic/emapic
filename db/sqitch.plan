@@ -1,0 +1,8 @@
+%syntax-version=1.0.0
+%project=emapic
+%uri=https://github.com/Emapic/emapic
+
+extensions 2016-07-13T12:46:26Z Jorge López Fernández <jlopez@emapic.es> # Create required pg extensions and search config.
+base_layers [extensions] 2016-07-13T14:42:38Z Jorge López Fernández <jlopez@emapic.es> # Create base layers tables and load their data.
+emapic_tables [base_layers] 2016-07-13T15:41:23Z Jorge López Fernández <jlopez@emapic.es> # Create all core emapic tables.
+emapic_db_user [emapic_tables] 2016-07-13T17:00:14Z Jorge López Fernández <jlopez@emapic.es> # Create emapic user for DB access.

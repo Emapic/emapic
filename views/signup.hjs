@@ -1,0 +1,195 @@
+{{#setTitleI18n}}signup_page_title{{/setTitleI18n}}
+
+{{#yield-styles}}
+<!-- Leaflet Styles -->
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.2/leaflet.css">
+{{/yield-styles}}
+
+<div class="container content">
+
+    <div class="col-md-8 col-md-push-2" id="access">
+
+		<h2>{{#__}}signup_title{{/__}}</h2>
+
+		<form class="form-horizontal" autocomplete="off" data-toggle="validator" role="form" id="local-reg" action="/signup" method="post" enctype="multipart/form-data">
+			<div class="input-block" id="register-step-1">
+				<h3 class="signup-subtitle">{{#__}}identify_subtitle{{/__}}</h3>
+				<div class="form-group form-group-sm">
+					<div class="col-xs-12"><p>{{#__}}email_help{{/__}}:</p></div>
+					<div class="col-xs-12 col-sm-8">
+					    <input class="form-control" type="email" required maxlength="200" name="email" data-error="{{#__}}type_an_email{{/__}}" value="{{email}}" placeholder="{{#__}}email{{/__}}">
+					</div>
+					<div class="col-sm-4 help-block with-errors"></div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div class="col-xs-12"><p>{{#__}}username_help{{/__}}:</p></div>
+					<div class="col-xs-12 col-sm-8">
+						<input class="form-control" type="text" required pattern="^[A-Za-z0-9_.\-~]+$" maxlength="25" name="login" data-error="{{#__}}type_a_username{{/__}}" value="{{login}}" placeholder="{{#__}}username{{/__}}">
+					</div>
+					<div class="col-sm-4 help-block with-errors"></div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div class="col-xs-12"><p><b>{{#__}}optional_note{{/__}}:</b> {{#__}}name_help{{/__}}:</p></div>
+					<div class="col-xs-12 col-sm-8">
+						<input class="form-control" type="text" maxlength="100" name="name" value="{{name}}" placeholder="{{#__}}name{{/__}}">
+					</div>
+					<div class="col-sm-4 help-block with-errors"></div>
+				</div>
+				<div class="form-group form-group-sm">
+					<div class="col-xs-12"><p>{{#__}}password_help{{/__}}:</p></div>
+					<div class="col-sm-4 col-sm-push-8 help-block">{{#__}}minimum_password_chars{{/__}}</div>
+					<div class="col-sm-8 col-sm-pull-4">
+							<input id="inputPassword" class="form-control" type="password" required maxlength="50" name="password" data-minlength="6" data-error=" " placeholder="{{#__}}password{{/__}}">
+					</div>
+					<div class="col-sm-8">
+							<input class="form-control" type="password" required maxlength="50" data-match="#inputPassword" data-match-error="{{#__}}passwords_dont_match{{/__}}" placeholder="{{#__}}retype_the_password{{/__}}">
+					</div>
+					<div class="col-sm-4 help-block with-errors"></div>
+				</div>
+			</div>
+
+			<div class="input-block" id="register-step-2">
+				<h3 class="signup-subtitle">{{#__}}show_your_image_subtitle{{/__}}</h3>
+				<div class="form-group form-group-sm">
+					<div class="col-xs-12"><p><b>{{#__}}optional_note{{/__}}:</b> {{#__}}avatar_help{{/__}}:</p></div>
+					<div class="col-xs-12">
+					    <div class="avatar-wrapper">
+                            <img id="avatarimg" class="img-responsive img-thumbnail user-avatar" src="/images/default-avatar.png">
+					    </div>
+					    <input id="avatarinput" class="form-control" type="file" accept="image/*" data-maxfilesize="250000" data-error="{{#__}}maximum_avatar_size{{/__}}" name="avatar" />
+					    <div class="help-block with-errors">{{#__}}maximum_avatar_size{{/__}}</div>
+					</div>
+			    </div>
+			</div>
+
+			<div class="input-block" id="register-step-3">
+				<h3 class="signup-subtitle">{{#__}}locate_subtitle{{/__}}</h3>
+				<div class="form-group">
+				<div class="col-xs-12"><p><b>{{#__}}optional_note{{/__}}:</b> {{#__}}default_position_help{{/__}}:</p></div>
+				<div class="col-xs-12">
+				    <input class="form-control" type="hidden" name="lat">
+				    <input class="form-control" type="hidden" name="lon">
+				    <label class="control-label" for="position">{{#__}}default_position{{/__}}:</label><div class="pull-right control-label"><span title="{{#__}}help_tooltip_default_position{{/__}}" class="help-tooltip glyphicon glyphicon-question-sign" aria-hidden="true"></span></div>
+				    <div id="map"></div>
+				</div>
+				</div>
+			</div>
+
+			<div class="input-block" id="register-step-4">
+			    <h3 class="signup-subtitle">{{#__}}general_conditions_accept_subtitle{{/__}}</h3>
+			    <div class="form-group">
+						<div class="col-xs-12 access" id="signup-disclaimer">
+							<p><input required type="checkbox" name="accept_general_conditions">{{#__}}signup_disclaimer_header{{/__}}<a href="/legal/general_conditions">{{#__}}signup_disclaimer_general_conditions{{/__}}</a></p>
+						</div>
+						<button type="submit" class="col-xs-12 col-sm-10 col-sm-offset-1 btn btn-primary btn-lg">{{#__}}accept{{/__}}</button>
+			    </div>
+			</div>
+
+		</form>
+
+    </div>
+
+</div> <!-- /content -->
+
+{{#yield-scripts}}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.2/leaflet.js"></script>
+<script src="/javascripts/emapic_utils.js"></script>
+{{> i18n_emapic_viewer }}
+<script src="/javascripts/geoapi.js"></script>
+
+<script type="text/javascript">
+    var map = null,
+        marker = null;
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#avatarimg').attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    afterGeopos = function() {
+        var position = [geoapiLat, geoapiLon];
+        setMarker(position);
+        map.setView(position, 17);
+    }
+
+    function setMarker(position) {
+        $('#update-position-btn').prop('disabled', false);
+        if (marker == null) {
+            marker = L.marker(position);
+            map.addLayer(marker);
+            marker.dragging.enable();
+        } else {
+            marker.setLatLng(position);
+        }
+        var position = marker.getLatLng();
+        $('input[name="lat"]').val(position.lat);
+        $('input[name="lon"]').val(position.lng);
+    }
+
+    function initializeMap() {
+        var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        var osmAttrib = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+        var osm = new L.TileLayer(osmUrl, {
+            minZoom : 1,
+            maxZoom : 18,
+            attribution : osmAttrib
+        });
+
+        map = L.map('map', {
+            attributionControl: false,
+            zoomControl: false
+        });
+        map.addControl(L.control.zoom({
+            zoomInTitle: getI18n('js_zoom_in', 'Zoom más'),
+            zoomOutTitle: getI18n('js_zoom_out', 'Zoom menos'),
+        }));
+        map.addControl(L.control.attribution({
+            prefix: '<a href="/legal/terms" title="' + getI18n('js_open_legal_terms_another_tab', 'Abrir cláusulas legales en otra pestaña') + '" target="_blank">' + getI18n('js_emapic_legal_terms', 'Cláusulas legales de emapic') + '</a> | <a title="A JS library for interactive maps" href="http://leafletjs.com">Leaflet</a>'
+        }));
+        var geolocationControl = L.control({position: 'bottomleft'});
+        geolocationControl.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'views-control leaflet-bar');
+            this._div.innerHTML = "<a id='geolocation-control' class='text-button' title=\"" + getI18n('js_geolocate', 'Geolocalizar automáticamente tu posición actual') + "\" href='#' onclick='getApiLocation();'>" + getI18n('js_geolocate_text', 'Geolocalizar') + "</a>";
+            return this._div;
+        };
+        geolocationControl.addTo(map);
+        disableDefaultClickEvents($('#geolocation-control')[0]);
+
+        map.setMaxBounds(
+            L.latLngBounds(
+                L.latLng(85, -180),
+                L.latLng(-85, 180)
+            )
+        );
+        map.fitBounds(
+            L.latLngBounds(
+                L.latLng(70, -160),
+                L.latLng(-70, 160)
+            )
+        );
+        map.addLayer(osm);
+
+        map.on('click', function(e) {
+            setMarker(e.latlng);
+        });
+    }
+
+    $(function() {
+        <!-- Preview the avatar img -->
+        $('#avatarinput').change(function(){
+            readURL(this);
+        });
+        $('.help-tooltip').tooltip({placement: 'left', html: true});
+        initializeMap();
+    });
+
+</script>
+{{/yield-scripts}}

@@ -1,0 +1,21 @@
+<div class="modal" id="geoposresult">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="geoposerror-title">{{#__}}geoposerror_title{{/__}}</h4>
+        <h4 class="modal-title" id="geoposmanual-title">{{#__}}geoposmanual_title{{/__}}</h4>
+      </div>
+      <div class="modal-body">
+        <p id="geoposmanualdefault">{{#__}}geoposmanualdefault_body{{/__}}</p>
+        <p id="geoposmanual">{{#__}}geoposmanual_body{{/__}}</p>
+        <p id="geoposmanualip">{{#__}}geoposmanualip_body{{/__}}</p>
+        <p id="geoposerrordefault">{{#__}}geoposerrordefault_body{{/__}}</p>
+        <p id="geoposapierror">{{#__}}geoposapierror_body{{/__}}</p>
+        <p id="geoposallerror">{{#__}}geoposallerror_body{{/__}}</p>
+      </div>
+      <div class="modal-footer">
+        <button id="accept-btn" type="button" class="btn btn-primary" onclick="autolocationFailedAck()">{{#__}}accept{{/__}}</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>

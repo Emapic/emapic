@@ -1,0 +1,11 @@
+{{> header}}
+{{> navbar}}
+
+    <div class="container content">
+			<div class="col-md-6 col-md-push-3 admin-centered">
+        <h2>{{#__}}404_header{{/__}}</h2><br>
+        <h4>{{#__}}page_doesnt_exist{{/__}}</h4>
+			</div>
+    </div>
+
+{{> footer}}

@@ -1,0 +1,40 @@
+{{#setTitleI18n}}login_page_title{{/setTitleI18n}}
+
+<div class="container content">
+
+	<div class="col-md-6 col-md-push-3" id="access">
+	  <h2>{{#__}}login_title{{/__}}</h2>
+	  <div class="row">
+			<div class="access col-xs-12" id="access-signup-button">
+				<p>{{#__}}not_yet_account{{/__}}</p>
+				<a href="/signup"><button class="col-xs-12 btn btn-primary btn-lg">{{#__}}create_new_account{{/__}}</button></a>
+			</div>
+			<form data-toggle="validator" class="form" id="formLogin" role="form" action="/login" method="post">
+                <div class="access form-group form-group-sm" id="access-box">
+                    <p>{{#__}}access_account{{/__}}</p>
+                    <input class="form-control" type="text" required name="email" id="email" placeholder="{{#__}}username_or_email{{/__}}">
+                    <input class="form-control" type="password" required name="password" id="password" placeholder="{{#__}}password{{/__}}">
+                    <div class="col-xs-12 text-center">
+                        <input id="remember-me" type="checkbox" name="remember_me"/><label id="remember-me-label" for="remember-me">{{#__}}remember_me{{/__}}</label>
+                    </div>
+                </div>
+                <div class="access col-xs-12 col-sm-6 pull-left text-center">
+                    <a href="/pwd_reset">{{#__}}forgot_your_password{{/__}}</a>
+                    <hr>
+                    <a href="/resend_activation">{{#__}}havent_activated_your_account{{/__}}</a>
+                </div>
+                <div class="access col-xs-12 col-sm-6 pull-right">
+                    <button type="submit" class="col-xs-12 col-sm-8 btn btn-primary btn-lg pull-right">{{#__}}start_session{{/__}}</button>
+                </div>
+				<div class="access col-xs-12">
+					<p>{{#__}}or_login_with{{/__}}</p>
+				</div>
+				<div class="col-xs-12">
+					<a href="/auth/google" class="btn btn-signin-google"><span class="fa fa-google"></span> {{#__}}Google{{/__}}</a>
+					<a href="/auth/facebook" class="btn btn-signin-facebook"><span class="fa fa-facebook-official"></span> {{#__}}Facebook{{/__}}</a>
+				</div>
+			</form>
+	  </div>
+	</div>
+
+</div><!-- /content -->

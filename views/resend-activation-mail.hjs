@@ -1,0 +1,20 @@
+{{#setTitleI18n}}resend_activation_mail_title{{/setTitleI18n}}
+
+<div class="container content">
+	<div class="col-md-6 col-md-push-3 admin-centered" id="reset-password">
+		<h2>{{#__}}resend_activation_mail{{/__}}</h2>
+		<div class="row">
+			<form class="form-horizontal" data-toggle="validator" role="form" id="local-reg" action="/resend_activation" method="post">
+                <h4 class="access">{{#__}}resend_activation_mail_instructions{{/__}}:</h4>
+                <div class="access form-group form-group-sm">
+                    <div class="col-xs-12">
+                        <input class="form-control" name="email" type="email" value="{{ user.email }}" placeholder="{{#__}}email{{/__}}">
+                    </div>
+                </div>
+                <div class="access">
+					<button type="submit" class="col-xs-12 col-sm-4 btn btn-primary btn-lg pull-right">{{#__}}send{{/__}}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div> <!-- /content -->

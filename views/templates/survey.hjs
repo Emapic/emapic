@@ -1,0 +1,225 @@
+
+    {{#emapicOpinion}}
+    {{> map_emapic_opinion_popup}}
+    {{/emapicOpinion}}
+
+    <!-- MAIN -------------------------------------------------------->
+    <div class="container" id="header">
+      <div class="navbar-right">
+        {{#results}}
+        <button type="button" class="btn btn-responsive btn-primary navbar-btn pull-right" onclick="answerSurvey()"><span class="glyphicon glyphicon-comment"></span> <span class="hide-small">{{#__}}answer_survey{{/__}}</span></button>
+        {{/results}}
+      </div>
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/"><img src="/images/logo.svg" alt="emapic logo" /></a><div class="title-container"><div><span id='survey-title' title="{{ survey.title }}">{{ survey.title }}</span></div>{{#subTitle}}<div><span id='survey-subtitle' title="{{ subTitle }}">{{ subTitle }}</span></div>{{/subTitle}}</div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="col">
+
+          <div id="map" class="map"></div>
+
+          <div id="questions-wrapper" class="text-center" hidden>
+            <div class="questions-section">
+            {{{ questions_html }}}
+            </div>
+
+            <div id="survey-nav-btns">
+                <div id="block-nav-btns">
+                </div>
+                <button id="end-survey-btn" class="btn btn-success" onclick="surveyFinished()" style="display: none;">{{#__}}finish{{/__}}</button>
+            </div>
+
+          </div>
+
+          <div id="thanks-msg" class="text-center" hidden>
+              <h2>{{#__}}survey_thanks{{/__}}</h2>
+          </div>
+          <div id="check-loc" class="check-loc text-center" hidden>
+              <h2>{{#__}}is_your_position_ok{{/__}}</h2>
+              {{#user.geom}}<button id="geolocate-btn" type="button" class="btn btn-warning" onclick="useApiGeolocation()">{{#__}}no_geolocate{{/__}}</button>{{/user.geom}}
+              <button type="button" class="btn btn-danger" onclick="editPosition()">{{#__}}no_edit_manually{{/__}}</button>
+              <button id="relocate-btn" type="button" class="btn btn-success" onclick="confirmPosition() ">{{#__}}yes{{/__}}</button>
+              <div id="return-to-survey">
+                  <button type="button" class="btn btn-info" onclick="returnToSurvey()"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> {{#__}}return_to_survey{{/__}}</button>
+              </div>
+          </div>
+          <div id="check-edit-loc" class="text-center" hidden>
+              <button type="button" class="btn btn-lg btn-danger" data-dismiss="modal" onclick="cancelPosition()">{{#__}}cancel{{/__}}</button>
+              <button id="relocate-btn" type="button" class="btn btn-lg btn-success" onclick="confirmPosition()">{{#__}}accept{{/__}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Modal -------->
+    <div class="modal" id="stats-modal" role="dialog">
+      <div class="modal-dialog" style="width: 230px;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span aria-hidden="true">&times;</span><span class="sr-only">{{#__}}close{{/__}}</span></button>
+            <h3 class="modal-title">{{#__}}stats{{/__}}</h3>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="dc-chart" id="vote-chart">
+                    <p>
+                        <span id="vote-chart-title">{{#__}}vote_stats_title{{/__}}</span>
+                        <a id="vote-chart-clear" class="reset" href="#" style="display: none;"><span class="glyphicon glyphicon-repeat"></span></a>
+                    </p>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+			<a class="btn btn-primary" type="button" target="_blank" href="/api/survey/{{ survey.encr_id }}/export">{{#__}}download_data_csv{{/__}}</a>
+		  </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Stats Modal -------->
+
+{{#yield-scripts}}
+
+    {{^results}}
+    <!-- Add survey -->
+    <script src="/javascripts/emapic_modules/survey.js"></script>
+    <script src="/javascripts/survey_blocks.js"></script>
+    {{/results}}
+
+    <!-- Add locators -->
+    <script src="/javascripts/emapic_modules/locators.js"></script>
+
+    <!-- Add vote aggregation by region/country -->
+    <script src="/javascripts/emapic_modules/aggregation.js"></script>
+
+    <!-- Add vote filtering by time slider -->
+    <script src="/javascripts/emapic_modules/time_slider.js"></script>
+
+    <!-- Add counter & stats -->
+    <script src="/javascripts/emapic_modules/counter_stats.js"></script>
+
+    <!-- Add clustering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/leaflet.markercluster.js"></script>
+    <script src="/javascripts/emapic_modules/clustering.js"></script>
+
+    <script type="text/javascript">
+        var surveyId = "{{survey.encr_id}}";
+
+        oldResponses = {{{ responses }}};
+
+        position = {{{ position }}};
+
+        {{#results}}
+        surveyResults = true;
+        {{#survey.already_opened}}
+        if (({{survey.active}} === false) ||
+            (('userId' in oldResponses) && !{{survey.multiple_answer}})) {
+            $('#header div.navbar-right button').prop('disabled', true);
+        }
+        {{/survey.already_opened}}
+        {{/results}}
+        {{^results}}
+        surveyResults = false;
+
+        {{^survey.results_after_vote}}
+        resultsAfterVote = false;
+        {{/survey.results_after_vote}}
+
+        {{/results}}
+
+        {{#user.geom}}
+        userDefaultPosition =  {
+            coords: {
+                latitude: {{user.geom.coordinates.1}},
+                longitude: {{user.geom.coordinates.0}},
+                accuracy: 0
+            }
+        };
+        {{/user.geom}}
+
+        {{#user}}
+        userLoggedIn = true;
+        {{/user}}
+
+        {{^user}}
+        {{#survey.active}}
+        $.notify({
+            message: "{{#__}}survey_not_logged_warning{{/__}}"
+        }, {
+            type: 'warning',
+            delay: 15000,
+            z_index: 1200
+        });
+        {{/survey.active}}
+        {{/user}}
+
+        var answerSurvey = function() {
+            window.location.href = '/survey/' + surveyId;
+        }
+
+        {{#emapicOpinion}}
+        var preparePopupData = function() {
+            data.emapic_experience_comments = ($('.leaflet-popup-content #emapic_experience_comments').val().trim() != "") ? $('.leaflet-popup-content #emapic_experience_comments').val().trim() : null;
+            data.emapic_experience_final_position_reason = $('.leaflet-popup-content #emapic_experience_final_position_reason').val();
+            data.emapic_experience_geolocation_result = $('.leaflet-popup-content #emapic_experience_geolocation_result').val();
+        }
+
+        {{/emapicOpinion}}
+        var prepareSurveyData = function() {
+            data.browser_os = navigator.userAgent;
+            data.precision = precision;
+            data.lat0 = geoapiLat;
+            data.lng0 = geoapiLon;
+            data.lat = position[0];
+            data.lng = position[1];
+            data.responses = responses;
+        }
+
+        var loadStats = overrideFunction(loadStats, null, function(data) {
+            var voteChart = dc.pieChart("#vote-chart");
+
+            $('#vote-chart .reset').click(function() {
+                voteChart.filterAll();
+                voteChart.redraw();
+            });
+
+            //### Create Crossfilter Dimensions and Groups
+            //See the [crossfilter API](https://github.com/square/crossfilter/wiki/API-Reference) for reference.
+            var ndx = crossfilter(data);
+            var all = ndx.groupAll();
+
+            // dimension by vote
+            var voteDimension = ndx.dimension(function (d) {
+                return (d.properties[legend.color.question + '.id']) ? d.properties[legend.color.question + '.id'] : 'NC';
+            });
+            var voteDimensionGroup = voteDimension.group();
+
+            voteChart
+                .width(180) // (optional) define chart width, :default = 200
+                .height(180) // (optional) define chart height, :default = 200
+                .radius(80) // define pie radius
+                .dimension(voteDimension) // set dimension
+                .group(voteDimensionGroup) // set group
+                .title(function(d) {
+                    var id = ('data' in d) ? d.data.key : d.key;
+                    return legend.color.responses[id].value + ": " + d.value;
+                }).label(function (d) {
+                    var label = legend.color.responses[d.key].value;
+                    if (voteChart.hasFilter() && !voteChart.hasFilter(d.key)) {
+                        return label + ' (0%)';
+                    }
+                    if (all.value()) {
+                        label += ' (' + Math.floor(d.value / all.value() * 100) + '%)';
+                    }
+                    return label;
+                })
+                .colors(function(d){ return (d && legend && legend.color) ? legend.color.responses[d].legend : 'grey';}); // set colors function
+
+            //simply call renderAll() to render all charts on the page
+            dc.renderAll();
+        });
+    </script>
+{{/yield-scripts}}
