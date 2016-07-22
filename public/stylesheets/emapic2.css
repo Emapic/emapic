@@ -885,6 +885,26 @@ span.user-inline {
 	padding: 8px;
 }
 
+#linked-accounts > div.col-xs-12,
+#linked-accounts > div.col-xs-12 .col-xs-12 {
+    padding: 0px 0px 5px;
+}
+
+#linked-accounts hr {
+    border-top-style: double;
+    border-top-color: #dddddd;
+    border-top-width: 3px;
+}
+
+#linked-accounts .linked-account {
+    padding: 5px 0px 0px !important;
+    border-bottom: 1px dashed #dddddd;
+}
+
+#linked-accounts .btn {
+    min-height: 37px;
+}
+
 /* --- Dashboard --- */
 .dashboard-content {
 	margin-top: 40px;

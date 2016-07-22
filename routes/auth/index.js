@@ -168,6 +168,40 @@ module.exports = function(app) {
         });
     });
 
+    app.post('/profile/unlink', function(req, res) {
+        var user = req.user;
+        if (!req.body.service || !req.body.id || req.user.password === null) {
+            return res.redirect('/profile');
+        }
+        switch (req.body.service) {
+            case 'google':
+                if (req.body.id !== user.google_id) {
+                    return res.redirect('/profile');
+                }
+                user.google_id = null;
+                user.google_token = null;
+                break;
+            case 'facebook':
+                if (req.body.id !== user.facebook_id) {
+                    return res.redirect('/profile');
+                }
+                user.facebook_id = null;
+                user.facebook_token = null;
+                break;
+            default:
+                return res.redirect('/profile');
+        }
+        user.save().then(function(user) {
+            req.session.success = 'unlink_ext_account_success_msg';
+            logger.info("Sucessfully unlinked service " + req.body.service + " from user account with email " + user.email + " and id " + user.id);
+        }).catch(function(err) {
+            req.session.success = 'unlink_ext_account_error_msg';
+            logger.error("Error while unlinking service " + req.body.service + " from user account with email " + user.email + " and id " + user.id);
+        }).lastly(function() {
+            res.redirect('/profile');
+        });
+    });
+
     app.post('/profile', function(req, res) {
         // Checking for the very suspicious case when the posted email
         // is different from the one logged in

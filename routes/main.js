@@ -51,6 +51,8 @@ module.exports = function(app) {
         }, res.locals);
         res.render('profile', {
             hasPassword: req.user.password !== null,
+            hasGoogleId: req.user.google_id !== null,
+            hasFacebookId: req.user.facebook_id !== null,
             layout: 'layouts/main'
         });
     });

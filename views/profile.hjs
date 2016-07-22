@@ -20,8 +20,8 @@
     </div>
 
     <div class="col-xs-12 col-sm-9 panel panel-default" id="profile-id">
-        <div class="panel-body">
-            <form class="form-horizontal" data-toggle="validator" role="form" id="profile-update" action="/profile" method="post">
+        <div class="panel-body form-horizontal">
+            <form data-toggle="validator" role="form" id="profile-update" action="/profile" method="post">
                 <div class="form-group form-group-sm">
                     <label class="col-xs-12 col-sm-4 control-label" for="email">{{#__}}email{{/__}}</label>
                     <div class="col-xs-12 col-sm-8 col-md-6 col-lg-5">
@@ -29,13 +29,6 @@
                         <input class="form-control" type="hidden" name="email" value="{{ userFormData.email }}">
                     </div>
                 </div>
-                <!-- <div class="form-group form-group-sm">
-                    <label class="col-xs-12 col-sm-4 control-label" for="url">{{#__}}user_url{{/__}}</label>
-                    <div class="col-xs-12 col-sm-8 col-md-6 col-lg-5">
-                        <input class="form-control" type="url" maxlength="300" name="url" data-error="{{#__}}type_a_url{{/__}}" value="{{ userFormData.url }}">
-                        <div class="help-block with-errors"></div>
-                    </div>
-                </div> -->
 				<div class="form-group form-group-sm">
 					<label class="col-xs-12 col-sm-4 control-label">{{#__}}username{{/__}}</label>
 					<div class="col-xs-12 col-sm-8 col-md-6 col-lg-5">
@@ -57,6 +50,44 @@
                     </button>
                 </div>
             </form>
+            <div id="linked-accounts" class="form-group form-group-sm">
+                <hr class="col-xs-8 col-xs-offset-2">
+                <label class="col-xs-12 col-sm-4 control-label">{{#__}}linked_ext_accounts{{/__}}</label>
+                <div class="col-xs-12 col-sm-8">
+                    {{#hasGoogleId}}
+                    <div class="linked-account col-xs-12">
+                        <div class="col-xs-12 col-sm-6">
+                            <a href="https://plus.google.com/{{userFormData.google_id}}" target="_blank" class="btn btn-google"><span class="fa fa-google"></span><span>{{#__}}Google{{/__}}</span></a>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                            <form class="form-horizontal unlink-account" role="form" action="/profile/unlink" method="post">
+                                <input type="hidden" name="service" value="google"/>
+                                <input type="hidden" name="id" value="{{userFormData.google_id}}"/>
+                            </form>
+                            <button class="{{^hasPassword}}help-tooltip {{/hasPassword}}btn btn-danger" {{^hasPassword}}disabled title="{{#__}}help_tooltip_unlink_account_no_password{{/__}}"{{/hasPassword}} onclick="confirm('{{#__}}unlink_ext_account_confirmation{{/__}}')?$(this).parent().find('.unlink-account').submit():null;">
+                                <span class="fa fa-chain-broken"></span> {{#__}}unlink_ext_account{{/__}}
+                            </button>
+                        </div>
+                    </div>
+                    {{/hasGoogleId}}
+                    {{#hasFacebookId}}
+                    <div class="linked-account col-xs-12">
+                        <div class="col-xs-12 col-sm-6">
+                            <a href="https://facebook.com/{{userFormData.facebook_id}}" target="_blank" class="btn btn-facebook"><span class="fa fa-facebook-official"></span><span>{{#__}}Facebook{{/__}}</span></a>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                            <form class="form-horizontal unlink-account" role="form" action="/profile/unlink" method="post">
+                                <input type="hidden" name="service" value="facebook"/>
+                                <input type="hidden" name="id" value="{{userFormData.facebook_id}}"/>
+                            </form>
+                            <button class="{{^hasPassword}}help-tooltip {{/hasPassword}}btn btn-danger" {{^hasPassword}}disabled title="{{#__}}help_tooltip_unlink_account_no_password{{/__}}"{{/hasPassword}} onclick="confirm('{{#__}}unlink_ext_account_confirmation{{/__}}')?$(this).parent().find('.unlink-account').submit():null;">
+                                <span class="fa fa-chain-broken"></span> {{#__}}unlink_ext_account{{/__}}
+                            </button>
+                        </div>
+                    </div>
+                    {{/hasFacebookId}}
+                </div>
+            </div>
         </div>
     </div>
 
