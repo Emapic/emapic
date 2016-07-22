@@ -787,14 +787,14 @@ span.user-inline {
     margin-right: 2px;
 }
 
-.btn-signin-facebook,
+.btn-facebook,
 .share-sq.fa-facebook-official {
     background: rgba(0, 0, 0, 0) linear-gradient(#4c69ba, #3b55a0) repeat scroll 0 0;
     color: white;
 }
 
-.btn-signin-facebook:hover,
-.btn-signin-facebook:focus,
+.btn-facebook:hover,
+.btn-facebook:focus,
 .share-sq.fa-facebook-official:hover {
     background: rgba(0, 0, 0, 0) linear-gradient(#5b7bd5, #4864b1) repeat scroll 0 0;
     color: white;
@@ -820,7 +820,7 @@ span.user-inline {
     color: white;
 }
 
-.btn-signin-google,
+.btn-google,
 .share-sq.fa-google-plus {
     background-color: #db4437;
     color: white;
@@ -828,16 +828,29 @@ span.user-inline {
     padding: 7px 4px 6px;
 }
 
-.btn-signin-google:hover,
-.btn-signin-google:focus,
+.btn-google:hover,
+.btn-google:focus,
 .share-sq.fa-google-plus:hover {
     background-color: #dc6d63;
     color: white;
 }
-.btn-signin-facebook,
-.btn-signin-google {
+.btn-facebook,
+.btn-google {
     font-size: 1em;
-    padding: 6px 12px;
+    padding: 6px 9px;
+    display: inline-block;
+}
+.btn-facebook .fa,
+.btn-google .fa {
+    font-size: 1.3em;
+    display: table-cell;
+    padding-right: 5px;
+}
+.btn-facebook span:not(.fa),
+.btn-google span:not(.fa) {
+    display: table-cell;
+    line-height: 22px;
+    vertical-align: middle;
 }
 
 
