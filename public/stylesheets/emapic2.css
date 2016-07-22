@@ -870,6 +870,10 @@ span.user-inline {
 	margin: 20px 20px;
 }
 
+#profile label:first-letter {
+    text-transform: capitalize
+}
+
 .avatar-wrapper {
 	max-width: 250px;
 	max-height: 250px;
