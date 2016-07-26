@@ -171,8 +171,8 @@
                 <div class="col-xs-12 form-group form-group-sm">
                     <a href="Javascript:void(0)" data-toggle="modal" data-target="#question-selector"><button class="btn btn-primary pull-left"><span class="glyphicon glyphicon-plus"></span> {{#__}}add_question{{/__}}</button></a>
                 </div>
-                <a class="col-xs-12 col-sm-4 col-sm-offset-1 btn btn-danger btn-lg survey-form-btn" href="/surveys/own">{{#__}}cancel{{/__}}</a>
-                <button id="save-survey-btn" type="submit" class="col-xs-12 col-sm-4 col-sm-offset-2 btn btn-primary btn-lg survey-form-btn">{{#__}}save_survey{{/__}}</button>
+                <a class="col-xs-12 col-sm-4 col-sm-offset-1 btn btn-danger btn-lg survey-form-btn" href="/surveys/own" onclick="return confirmLeavingPageSafely();">{{#__}}cancel{{/__}}</a>
+                <button id="save-survey-btn" type="submit" class="col-xs-12 col-sm-4 col-sm-offset-2 btn btn-primary btn-lg survey-form-btn" onclick="return confirmLeavingPageSafely();">{{#__}}save_survey{{/__}}</button>
 
             </form>
         </div>

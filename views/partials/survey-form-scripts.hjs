@@ -3,6 +3,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.4.4/randomColor.min.js"></script>
 <script src="/libs/spectrum/spectrum.js"></script>
 <script type="text/javascript">
+    window.onbeforeunload = checkLeavingPageSafely;
 
     // Workaround for having the validator check that the survey has any questions
     $().validator.prototype.constructor.Constructor.prototype.isIncomplete = function () {

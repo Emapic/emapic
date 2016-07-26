@@ -3,6 +3,7 @@
 	"404_header": "404: not found",
 	"page_doesnt_exist": "Oops!, looks like this page does not exist.",
 	"js_mandatory_alert": "To use all the functionalities of this site it is mandatory to have JavaScript enabled (<a href=\"http://www.enable-javascript.com/es/\" target=\"_blank\">instructions to enable JavaScript in your browser</a>).",
+	"js_leaving_page_warning": "Data you have entered may not be saved.",
 	"Google": "Google",
 	"Facebook": "Facebook",
 	"facebook_language": "en_US",

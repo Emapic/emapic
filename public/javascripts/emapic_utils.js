@@ -297,3 +297,19 @@ function getComplimentaryColor(hex) {
     temphsv.hue=hueShift(temphsv.hue,180.0);
     return rgbToHex(hsvToRgbB(temphsv));
 }
+
+// Utilities for checking that the user doesn't leave the page w/o saving changes
+
+var leavingPageSafely = false;
+
+function checkLeavingPageSafely() {
+    if (leavingPageSafely) {
+        return;
+    }
+    return getI18n('js_leaving_page_warning');
+}
+
+function confirmLeavingPageSafely() {
+    leavingPageSafely = true;
+    return true;
+}

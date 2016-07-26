@@ -23,6 +23,7 @@
     <script type="text/javascript" src="/libs/date.format.min.js"></script>
     <script type="text/javascript" src="/javascripts/emapic_index.js"></script>
     <script type="text/javascript" src="/javascripts/emapic_utils.js"></script>
+    {{> i18n_emapic_general }}
     <script type="text/javascript">
         $(document).ready(function() {
             $('[data-toggle="tooltip"], .bs-tooltip').tooltip();

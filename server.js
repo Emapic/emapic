@@ -165,6 +165,7 @@ var SampleApp = function() {
 
         // Add global partials to all rendering contexts
         self.app.set('partials', {
+            i18n_emapic_general : 'partials/i18n/emapic_general',
             i18n_emapic_viewer : 'partials/i18n/emapic_viewer',
             base_header: 'partials/base-header',
             header: 'partials/header',
