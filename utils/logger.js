@@ -76,7 +76,12 @@ var requestsLogger = winston.loggers.requests = new winston.Logger({
 });
 
 module.exports.stream = {
-    write: function(message, encoding){
-        requestsLogger.verbose('Web request info', JSON.parse(message));
+    write: function(message, encoding) {
+        var json = JSON.parse(message);
+        if (json.remote_addr != '127.0.0.1' && json.remote_addr != 'localhost') {
+            requestsLogger.verbose('Web request info', json);
+        } else {
+            requestsLogger.debug('Localhost web request info', json);
+        }
     }
 };
