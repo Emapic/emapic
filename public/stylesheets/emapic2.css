@@ -402,10 +402,6 @@ div#signup-disclaimer input[type="checkbox"] {
 	max-width: 1100px;
 }
 
-.navbar #menu-navbar {
-    border-bottom: 1px solid #EBEBEB;
-}
-
 .navbar-inverse .navbar-toggle {
 	margin-top: 5px;
 	border: none;
@@ -1325,6 +1321,12 @@ div.legal-text ol > li {
     .share-sq.fa-google-plus {
         font-size: 2.1em;
         padding: 10px 4px 9px;
+    }
+}
+
+@media screen and (max-device-width: 767px) {
+    .navbar #menu-navbar {
+        border: 1px solid #EBEBEB;
     }
 }
 
