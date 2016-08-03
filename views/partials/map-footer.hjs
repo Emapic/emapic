@@ -18,6 +18,22 @@
     {{> i18n_emapic_viewer }}
     <script src="/javascripts/geoapi.js"></script>
     <script src="/javascripts/emapic_main.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('[data-toggle="tooltip"], .bs-tooltip').tooltip();
+            $('.date-to-locale').each(function(i, element) {
+                var el = $(element);
+                var date = new Date(el.attr('date'));
+                el.html(date.format('{{#__}}js_full_date_format{{/__}}'));
+            });
+        });
+    {{#success}}
+        notifications.push("{{{success}}}");
+    {{/success}}
+    {{#error}}
+        errors.push("{{{error}}}");
+    {{/error}}
+    </script>
     {{{yield-scripts}}}
 
 </body>

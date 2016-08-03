@@ -65,10 +65,13 @@ li {
 		border: solid 1px #A2C73A;
 		color: white;
 }
-.btn-primary:hover {
-		background-color: white;
-		border: solid 1px #EBEBEB;
-		color: #A2C73A;
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.open > .dropdown-toggle.btn-primary {
+		background-color: white !important;
+		border: solid 1px #EBEBEB !important;
+		color: #A2C73A !important;
 }
 .btn-default, .btn-default:focus {
 	color: #A2C73A;
@@ -94,6 +97,107 @@ div.alert, div.alert a {
 }
 div.alert-warning a {
     color: brown;
+}
+#share-url-btn {
+    margin-right: 5px;
+}
+.dropdown-menu.share-url {
+	min-width: none;
+	border: none;
+	box-shadow: none;
+	margin: 0;
+    padding: 5px;
+    background: #969696;
+    z-index: 11000;
+    left: auto;
+    right: 100%;
+    top: 7px;
+}
+.share-url-box {
+	background-color: #A2C73A;
+	border: solid 1px #A2C73A;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	font-size: 0.9em !important;
+	color: white !important;
+	min-width: 260px;
+    margin: 0 0 5px;
+    padding: 0px 6px;
+}
+.share-url-box p::-moz-selection,
+.share-url-box::-moz-selection,
+.share-url-box textarea::-moz-selection {
+	color: #85A330;
+	background-color: white;
+}
+.share-sq {
+    border: medium none;
+    border-radius: 4px;
+    padding: 3px 4px 1px;
+    font-size: 2em;
+    vertical-align: middle;
+}
+.share-url .share-sq {
+    margin-right: 2px;
+}
+.btn-facebook,
+.share-sq.fa-facebook-official {
+    background: rgba(0, 0, 0, 0) linear-gradient(#4c69ba, #3b55a0) repeat scroll 0 0;
+    color: white;
+}
+.btn-facebook:hover,
+.btn-facebook:focus,
+.share-sq.fa-facebook-official:hover {
+    background: rgba(0, 0, 0, 0) linear-gradient(#5b7bd5, #4864b1) repeat scroll 0 0;
+    color: white;
+}
+.share-sq.fa-twitter {
+    background-color: #1b95e0;
+    color: white;
+}
+.share-sq.fa-twitter:hover {
+    background-color: #48a7e1;
+    color: white;
+}
+.share-sq.fa-linkedin {
+    background-color: #0077b5;
+    color: white;
+}
+.share-sq.fa-linkedin:hover {
+    background-color: #2d86b6;
+    color: white;
+}
+.btn-google,
+.share-sq.fa-google-plus {
+    background-color: #db4437;
+    color: white;
+    font-size: 1.4em;
+    padding: 7px 4px 6px;
+}
+.btn-google:hover,
+.btn-google:focus,
+.share-sq.fa-google-plus:hover {
+    background-color: #dc6d63;
+    color: white;
+}
+.btn-facebook,
+.btn-google {
+    font-size: 1em;
+    padding: 6px 9px;
+    display: inline-block;
+}
+.btn-facebook .fa,
+.btn-google .fa {
+    font-size: 1.3em;
+    display: table-cell;
+    padding-right: 5px;
+}
+.btn-facebook span:not(.fa),
+.btn-google span:not(.fa) {
+    display: table-cell;
+    line-height: 22px;
+    vertical-align: middle;
 }
 #geoposwarn .modal-content, #geoposwarn .panel, #geoposwarn .panel-default > .panel-heading, #geoposresult .modal-content, #stats-modal .modal-content, #survey-resume .modal-content {
     background-color: #004F71;
@@ -386,7 +490,7 @@ input.form-control[type="radio"] {
 .time-control .tooltip-arrow {
     border-top-color: #004F71 !important;
 }
-.tooltip-inner {
+.map .tooltip-inner {
     background-color: #004F71;
     min-width: 100px;
 }
@@ -838,12 +942,6 @@ select#sex-select.mas {
 }
 
 @media screen and (max-device-width: 599px), screen and (max-device-height: 639px) {
-    #header {
-        height: 60px;
-    }
-    body > div.container-fluid {
-        height: calc(100% - 60px);
-    }
     .navbar-brand {
         padding: 5px;
         height: 35px;
@@ -852,6 +950,7 @@ select#sex-select.mas {
         height: 35px;
         width: 120px;
         margin-right: 5px;
+        margin-top: 15px;
     }
     #survey-title {
         font-size: 16px;
@@ -859,10 +958,6 @@ select#sex-select.mas {
     }
     #survey-subtitle {
         font-size: 13px;
-    }
-    #questions-wrapper, #thanks-msg {
-        padding: 0 2em;
-        margin-top: -86vh;
     }
     /* Make the votes list smaller */
     #app-total-counter {
@@ -915,12 +1010,56 @@ select#sex-select.mas {
 }
 
 @media screen and (max-device-width: 359px), screen and (max-device-height: 549px) {
+    #header {
+        height: 60px;
+    }
+    .title-container > div:first-child {
+        padding-top: 7px;
+    }
+    #header div.navbar-right {
+        width: 30px;
+    }
+    #header div.navbar-right > button {
+        margin: 5px 0px 0px;
+        right: 0;
+    }
+    #header div.navbar-right > div.dropdown:not(:first-child) {
+        right: 0;
+    }
+    #header div.navbar-right > div.dropdown:not(:first-child) button {
+        margin: 4px 0px 0px;
+    }
+    #header div.navbar-right > div.dropdown:first-child button {
+        margin: 18px 0px 0px;
+    }
+    .navbar-brand img {
+        margin-top: 0px;
+    }
+    body > div.container-fluid {
+        height: calc(100% - 60px);
+    }
     #survey-title {
         font-size: 11px;
         line-height: 14px;
     }
     #survey-subtitle {
         font-size: 9px;
+    }
+    .share-sq {
+        font-size: 3em;
+        padding-bottom: 3px;
+    }
+    .share-sq.fa-google-plus {
+        font-size: 2.1em;
+        padding: 10px 4px 9px;
+    }
+    .dropdown-menu.share-url {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        margin-left: -151px;
+        padding: 20px;
+        right: auto;
     }
     #questions-wrapper, #thanks-msg {
         padding: 0 1em;
