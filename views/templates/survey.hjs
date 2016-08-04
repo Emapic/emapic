@@ -169,7 +169,7 @@
         {{#survey.already_opened}}
         if (({{survey.active}} === false) ||
             (('userId' in oldResponses) && !{{survey.multiple_answer}})) {
-            $('#header div.navbar-right button').prop('disabled', true);
+            $('#header div.navbar-right > button').prop('disabled', true);
         }
         {{/survey.already_opened}}
         {{/results}}
