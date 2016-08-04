@@ -3,6 +3,28 @@
     {{> map_emapic_opinion_popup}}
     {{/emapicOpinion}}
 
+    <!-- Survey info modal -->
+    <div id="survey-info" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span aria-hidden="true">&times;</span><span class="sr-only">{{#__}}close{{/__}}</span></button>
+            <h3 class="modal-title">{{#__}}survey_info{{/__}}</h3>
+          </div>
+          <div class="modal-body">
+              <h4>{{#__}}title{{/__}}:</h4> <span>{{survey.title}}</span><br>
+              {{#survey.description}}<h4>{{#__}}description{{/__}}:</h4> <span>{{survey.description}}</span>{{/survey.description}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{{#__}}close{{/__}}</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- MAIN -------------------------------------------------------->
     <div class="container" id="header">
       <div class="navbar-right pull-right">
@@ -37,7 +59,11 @@
         </div>
       </div>
       <div class="navbar-header">
-        <a class="navbar-brand" href="/"><img src="/images/logo.svg" alt="emapic logo" /></a><div class="title-container"><div><span id='survey-title' title="{{ survey.title }}">{{ survey.title }}</span></div>{{#subTitle}}<div><span id='survey-subtitle' title="{{ subTitle }}">{{ subTitle }}</span></div>{{/subTitle}}</div>
+        <a class="navbar-brand" href="/"><img src="/images/logo.svg" alt="emapic logo" /></a>
+        <div class="title-container">
+            <div><a href="Javascript:void(0)" data-toggle="modal" data-target="#survey-info"><span id='survey-title' data-toggle="tooltip" data-placement="right" title="{{#__}}see_survey_info{{/__}}">{{ survey.title }} <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></span></a></div>
+            {{#subTitle}}<div><span id='survey-subtitle' title="{{ subTitle }}">{{ subTitle }}</span></div>{{/subTitle}}
+        </div>
       </div>
     </div>
 

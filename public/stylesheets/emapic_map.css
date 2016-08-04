@@ -43,7 +43,9 @@ a:link {
 	text-decoration: none;
 	color: white;
 }
-a:hover {
+a:hover,
+a:active,
+a:focus {
 	color: #85A330;
 }
 /* --- General classes --- */
@@ -199,7 +201,7 @@ div.alert-warning a {
     line-height: 22px;
     vertical-align: middle;
 }
-#geoposwarn .modal-content, #geoposwarn .panel, #geoposwarn .panel-default > .panel-heading, #geoposresult .modal-content, #stats-modal .modal-content, #survey-resume .modal-content {
+#geoposwarn .modal-content, #geoposwarn .panel, #geoposwarn .panel-default > .panel-heading, #geoposresult .modal-content, #stats-modal .modal-content, #survey-resume .modal-content, #survey-info .modal-content {
     background-color: #004F71;
 }
 #geoposwarn .modal-header button, #geoposresult .modal-header button, #stats-modal .modal-header button, #survey-resume .modal-header button {
@@ -218,6 +220,16 @@ div.alert-warning a {
 #geoposwarn .modal-footer button, #geoposresult .modal-footer button, #stats-modal .modal-footer button, #survey-resume .modal-footer button {
     margin-bottom: 5px;
     margin-left: 0px;
+}
+#survey-info h4 {
+    margin-bottom: 0px;
+}
+#survey-info span {
+    color: #d0d0d0;
+    font-size: 16px;
+}
+#survey-info .modal-body h4 {
+    display: inline-block;
 }
 .panel-heading a:after {
     font-family:'Glyphicons Halflings';
@@ -298,6 +310,9 @@ div.alert-warning a {
     line-height: 25px;
     vertical-align: bottom;
     overflow: hidden;
+}
+#survey-title .glyphicon-info-sign {
+    font-size: 0.7em;
 }
 #survey-subtitle {
     font-size: 17px;

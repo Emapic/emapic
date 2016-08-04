@@ -359,6 +359,8 @@
 	"tagged_surveys": "Encuestas con la etiqueta",
 	"user_surveys": "Encuestas publicadas",
 	"answer_survey": "Contestar encuesta",
+	"survey_info": "Información de la encuesta",
+	"see_survey_info": "Ver información de la encuesta",
 	"option_other": "Opción «Otro»",
 	"help_tooltip_option_other_answer": "Añadir una opción para «Otro» con un campo de texto para que el usuario escriba una opción no contemplada. Aunque el usuario puede escribir su opción concreta, hay que especificar una etiqueta para la opción genérica «Otro».",
 	"option_other_default_value": "Otra opción",

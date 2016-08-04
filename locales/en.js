@@ -359,6 +359,8 @@
 	"tagged_surveys": "Surveys with tag",
 	"user_surveys": "Published surveys",
 	"answer_survey": "Answer survey",
+	"survey_info": "Survey info",
+	"see_survey_info": "See survey info",
 	"option_other": "Option \"Other\"",
 	"help_tooltip_option_other_answer": "Adds an option for \"Other\" with a text field so the user can write an option not taken into account. Although the user can write its option, a label must be specified to be shown to the user for the generic \"Other\" option.",
 	"option_other_default_value": "Other option",
