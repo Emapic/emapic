@@ -287,9 +287,9 @@ div.alert-warning a {
 }
 .navbar-brand {
     height: 100%;
+    margin-right: 20px;
 }
 .navbar-brand img {
-    margin-right: 20px;
     height: 50px;
     width: 171px;
 }
@@ -960,12 +960,12 @@ select#sex-select.mas {
     .navbar-brand {
         padding: 5px;
         height: 35px;
+        margin-right: 5px;
+        margin-top: 15px;
     }
     .navbar-brand img {
         height: 35px;
         width: 120px;
-        margin-right: 5px;
-        margin-top: 15px;
     }
     #survey-title {
         font-size: 16px;
@@ -1009,7 +1009,7 @@ select#sex-select.mas {
 }
 
 /* --- Styles for NOT very small screen devices --- */
-@media screen and (min-device-width: 360px) and (min-device-height: 550px) {
+@media screen and (min-device-width: 361px) and (min-device-height: 551px) {
     .always-show-not-extrasmall {
         display: inherit !important;
     }
@@ -1024,7 +1024,7 @@ select#sex-select.mas {
     display: none;
 }
 
-@media screen and (max-device-width: 359px), screen and (max-device-height: 549px) {
+@media screen and (max-device-width: 360px), screen and (max-device-height: 550px) {
     #header {
         height: 60px;
     }
@@ -1047,7 +1047,7 @@ select#sex-select.mas {
     #header div.navbar-right > div.dropdown:first-child button {
         margin: 18px 0px 0px;
     }
-    .navbar-brand img {
+    .navbar-brand {
         margin-top: 0px;
     }
     body > div.container-fluid {
