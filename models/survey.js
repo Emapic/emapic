@@ -354,7 +354,8 @@ module.exports = function(sequelize, DataTypes) {
 
             saveResponse: function(req) {
                 var survey = this,
-                    date = new Date();
+                    date = new Date(),
+                    dateUtc = date.toISOString().replace(/T/, ' ').replace(/Z/, '');
                 return Promise.join(this.getOwner(), this.getQuestions(), function(owner, questions) {
                     var usr_id = (req.user) ? parseInt(req.user.id) : null;
                     // If the survey is closed, or it's a draft and the
@@ -377,7 +378,7 @@ module.exports = function(sequelize, DataTypes) {
 
                     var insert_query1 = 'INSERT INTO opinions.survey_' + survey.id + ' (usr_id, precision, timestamp, geom',
                     insert_query2 = ') VALUES (?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326)',
-                    insert_params = [usr_id, body.precision, date, body.lng, body.lat];
+                    insert_params = [usr_id, body.precision, dateUtc, body.lng, body.lat];
                     for (var i = 0, iLen = questions.length; i<iLen; i++) {
                         var vars = questions[i].getInsertSql(body.responses);
                         insert_query1 += (vars[0] !== '' ? ', ' : '') + vars[0];
