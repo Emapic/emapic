@@ -34,10 +34,10 @@
             });
         });
     {{#success}}
-        notifications.push("{{{success}}}");
+        emapic.website.addNotification("{{{success}}}");
     {{/success}}
     {{#error}}
-        errors.push("{{{error}}}");
+        emapic.website.addError("{{{error}}}");
     {{/error}}
     </script>
     {{{yield-scripts}}}

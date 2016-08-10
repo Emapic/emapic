@@ -1,31 +1,60 @@
-var notifications = [],
-    errors = [];
+//
+// Emapic general website functions
+//
 
-function on_arrow_click() {
-	$('html, body').animate({scrollTop: $("#lema").offset().top}, 1000);
-};
+var emapic = emapic || {};
 
-function toggleFooterArrow() {
-    $('#footer-arrow span').toggleClass('glyphicon-menu-up');
-    $('#footer-arrow span').toggleClass('glyphicon-menu-down');
-};
+(function(emapic) {
 
-function onFooterArrowClick() {
-    $('html, body').animate({scrollTop: $(document).height()}, 900);
-    $('#contacts').slideToggle( "slow", function() {
+    var notifications = [],
+        errors = [];
+
+    emapic.website = emapic.website || {};
+
+    emapic.website.addNotification = function(msg) {
+        notifications.push(msg);
+    };
+
+    emapic.website.addError = function(msg) {
+        errors.push(msg);
+    };
+
+    emapic.website.getNotifications = function() {
+        return notifications;
+    };
+
+    emapic.website.getErrors = function() {
+        return errors;
+    };
+
+    emapic.website.onArrowClick = function() {
+    	$('html, body').animate({scrollTop: $("#lema").offset().top}, 1000);
+    };
+
+    function toggleFooterArrow() {
+        $('#footer-arrow span').toggleClass('glyphicon-menu-up');
+        $('#footer-arrow span').toggleClass('glyphicon-menu-down');
+    }
+
+    emapic.website.onFooterArrowClick = function() {
+        $('html, body').animate({scrollTop: $(document).height()}, 900);
+        $('#contacts').slideToggle( "slow", function() {
+            toggleFooterArrow();
+        });
+    };
+
+    emapic.website.onInitContactsExpand = function() {
+        $('#contacts').toggle();
         toggleFooterArrow();
-    });
-};
+    };
 
-function onInitContactsExpand() {
-    $('#contacts').toggle();
-    toggleFooterArrow();
-};
+})(emapic);
 
 $(document).ready(function() {
-    for (i in errors) {
+    var errors = emapic.website.getErrors(),
+        notifications = emapic.website.getNotifications();
+    for (var i in errors) {
         $.notify({
-            // options
             message: errors[i]
         }, {
             delay: 0,
@@ -34,7 +63,6 @@ $(document).ready(function() {
     }
     for (i in notifications) {
         $.notify({
-            // options
             message: notifications[i]
         });
     }

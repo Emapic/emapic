@@ -43,7 +43,7 @@
       </div>
       <div class="modal-footer">
         <button id="dismiss-btn" type="button" class="col-xs-12 col-md-5 btn btn-default" data-dismiss="modal">{{#__}}locate_manually{{/__}}</button>
-        <button id="relocate-btn" type="button" class="col-xs-12 col-md-5 pull-right btn btn-primary" onclick="getApiLocation()">{{#__}}locate_automatically{{/__}}</button>
+        <button id="relocate-btn" type="button" class="col-xs-12 col-md-5 pull-right btn btn-primary" onclick="emapic.geoapi.getApiLocation()">{{#__}}locate_automatically{{/__}}</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

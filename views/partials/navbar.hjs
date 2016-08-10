@@ -21,8 +21,8 @@
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" onclick="setLocale('es');"><img src="/images/languages-flags/es.png"/></a></li>
-            <li><a href="#" onclick="setLocale('en');"><img src="/images/languages-flags/en.png"/></a></li>
+            <li><a href="#" onclick="emapic.utils.setLocale('es');"><img src="/images/languages-flags/es.png"/></a></li>
+            <li><a href="#" onclick="emapic.utils.setLocale('en');"><img src="/images/languages-flags/en.png"/></a></li>
           </ul>
         </div>
     </div>

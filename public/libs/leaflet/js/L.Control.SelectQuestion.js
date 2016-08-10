@@ -80,7 +80,7 @@ L.Control.SelectQuestion = L.Control.extend({
 		this._container.innerHTML += '<button type="button" class="btn btn-default dropdown-toggle hide-small" data-toggle="dropdown" aria-expanded="false"><span id="1" class="selected" style="float: left;">' + this._questions[0] + '</span> <span class="caret"></span></button>';
 		this._container.appendChild(this._questionsList);
 		this._container.appendChild(this._questionsSelect);
-		
+
 	}
 
   ,_onQuestionOptionChange: function (e) {
@@ -88,7 +88,7 @@ L.Control.SelectQuestion = L.Control.extend({
 	  var text = $(e.target).find('option:selected').text()
 	  $('#vote-chart-title').text(text);
 	  $('.leaflet-control.question-selector button span.selected').text(text);
-	  changeActiveLegend('color', val);
+	  emapic.changeActiveLegend('color', val);
   }
 
   ,_onQuestionLiChange: function (e) {

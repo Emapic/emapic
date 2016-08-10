@@ -1,202 +1,209 @@
-// 
+//
 // Geolocation (IP-based, standard API)
 //
 
-var geoapiLat, geoapiLon, position0;
-var ipLocationFinished = false,
-    ipLocationFail = false,
-    apiLocationFail = false,
-    manualGeolocation = false;
-var defaultPosition = {
-        coords: {
-            latitude: 40.416763,
-            longitude: -3.703403,
-            accuracy: 0
+var emapic = emapic || {};
+
+(function(emapic) {
+
+    var ipLocationFinished = false,
+        ipLocationFail = false,
+        apiLocationFail = false,
+        defaultPosition = {
+            coords: {
+                latitude: 40.416763,
+                longitude: -3.703403,
+                accuracy: 0
+            }
+        },
+        apiTimeout = 30000000,
+        apidfd = null;
+
+    emapic.geoapi = emapic.geoapi || {};
+
+    emapic.geoapi.geoapiLat = null;
+    emapic.geoapi.geoapiLon = null;
+    emapic.geoapi.position0 = null;
+
+    emapic.geoapi.manualGeolocation = false;
+    emapic.geoapi.userDefaultPosition = null;
+    emapic.geoapi.userCountryCode = 'es';
+
+    emapic.geoapi.getLocation = function(callApi) {
+        getIpLocation();
+        $('#geoposwarn').modal("show");
+        $('#dismiss-btn').click(function() {
+            emapic.geoapi.manualGeolocation = true;
+            if (apidfd !== null) {
+                // If made a geolocation request, we reject its promise,
+                // triggering a call to autolocationFailed
+                apidfd.reject();
+            } else {
+                // If we don't have one, we call autolocationFailed manually
+                autolocationFailed();
+            }
+        });
+        if (callApi) {
+            emapic.geoapi.getApiLocation();
         }
     };
-var userDefaultPosition = null;
-var apiTimeout = 30000000;
-var userCountryCode = 'es';
-var apidfd = null;
 
-function getLocation(callApi) {
-    getIpLocation();
-    $('#geoposwarn').modal("show");
-    $('#dismiss-btn').click(function() {
-        manualGeolocation = true;
-        if (apidfd != null) {
-            // If made a geolocation request, we reject its promise,
-            // triggering a call to autolocationFailed
-            apidfd.reject();
-        } else {
-            // If we don't have one, we call autolocationFailed manually
-            autolocationFailed();
-        }
-    });
-    if (callApi) {
-        getApiLocation();
-    }
-}
+    emapic.geoapi.afterGeopos = function() {
+    };
 
-function afterGeopos() {
-}
+    emapic.geoapi.processUserCountry = function(code) {
+    };
 
-function processUserCountry(code) {
-}
-
-function getIpLocation() {
-    var json = $.getJSON( "https://www.freegeoip.net/json/",
-        function(data) {
-            //~ Country codes as in "ISO 3166-1 alfa-2"
-            userCountryCode = data.country_code.toLowerCase() || userCountryCode;
-            if (geoapiLat == null && geoapiLon == null) {
-                defaultPosition.coords.latitude = data.latitude;
-                defaultPosition.coords.longitude = data.longitude
-                if (map == null) {
-                    initializeMap();
+    function getIpLocation() {
+        var json = $.getJSON( "https://www.freegeoip.net/json/",
+            function(data) {
+                //~ Country codes as in "ISO 3166-1 alfa-2"
+                emapic.geoapi.userCountryCode = data.country_code.toLowerCase() || emapic.geoapi.userCountryCode;
+                if (emapic.geoapi.geoapiLat === null && emapic.geoapi.geoapiLon === null) {
+                    defaultPosition.coords.latitude = data.latitude;
+                    defaultPosition.coords.longitude = data.longitude;
+                    if (map === null) {
+                        emapic.initializeMap();
+                    }
+                    emapic.geoapi.processUserCountry(emapic.geoapi.userCountryCode);
                 }
-                processUserCountry(userCountryCode);
+                ipLocationFinished = true;
+                autolocationFailed();
+            }).fail(function() {
+                ipLocationFinished = true;
+                ipLocationFail = true;
+                console.log("not able to connect to freegeoip");
+                autolocationFailed();
+            });
+    }
+
+    emapic.geoapi.getApiLocationRaw = function(successCallback, failCallback) {
+        // standard geolocation api location
+        apidfd = new $.Deferred();
+
+        function errorCallback(error) {
+            //~ Location error handling
+
+            console.log('ERROR(' + error.code + '): ' + error.message);
+            var message = "";
+            apiLocationFail = true;
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                message = "This website does not have permission to use " + "the Geolocation API";
+                break;
+
+                case error.POSITION_UNAVAILABLE:
+                message = "The current position could not be determined.";
+                break;
+
+                case error.PERMISSION_DENIED_TIMEOUT:
+                message = "The current position could not be determined " + "within the specified timeout period.";
+                break;
+
+                case error.TIMEOUT:
+                message = "The request to get user location timed out.";
+                break;
+
+                case error.UNKNOWN_ERROR:
+                message = "An unknown error occurred.";
+                break;
             }
-            ipLocationFinished = true;
-            autolocationFailed();
-        }).fail(function() {
-            ipLocationFinished = true;
-            ipLocationFail = true;
-            console.log("not able to connect to freegeoip");
-            autolocationFailed();
-        });
-}
 
-function declineGeoposwarn() {
-    window.location = 'http://cartolab.udc.es/';
-}
-
-function getApiLocationRaw(successCallback, failCallback) {
-    // standard geolocation api location
-    apidfd = new $.Deferred();
-
-    function errorCallback(error) {
-        //~ Location error handling
-
-        console.log('ERROR(' + error.code + '): ' + error.message);
-        var message = "";
-        apiLocationFail = true;
-        switch (error.code) {
-            case error.PERMISSION_DENIED:
-            message = "This website does not have permission to use " + "the Geolocation API";
-            break;
-
-            case error.POSITION_UNAVAILABLE:
-            message = "The current position could not be determined.";
-            break;
-
-            case error.PERMISSION_DENIED_TIMEOUT:
-            message = "The current position could not be determined " + "within the specified timeout period.";
-            break;
-
-            case error.TIMEOUT:
-            message = "The request to get user location timed out."
-            break;
-
-            case error.UNKNOWN_ERROR:
-            message = "An unknown error occurred."
-            break;
+            if (message === "") {
+                var strErrorCode = error.code.toString();
+                message = "The position could not be determined due to " +
+                    "an unknown error (Code: " + strErrorCode + ").";
+            }
+            console.log('GEOLOCATION ERROR: ' + message);
+            apidfd.reject();
         }
 
-        if (message == "") {
-            var strErrorCode = error.code.toString();
-            message = "The position could not be determined due to " +
-                "an unknown error (Code: " + strErrorCode + ").";
+        function confirmPosition(pos) {
+            apidfd.resolve(pos);
         }
-        console.log('GEOLOCATION ERROR: ' + message);
-        apidfd.reject();
-    }
 
-    function confirmPosition(pos) {
-        apidfd.resolve(pos);
-    }
-
-    if ( navigator.geolocation ) {
-        navigator.geolocation.getCurrentPosition(confirmPosition, errorCallback, {timeout: apiTimeout, maximumAge: 300000});
-        setTimeout(function () {
-            if (apidfd.state() == "pending") {
-                apiLocationFail = true;
-                console.log("GEOLOCATION ERROR: Timeout passed, most probably due to no confirmation from user");
-                apidfd.reject();
-            }
-        }, apiTimeout + 5000);
-    } else {
-        apiLocationFail = true;
-        console.log("GEOLOCATION ERROR: Standard Geolocation API no available");
-        apidfd.reject();
-    }
-    usedGeolocation = true;
-    apidfd.promise().then(function(pos) {
-        geoapiLat = pos.coords.latitude;
-        geoapiLon = pos.coords.longitude;
-        successCallback(pos);
-    }, failCallback);
-}
-
-function getApiLocation() {
-    getApiLocationRaw(setPosition, autolocationFailed);
-}
-
-function saveGeopositionData(pos) {
-    position = [pos.coords.latitude, pos.coords.longitude];
-    position0 = position;
-}
-
-function setPosition(pos) {
-    saveGeopositionData(pos);
-    $('#waiting-location').modal("hide");
-    if (map == null) {
-        initializeMap();
-    }
-    $('#geoposwarn').modal("hide");
-    afterGeopos();
-}
-
-function autolocationFailed() {
-    if (ipLocationFinished && manualGeolocation) {
-        $('#geoposwarn').modal("hide");
-        if (userDefaultPosition) {
-            $('#geoposmanualdefault').show();
-        } else if (ipLocationFail) {
-            if (map == null) {
-                initializeMap();
-            }
-            $('#geoposmanual').show();
+        if ( navigator.geolocation ) {
+            navigator.geolocation.getCurrentPosition(confirmPosition, errorCallback, {timeout: apiTimeout, maximumAge: 300000});
+            setTimeout(function () {
+                if (apidfd.state() == "pending") {
+                    apiLocationFail = true;
+                    console.log("GEOLOCATION ERROR: Timeout passed, most probably due to no confirmation from user");
+                    apidfd.reject();
+                }
+            }, apiTimeout + 5000);
         } else {
-            $('#geoposmanualip').show();
+            apiLocationFail = true;
+            console.log("GEOLOCATION ERROR: Standard Geolocation API no available");
+            apidfd.reject();
         }
-        $('#geoposmanual-title').show();
-        $('#geoposresult').modal('show');
-    } else if (ipLocationFinished && apiLocationFail) {
-        // If the geolocation fails, then it's like manual geolocation
-        // from now on.
-        manualGeolocation = true;
-        $('#geoposwarn').modal("hide");
-        if (ipLocationFail) {
-            if (map == null) {
-                initializeMap();
-            }
-            $('#geoposallerror').show();
-        } else {
-            $('#geoposapierror').show();
-        }
-        $('#geoposerror-title').show();
-        $('#geoposresult').modal('show');
-    }
-}
+        apidfd.promise().then(function(pos) {
+            emapic.geoapi.geoapiLat = pos.coords.latitude;
+            emapic.geoapi.geoapiLon = pos.coords.longitude;
+            successCallback(pos);
+        }, failCallback);
+    };
 
-function autolocationFailedAck() {
-    $('#geoposresult').modal('hide');
-    if (position == null) {
-        setPosition(userDefaultPosition || defaultPosition);
-        position0 = [null, null];
-        if (!userDefaultPosition && ipLocationFail) {
-            processUserCountry(userCountryCode);
+    emapic.geoapi.getApiLocation = function() {
+        emapic.geoapi.getApiLocationRaw(emapic.geoapi.setPosition, autolocationFailed);
+    };
+
+    emapic.geoapi.saveGeopositionData = function(pos) {
+        emapic.position = [pos.coords.latitude, pos.coords.longitude];
+        emapic.geoapi.position0 = emapic.position;
+    };
+
+    emapic.geoapi.setPosition = function(pos) {
+        emapic.geoapi.saveGeopositionData(pos);
+        $('#waiting-location').modal("hide");
+        if (emapic.map === null) {
+            emapic.initializeMap();
+        }
+        $('#geoposwarn').modal("hide");
+        emapic.geoapi.afterGeopos();
+    };
+
+    function autolocationFailed() {
+        if (ipLocationFinished && emapic.geoapi.manualGeolocation) {
+            $('#geoposwarn').modal("hide");
+            if (emapic.geoapi.userDefaultPosition) {
+                $('#geoposmanualdefault').show();
+            } else if (ipLocationFail) {
+                if (map === null) {
+                    emapic.initializeMap();
+                }
+                $('#geoposmanual').show();
+            } else {
+                $('#geoposmanualip').show();
+            }
+            $('#geoposmanual-title').show();
+            $('#geoposresult').modal('show');
+        } else if (ipLocationFinished && apiLocationFail) {
+            // If the geolocation fails, then it's like manual geolocation
+            // from now on.
+            emapic.geoapi.manualGeolocation = true;
+            $('#geoposwarn').modal("hide");
+            if (ipLocationFail) {
+                if (map === null) {
+                    emapic.initializeMap();
+                }
+                $('#geoposallerror').show();
+            } else {
+                $('#geoposapierror').show();
+            }
+            $('#geoposerror-title').show();
+            $('#geoposresult').modal('show');
         }
     }
-}
+
+    emapic.geoapi.autolocationFailedAck = function() {
+        $('#geoposresult').modal('hide');
+        if (emapic.position === null) {
+            emapic.geoapi.setPosition(emapic.geoapi.userDefaultPosition || defaultPosition);
+            emapic.geoapi.position0 = [null, null];
+            if (!emapic.geoapi.userDefaultPosition && ipLocationFail) {
+                emapic.geoapi.processUserCountry(emapic.geoapi.userCountryCode);
+            }
+        }
+    };
+
+})(emapic);

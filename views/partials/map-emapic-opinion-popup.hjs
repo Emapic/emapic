@@ -31,6 +31,6 @@
             </div>
         </form>
         <div class='row text-center'>
-            <button type='submit' class='btn btn-success' onclick='submitMarkerPopupData()'>{{#__}}end_survey{{/__}}</button>
+            <button type='submit' class='btn btn-success' onclick='emapic.modules.survey.submitMarkerPopupData()'>{{#__}}end_survey{{/__}}</button>
         </div>
     </div>

@@ -3,15 +3,11 @@
 //
 
 function startSurvey() {
-	/*$('#general, #survey-nav-btns').show();
-	$('#section-nav-btns').show();
-	$(".questions-block").hide();
-	$('#end-survey-btn').hide();*/
 	addBlockButtons( $('div.questions-section:visible > div.questions-block').length );
 	toQuestionBlock(0);
 }
 
-var afterGeopos = overrideFunction(afterGeopos, null, startSurvey);
+emapic.geoapi.afterGeopos = emapic.utils.overrideFunction(emapic.geoapi.afterGeopos, null, startSurvey);
 
 function continueSurvey() {
 	surveyNextStep();
@@ -28,26 +24,17 @@ function surveyNextStep() {
 		btnIdx = activeBlockIdx + 1;
 		focusBlockButton(btnIdx);
 		document.location.href = "#questions-wrapper";
-		/*if (activeBlockIdx == (blocksNo - 2) && activeSectionIdx == (sectionsNo - 1)) {
-			$('#end-survey-btn').show();
-			$('#survey-next-btn').hide();
-		}*/
 	} else {
 		if (sectionsNo > 1 && activeSectionIdx < (sectionsNo - 1)) {
 			nextQuestionGroup('section');
 			$(".questions-section:visible div.questions-block:first").show();
 			blocksNo = $( 'div.questions-section:visible > div.questions-block').length;
 			activeBlockIdx = $( 'div.questions-section:visible > div.questions-block:visible' ).index();
-			/*if (activeBlockIdx == (blocksNo - 1) && activeSectionIdx == (sectionsNo - 2)) {
-				$('#end-survey-btn').show();
-				$('#survey-next-btn').hide();
-			}*/
 		} else {
 			return false;
 		}
 	}
 	return true;
-	//$('#prev-step-btn').show();
 }
 
 function surveyPrevStep() {
@@ -60,9 +47,6 @@ function surveyPrevStep() {
 		btnIdx = activeBlockIdx - 1;
 		focusBlockButton(btnIdx);
 		document.location.href = "#questions-wrapper";
-		/*if (activeBlockIdx == 1 && activeSectionIdx == 0) {
-			$('#prev-step-btn').hide();
-		}*/
 	} else {
 		if (sectionsNo > 1 && activeSectionIdx >= 1) {
 			prevQuestionGroup('section');
@@ -71,13 +55,8 @@ function surveyPrevStep() {
 			btnIdx = $(".questions-section:visible div.questions-block:last").index();
 			focusBlockButton(btnIdx);
 			activeBlockIdx = $( 'div.questions-section:visible > div.questions-block:visible' ).index();
-			/*if (activeBlockIdx == 0 && activeSectionIdx == 1) {
-				$('#prev-step-btn').hide();
-			}*/
 		}
 	}
-	/*$('#end-survey-btn').hide();
-	$('#survey-next-btn').show();*/
 }
 
 function toQuestionSection(section) {
@@ -105,9 +84,7 @@ function addBlockButtons(blocksNo) {
 	$('#block-nav-btns').html("");
 	if ( blocksNo > 1 ) {
 		for (var i = 1; i <= blocksNo; i++ ) {
-			$('#block-nav-btns').append("\
-				<button type='button' id='edit-question-btn-" + i + "' class='btn edit-question-btn' disabled onclick='toQuestionBlock(" + (i - 1) + ")'></button>\
-			");
+			$('#block-nav-btns').append("<button type='button' id='edit-question-btn-" + i + "' class='btn edit-question-btn' disabled onclick='toQuestionBlock(" + (i - 1) + ")'></button> ");
 		}
 	}
 }
@@ -177,8 +154,8 @@ function prevQuestionGroup(groupType) {
 	}
 }
 
-function activateButton(id) {
+emapic.activateButton = function(id) {
 	$el = $('#' + id).closest('.survey-answer');
 	$el.closest('.listbtns, .rowbtns').find('.active').removeClass('active');
 	$el.addClass('active');
-}
+};

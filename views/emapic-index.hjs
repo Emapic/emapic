@@ -16,7 +16,7 @@
 		</div>
 		<div class="" id="intro-bar">
 			<div class="col-xs-4 col-xs-push-4 text-center" id="intro-arrow">
-				<a class="" href="javascript:void()" onclick="on_arrow_click()"><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span></a>
+				<a class="" href="javascript:void(0)" onclick="emapic.website.onArrowClick()"><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span></a>
 			</div>
 			<div class="col-xs-4 col-xs-push-4 text-right" id="intro-access">
 				{{^user}}
@@ -38,7 +38,7 @@
 
 {{#yield-scripts}}
 <script type="text/javascript">
-    onInitContactsExpand();
+    emapic.website.onInitContactsExpand();
     $('#intro').height(window.innerHeight - 70);
     $('#intro').css('min-height', 350);
     $('#intro-title').css('padding-top', (window.innerHeight - 70) / 4);

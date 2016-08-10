@@ -59,7 +59,7 @@ page.open(url, function(status) {
     window.setTimeout(function () {
         page.evaluate(function() {
             // Disable clustering
-            toggleClustering($('#clustering-control-activate'));
+            emapic.modules.clustering.toggleClustering($('#clustering-control-activate'));
             // Remove the controls
             var control = document.getElementsByClassName('leaflet-control-container');
             for (var i=0; i < control.length; i++) {

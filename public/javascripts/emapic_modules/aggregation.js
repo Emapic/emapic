@@ -1,253 +1,261 @@
 //
 // Vote aggregation by area code
 //
-var provincesLayer;
-var provincesLayerData;
-var countriesLayer;
-var countriesLayerData;
 
-var aggregationButtonsHtml = "<a id='grouping-control-region' title='" + getI18n('js_total_votes_region', 'Ver total de votos por región') + "' class='exclusive-control' href='javascript:void(0)' onclick='showVotesByProvince(this)'><img src='/images/icon-agg_region.png' style='width: 16px; height: 16px;'/></a>\
-    <a id='grouping-control-country' class='exclusive-control' title='" + getI18n('js_total_votes_country', 'Ver total de votos por país') + "' href='javascript:void(0)' onclick='showVotesByCountry(this)'><img src='/images/icon-agg_country.png' style='width: 16px; height: 16px;'/></a>";
+var emapic = emapic || {};
 
-function getProvinceResultsUrl() {
-    return "/api/survey/" + surveyId + "/totals/provinces";
-}
+(function(emapic) {
 
-function getCountryResultsUrl() {
-    return "/api/survey/" + surveyId + "/totals/countries";
-}
+    var provincesLayer,
+        provincesLayerData,
+        countriesLayer,
+        countriesLayerData,
+        aggregationButtonsHtml = "<a id='grouping-control-region' title='" + emapic.utils.getI18n('js_total_votes_region', 'Ver total de votos por región') + "' class='exclusive-control' href='javascript:void(0)' onclick='emapic.modules.aggregation.showVotesByProvince(this)'><img src='/images/icon-agg_region.png' style='width: 16px; height: 16px;'/></a>\n"+
+            "<a id='grouping-control-country' class='exclusive-control' title='" + emapic.utils.getI18n('js_total_votes_country', 'Ver total de votos por país') + "' href='javascript:void(0)' onclick='emapic.modules.aggregation.showVotesByCountry(this)'><img src='/images/icon-agg_country.png' style='width: 16px; height: 16px;'/></a>";
 
-var addViewsControls = overrideFunction(addViewsControls, null, function() {
-    var groupingViewsControl = L.control({position: 'topleft'});
-    groupingViewsControl.onAdd = function (map) {
-        this._div = L.DomUtil.create('div', 'views-control leaflet-bar');
-        this._div.innerHTML = aggregationButtonsHtml;
-        return this._div;
+    emapic.modules = emapic.modules || {};
+    emapic.modules.aggregation = emapic.modules.aggregation || {};
+
+    emapic.modules.aggregation.getProvinceResultsUrl = function() {
+        return "/api/survey/" + emapic.surveyId + "/totals/provinces";
     };
-    groupingViewsControl.addTo(map);
-});
 
-var updateIndivVotesLayer = overrideFunction(updateIndivVotesLayer, function() {
-    deactivateButton($('#grouping-control-region'));
-    deactivateButton($('#grouping-control-country'));
-    if (map.hasLayer(provincesLayer)) {
-        map.removeLayer(provincesLayer);
-    }
+    emapic.modules.aggregation.getCountryResultsUrl = function() {
+        return "/api/survey/" + emapic.surveyId + "/totals/countries";
+    };
 
-    if (map.hasLayer(countriesLayer)) {
-        map.removeLayer(countriesLayer);
-    }
-});
+    emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
+        var groupingViewsControl = L.control({position: 'topleft'});
+        groupingViewsControl.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'views-control leaflet-bar');
+            this._div.innerHTML = aggregationButtonsHtml;
+            return this._div;
+        };
+        groupingViewsControl.addTo(emapic.map);
+    });
 
-function hideAggregatedLayers() {
-    if (map.hasLayer(provincesLayer)) {
-        map.removeLayer(provincesLayer);
-    }
-
-    if (map.hasLayer(countriesLayer)) {
-        map.removeLayer(countriesLayer);
-    }
-    
-    addIndivVotesLayer();
-};
-
-function showVotesByProvince(element) {
-    if (!map.hasLayer(provincesLayer)) {
-        disableIndivLayerExclusiveComponents();
-        if (element != null) {
-            activateExclusiveButton(element);
+    emapic.updateIndivVotesLayer = emapic.utils.overrideFunction(emapic.updateIndivVotesLayer, function() {
+        emapic.deactivateButton($('#grouping-control-region'));
+        emapic.deactivateButton($('#grouping-control-country'));
+        if (emapic.map.hasLayer(provincesLayer)) {
+            emapic.map.removeLayer(provincesLayer);
         }
-        map.removeLayer(indivVotesLayer);
-        map.removeLayer(countriesLayer);
-        if (map.getZoom() > 8) {
-            map.setZoom(6);
-        }
-        map.addLayer(provincesLayer);
-    } else {
-        deactivateButton(element);
-        hideAggregatedLayers();
-    }
-}
 
-function showVotesByCountry(element) {
-    if (!map.hasLayer(countriesLayer)) {
-        disableIndivLayerExclusiveComponents();
-        if (element != null) {
-            activateExclusiveButton(element);
+        if (emapic.map.hasLayer(countriesLayer)) {
+            emapic.map.removeLayer(countriesLayer);
         }
-        map.removeLayer(indivVotesLayer);
-        map.removeLayer(provincesLayer);
-        if (map.getZoom() > 5) {
-            map.setZoom(3);
-        }
-        map.addLayer(countriesLayer);
-    } else {
-        deactivateButton(element);
-        hideAggregatedLayers();
-    }
-}
+    });
 
-function provincePopup(feature) {
-	if (feature.properties.popup_msg) {
-		return feature.properties.popup_msg;
-	}
-    var popup = '<h4><small>' + feature.properties.name + '</small></h4>';
-    var popupProperties = '';
-    var orderedVotes = {};
-    // We order the votes in descending order
-    for (var i in feature.properties) {
-        if (i != 'name' && i != 'total_responses' && i != 'iso_code') {
-			var question = i.split('_')[0];
-			if (!orderedVotes[question]) {
-				orderedVotes[question] = [];
-			}
-            var position = orderedVotes[question].length;
-            for (var j in orderedVotes[question]) {
-                if (orderedVotes[question][j].nr < parseInt(feature.properties[i])) {
-                    position = j;
-                    break;
-                }
+    function hideAggregatedLayers() {
+        if (emapic.map.hasLayer(provincesLayer)) {
+            emapic.map.removeLayer(provincesLayer);
+        }
+
+        if (emapic.map.hasLayer(countriesLayer)) {
+            emapic.map.removeLayer(countriesLayer);
+        }
+        emapic.addIndivVotesLayer();
+    }
+
+    emapic.modules.aggregation.showVotesByProvince = function(element) {
+        if (!emapic.map.hasLayer(provincesLayer)) {
+            emapic.disableIndivLayerExclusiveComponents();
+            if (element !== null) {
+                emapic.activateExclusiveButton(element);
             }
-            orderedVotes[question].splice(position, 0, {nr: parseInt(feature.properties[i]), name: i});
-        }
-    }
-    for (var i in orderedVotes) {
-		for (var j in orderedVotes[i]) {
-			var name = legend.color.responses[orderedVotes[i][j].name.split('_')[1]].value;
-			popupProperties += '<small>' + name + ':</small> ' + orderedVotes[i][j].nr + '<br/>';
-		}
-		if (popupProperties != '') {
-			popupProperties = popupProperties.replace(new RegExp('<br/>$'), '<hr>');
-		}
-    }
-    return popup + popupProperties + '<small>' + getI18n('js_total_votes', 'Votos totales') + ':</small> ' + feature.properties.total_responses;
-}
-
-function countryPopup(feature) {
-	if (feature.properties.popup_msg) {
-		return feature.properties.popup_msg;
-	}
-    var popup = '<h4><small>' + feature.properties.name + '</small></h4>';
-    var popupProperties = '';
-    var orderedVotes = [];
-    // We order the votes in descending order
-    for (var i in feature.properties) {
-        if (i != 'name' && i != 'total_responses' && i != 'iso_code' && i.split('_')[0] == legend.color.question) {
-            var position = orderedVotes.length;
-            for (var j in orderedVotes) {
-                if (orderedVotes[j].nr < parseInt(feature.properties[i])) {
-                    position = j;
-                    break;
-                }
+            emapic.map.removeLayer(emapic.indivVotesLayer);
+            emapic.map.removeLayer(countriesLayer);
+            if (emapic.map.getZoom() > 8) {
+                emapic.map.setZoom(6);
             }
-            orderedVotes.splice(position, 0, {nr: parseInt(feature.properties[i]), name: i});
-        }
-    }
-    for (var i in orderedVotes) {
-		var name = legend.color.responses[orderedVotes[i].name.split('_')[1]].value;
-        popupProperties += '<small>' + name + ':</small> ' + orderedVotes[i].nr + '<br/>'
-    }
-    if (popupProperties != '') {
-        popupProperties = popupProperties.replace(new RegExp('<br/>$'), '<hr>');
-    }
-    return popup + popupProperties + '<small>' + getI18n('js_total_votes', 'Votos totales') + ':</small> ' + feature.properties.total_responses;
-}
-
-function getAreaStyle(feature) {
-    var color = fallbackColor;
-    if (legend && legend.color) {
-        var biggestNr = 0,
-        biggestOpt = null,
-        tie = false;
-        for (var i in feature.properties) {
-            if (i != 'name' && i != 'total_responses' && i != 'iso_code' && i.split('_')[0] == legend.color.question) {
-                var nr = parseInt(feature.properties[i]);
-                if (nr == biggestNr) {
-                    tie = true;
-                }
-                if (nr > biggestNr) {
-                    tie = false;
-                    biggestNr = nr;
-                    biggestOpt = i.split('_')[1];
-                }
-            }
-        }
-
-        if (tie || biggestOpt == null || !(biggestOpt in legend.color.responses)) {
-            color = neutralColor;
+            emapic.map.addLayer(provincesLayer);
         } else {
-            color = legend.color.responses[biggestOpt].legend;
+            emapic.deactivateButton(element);
+            hideAggregatedLayers();
         }
-    }
-
-    return {
-        "color": color,
-        "weight": 5,
-        "opacity": 0.65
     };
-}
 
-function updateAggregatedLayers() {
-	updateAggregatedProvinceLayer();
-	updateAggregatedCountryLayer();
-}
+    emapic.modules.aggregation.showVotesByCountry = function(element) {
+        if (!emapic.map.hasLayer(countriesLayer)) {
+            emapic.disableIndivLayerExclusiveComponents();
+            if (element !== null) {
+                emapic.activateExclusiveButton(element);
+            }
+            emapic.map.removeLayer(emapic.indivVotesLayer);
+            emapic.map.removeLayer(provincesLayer);
+            if (emapic.map.getZoom() > 5) {
+                emapic.map.setZoom(3);
+            }
+            emapic.map.addLayer(countriesLayer);
+        } else {
+            emapic.deactivateButton(element);
+            hideAggregatedLayers();
+        }
+    };
 
-function updateAggregatedProvinceLayer() {
-	var oldLayer = provincesLayer;
-	provincesLayer = L.geoJson(provincesLayerData, {
-		onEachFeature : function(feature, layer) {
-			layer.bindPopup(
-				provincePopup(feature),
-				{
-					className: 'popup-aggregated popup-aggregated-province'
-				}
-			);
-		},
-		style: getAreaStyle
-	});
-	if (map.hasLayer(oldLayer)) {
-		map.removeLayer(oldLayer);
-		map.addLayer(provincesLayer);
-	}
-}
-
-function updateAggregatedCountryLayer() {
-	var oldLayer = countriesLayer;
-	countriesLayer = L.geoJson(countriesLayerData, {
-		onEachFeature : function(feature, layer) {
-			layer.bindPopup(
-				countryPopup(feature),
-				{
-					className: 'popup-aggregated popup-aggregated-country'
-				}
-			);
-		},
-		style: getAreaStyle
-	});
-	if (map.hasLayer(oldLayer)) {
-		map.removeLayer(oldLayer);
-		map.addLayer(countriesLayer);
-	}
-}
-
-var addAllMarkers = (function() {
-    var originalAddAllMarkers = addAllMarkers;
-
-    return function() {
-        originalAddAllMarkers();
-
-        $.getJSON(getProvinceResultsUrl(), function(data) {
-            provincesLayerData = data;
-            updateAggregatedProvinceLayer();
-        });
-        
-        $.getJSON(getCountryResultsUrl(), function(data) {
-            countriesLayerData = data;
-            updateAggregatedCountryLayer();
-        });
+    function provincePopup(feature) {
+    	if (feature.properties.popup_msg) {
+    		return feature.properties.popup_msg;
+    	}
+        var popup = '<h4><small>' + feature.properties.name + '</small></h4>';
+        var popupProperties = '';
+        var orderedVotes = {};
+        // We order the votes in descending order
+        for (var i in feature.properties) {
+            if (i != 'name' && i != 'total_responses' && i != 'iso_code') {
+    			var question = i.split('_')[0];
+    			if (!orderedVotes[question]) {
+    				orderedVotes[question] = [];
+    			}
+                var position = orderedVotes[question].length;
+                for (var j in orderedVotes[question]) {
+                    if (orderedVotes[question][j].nr < parseInt(feature.properties[i])) {
+                        position = j;
+                        break;
+                    }
+                }
+                orderedVotes[question].splice(position, 0, {nr: parseInt(feature.properties[i]), name: i});
+            }
+        }
+        for (i in orderedVotes) {
+    		for (var k in orderedVotes[i]) {
+    			var name = emapic.legend.color.responses[orderedVotes[i][k].name.split('_')[1]].value;
+    			popupProperties += '<small>' + name + ':</small> ' + orderedVotes[i][k].nr + '<br/>';
+    		}
+    		if (popupProperties !== '') {
+    			popupProperties = popupProperties.replace(new RegExp('<br/>$'), '<hr>');
+    		}
+        }
+        return popup + popupProperties + '<small>' + emapic.utils.getI18n('js_total_votes', 'Votos totales') + ':</small> ' + feature.properties.total_responses;
     }
-})();
 
-var reloadLegend = overrideFunction(reloadLegend, null, function() {
-	updateAggregatedLayers();
-});
+    function countryPopup(feature) {
+    	if (feature.properties.popup_msg) {
+    		return feature.properties.popup_msg;
+    	}
+        var popup = '<h4><small>' + feature.properties.name + '</small></h4>';
+        var popupProperties = '';
+        var orderedVotes = [];
+        // We order the votes in descending order
+        for (var i in feature.properties) {
+            if (i != 'name' && i != 'total_responses' && i != 'iso_code' && i.split('_')[0] == emapic.legend.color.question) {
+                var position = orderedVotes.length;
+                for (var j in orderedVotes) {
+                    if (orderedVotes[j].nr < parseInt(feature.properties[i])) {
+                        position = j;
+                        break;
+                    }
+                }
+                orderedVotes.splice(position, 0, {nr: parseInt(feature.properties[i]), name: i});
+            }
+        }
+        for (i in orderedVotes) {
+    		var name = emapic.legend.color.responses[orderedVotes[i].name.split('_')[1]].value;
+            popupProperties += '<small>' + name + ':</small> ' + orderedVotes[i].nr + '<br/>';
+        }
+        if (popupProperties !== '') {
+            popupProperties = popupProperties.replace(new RegExp('<br/>$'), '<hr>');
+        }
+        return popup + popupProperties + '<small>' + emapic.utils.getI18n('js_total_votes', 'Votos totales') + ':</small> ' + feature.properties.total_responses;
+    }
+
+    function getAreaStyle(feature) {
+        var color = emapic.fallbackColor;
+        if (emapic.legend && emapic.legend.color) {
+            var biggestNr = 0,
+                biggestOpt = null,
+                tie = false;
+            for (var i in feature.properties) {
+                if (i != 'name' && i != 'total_responses' && i != 'iso_code' && i.split('_')[0] == emapic.legend.color.question) {
+                    var nr = parseInt(feature.properties[i]);
+                    if (nr == biggestNr) {
+                        tie = true;
+                    }
+                    if (nr > biggestNr) {
+                        tie = false;
+                        biggestNr = nr;
+                        biggestOpt = i.split('_')[1];
+                    }
+                }
+            }
+
+            if (tie || biggestOpt === null || !(biggestOpt in emapic.legend.color.responses)) {
+                color = emapic.neutralColor;
+            } else {
+                color = emapic.legend.color.responses[biggestOpt].legend;
+            }
+        }
+
+        return {
+            "color": color,
+            "weight": 5,
+            "opacity": 0.65
+        };
+    }
+
+    function updateAggregatedLayers() {
+    	updateAggregatedProvinceLayer();
+    	updateAggregatedCountryLayer();
+    }
+
+    function updateAggregatedProvinceLayer() {
+    	var oldLayer = provincesLayer;
+    	provincesLayer = L.geoJson(provincesLayerData, {
+    		onEachFeature : function(feature, layer) {
+    			layer.bindPopup(
+    				provincePopup(feature),
+    				{
+    					className: 'popup-aggregated popup-aggregated-province'
+    				}
+    			);
+    		},
+    		style: getAreaStyle
+    	});
+    	if (emapic.map.hasLayer(oldLayer)) {
+    		emapic.map.removeLayer(oldLayer);
+    		emapic.map.addLayer(provincesLayer);
+    	}
+    }
+
+    function updateAggregatedCountryLayer() {
+    	var oldLayer = countriesLayer;
+    	countriesLayer = L.geoJson(countriesLayerData, {
+    		onEachFeature : function(feature, layer) {
+    			layer.bindPopup(
+    				countryPopup(feature),
+    				{
+    					className: 'popup-aggregated popup-aggregated-country'
+    				}
+    			);
+    		},
+    		style: getAreaStyle
+    	});
+    	if (emapic.map.hasLayer(oldLayer)) {
+    		emapic.map.removeLayer(oldLayer);
+    		emapic.map.addLayer(countriesLayer);
+    	}
+    }
+
+    emapic.addAllMarkers = (function() {
+        var originalAddAllMarkers = emapic.addAllMarkers;
+
+        return function() {
+            originalAddAllMarkers();
+
+            $.getJSON(emapic.modules.aggregation.getProvinceResultsUrl(), function(data) {
+                provincesLayerData = data;
+                updateAggregatedProvinceLayer();
+            });
+
+            $.getJSON(emapic.modules.aggregation.getCountryResultsUrl(), function(data) {
+                countriesLayerData = data;
+                updateAggregatedCountryLayer();
+            });
+        };
+    })();
+
+    emapic.reloadLegend = emapic.utils.overrideFunction(emapic.reloadLegend, null, function() {
+    	updateAggregatedLayers();
+    });
+
+})(emapic);

@@ -81,7 +81,7 @@
             <div id="survey-nav-btns">
                 <div id="block-nav-btns">
                 </div>
-                <button id="end-survey-btn" class="btn btn-success" onclick="surveyFinished()" style="display: none;">{{#__}}finish{{/__}}</button>
+                <button id="end-survey-btn" class="btn btn-success" onclick="emapic.modules.survey.surveyFinished()" style="display: none;">{{#__}}finish{{/__}}</button>
             </div>
 
           </div>
@@ -91,16 +91,16 @@
           </div>
           <div id="check-loc" class="check-loc text-center" hidden>
               <h2>{{#__}}is_your_position_ok{{/__}}</h2>
-              {{#user.geom}}<button id="geolocate-btn" type="button" class="btn btn-warning" onclick="useApiGeolocation()">{{#__}}no_geolocate{{/__}}</button>{{/user.geom}}
-              <button type="button" class="btn btn-danger" onclick="editPosition()">{{#__}}no_edit_manually{{/__}}</button>
-              <button id="relocate-btn" type="button" class="btn btn-success" onclick="confirmPosition() ">{{#__}}yes{{/__}}</button>
+              {{#user.geom}}<button id="geolocate-btn" type="button" class="btn btn-warning" onclick="emapic.modules.survey.useApiGeolocation()">{{#__}}no_geolocate{{/__}}</button>{{/user.geom}}
+              <button type="button" class="btn btn-danger" onclick="emapic.modules.survey.editPosition()">{{#__}}no_edit_manually{{/__}}</button>
+              <button id="relocate-btn" type="button" class="btn btn-success" onclick="emapic.modules.survey.confirmPosition()">{{#__}}yes{{/__}}</button>
               <div id="return-to-survey">
-                  <button type="button" class="btn btn-info" onclick="returnToSurvey()"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> {{#__}}return_to_survey{{/__}}</button>
+                  <button type="button" class="btn btn-info" onclick="emapic.modules.survey.returnToSurvey()"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> {{#__}}return_to_survey{{/__}}</button>
               </div>
           </div>
           <div id="check-edit-loc" class="text-center" hidden>
-              <button type="button" class="btn btn-lg btn-danger" data-dismiss="modal" onclick="cancelPosition()">{{#__}}cancel{{/__}}</button>
-              <button id="relocate-btn" type="button" class="btn btn-lg btn-success" onclick="confirmPosition()">{{#__}}accept{{/__}}</button>
+              <button type="button" class="btn btn-lg btn-danger" data-dismiss="modal" onclick="emapic.modules.survey.cancelPosition()">{{#__}}cancel{{/__}}</button>
+              <button id="relocate-btn" type="button" class="btn btn-lg btn-success" onclick="emapic.modules.survey.confirmPosition()">{{#__}}accept{{/__}}</button>
           </div>
         </div>
       </div>
@@ -138,7 +138,6 @@
     {{^results}}
     <!-- Add survey -->
     <script src="/javascripts/emapic_modules/survey.js"></script>
-    <script src="/javascripts/survey_blocks.js"></script>
     {{/results}}
 
     <!-- Add locators -->
@@ -158,32 +157,31 @@
     <script src="/javascripts/emapic_modules/clustering.js"></script>
 
     <script type="text/javascript">
-        var surveyId = "{{survey.encr_id}}";
+        emapic.surveyId = "{{survey.encr_id}}";
 
-        oldResponses = {{{ responses }}};
+        emapic.oldResponses = {{{ responses }}};
 
-        position = {{{ position }}};
+        emapic.position = {{{ position }}};
 
         {{#results}}
-        surveyResults = true;
+        emapic.surveyResults = true;
         {{#survey.already_opened}}
         if (({{survey.active}} === false) ||
-            (('userId' in oldResponses) && !{{survey.multiple_answer}})) {
+            (('userId' in emapic.oldResponses) && !{{survey.multiple_answer}})) {
             $('#header div.navbar-right > button').prop('disabled', true);
         }
         {{/survey.already_opened}}
         {{/results}}
         {{^results}}
-        surveyResults = false;
+        emapic.surveyResults = false;
 
         {{^survey.results_after_vote}}
-        resultsAfterVote = false;
+        emapic.resultsAfterVote = false;
         {{/survey.results_after_vote}}
-
         {{/results}}
 
         {{#user.geom}}
-        userDefaultPosition =  {
+        emapic.geoapi.userDefaultPosition =  {
             coords: {
                 latitude: {{user.geom.coordinates.1}},
                 longitude: {{user.geom.coordinates.0}},
@@ -193,7 +191,7 @@
         {{/user.geom}}
 
         {{#user}}
-        userLoggedIn = true;
+        emapic.userLoggedIn = true;
         {{/user}}
 
         {{^user}}
@@ -209,28 +207,30 @@
         {{/user}}
 
         var answerSurvey = function() {
-            window.location.href = '/survey/' + surveyId;
+            window.location.href = '/survey/' + emapic.surveyId;
         }
 
+        {{^results}}
         {{#emapicOpinion}}
-        var preparePopupData = function() {
-            data.emapic_experience_comments = ($('.leaflet-popup-content #emapic_experience_comments').val().trim() != "") ? $('.leaflet-popup-content #emapic_experience_comments').val().trim() : null;
-            data.emapic_experience_final_position_reason = $('.leaflet-popup-content #emapic_experience_final_position_reason').val();
-            data.emapic_experience_geolocation_result = $('.leaflet-popup-content #emapic_experience_geolocation_result').val();
-        }
+        emapic.modules.survey.preparePopupData = function() {
+            emapic.modules.survey.data.emapic_experience_comments = ($('.leaflet-popup-content #emapic_experience_comments').val().trim() != "") ? $('.leaflet-popup-content #emapic_experience_comments').val().trim() : null;
+            emapic.modules.survey.data.emapic_experience_final_position_reason = $('.leaflet-popup-content #emapic_experience_final_position_reason').val();
+            emapic.modules.survey.data.emapic_experience_geolocation_result = $('.leaflet-popup-content #emapic_experience_geolocation_result').val();
+        };
 
         {{/emapicOpinion}}
-        var prepareSurveyData = function() {
-            data.browser_os = navigator.userAgent;
-            data.precision = precision;
-            data.lat0 = geoapiLat;
-            data.lng0 = geoapiLon;
-            data.lat = position[0];
-            data.lng = position[1];
-            data.responses = responses;
-        }
+        emapic.modules.survey.prepareSurveyData = function() {
+            emapic.modules.survey.data.browser_os = navigator.userAgent;
+            emapic.modules.survey.data.precision = emapic.precision;
+            emapic.modules.survey.data.lat0 = emapic.geoapi.geoapiLat;
+            emapic.modules.survey.data.lng0 = emapic.geoapi.geoapiLon;
+            emapic.modules.survey.data.lat = emapic.position[0];
+            emapic.modules.survey.data.lng = emapic.position[1];
+            emapic.modules.survey.data.responses = emapic.modules.survey.responses;
+        };
 
-        var loadStats = overrideFunction(loadStats, null, function(data) {
+        {{/results}}
+        emapic.modules.counterStats.loadStats = emapic.utils.overrideFunction(emapic.modules.counterStats.loadStats, null, function(data) {
             var voteChart = dc.pieChart("#vote-chart");
 
             $('#vote-chart .reset').click(function() {
@@ -245,7 +245,7 @@
 
             // dimension by vote
             var voteDimension = ndx.dimension(function (d) {
-                return (d.properties[legend.color.question + '.id']) ? d.properties[legend.color.question + '.id'] : 'NC';
+                return (d.properties[emapic.legend.color.question + '.id']) ? d.properties[emapic.legend.color.question + '.id'] : 'NC';
             });
             var voteDimensionGroup = voteDimension.group();
 
@@ -257,9 +257,9 @@
                 .group(voteDimensionGroup) // set group
                 .title(function(d) {
                     var id = ('data' in d) ? d.data.key : d.key;
-                    return legend.color.responses[id].value + ": " + d.value;
+                    return emapic.legend.color.responses[id].value + ": " + d.value;
                 }).label(function (d) {
-                    var label = legend.color.responses[d.key].value;
+                    var label = emapic.legend.color.responses[d.key].value;
                     if (voteChart.hasFilter() && !voteChart.hasFilter(d.key)) {
                         return label + ' (0%)';
                     }
@@ -268,7 +268,7 @@
                     }
                     return label;
                 })
-                .colors(function(d){ return (d && legend && legend.color) ? legend.color.responses[d].legend : 'grey';}); // set colors function
+                .colors(function(d){ return (d && emapic.legend && emapic.legend.color) ? emapic.legend.color.responses[d].legend : 'grey';}); // set colors function
 
             //simply call renderAll() to render all charts on the page
             dc.renderAll();

@@ -379,7 +379,7 @@ module.exports = function(sequelize, DataTypes) {
                                                     // If we have an image for the answer, we display it inside a box with the legend color left of the answer's text
                                                     html += '<div class="col-xs-12 text-left"><button id="btn-q' + parent.question_order + '-a' + answers[i].sortorder +
                                                         '" type="button" class="col-xs-12 btn btn-lg survey-answer outlined-text answer-with-image" value="' + escape(answers[i].answer) +
-                                                        '" onclick="addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' + answers[i].sortorder +
+                                                        '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' + answers[i].sortorder +
                                                         '\', \'' + answers[i].sortorder + '\')"' + ((parent.legend_question == 'color' && answers[i].legend !== null) ?
                                                         (' style="border-color: ' + escape(answers[i].legend) + '"') : '' ) + '><div class="flex-container">' +
                                                         '<div class="answer-img" style="background-image: url(\'/answer_img/' + answers[i].id + '\');"></div><span>' +
@@ -388,7 +388,7 @@ module.exports = function(sequelize, DataTypes) {
                                                     // If we don't have an image, we simply put the text along with a box with the legend color
                                                     html += '<div class="col-xs-12 text-left"><button id="btn-q' + parent.question_order + '-a' + answers[i].sortorder +
                                                         '" type="button" class="col-xs-12 btn btn-lg survey-answer outlined-text" value="' + escape(answers[i].answer) +
-                                                        '" onclick="addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
+                                                        '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
                                                         answers[i].sortorder + '\', \'' + answers[i].sortorder + '\')"' + ((parent.legend_question == 'color' &&
                                                         answers[i].legend !== null) ? (' style="border-color: ' + escape(answers[i].legend) + '"') : '' ) +
                                                         '><div class="flex-container"><span>' + escape(answers[i].answer) + '</span></div></button></div>\n';
@@ -407,7 +407,7 @@ module.exports = function(sequelize, DataTypes) {
                                                     // If we have an image for the answer, we display it inside the button, with a tooltip with the text
                                                     html += '<div class="col-xs-12 col-lg-6 text-center"><button id="btn-q' + parent.question_order + '-a' + answers[j].sortorder +
                                                         '" type="button" class="survey-answer outlined-text btn btn-lg answer-with-image" value="' + escape(answers[j].answer) +
-                                                        '" onclick="addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
+                                                        '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
                                                         answers[j].sortorder + '\', \'' + answers[j].sortorder + '\')"' +
                                                         ((parent.legend_question == 'color' && answers[j].legend !== null) ? (' style="border-color: ' +
                                                         escape(answers[j].legend) + '"') : '' ) + ' title="' + escape(answers[j].answer) + '">' + '<div class="img-with-caption"><img src="/answer_img/' +
@@ -416,7 +416,7 @@ module.exports = function(sequelize, DataTypes) {
                                                     // If we don't have an image, we simply put the text
                                                     html += '<div class="col-xs-12 col-lg-6 text-center"><button id="btn-q' + parent.question_order + '-a' + answers[j].sortorder +
                                                         '" type="button" class="survey-answer outlined-text btn btn-lg" value="' + escape(answers[j].answer) +
-                                                        '" onclick="addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order +
+                                                        '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order +
                                                         '-a' + answers[j].sortorder + '\', \'' + answers[j].sortorder + '\')"' +
                                                         ((parent.legend_question == 'color' && escape(answers[j].legend) !== null) ? (' style="border-color: ' +
                                                         escape(answers[j].legend) + '"') : '' ) + '>' + escape(answers[j].answer) + '</button></div>\n';
@@ -442,7 +442,7 @@ module.exports = function(sequelize, DataTypes) {
                                                 // If we have an image for the answer, we display it inside a box with the legend color left of the answer's text
                                                 html += '<div class="col-xs-12 text-left"><button id="btn-q' + parent.question_order + '-a' + answers[k].sortorder +
                                                     '" type="button" class="col-xs-12 btn btn-lg survey-answer outlined-text answer-with-image" value="' + escape(answers[k].answer) +
-                                                    '" onclick="addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
+                                                    '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
                                                     answers[k].sortorder + '\', \'' + answers[k].sortorder + '\')"' + ((parent.legend_question == 'color' && answers[k].legend !== null) ?
                                                     (' style="border-color: ' + escape(answers[k].legend) + '"') : '' ) + '><div class="flex-container">' +
                                                     '<div class="answer-img" style="background-image: url(\'/answer_img/' + answers[k].id +
@@ -451,7 +451,7 @@ module.exports = function(sequelize, DataTypes) {
                                                 // If we don't have an image, we simply put the text along with a box with the legend color
                                                 html += '<div class="col-xs-12 text-left"><button id="btn-q' + parent.question_order + '-a' + answers[k].sortorder +
                                                     '" type="button" class="col-xs-12 btn btn-lg survey-answer outlined-text" value="' + escape(answers[k].answer) +
-                                                    '" onclick="addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
+                                                    '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
                                                     answers[k].sortorder + '\', \'' + answers[k].sortorder + '\')"' + ((parent.legend_question == 'color' &&
                                                     answers[k].legend !== null) ? (' style="border-color: ' + escape(answers[k].legend) + '"') : '' ) +
                                                     '><div class="flex-container"><span>' + escape(answers[k].answer) + '</span></div></button></div>\n';
@@ -472,8 +472,8 @@ module.exports = function(sequelize, DataTypes) {
                                                     '<div class="answer-img" style="background-image: url(\'/answer_img/' + otherAnswer.id +
                                                     '\');"></div><input autocomplete="off" id="btn-q' + parent.question_order + '-other-input"' +
                                                     ' placeholder="' + escape(otherAnswer.answer) + '" type="text" target="btn-q' + parent.question_order +
-                                                    '-other-ok" onkeydown="inputEnterToClick(event)" onkeyup="checkInputNotVoid(this)"/><button id="btn-q' + parent.question_order +
-                                                    '-other-ok" autocomplete="off" disabled class="btn btn-primary pull-right" onclick="addAnswer(\'q' + parent.question_order +
+                                                    '-other-ok" onkeydown="emapic.utils.inputEnterToClick(event)" onkeyup="emapic.utils.checkInputNotVoid(this)"/><button id="btn-q' + parent.question_order +
+                                                    '-other-ok" autocomplete="off" disabled class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order +
                                                     '\', \'btn-q' + parent.question_order + '-other-input\', \'' + otherAnswer.sortorder + '\')">OK</button></div></div></div>\n';
                                             } else {
                                                 // If we don't have an image, we simply put the text along with a box with the legend color
@@ -482,8 +482,8 @@ module.exports = function(sequelize, DataTypes) {
                                                     otherAnswer.legend !== null) ? (' style="border-color: ' + escape(otherAnswer.legend) + '"') : '' ) +
                                                     '><div class="flex-container"><input autocomplete="off" id="btn-q' + parent.question_order +
                                                     '-other-input" placeholder="' + escape(otherAnswer.answer) + '" type="text" target="btn-q' + parent.question_order +
-                                                    '-other-ok" onkeydown="inputEnterToClick(event)" onkeyup="checkInputNotVoid(this)"/><button id="btn-q' + parent.question_order +
-                                                    '-other-ok" autocomplete="off" disabled class="btn btn-primary pull-right" onclick="addAnswer(\'q' + parent.question_order +
+                                                    '-other-ok" onkeydown="emapic.utils.inputEnterToClick(event)" onkeyup="emapic.utils.checkInputNotVoid(this)"/><button id="btn-q' + parent.question_order +
+                                                    '-other-ok" autocomplete="off" disabled class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order +
                                                     '\', \'btn-q' + parent.question_order + '-other-input\', \'' + otherAnswer.sortorder + '\')">OK</button></div></div></div>\n';
                                             }
                                             html += '<style>#btn-q' + parent.question_order + '-other:hover,' +
@@ -506,15 +506,15 @@ module.exports = function(sequelize, DataTypes) {
                             '<div class="col-xs-12 text-left"><div id="q' + parent.question_order + '-other"' +
                             ' class="col-xs-12 btn btn-lg survey-answer text-answer"><div class="flex-container"><input autocomplete="off" id="q' +
                             parent.question_order + '-input" type="text" target="q' + parent.question_order +
-                            '-ok" onkeydown="inputEnterToClick(event)" onkeyup="checkInputNotVoid(this)"/><button id="q' + parent.question_order +
-                            '-ok" autocomplete="off" disabled class="btn btn-primary pull-right" onclick="addAnswer(\'q' + parent.question_order +
+                            '-ok" onkeydown="emapic.utils.inputEnterToClick(event)" onkeyup="emapic.utils.checkInputNotVoid(this)"/><button id="q' + parent.question_order +
+                            '-ok" autocomplete="off" disabled class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order +
                             '\', \'q' + parent.question_order + '-input\')">OK</button></div></div></div>\n</div>';
                     case 'explanatory-text':
                         return '<div class="main-question" id="question-' + parent.question_order + '">\n' +
                             '<div class="col-xs-12 text-center"><div id="q' + parent.question_order + '-other"' +
                             '  class="col-xs-12 col-md-6 col-md-offset-3 survey-answer explanatory-text"><p id="q' + parent.question_order +
                             '">' + escape(parent.question) + '</p><br/><button id="q' + parent.question_order +
-                            '-ok" class="btn btn-primary" onclick="advanceSurvey()">OK</button></div></div>\n</div>';
+                            '-ok" class="btn btn-primary" onclick="emapic.modules.survey.advanceSurvey()">OK</button></div></div>\n</div>';
                     default:
                         return new Error("Question type not contemplated.");
                 }

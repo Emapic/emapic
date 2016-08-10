@@ -14,7 +14,7 @@
         <p id="geoposallerror">{{#__}}geoposallerror_body{{/__}}</p>
       </div>
       <div class="modal-footer">
-        <button id="accept-btn" type="button" class="btn btn-primary" onclick="autolocationFailedAck()">{{#__}}accept{{/__}}</button>
+        <button id="accept-btn" type="button" class="btn btn-primary" onclick="emapic.geoapi.autolocationFailedAck()">{{#__}}accept{{/__}}</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
