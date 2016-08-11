@@ -151,6 +151,7 @@
 	"js_all": "All",
 	"js_see_country": "See country",
 	"js_country_of_origin": "Country of origin",
+	"js_totals": "Totals",
 	"js_%_positive_votes": "% positive votes",
 	"js_full_date_format": "j/n/Y",
 	"js_week_format": "\\\\S\\\\e\\\\m\\\\a\\\\n\\\\a W (\\\\d\\\\e\\\\l j/n/Y)",

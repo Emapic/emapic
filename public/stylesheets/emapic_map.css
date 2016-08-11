@@ -880,8 +880,18 @@ select#sex-select.mas {
     min-width: 32px;
     min-height: 16px;
 }
+.leaflet-sidebar table#countries-table tbody tr {
+    border-bottom: none !important;
+}
+.leaflet-sidebar table#countries-table tbody tr:first-child td,
+.leaflet-sidebar table#countries-table tbody tr:last-child td {
+    border-top: 3px double #dddddd;
+}
 .leaflet-sidebar .stats-country-label {
     display: none;
+}
+.leaflet-sidebar .stats-country-totals {
+    font-weight: bold;
 }
 /* Fix a small problem with popup messages over leaflet buttons */
 .leaflet-bar a:last-of-type {

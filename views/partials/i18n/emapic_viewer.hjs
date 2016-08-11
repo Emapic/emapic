@@ -20,6 +20,7 @@
     emapic.utils.registerI18n('js_all', '{{#__}}js_all{{/__}}');
     emapic.utils.registerI18n('js_see_country', '{{#__}}js_see_country{{/__}}');
     emapic.utils.registerI18n('js_country_of_origin', '{{#__}}js_country_of_origin{{/__}}');
+    emapic.utils.registerI18n('js_totals', '{{#__}}js_totals{{/__}}');
     emapic.utils.registerI18n('js_%_positive_votes', '{{#__}}js_%_positive_votes{{/__}}');
     emapic.utils.registerI18n('js_full_date_format', '{{#__}}js_full_date_format{{/__}}');
     emapic.utils.registerI18n('js_week_format', '{{#__}}js_week_format{{/__}}');

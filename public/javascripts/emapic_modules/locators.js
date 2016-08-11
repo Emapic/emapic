@@ -162,7 +162,9 @@ var emapic = emapic || {};
 
     function populateSidebarDataVotedCountries() {
         if (sidebarVotedCountriesData) {
-            var specificVotesHtml = '';
+            var specificVotesHtml = '',
+                total = 0,
+                totals = [];
             if (emapic.legend && emapic.legend.color) {
                 for (var i=0, len=emapic.legend.color.responses_array.length; i<len; i++) {
                     specificVotesHtml += "<td><small>" + emapic.utils.escapeHtml(emapic.legend.color.responses_array[i].value) + "</small></td>\n";
@@ -173,8 +175,15 @@ var emapic = emapic || {};
     			if (sidebarAllCountriesData[stat.properties.iso_code] !== undefined) {
     				var specificVotesHtml = '';
                     if (emapic.legend && emapic.legend.color) {
+                        var votes;
                         for (i=0, len=emapic.legend.color.responses_array.length; i<len; i++) {
-                            specificVotesHtml += "<td><small>" + stat.properties[emapic.legend.color.question + '_' + emapic.legend.color.responses_array[i].id] + "</small></td>\n";
+                            votes = parseInt(stat.properties[emapic.legend.color.question + '_' + emapic.legend.color.responses_array[i].id]);
+                            if (typeof totals[i] == 'undefined') {
+                                totals[i] = 0;
+                            }
+                            totals[i] += votes;
+                            total += votes;
+                            specificVotesHtml += "<td><small>" + votes + "</small></td>\n";
                         }
                     }
     				$('#voted_countries tbody').append("<tr>\n" +
@@ -186,6 +195,19 @@ var emapic = emapic || {};
     					"</tr>");
     			}
     		});
+            var totalsHtml = "";
+            if (emapic.legend && emapic.legend.color) {
+                for (var j=0, leng=emapic.legend.color.responses_array.length; j<leng; j++) {
+                    totalsHtml += "<td><small>" + totals[j] + "</small></td>\n";
+                }
+            }
+            $('#voted_countries tbody').append("<tr class='stats-country-totals'>\n" +
+                "<td class='stats-country-label'></td>\n" +
+                "<td></td>\n" +
+                "<td class='country-name'>" + emapic.utils.getI18n('js_totals', 'Totales') + "</td>\n" +
+                totalsHtml +
+                "<td><small>" + total + "</small></td>\n" +
+                "</tr>");
 
             $('#voted_countries tbody tr').on("click", function() {
                 var countryCode = $(this).find('.stats-country-label').html();
