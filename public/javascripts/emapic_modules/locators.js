@@ -220,7 +220,9 @@ var emapic = emapic || {};
             $('#voted_countries tbody').append("<tr class='stats-country-totals'>\n" +
                 "<td class='stats-country-label'></td>\n" +
                 "<td colspan='2'>" + sidebarVotedCountriesData.length +
-                " " + emapic.utils.getI18n('js_totals_countries', 'países') + "</td>\n" +
+                " " + (sidebarVotedCountriesData.length == 1 ?
+                emapic.utils.getI18n('js_totals_country', 'país') :
+                emapic.utils.getI18n('js_totals_countries', 'países')) + "</td>\n" +
                 totalsHtml + "<td><small>" + total + "</small></td>\n</tr>");
 
             $('#voted_countries tbody').append(countriesHtml);

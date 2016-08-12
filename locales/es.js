@@ -151,6 +151,7 @@
 	"js_all": "todos",
 	"js_see_country": "Ver país",
 	"js_country_of_origin": "País de origen",
+	"js_totals_country": "país",
 	"js_totals_countries": "países",
 	"js_%_positive_votes": "% votos positivos",
 	"js_full_date_format": "j/n/Y",
