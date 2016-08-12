@@ -868,6 +868,7 @@ select#sex-select.mas {
     max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
+    vertical-align: middle !important;
 }
 .leaflet-sidebar td img {
     margin: 2px 0 0 -5px;
@@ -898,6 +899,7 @@ select#sex-select.mas {
 .leaflet-sidebar .flag-container {
     height: 14px;
     width: 18px;
+    margin: auto;
 }
 .leaflet-sidebar .stats-country-label {
     display: none;
