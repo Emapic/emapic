@@ -128,6 +128,14 @@ var SampleApp = function() {
           req.i18n.setLocaleFromQuery();
           req.i18n.setLocaleFromCookie();
           res.locals.web_locale = req.i18n.getLocale();
+          switch(res.locals.web_locale) {
+              case 'en':
+                // We use United Kingdom as reference for english
+                res.locals.web_locale_iso = 'gb';
+                break;
+              default:
+                res.locals.web_locale_iso = res.locals.web_locale;
+          }
           next();
         });
         self.app.use(function(req, res, next) {

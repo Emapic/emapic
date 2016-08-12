@@ -8,6 +8,14 @@
   font-weight: normal;
   font-style: normal;
 }
+.flag-container {
+    display: inline;
+    display: flex;
+    border: 1px solid black;
+}
+.flag-container .flag-icon {
+    width: 100%;
+}
 body {
     font-family: hero,sans-serif;
     background-color: #004F71;
@@ -886,6 +894,10 @@ select#sex-select.mas {
 .leaflet-sidebar table#countries-table tbody tr:first-child td,
 .leaflet-sidebar table#countries-table tbody tr:nth-child(2) td {
     border-top: 3px double #dddddd;
+}
+.leaflet-sidebar .flag-container {
+    height: 14px;
+    width: 18px;
 }
 .leaflet-sidebar .stats-country-label {
     display: none;

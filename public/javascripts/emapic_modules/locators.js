@@ -189,8 +189,9 @@ var emapic = emapic || {};
                     }
                     countriesHtml += "<tr>\n" +
                         "<td class='stats-country-label'>" + stat.properties.iso_code + "</td>\n" +
-                        "<td><img class='pull-left' src='/images/flags/gif/" + stat.properties.iso_code +
-                        ".gif' /></td>\n<td class='country-name'>" +
+                        "<td><div class='flag-container'><span class='flag-icon flag-icon-" +
+                        stat.properties.iso_code + "'></div></span>" +
+                        "</td>\n<td class='country-name'>" +
                         sidebarAllCountriesData[stat.properties.iso_code].NAME + "</td>\n" +
                         specificVotesHtml + "<td><small>" +
                         stat.properties.total_responses + "</small></td>\n</tr>";
@@ -224,7 +225,7 @@ var emapic = emapic || {};
             $('#all_countries tbody').append("<tr>\n" +
                 "<td><span class='label label-default pull-left'>" + code + "</span></td>\n" +
                 "<td class='country-name'>" + sidebarAllCountriesData[code].NAME + "</td>\n" +
-                "<td><img class='pull-right' src='/images/flags/gif/" + code + ".gif' /></td>\n" +
+                "<td><div class='flag-container'><span class='flag-icon flag-icon-" + code + "'></span></div></td>\n" +
                 "</tr>");
         });
 

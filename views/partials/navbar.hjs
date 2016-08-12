@@ -17,12 +17,12 @@
         <a class="navbar-brand" href="/"><img src="/images/logo.svg" alt="Emapic"/></a>
         <div class="dropdown pull-left language-selector">
           <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            <span><img src="/images/languages-flags/{{web_locale}}.png"/></span>
+            <div class="flag-container"><span class='flag-icon flag-icon-{{web_locale_iso}}'></span></div>
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" onclick="emapic.utils.setLocale('es');"><img src="/images/languages-flags/es.png"/></a></li>
-            <li><a href="#" onclick="emapic.utils.setLocale('en');"><img src="/images/languages-flags/en.png"/></a></li>
+            <li><a href="#" onclick="emapic.utils.setLocale('es');"><div class="flag-container"><span class='flag-icon flag-icon-es'></span></div></a></li>
+            <li><a href="#" onclick="emapic.utils.setLocale('en');"><div class="flag-container"><span class='flag-icon flag-icon-gb'></span></div></a></li>
           </ul>
         </div>
     </div>
