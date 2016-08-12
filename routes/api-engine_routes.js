@@ -169,6 +169,64 @@ module.exports = function(app) {
         });
     });
 
+    app.get('/api/survey/:id/totals/provinces/bbox', function(req, res) {
+        models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
+            if (survey === null) {
+                return res.end();
+            }
+            survey.getOwner().then(function(owner) {
+                // Survey is closed
+                if ((survey.active === false) ||
+                // Data required by the owner
+                (req.user && owner.id == req.user.id) ||
+                // Results are always public
+                survey.public_results ||
+                // Results after vote
+                survey.results_after_vote ||
+                // It's a local request from the server itself
+                (req.ip == '127.0.0.1' && (req.host == '127.0.0.1' || req.host == 'localhost'))) {
+                    survey.getProvinceTotalsBbox().then(function(responses) {
+                        if (!responses) {
+                            return res.json([]);
+                        }
+                        res.json(postGISQueryToFeatureCollection(responses));
+                    });
+                } else {
+                    res.end();
+                }
+            });
+        });
+    });
+
+    app.get('/api/survey/:id/totals/provinces/nogeom', function(req, res) {
+        models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
+            if (survey === null) {
+                return res.end();
+            }
+            survey.getOwner().then(function(owner) {
+                // Survey is closed
+                if ((survey.active === false) ||
+                // Data required by the owner
+                (req.user && owner.id == req.user.id) ||
+                // Results are always public
+                survey.public_results ||
+                // Results after vote
+                survey.results_after_vote ||
+                // It's a local request from the server itself
+                (req.ip == '127.0.0.1' && (req.host == '127.0.0.1' || req.host == 'localhost'))) {
+                    survey.getProvinceTotalsNoGeom().then(function(responses) {
+                        if (!responses) {
+                            return res.json([]);
+                        }
+                        res.json(responses);
+                    });
+                } else {
+                    res.end();
+                }
+            });
+        });
+    });
+
     app.get('/api/survey/:id/totals/countries', function(req, res) {
         models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
@@ -196,6 +254,64 @@ module.exports = function(app) {
                             answers.push(questions[i].Answers);
                         }
                         res.json(postGISQueryToFeatureCollection(addAggregatedVotesPopupMessage(responses, questions, answers)));
+                    });
+                } else {
+                    res.end();
+                }
+            });
+        });
+    });
+
+    app.get('/api/survey/:id/totals/countries/bbox', function(req, res) {
+        models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
+            if (survey === null) {
+                return res.end();
+            }
+            survey.getOwner().then(function(owner) {
+                // Survey is closed
+                if ((survey.active === false) ||
+                // Data required by the owner
+                (req.user && owner.id == req.user.id) ||
+                // Results are always public
+                survey.public_results ||
+                // Results after vote
+                survey.results_after_vote ||
+                // It's a local request from the server itself
+                (req.ip == '127.0.0.1' && (req.host == '127.0.0.1' || req.host == 'localhost'))) {
+                    survey.getCountryTotalsBbox().then(function(responses) {
+                        if (!responses) {
+                            return res.json([]);
+                        }
+                        res.json(postGISQueryToFeatureCollection(responses));
+                    });
+                } else {
+                    res.end();
+                }
+            });
+        });
+    });
+
+    app.get('/api/survey/:id/totals/countries/nogeom', function(req, res) {
+        models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
+            if (survey === null) {
+                return res.end();
+            }
+            survey.getOwner().then(function(owner) {
+                // Survey is closed
+                if ((survey.active === false) ||
+                // Data required by the owner
+                (req.user && owner.id == req.user.id) ||
+                // Results are always public
+                survey.public_results ||
+                // Results after vote
+                survey.results_after_vote ||
+                // It's a local request from the server itself
+                (req.ip == '127.0.0.1' && (req.host == '127.0.0.1' || req.host == 'localhost'))) {
+                    survey.getCountryTotalsNoGeom().then(function(responses) {
+                        if (!responses) {
+                            return res.json([]);
+                        }
+                        res.json(responses);
                     });
                 } else {
                     res.end();

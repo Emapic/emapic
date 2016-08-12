@@ -522,7 +522,7 @@ module.exports = function(sequelize, DataTypes) {
             getProvinceTotals: function() {
                 var survey = this;
                 return this.getLegend().then(function(legend) {
-                    var query = "SELECT a.name, st_asgeojson(a.geom) as geojson, count(b.gid) AS total_responses";
+                    var query = "SELECT lower(a.iso_a2) AS iso_code, a.name, st_asgeojson(a.geom) as geojson, count(b.gid) AS total_responses";
                     if (legend && legend.color) {
                         for (var i = 0, iLen = legend.color.length; i<iLen; i++) {
                             var legendResponses = legend.color[i].responses_array;
@@ -531,7 +531,41 @@ module.exports = function(sequelize, DataTypes) {
                             }
                         }
                     }
-                    query += " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid GROUP BY a.name, geojson ORDER BY total_responses DESC, a.name ASC;";
+                    query += " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid GROUP BY iso_code, a.name, geojson ORDER BY total_responses DESC, a.name ASC;";
+                    return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+                });
+            },
+
+            getProvinceTotalsBbox: function() {
+                var survey = this;
+                return this.getLegend().then(function(legend) {
+                    var query = "SELECT lower(a.iso_a2) AS iso_code, a.name, st_asgeojson(st_envelope(a.geom)) as geojson, count(b.gid) AS total_responses";
+                    if (legend && legend.color) {
+                        for (var i = 0, iLen = legend.color.length; i<iLen; i++) {
+                            var legendResponses = legend.color[i].responses_array;
+                            for (var j = 0, jLen = legendResponses.length; j<jLen; j++) {
+                                query += ", count(CASE WHEN b." + legend.color[i].question + "::text = '" + legendResponses[j].id + "'::text THEN 1 ELSE NULL::integer END) AS \"" + legend.color[i].question + "_" + legendResponses[j].id + "\"";
+                            }
+                        }
+                    }
+                    query += " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid GROUP BY iso_code, a.name, geojson ORDER BY total_responses DESC, a.name ASC;";
+                    return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+                });
+            },
+
+            getProvinceTotalsNoGeom: function() {
+                var survey = this;
+                return this.getLegend().then(function(legend) {
+                    var query = "SELECT lower(a.iso_a2) AS iso_code, a.name, count(b.gid) AS total_responses";
+                    if (legend && legend.color) {
+                        for (var i = 0, iLen = legend.color.length; i<iLen; i++) {
+                            var legendResponses = legend.color[i].responses_array;
+                            for (var j = 0, jLen = legendResponses.length; j<jLen; j++) {
+                                query += ", count(CASE WHEN b." + legend.color[i].question + "::text = '" + legendResponses[j].id + "'::text THEN 1 ELSE NULL::integer END) AS \"" + legend.color[i].question + "_" + legendResponses[j].id + "\"";
+                            }
+                        }
+                    }
+                    query += " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid GROUP BY iso_code, a.name ORDER BY total_responses DESC, a.name ASC;";
                     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
                 });
             },
@@ -549,6 +583,40 @@ module.exports = function(sequelize, DataTypes) {
                         }
                     }
                     query += " FROM base_layers.countries a JOIN base_layers.provinces b ON a.gid = b.country_gid JOIN opinions.survey_" + survey.id + " c ON b.gid = c.province_gid GROUP BY iso_code, a.name, geojson ORDER BY total_responses DESC, a.name ASC;";
+                    return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+                });
+            },
+
+            getCountryTotalsBbox: function() {
+                var survey = this;
+                return this.getLegend().then(function(legend) {
+                    var query = "SELECT lower(a.iso_code_2) AS iso_code, a.name, st_asgeojson(st_envelope(a.geom)) as geojson, count(c.gid) AS total_responses";
+                    if (legend && legend.color) {
+                        for (var i = 0, iLen = legend.color.length; i<iLen; i++) {
+                            var legendResponses = legend.color[i].responses_array;
+                            for (var j = 0, jLen = legendResponses.length; j<jLen; j++) {
+                                query += ", count(CASE WHEN c." + legend.color[i].question + "::text = '" + legendResponses[j].id + "'::text THEN 1 ELSE NULL::integer END) AS \"" + legend.color[i].question + "_" + legendResponses[j].id + "\"";
+                            }
+                        }
+                    }
+                    query += " FROM base_layers.countries a JOIN base_layers.provinces b ON a.gid = b.country_gid JOIN opinions.survey_" + survey.id + " c ON b.gid = c.province_gid GROUP BY iso_code, a.name, geojson ORDER BY total_responses DESC, a.name ASC;";
+                    return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+                });
+            },
+
+            getCountryTotalsNoGeom: function() {
+                var survey = this;
+                return this.getLegend().then(function(legend) {
+                    var query = "SELECT lower(a.iso_code_2) AS iso_code, a.name, count(c.gid) AS total_responses";
+                    if (legend && legend.color) {
+                        for (var i = 0, iLen = legend.color.length; i<iLen; i++) {
+                            var legendResponses = legend.color[i].responses_array;
+                            for (var j = 0, jLen = legendResponses.length; j<jLen; j++) {
+                                query += ", count(CASE WHEN c." + legend.color[i].question + "::text = '" + legendResponses[j].id + "'::text THEN 1 ELSE NULL::integer END) AS \"" + legend.color[i].question + "_" + legendResponses[j].id + "\"";
+                            }
+                        }
+                    }
+                    query += " FROM base_layers.countries a JOIN base_layers.provinces b ON a.gid = b.country_gid JOIN opinions.survey_" + survey.id + " c ON b.gid = c.province_gid GROUP BY iso_code, a.name ORDER BY total_responses DESC, a.name ASC;";
                     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
                 });
             },
