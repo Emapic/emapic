@@ -17,6 +17,7 @@ var emapic = emapic || {};
     emapic.redirectUrl = "/";
     emapic.legend = {};
     emapic.fullLegend = null;
+    emapic.allCountriesData = {};
     // We'll use this color, for example, in ties
     emapic.neutralColor = 'grey';
     emapic.fallbackColor = 'black';
@@ -33,7 +34,12 @@ var emapic = emapic || {};
         return "/api/survey/" + emapic.surveyId + "/legend";
     };
 
+    emapic.getCountryBboxesJsonUrl = function() {
+        return "/api/baselayers/countries/bbox";
+    };
+
     emapic.preinitEmappy = function() {
+        emapic.loadCountryBboxes();
         emapic.loadLegend();
         if (emapic.map === null) {
             emapic.initializeMap();
@@ -147,15 +153,28 @@ var emapic = emapic || {};
         }
     };
 
-    emapic.centerViewBounds = function(countryCode) {
-        //~ Country codes as in "ISO 3166-1 alfa-2"
-        $.getJSON("/data/countries.json", function(data) {
-            var miny = data[countryCode].MINY,
-                minx = data[countryCode].MINX,
-                maxy = data[countryCode].MAXY,
-                maxx = data[countryCode].MAXX;
-            emapic.map.fitBounds([[miny, minx], [maxy, maxx]]);
+    emapic.loadCountryBboxes = function() {
+        var countryBboxesUrl = emapic.getCountryBboxesJsonUrl();
+        if (countryBboxesUrl) {
+            $.getJSON(countryBboxesUrl, emapic.processCountriesBboxesData);
+        }
+    };
+
+    emapic.processCountriesBboxesData = function(data) {
+        $.each(data.features, function(i, country) {
+            emapic.allCountriesData[country.properties.iso_code] = {};
+            emapic.allCountriesData[country.properties.iso_code].properties = country.properties;
+            emapic.allCountriesData[country.properties.iso_code].bbox = [[country.geometry.coordinates[0][0][1], country.geometry.coordinates[0][0][0]],
+                [country.geometry.coordinates[0][2][1], country.geometry.coordinates[0][2][0]]];
         });
+        return data;
+    };
+
+    emapic.centerViewCountryBounds = function(countryCode) {
+        //~ Country codes as in "ISO 3166-1 alfa-2"
+        if (countryCode in emapic.allCountriesData) {
+            emapic.map.fitBounds(emapic.allCountriesData[countryCode].bbox);
+        }
     };
 
     emapic.centerOnGeolocation = function(lat, long, accuracy) {

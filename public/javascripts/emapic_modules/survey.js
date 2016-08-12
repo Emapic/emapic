@@ -64,8 +64,8 @@ var emapic = emapic || {};
         emapic.modules.survey.startSurvey();
     };
 
-    emapic.geoapi.processUserCountry = function(code) {
-        emapic.centerViewBounds(code);
+    emapic.geoapi.processUserCountry = function(countryCode) {
+        emapic.centerViewCountryBounds(countryCode);
     };
 
     emapic.modules.survey.startSurvey = function() {
