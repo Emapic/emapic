@@ -310,4 +310,64 @@ module.exports = function(app) {
         });
 	});
 
+    app.get('/api/baselayers/countries', function(req, res) {
+        sequelize.query("SELECT lower(iso_code_2) AS iso_code, name, st_asgeojson(geom) as geojson FROM base_layers.countries WHERE iso_code_2 IS NOT NULL ORDER BY iso_code;",
+            { type: sequelize.QueryTypes.SELECT }).then(function(responses) {
+            if (!responses) {
+                return res.json([]);
+            }
+            res.json(postGISQueryToFeatureCollection(responses));
+        });
+    });
+
+    app.get('/api/baselayers/countries/bbox', function(req, res) {
+        sequelize.query("SELECT lower(iso_code_2) AS iso_code, name, st_asgeojson(st_envelope(geom)) as geojson FROM base_layers.countries WHERE iso_code_2 IS NOT NULL ORDER BY iso_code;",
+            { type: sequelize.QueryTypes.SELECT }).then(function(responses) {
+            if (!responses) {
+                return res.json([]);
+            }
+            res.json(postGISQueryToFeatureCollection(responses));
+        });
+    });
+
+    app.get('/api/baselayers/countries/nogeom', function(req, res) {
+        sequelize.query("SELECT lower(iso_code_2) AS iso_code, name FROM base_layers.countries WHERE iso_code_2 IS NOT NULL ORDER BY iso_code;",
+            { type: sequelize.QueryTypes.SELECT }).then(function(responses) {
+            if (!responses) {
+                return res.json([]);
+            }
+            res.json(responses);
+        });
+    });
+
+    app.get('/api/baselayers/provinces', function(req, res) {
+        sequelize.query("SELECT gns_adm1 AS country_id, iso_3166_2 AS iso_code, adm1_code as adm_code, name, type_en AS type, lower(iso_a2) AS country_iso_code, st_asgeojson(geom) as geojson FROM base_layers.provinces WHERE iso_a2 IS NOT NULL ORDER BY country_id;",
+            { type: sequelize.QueryTypes.SELECT }).then(function(responses) {
+            if (!responses) {
+                return res.json([]);
+            }
+            res.json(postGISQueryToFeatureCollection(responses));
+        });
+    });
+
+    app.get('/api/baselayers/provinces/bbox', function(req, res) {
+        sequelize.query("SELECT gns_adm1 AS country_id, iso_3166_2 AS iso_code, adm1_code as adm_code, name, type_en AS type, lower(iso_a2) AS country_iso_code, st_asgeojson(st_envelope(geom)) as geojson FROM base_layers.provinces WHERE iso_a2 IS NOT NULL ORDER BY country_id;provinces",
+            { type: sequelize.QueryTypes.SELECT }).then(function(responses) {
+            if (!responses) {
+                return res.json([]);
+            }
+            res.json(postGISQueryToFeatureCollection(responses));
+        });
+    });
+
+    app.get('/api/baselayers/provinces/nogeom', function(req, res) {
+        sequelize.query("SELECT gns_adm1 AS country_id, iso_3166_2 AS iso_code, adm1_code as adm_code, name, type_en AS type, lower(iso_a2) AS country_iso_code FROM base_layers.provinces WHERE iso_a2 IS NOT NULL ORDER BY country_id;",
+            { type: sequelize.QueryTypes.SELECT }).then(function(responses) {
+            if (!responses) {
+                return res.json([]);
+            }
+            res.json(responses);
+        });
+    });
+
 };
