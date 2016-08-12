@@ -164,7 +164,8 @@ var emapic = emapic || {};
         if (sidebarVotedCountriesData) {
             var specificVotesHtml = '',
                 total = 0,
-                totals = [];
+                totals = [],
+                countriesHtml = "";
             if (emapic.legend && emapic.legend.color) {
                 for (var i=0, len=emapic.legend.color.responses_array.length; i<len; i++) {
                     specificVotesHtml += "<td><small>" + emapic.utils.escapeHtml(emapic.legend.color.responses_array[i].value) + "</small></td>\n";
@@ -186,13 +187,13 @@ var emapic = emapic || {};
                             specificVotesHtml += "<td><small>" + votes + "</small></td>\n";
                         }
                     }
-    				$('#voted_countries tbody').append("<tr>\n" +
-    					"<td class='stats-country-label'>" + stat.properties.iso_code + "</td>\n" +
-    					"<td><img class='pull-left' src='/images/flags/gif/" + stat.properties.iso_code + ".gif' /></td>\n" +
-    					"<td class='country-name'>" + sidebarAllCountriesData[stat.properties.iso_code].NAME + "</td>\n" +
-    					specificVotesHtml +
-    					"<td><small>" + stat.properties.total_responses + "</small></td>\n" +
-    					"</tr>");
+                    countriesHtml += "<tr>\n" +
+                        "<td class='stats-country-label'>" + stat.properties.iso_code + "</td>\n" +
+                        "<td><img class='pull-left' src='/images/flags/gif/" + stat.properties.iso_code +
+                        ".gif' /></td>\n<td class='country-name'>" +
+                        sidebarAllCountriesData[stat.properties.iso_code].NAME + "</td>\n" +
+                        specificVotesHtml + "<td><small>" +
+                        stat.properties.total_responses + "</small></td>\n</tr>";
     			}
     		});
             var totalsHtml = "";
@@ -203,15 +204,17 @@ var emapic = emapic || {};
             }
             $('#voted_countries tbody').append("<tr class='stats-country-totals'>\n" +
                 "<td class='stats-country-label'></td>\n" +
-                "<td></td>\n" +
-                "<td class='country-name'>" + emapic.utils.getI18n('js_totals', 'Totales') + "</td>\n" +
-                totalsHtml +
-                "<td><small>" + total + "</small></td>\n" +
-                "</tr>");
+                "<td colspan='2'>" + sidebarVotedCountriesData.features.length +
+                " " + emapic.utils.getI18n('js_totals_countries', 'países') + "</td>\n" +
+                totalsHtml + "<td><small>" + total + "</small></td>\n</tr>");
+
+            $('#voted_countries tbody').append(countriesHtml);
 
             $('#voted_countries tbody tr').on("click", function() {
                 var countryCode = $(this).find('.stats-country-label').html();
-                emapic.centerViewBounds(countryCode);
+                if (countryCode !== '') {
+                    emapic.centerViewBounds(countryCode);
+                }
             });
         }
     }
