@@ -249,7 +249,7 @@ var emapic = emapic || {};
     }
 
     function populateSidebarDataAllCountries() {
-        $.when(emapic.getAllCountriesData()).done(function() {
+        emapic.getAllCountriesData().then(function() {
             allCountriesSpinner.stop();
             $.each(emapic.allCountriesData, function(code, country) {
                 $('#all_countries tbody').append("<tr>\n" +

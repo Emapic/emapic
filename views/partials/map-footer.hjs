@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jScrollPane/2.0.22/script/jquery.jscrollpane.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.2/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.Spin/1.0.0/leaflet.spin.min.js"></script>
     <script src="/libs/leaflet/js/L.Control.Sidebar.js"></script>
     <script src="/libs/leaflet/js/L.Control.SelectQuestion.js"></script>
 

@@ -165,13 +165,17 @@ var emapic = emapic || {};
     };
 
     emapic.loadData = function() {
-        emapic.addAllMarkers(null);
+        emapic.map.spin(true);
+        var allLayersLoadedPromise = emapic.addAllMarkers();
         emapic.addViewsControls();
         // If we have more than one set of legend, we display a question selector
         if (emapic.fullLegend && emapic.fullLegend.color && emapic.fullLegend.color.length > 1) {
     		emapic.addQuestionSelector();
     	}
         emapic.addTooltips();
+        allLayersLoadedPromise.then(function() {
+            emapic.map.spin(false);
+        });
     };
 
     emapic.addTooltips = function() {
@@ -340,7 +344,7 @@ var emapic = emapic || {};
     emapic.addAllMarkers = function() {
         var resultsUrl = emapic.getResultsJsonUrl();
         if (resultsUrl) {
-            $.getJSON(resultsUrl, emapic.processMainLayerData);
+            return emapic.addIndivMarkers();
         } else {
             if (emapic.map) {
                 emapic.map.fitBounds(
@@ -350,7 +354,17 @@ var emapic = emapic || {};
                     )
                 );
             }
+            return $.when();
         }
+    };
+
+    emapic.addIndivMarkers = function() {
+        var indivMarkersDfd = $.Deferred();
+        $.getJSON(emapic.getResultsJsonUrl(), function(data) {
+            emapic.processMainLayerData(data);
+            indivMarkersDfd.resolve();
+        });
+        return indivMarkersDfd.promise();
     };
 
     emapic.processLegendData = function(data) {

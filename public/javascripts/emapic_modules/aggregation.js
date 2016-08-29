@@ -236,23 +236,23 @@ var emapic = emapic || {};
     	}
     }
 
-    emapic.addAllMarkers = (function() {
-        var originalAddAllMarkers = emapic.addAllMarkers;
-
-        return function() {
-            originalAddAllMarkers();
-
+    emapic.addAllMarkers = emapic.utils.overrideFunction(emapic.addAllMarkers, null, function(promise) {
+            var provinceResultsDfd = $.Deferred();
             $.getJSON(emapic.modules.aggregation.getProvinceResultsUrl(), function(data) {
                 provincesLayerData = data;
                 updateAggregatedProvinceLayer();
+                provinceResultsDfd.resolve();
             });
 
+            var countryResultsDfd = $.Deferred();
             $.getJSON(emapic.modules.aggregation.getCountryResultsUrl(), function(data) {
                 countriesLayerData = data;
                 updateAggregatedCountryLayer();
+                countryResultsDfd.resolve();
             });
-        };
-    })();
+
+            return $.when(promise, provinceResultsDfd.promise(), countryResultsDfd.promise());
+    });
 
     emapic.reloadLegend = emapic.utils.overrideFunction(emapic.reloadLegend, null, function() {
     	updateAggregatedLayers();
