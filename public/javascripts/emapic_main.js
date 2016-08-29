@@ -85,7 +85,7 @@ var emapic = emapic || {};
         return votedCountriesDataDfd.promise();
     };
 
-    emapic.preinitEmappy = function() {
+    emapic.preinitEmapic = function() {
         emapic.getAllCountriesData();
         emapic.loadLegend();
         if (emapic.map === null) {
@@ -93,7 +93,7 @@ var emapic = emapic || {};
         }
     };
 
-    emapic.initEmappy = function() {
+    emapic.initEmapic = function() {
         if (emapic.map === null) {
             emapic.initializeMap();
         }
@@ -337,7 +337,7 @@ var emapic = emapic || {};
         if (legendUrl) {
             $.getJSON(legendUrl, emapic.processLegendData);
         } else {
-            emapic.initEmappy();
+            emapic.initEmapic();
         }
     };
 
@@ -372,7 +372,7 @@ var emapic = emapic || {};
     	for (var a in emapic.fullLegend) {
     		emapic.legend[a] = emapic.fullLegend[a][0];
     	}
-        emapic.initEmappy();
+        emapic.initEmapic();
     };
 
     emapic.changeActiveLegend = function(type, nr) {
@@ -449,5 +449,5 @@ var emapic = emapic || {};
 
 $(document).ready(function() {
     $.ajaxSetup({ cache: false });
-    emapic.preinitEmappy();
+    emapic.preinitEmapic();
 });

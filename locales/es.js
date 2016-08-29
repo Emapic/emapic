@@ -16,7 +16,7 @@
 	"geoposwarning_emapic_geopositioning": "Geoposicionamiento de Emapic",
 	"geoposwarning_emapic_geopositioning_body_1": "Esta encuesta requiere utilizar la posición geográfica ofrecida por el navegador web para poder ofrecer un mapa de ubicaciones de las respuestas.",
 	"geoposwarning_emapic_geopositioning_body_2": "La única finalidad de la encuesta es conocer las opiniones de los usuarios y su localización aproximada, así la posición final puede ser modificada libremente durante el proceso de la encuesta antes de que se guarde la información requerida del usuario.",
-	"geoposwarning_emapic_geopositioning_body_3": "La tecnología usada pertenece al proyecto <a href='http://emappy-cartolab.rhcloud.com'>Emapic</a> desarrollado por el <a href='http://cartolab.udc.es'>laboratorio de investigación Cartolab</a> de la Escuela de Ingenieros de Caminos, Canales y Puertos de la Universidad de Coruña.",
+	"geoposwarning_emapic_geopositioning_body_3": "La tecnología usada pertenece al proyecto <a href='https://emapic.es'>Emapic</a> desarrollado por el <a href='http://cartolab.udc.es'>laboratorio de investigación Cartolab</a> de la Escuela de Ingenieros de Caminos, Canales y Puertos de la Universidad de Coruña.",
 	"geoposwarning_options": "Opciones de geoposicionamiento",
 	"geoposwarning_options_header_logged": "Como usuario autenticado puedes elegir entre:",
 	"geoposwarning_options_header_non_logged": "Como usuario anónimo puedes elegir entre:",

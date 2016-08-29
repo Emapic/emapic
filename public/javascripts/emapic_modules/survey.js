@@ -6,7 +6,7 @@ var emapic = emapic || {};
 
 (function(emapic) {
 
-    var originalInitEmappy = emapic.initEmappy,
+    var originalInitEmapic = emapic.initEmapic,
         questionId;
 
     emapic.modules = emapic.modules || {};
@@ -31,12 +31,12 @@ var emapic = emapic || {};
         "style='fill:#005781;stroke:#ffffff;stroke-width:0.99999998;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none' />\n" +
         "</svg>";
 
-    emapic.initEmappy = function()  {
+    emapic.initEmapic = function()  {
         // If we have a position, then the user already voted
         // and if we are in a results page, no survey should
         // be displayed
         if (emapic.position !== null || emapic.surveyResults) {
-            originalInitEmappy();
+            originalInitEmapic();
             if (emapic.position !== null) {
                 // Position must be reversed (x,y) -> (lat,lon)
                 emapic.position = emapic.position.reverse();

@@ -16,7 +16,7 @@
 	"geoposwarning_emapic_geopositioning": "Geopositioning of Emapic",
 	"geoposwarning_emapic_geopositioning_body_1": "This survey requires the use of the geographical position offered by the web browser in order to provide a location map of the answers.",
 	"geoposwarning_emapic_geopositioning_body_2": "The only objective of the survey is to get to know the opinions of the users and their approximate location, that way the final position can be freely modified during the process of the survey before saving the information required from the user.",
-	"geoposwarning_emapic_geopositioning_body_3": "The technology used belongs to the project <a href='http://emappy-cartolab.rhcloud.com'>Emapic</a> developed by the <a href='http://cartolab.udc.es'> investigation laboratory Cartolab</a> at the Escuela de Ingenieros de Caminos, Canales y Puertos of the University of Coruña.",
+	"geoposwarning_emapic_geopositioning_body_3": "The technology used belongs to the project <a href='https://emapic.es'>Emapic</a> developed by the <a href='http://cartolab.udc.es'> investigation laboratory Cartolab</a> at the Escuela de Ingenieros de Caminos, Canales y Puertos of the University of Coruña.",
 	"geoposwarning_options": "Geopositioning options",
 	"geoposwarning_options_header_logged": "As an authorised user you can choose between:",
 	"geoposwarning_options_header_non_logged": "As an anonymous user you can choose between:",

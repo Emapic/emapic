@@ -2,7 +2,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
 
-    <!-- Emappy Styles -->
+    <!-- Emapic Styles -->
     <link rel="stylesheet" type="text/css" href="/stylesheets/emapic_map.css">
     <!-- Jquery-UI Styles -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.0/themes/ui-lightness/jquery-ui.min.css">
