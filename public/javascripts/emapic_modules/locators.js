@@ -23,7 +23,7 @@ var emapic = emapic || {};
             "<a id='control-country-filter' title='" + emapic.utils.getI18n('js_see_per_country', 'Ver por país') + "' href='javascript:void(0)' onclick='emapic.modules.locators.filterCountry();'><span class='glyphicon glyphicon-flag'></span></a>\n" +
             "<a id='control-world' title='" + emapic.utils.getI18n('js_see_whole_world', 'Ver todo el mundo') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"world\");'><span class='glyphicon glyphicon-globe'></span></a>",
         geolocationDependantBtns = ['control-user', 'control-country'],
-        allCountriesHtml = "<h3>" + emapic.utils.getI18n('js_see_country', 'Ver país') + "</h3>\n" +
+        allCountriesHtml = "<div><h3>" + emapic.utils.getI18n('js_see_country', 'Ver país') + "</h3>\n" +
             "<div class='row'>\n" +
             "<div class='col-md-6'>\n" +
             "<div class='btn-group'>\n" +
@@ -35,8 +35,15 @@ var emapic = emapic || {};
             "<input type='text' id='country-search' class='form-control input-sm search-countries' oninput='emapic.modules.locators.searchCountries(\"all_countries\");'>\n" +
             "</div>\n" +
             "</div>\n" +
-            "<table class='table table-responsive' id='countries-table-all'><tbody></tbody></table>\n",
-        votedCountriesHtml = "<h3>" + emapic.utils.getI18n('js_see_country', 'Ver país') + "</h3>\n" +
+            "</div>\n" +
+            "<div>\n" +
+            "<div>\n" +
+            "<div class='table-scroll'>\n" +
+            "<table class='table table-responsive' id='countries-table-all'><tbody></tbody></table>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n",
+        votedCountriesHtml = "<div><h3>" + emapic.utils.getI18n('js_see_country', 'Ver país') + "</h3>\n" +
             "<div class='row'>\n" +
             "<div class='col-md-6'>\n" +
             "<div class='btn-group'>\n" +
@@ -48,10 +55,17 @@ var emapic = emapic || {};
             "<input type='text' id='country-search' class='form-control input-sm search-countries' oninput='emapic.modules.locators.searchCountries(\"voted_countries\");'>\n" +
             "</div>\n" +
             "</div>\n" +
+            "</div>\n" +
+            "<div>\n" +
+            "<div>\n" +
+            "<div class='table-scroll'>\n" +
             "<table class='table table-responsive text-center' id='countries-table'>\n" +
             "<thead></thead>\n" +
             "<tbody></tbody>\n" +
-            "</table>";
+            "</table>\n" +
+            "</div>\n" +
+            "</div>\n" +
+            "</div>\n";
 
     emapic.modules = emapic.modules || {};
     emapic.modules.locators = emapic.modules.locators || {};
