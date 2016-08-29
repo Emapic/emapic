@@ -582,7 +582,7 @@ module.exports = function(sequelize, DataTypes) {
                             }
                         }
                     }
-                    query += " FROM base_layers.countries a JOIN base_layers.provinces b ON a.gid = b.country_gid JOIN opinions.survey_" + survey.id + " c ON b.gid = c.province_gid GROUP BY iso_code, a.name, geojson ORDER BY total_responses DESC, a.name ASC;";
+                    query += " FROM base_layers.countries a JOIN base_layers.provinces b ON a.gid = b.country_gid JOIN opinions.survey_" + survey.id + " c ON b.gid = c.province_gid GROUP BY iso_code, a.name, geojson ORDER BY total_responses DESC, iso_code ASC;";
                     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
                 });
             },
@@ -599,7 +599,7 @@ module.exports = function(sequelize, DataTypes) {
                             }
                         }
                     }
-                    query += " FROM base_layers.countries a JOIN base_layers.provinces b ON a.gid = b.country_gid JOIN opinions.survey_" + survey.id + " c ON b.gid = c.province_gid GROUP BY iso_code, a.name, geojson ORDER BY total_responses DESC, a.name ASC;";
+                    query += " FROM base_layers.countries a JOIN base_layers.provinces b ON a.gid = b.country_gid JOIN opinions.survey_" + survey.id + " c ON b.gid = c.province_gid GROUP BY iso_code, a.name, geojson ORDER BY total_responses DESC, iso_code ASC;";
                     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
                 });
             },
@@ -616,7 +616,7 @@ module.exports = function(sequelize, DataTypes) {
                             }
                         }
                     }
-                    query += " FROM base_layers.countries a JOIN base_layers.provinces b ON a.gid = b.country_gid JOIN opinions.survey_" + survey.id + " c ON b.gid = c.province_gid GROUP BY iso_code, a.name ORDER BY total_responses DESC, a.name ASC;";
+                    query += " FROM base_layers.countries a JOIN base_layers.provinces b ON a.gid = b.country_gid JOIN opinions.survey_" + survey.id + " c ON b.gid = c.province_gid GROUP BY iso_code, a.name ORDER BY total_responses DESC, iso_code ASC;";
                     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
                 });
             },
