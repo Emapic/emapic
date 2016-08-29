@@ -14,9 +14,10 @@ var emapic = emapic || {};
 
     var allCountries = $('#all_countries'),
         votedCountries = $('#voted_countries'),
+        allCountriesSpinner = null,
+        votedCountriesSpinner = null,
         sidebar,
         allCountriesBbox = [[null, null], [null, null]],
-        sidebarVotedCountriesData = null,
         locatorsButtonsHtml = "<a id='control-user' title='" + emapic.utils.getI18n('js_see_my_position', 'Ver mi posición') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"user\");'><span class='glyphicon glyphicon-user'></span></a>\n" +
             "<a id='control-country' title='" + emapic.utils.getI18n('js_see_my_country', 'Ver mi país') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"country\");'><img src='/images/icon-espana.png' /></a>\n" +
             "<a id='control-country-filter' title='" + emapic.utils.getI18n('js_see_per_country', 'Ver por país') + "' href='javascript:void(0)' onclick='emapic.modules.locators.filterCountry();'><span class='glyphicon glyphicon-flag'></span></a>\n" +
@@ -48,22 +49,12 @@ var emapic = emapic || {};
             "</div>\n" +
             "</div>\n" +
             "<table class='table table-responsive text-center' id='countries-table'>\n" +
-            "<thead>\n" +
-            "<tr>\n" +
-            "<td></td>\n" +
-            "<td><small>" + emapic.utils.getI18n('js_country_of_origin', 'País de origen') + "</small></td>{{specificVotesHtml}}\n" +
-            "<td><small>" + emapic.utils.getI18n('js_total_votes', 'Votos totales') + "</small></td>\n" +
-            "</tr>\n" +
-            "</thead>\n" +
+            "<thead></thead>\n" +
             "<tbody></tbody>\n" +
             "</table>";
 
     emapic.modules = emapic.modules || {};
     emapic.modules.locators = emapic.modules.locators || {};
-
-    emapic.modules.locators.getStatsCountriesJsonUrl = function() {
-        return "/api/survey/" + emapic.surveyId + "/totals/countries/nogeom";
-    };
 
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
         sidebar = L.control.sidebar('sidebar', {
@@ -142,23 +133,27 @@ var emapic = emapic || {};
 
     function populateSidebar() {
         allCountries.html(allCountriesHtml);
-
-        $.getJSON(emapic.modules.locators.getStatsCountriesJsonUrl(), populateSidebarData);
+        allCountriesSpinner = new Spinner().spin($('#all_countries tbody')[0]);
+        votedCountries.html(votedCountriesHtml);
+        votedCountriesSpinner = new Spinner().spin($('#voted_countries tbody')[0]);
+        emapic.modules.locators.showSidebarAllCountries();
+        populateSidebarData();
     }
 
-    function populateSidebarData(stats) {
-    	sidebarVotedCountriesData = stats;
+    function populateSidebarData() {
         populateSidebarDataAllCountries();
         populateSidebarDataVotedCountries();
-        if (sidebarVotedCountriesData &&
-            sidebarVotedCountriesData.length > 0) {
+        if (emapic.votedCountriesData &&
+            emapic.votedCountriesData.length > 0) {
             emapic.modules.locators.showSidebarVotedCountries();
         }
     }
 
     function populateSidebarDataVotedCountries() {
-        if (sidebarVotedCountriesData) {
-            var specificVotesHtml = '',
+        $.when(emapic.getAllCountriesData(), emapic.getVotedCountriesData()).done(function() {
+            votedCountriesSpinner.stop();
+            var specificVotesHtml = '<tr>\n' +
+                "<td colspan='2'><small>" + emapic.utils.getI18n('js_country_of_origin', 'País de origen') + "</small></td>\n",
                 total = 0,
                 totals = [],
                 countriesHtml = "";
@@ -167,8 +162,9 @@ var emapic = emapic || {};
                     specificVotesHtml += "<td><small>" + emapic.utils.escapeHtml(emapic.legend.color.responses_array[i].value) + "</small></td>\n";
                 }
             }
-            votedCountries.html(votedCountriesHtml.replace('{{specificVotesHtml}}', specificVotesHtml));
-    		$.each(sidebarVotedCountriesData, function(i, stat) {
+            specificVotesHtml += "<td><small>" + emapic.utils.getI18n('js_total_votes', 'Votos totales') + "</small></td></tr>";
+            $('#voted_countries thead').html(specificVotesHtml);
+    		$.each(emapic.votedCountriesData, function(i, stat) {
     			if (emapic.allCountriesData[stat.iso_code] !== undefined) {
     				var specificVotesHtml = '';
                     if (emapic.legend && emapic.legend.color) {
@@ -217,10 +213,10 @@ var emapic = emapic || {};
                     totalsHtml += "<td><small>" + totals[j] + "</small></td>\n";
                 }
             }
-            $('#voted_countries tbody').append("<tr class='stats-country-totals'>\n" +
+            $('#voted_countries tbody').html("<tr class='stats-country-totals'>\n" +
                 "<td class='stats-country-label'></td>\n" +
-                "<td colspan='2'>" + sidebarVotedCountriesData.length +
-                " " + (sidebarVotedCountriesData.length == 1 ?
+                "<td colspan='2'>" + emapic.votedCountriesData.length +
+                " " + (emapic.votedCountriesData.length == 1 ?
                 emapic.utils.getI18n('js_totals_country', 'país') :
                 emapic.utils.getI18n('js_totals_countries', 'países')) + "</td>\n" +
                 totalsHtml + "<td><small>" + total + "</small></td>\n</tr>");
@@ -235,21 +231,23 @@ var emapic = emapic || {};
                     emapic.map.fitBounds(allCountriesBbox);
                 }
             });
-        }
+        });
     }
 
     function populateSidebarDataAllCountries() {
-        $.each(emapic.allCountriesData, function(code, country) {
-            $('#all_countries tbody').append("<tr>\n" +
-                "<td><span class='label label-default pull-left'>" + code + "</span></td>\n" +
-                "<td class='country-name'>" + emapic.allCountriesData[code].properties.name + "</td>\n" +
-                "<td><div class='flag-container'><span class='flag-icon flag-icon-" + code + "'></span></div></td>\n" +
-                "</tr>");
-        });
-
-        $('#all_countries tbody tr').on("click", function() {
-            var countryCode = $(this).find('.label').html();
-            emapic.centerViewCountryBounds(countryCode);
+        $.when(emapic.getAllCountriesData()).done(function() {
+            allCountriesSpinner.stop();
+            $.each(emapic.allCountriesData, function(code, country) {
+                $('#all_countries tbody').append("<tr>\n" +
+                    "<td><span class='label label-default pull-left'>" + code + "</span></td>\n" +
+                    "<td class='country-name'>" + emapic.allCountriesData[code].properties.name + "</td>\n" +
+                    "<td><div class='flag-container'><span class='flag-icon flag-icon-" + code + "'></span></div></td>\n" +
+                    "</tr>");
+            });
+            $('#all_countries tbody tr').on("click", function() {
+                var countryCode = $(this).find('.label').html();
+                emapic.centerViewCountryBounds(countryCode);
+            });
         });
     }
 

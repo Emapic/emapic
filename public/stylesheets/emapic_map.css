@@ -892,9 +892,9 @@ select#sex-select.mas {
 .leaflet-sidebar table#countries-table tbody tr {
     border-bottom: none !important;
 }
-.leaflet-sidebar table#countries-table tbody tr:first-child td,
-.leaflet-sidebar table#countries-table tbody tr:nth-child(2) td {
-    border-top: 3px double #dddddd;
+.leaflet-sidebar table#countries-table thead tr:first-child td,
+.leaflet-sidebar table#countries-table tbody tr:first-child td {
+    border-bottom: 3px double #dddddd;
 }
 .leaflet-sidebar .flag-container {
     height: 14px;
