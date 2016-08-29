@@ -227,7 +227,7 @@ var emapic = emapic || {};
                     totalsHtml += "<td><small>" + totals[j] + "</small></td>\n";
                 }
             }
-            $('#voted_countries tbody').html("<tr class='stats-country-totals'>\n" +
+            $('#voted_countries thead').append("<tr class='stats-country-totals'>\n" +
                 "<td class='stats-country-label'></td>\n" +
                 "<td colspan='2'>" + emapic.votedCountriesData.length +
                 " " + (emapic.votedCountriesData.length == 1 ?
@@ -235,7 +235,7 @@ var emapic = emapic || {};
                 emapic.utils.getI18n('js_totals_countries', 'países')) + "</td>\n" +
                 totalsHtml + "<td><small>" + total + "</small></td>\n</tr>");
 
-            $('#voted_countries tbody').append(countriesHtml);
+            $('#voted_countries tbody').html(countriesHtml);
 
             $('#voted_countries tbody tr').on("click", function() {
                 var countryCode = $(this).find('.stats-country-label').html();
