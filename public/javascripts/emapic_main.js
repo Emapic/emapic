@@ -165,7 +165,9 @@ var emapic = emapic || {};
     };
 
     emapic.loadData = function() {
-        emapic.map.spin(true);
+        if (emapic.map !== null) {
+            emapic.map.spin(true);
+        }
         var allLayersLoadedPromise = emapic.addAllMarkers();
         emapic.addViewsControls();
         // If we have more than one set of legend, we display a question selector
@@ -174,7 +176,9 @@ var emapic = emapic || {};
     	}
         emapic.addTooltips();
         allLayersLoadedPromise.then(function() {
-            emapic.map.spin(false);
+            if (emapic.map !== null) {
+                emapic.map.spin(false);
+            }
         });
     };
 
