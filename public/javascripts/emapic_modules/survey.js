@@ -321,7 +321,6 @@ var emapic = emapic || {};
 
         emapic.modules.survey.marker.closePopup();
         emapic.modules.survey.marker.unbindPopup();
-        createMarkerPopup();
     };
 
     emapic.modules.survey.prepareSurveyData = function() {
@@ -391,18 +390,6 @@ var emapic = emapic || {};
 
     emapic.updateIndivVotesLayerControls = emapic.utils.overrideFunction(emapic.updateIndivVotesLayerControls,
         null, emapic.modules.survey.updateResponsesMarker);
-
-    function createMarkerPopup() {
-        var popupHtml = emapic.getPopupHtml(emapic.modules.survey.data);
-        if (popupHtml !== null && popupHtml.length > 0) {
-            var userPopup = L.popup({
-                offset: [25, 50],
-                className: 'popup-user popup-userinfo'
-            });
-            userPopup.setContent($(popupHtml).html());
-            emapic.modules.survey.marker.bindPopup(userPopup);
-        }
-    }
 
     function centerMarker() {
         var markerPos = emapic.modules.survey.marker.getLatLng();
