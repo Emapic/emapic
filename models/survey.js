@@ -522,7 +522,7 @@ module.exports = function(sequelize, DataTypes) {
             getProvinceTotals: function() {
                 var survey = this;
                 return this.getLegend().then(function(legend) {
-                    var query = "SELECT lower(a.iso_a2) AS iso_code, a.name, st_asgeojson(a.geom) as geojson, count(b.gid) AS total_responses";
+                    var query = "SELECT gns_adm1 AS country_id, iso_3166_2 AS iso_code, adm1_code as adm_code, a.name, type_en AS adm_type, lower(iso_a2) AS country_iso_code, st_asgeojson(a.geom) as geojson, count(b.gid) AS total_responses";
                     if (legend && legend.color) {
                         for (var i = 0, iLen = legend.color.length; i<iLen; i++) {
                             var legendResponses = legend.color[i].responses_array;
@@ -531,7 +531,7 @@ module.exports = function(sequelize, DataTypes) {
                             }
                         }
                     }
-                    query += " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid GROUP BY iso_code, a.name, geojson ORDER BY total_responses DESC, a.name ASC;";
+                    query += " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid GROUP BY country_id, iso_code, adm_code, a.name, adm_type, country_iso_code, geojson ORDER BY total_responses DESC, a.name ASC;";
                     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
                 });
             },
@@ -539,7 +539,7 @@ module.exports = function(sequelize, DataTypes) {
             getProvinceTotalsBbox: function() {
                 var survey = this;
                 return this.getLegend().then(function(legend) {
-                    var query = "SELECT lower(a.iso_a2) AS iso_code, a.name, st_asgeojson(st_envelope(a.geom)) as geojson, count(b.gid) AS total_responses";
+                    var query = "SELECT gns_adm1 AS country_id, iso_3166_2 AS iso_code, adm1_code as adm_code, a.name, type_en AS adm_type, lower(iso_a2) AS country_iso_code, st_asgeojson(st_envelope(a.geom)) as geojson, count(b.gid) AS total_responses";
                     if (legend && legend.color) {
                         for (var i = 0, iLen = legend.color.length; i<iLen; i++) {
                             var legendResponses = legend.color[i].responses_array;
@@ -548,7 +548,7 @@ module.exports = function(sequelize, DataTypes) {
                             }
                         }
                     }
-                    query += " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid GROUP BY iso_code, a.name, geojson ORDER BY total_responses DESC, a.name ASC;";
+                    query += " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid GROUP BY country_id, iso_code, adm_code, a.name, adm_type, country_iso_code, geojson ORDER BY total_responses DESC, a.name ASC;";
                     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
                 });
             },
@@ -556,7 +556,7 @@ module.exports = function(sequelize, DataTypes) {
             getProvinceTotalsNoGeom: function() {
                 var survey = this;
                 return this.getLegend().then(function(legend) {
-                    var query = "SELECT lower(a.iso_a2) AS iso_code, a.name, count(b.gid) AS total_responses";
+                    var query = "SELECT gns_adm1 AS country_id, iso_3166_2 AS iso_code, adm1_code as adm_code, a.name, type_en AS adm_type, lower(iso_a2) AS country_iso_code, count(b.gid) AS total_responses";
                     if (legend && legend.color) {
                         for (var i = 0, iLen = legend.color.length; i<iLen; i++) {
                             var legendResponses = legend.color[i].responses_array;
@@ -565,7 +565,7 @@ module.exports = function(sequelize, DataTypes) {
                             }
                         }
                     }
-                    query += " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid GROUP BY iso_code, a.name ORDER BY total_responses DESC, a.name ASC;";
+                    query += " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid GROUP BY country_id, iso_code, adm_code, a.name, adm_type, country_iso_code ORDER BY total_responses DESC, a.name ASC;";
                     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
                 });
             },
