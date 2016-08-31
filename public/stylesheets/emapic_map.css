@@ -864,11 +864,16 @@ select#sex-select.mas {
     cursor: pointer;
     background-color: #F2F1F0;
 }
-.leaflet-sidebar td {
+.leaflet-sidebar td,
+.leaflet-sidebar th {
     max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: middle !important;
+    font-weight: normal;
+}
+.text-center th {
+    text-align: center;
 }
 .leaflet-sidebar td img {
     margin: 2px 0 0 -5px;
@@ -933,8 +938,15 @@ select#sex-select.mas {
 .leaflet-sidebar table#countries-table tbody tr {
     border-bottom: none !important;
 }
-.leaflet-sidebar table#countries-table thead tr td {
+.leaflet-sidebar table#countries-table thead tr th {
     border-bottom: 3px double #dddddd;
+}
+.leaflet-sidebar table#countries-table tbody td.country-flag {
+    padding: 0px;
+}
+.leaflet-sidebar table#countries-table tbody tr.province td {
+    font-size: 0.8em;
+    padding: 4px;
 }
 .leaflet-sidebar table#countries-table-all tbody tr:first-child td {
     border-top-width: 0px;
@@ -944,7 +956,8 @@ select#sex-select.mas {
     width: 18px;
     margin: auto;
 }
-.leaflet-sidebar .stats-country-label {
+.leaflet-sidebar .stats-country-label,
+.leaflet-sidebar .stats-province-label {
     display: none;
 }
 /* Fix a small problem with popup messages over leaflet buttons */
@@ -1184,7 +1197,8 @@ select#sex-select.mas {
     .survey-answer.explanatory-text p {
         font-size: 16px;
     }
-    .leaflet-sidebar table#countries-table td,
+    .leaflet-sidebar table#countries-table td:not(.show-provinces),
+    .leaflet-sidebar table#countries-table th,
     .leaflet-sidebar table#countries-table-all td {
         padding: 4px;
     }

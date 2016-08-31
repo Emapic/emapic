@@ -153,6 +153,8 @@
 	"js_country_of_origin": "Country of origin",
 	"js_totals_country": "country",
 	"js_totals_countries": "countries",
+	"js_totals_region": "region",
+	"js_totals_regions": "regions",
 	"js_%_positive_votes": "% positive votes",
 	"js_full_date_format": "j/n/Y",
 	"js_week_format": "\\\\S\\\\e\\\\m\\\\a\\\\n\\\\a W (\\\\d\\\\e\\\\l j/n/Y)",

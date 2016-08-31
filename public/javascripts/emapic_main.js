@@ -7,7 +7,8 @@ var emapic = emapic || {};
 (function(emapic) {
 
     var allCountriesDataBboxDfd = null,
-        votedCountriesDataNoGeomDfd = null;
+        votedCountriesDataNoGeomDfd = null,
+        votedProvincesDataBboxDfd = null;
 
     emapic.map = null;
     emapic.position = null;
@@ -22,6 +23,7 @@ var emapic = emapic || {};
     emapic.fullLegend = null;
     emapic.allCountriesData = {};
     emapic.votedCountriesData = {};
+    emapic.votedProvincesData = {};
     // We'll use this color, for example, in ties
     emapic.neutralColor = 'grey';
     emapic.fallbackColor = 'black';
@@ -46,6 +48,10 @@ var emapic = emapic || {};
         return "/api/survey/" + emapic.surveyId + "/totals/countries/nogeom";
     };
 
+    emapic.getStatsProvincesJsonBboxUrl = function() {
+        return "/api/survey/" + emapic.surveyId + "/totals/provinces/bbox";
+    };
+
     // Methods for loading additional JSON data. If we want to preload them, we
     // can simply call the methods and ignore the returned values.
     emapic.getAllCountriesDataBbox = function() {
@@ -60,7 +66,7 @@ var emapic = emapic || {};
                         emapic.allCountriesData[country.properties.iso_code].bbox = [[country.geometry.coordinates[0][0][1], country.geometry.coordinates[0][0][0]],
                             [country.geometry.coordinates[0][2][1], country.geometry.coordinates[0][2][0]]];
                     });
-                    allCountriesDataBboxDfd.resolve(data);
+                    allCountriesDataBboxDfd.resolve(emapic.allCountriesData);
                 });
             } else {
                 allCountriesDataBboxDfd.reject();
@@ -83,6 +89,27 @@ var emapic = emapic || {};
             }
         }
         return votedCountriesDataNoGeomDfd.promise();
+    };
+
+    emapic.getVotedProvincesDataBbox = function() {
+        if (votedProvincesDataBboxDfd === null) {
+            votedProvincesDataBboxDfd = $.Deferred();
+            var statsProvincesUrl = emapic.getStatsProvincesJsonBboxUrl();
+            if (statsProvincesUrl) {
+                $.getJSON(statsProvincesUrl, function(data) {
+                    $.each(data.features, function(i, province) {
+                        emapic.votedProvincesData[province.properties.adm_code] = {};
+                        emapic.votedProvincesData[province.properties.adm_code].properties = province.properties;
+                        emapic.votedProvincesData[province.properties.adm_code].bbox = [[province.geometry.coordinates[0][0][1], province.geometry.coordinates[0][0][0]],
+                            [province.geometry.coordinates[0][2][1], province.geometry.coordinates[0][2][0]]];
+                    });
+                    votedProvincesDataBboxDfd.resolve(emapic.votedProvincesData);
+                });
+            } else {
+                votedProvincesDataBboxDfd.reject();
+            }
+        }
+        return votedProvincesDataBboxDfd.promise();
     };
 
     emapic.preinitEmapic = function() {

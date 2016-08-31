@@ -17,6 +17,7 @@ var emapic = emapic || {};
         allCountriesSpinner = null,
         votedCountriesSpinner = null,
         sidebar,
+        countriesProvincesData = {},
         allCountriesBbox = [[null, null], [null, null]],
         locatorsButtonsHtml = "<a id='control-user' title='" + emapic.utils.getI18n('js_see_my_position', 'Ver mi posición') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"user\");'><span class='glyphicon glyphicon-user'></span></a>\n" +
             "<a id='control-country' title='" + emapic.utils.getI18n('js_see_my_country', 'Ver mi país') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"country\");'><img src='/images/icon-espana.png' /></a>\n" +
@@ -164,23 +165,36 @@ var emapic = emapic || {};
     }
 
     function populateSidebarDataVotedCountries() {
-        $.when(emapic.getAllCountriesDataBbox(), emapic.getVotedCountriesDataNoGeom()).done(function() {
+        $.when(
+            emapic.getAllCountriesDataBbox(),
+            emapic.getVotedCountriesDataNoGeom(),
+            emapic.getVotedProvincesDataBbox()
+        ).done(function() {
             votedCountriesSpinner.stop();
             var specificVotesHtml = '<tr>\n' +
-                "<td colspan='2'><small>" + emapic.utils.getI18n('js_country_of_origin', 'País de origen') + "</small></td>\n",
+                "<th colspan='3'><small>" + emapic.utils.getI18n('js_country_of_origin', 'País de origen') + "</small></th>\n",
                 total = 0,
                 totals = [],
                 countriesHtml = "";
             if (emapic.legend && emapic.legend.color) {
                 for (var i=0, len=emapic.legend.color.responses_array.length; i<len; i++) {
-                    specificVotesHtml += "<td><small>" + emapic.utils.escapeHtml(emapic.legend.color.responses_array[i].value) + "</small></td>\n";
+                    specificVotesHtml += "<th><small>" + emapic.utils.escapeHtml(emapic.legend.color.responses_array[i].value) + "</small></th>\n";
                 }
             }
-            specificVotesHtml += "<td><small>" + emapic.utils.getI18n('js_total_votes', 'Votos totales') + "</small></td></tr>";
+            specificVotesHtml += "<th><small>" + emapic.utils.getI18n('js_total_votes', 'Votos totales') + "</small></th></tr>";
             $('#voted_countries thead').html(specificVotesHtml);
+            if ($.isEmptyObject(countriesProvincesData)) {
+        		$.each(emapic.votedProvincesData, function(code, province) {
+                    if (!(province.properties.country_iso_code in countriesProvincesData)) {
+                        countriesProvincesData[province.properties.country_iso_code] = [];
+                    }
+                    countriesProvincesData[province.properties.country_iso_code].push(province);
+                });
+            }
     		$.each(emapic.votedCountriesData, function(i, stat) {
     			if (emapic.allCountriesData[stat.iso_code] !== undefined) {
-    				var specificVotesHtml = '';
+    				var specificVotesHtml = '',
+                        provincesShown = $('tr.province-' + stat.iso_code + ':visible').length > 0;
                     if (emapic.legend && emapic.legend.color) {
                         var votes;
                         for (i=0, len=emapic.legend.color.responses_array.length; i<len; i++) {
@@ -211,38 +225,79 @@ var emapic = emapic || {};
                             allCountriesBbox[1][1] = emapic.allCountriesData[stat.iso_code].bbox[1][1];
                         }
                     }
-                    countriesHtml += "<tr>\n" +
+                    countriesHtml += "<tr class='country'>\n" +
                         "<td class='stats-country-label'>" + stat.iso_code + "</td>\n" +
-                        "<td><div class='flag-container'><span class='flag-icon flag-icon-" +
+                        "<td class='show-provinces'><i class='fa fa-caret-down" +
+                        (provincesShown ? ' fa-caret-up' : '') + "' aria-hidden='true'></i></td>\n" +
+                        "<td class='country-flag'><div class='flag-container'><span title='" +
+                        emapic.allCountriesData[stat.iso_code].properties.name + "' class='flag-icon flag-icon-" +
                         stat.iso_code + "'></div></span>" +
                         "</td>\n<td class='country-name'>" +
                         emapic.allCountriesData[stat.iso_code].properties.name + "</td>\n" +
                         specificVotesHtml + "<td><small>" +
                         stat.total_responses + "</small></td>\n</tr>";
+                	$.each(countriesProvincesData[stat.iso_code], function(i, province) {
+        				var specificVotesHtml = '';
+                        if (emapic.legend && emapic.legend.color) {
+                            var votes;
+                            for (i=0, len=emapic.legend.color.responses_array.length; i<len; i++) {
+                                specificVotesHtml += "<td><small>" +
+                                    parseInt(province.properties[emapic.legend.color.question +
+                                    '_' + emapic.legend.color.responses_array[i].id]) + "</small></td>\n";
+                            }
+                        }
+                        countriesHtml += "<tr class='province province-" + stat.iso_code + "' " +
+                            (provincesShown ? '' : "style='display: none;'") + ">\n" +
+                            "<td class='stats-province-label'>" + province.properties.adm_code + "</td>\n" +
+                            "<td colspan='3' class='province-name'>" +
+                            province.properties.name + "</td>\n" +
+                            specificVotesHtml + "<td><small>" +
+                            province.properties.total_responses + "</small></td>\n</tr>";
+                    });
     			}
     		});
             var totalsHtml = "";
             if (emapic.legend && emapic.legend.color) {
                 for (var j=0, leng=emapic.legend.color.responses_array.length; j<leng; j++) {
-                    totalsHtml += "<td><small>" + totals[j] + "</small></td>\n";
+                    totalsHtml += "<th><small>" + totals[j] + "</small></th>\n";
                 }
             }
             $('#voted_countries thead').append("<tr class='stats-country-totals'>\n" +
-                "<td class='stats-country-label'></td>\n" +
-                "<td colspan='2'>" + emapic.votedCountriesData.length +
+                "<th class='stats-country-label'></th>\n" +
+                "<th colspan='3'>" + emapic.votedCountriesData.length +
                 " " + (emapic.votedCountriesData.length == 1 ?
                 emapic.utils.getI18n('js_totals_country', 'país') :
-                emapic.utils.getI18n('js_totals_countries', 'países')) + "</td>\n" +
-                totalsHtml + "<td><small>" + total + "</small></td>\n</tr>");
+                emapic.utils.getI18n('js_totals_countries', 'países')) +
+                " / " + Object.keys(emapic.votedProvincesData).length + " " +
+                (emapic.votedCountriesData.length == 1 ?
+                emapic.utils.getI18n('js_totals_region', 'región') :
+                emapic.utils.getI18n('js_totals_regions', 'regiones')) + "</th>\n" +
+                totalsHtml + "<th><small>" + total + "</small></th>\n</tr>");
 
             $('#voted_countries tbody').html(countriesHtml);
 
-            $('#voted_countries tbody tr').on("click", function() {
-                var countryCode = $(this).find('.stats-country-label').html();
+            $('#voted_countries tbody tr.country td:not(.show-provinces)').on("click", function() {
+                var countryCode = $(this).parent().find('.stats-country-label').html();
                 if (countryCode !== '') {
                     emapic.centerViewCountryBounds(countryCode);
                 } else {
                     emapic.map.fitBounds(allCountriesBbox);
+                }
+            });
+
+            $('#voted_countries tbody tr.country td.show-provinces').on("click", function() {
+                var $this = $(this),
+                    countryCode = $this.parent().find('.stats-country-label').html();
+                if (countryCode !== '') {
+                    $this.find('.fa.fa-caret-down').toggleClass('fa-caret-up');
+                    $('tr.province-' + countryCode).toggle();
+                }
+            });
+
+            $('#voted_countries tbody tr.province').on("click", function() {
+                var provinceCode = $(this).find('.stats-province-label').html();
+                if (provinceCode !== '') {
+                    emapic.map.fitBounds(emapic.votedProvincesData[provinceCode].bbox);
                 }
             });
         });
