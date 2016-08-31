@@ -164,7 +164,7 @@ var emapic = emapic || {};
     }
 
     function populateSidebarDataVotedCountries() {
-        $.when(emapic.getAllCountriesData(), emapic.getVotedCountriesData()).done(function() {
+        $.when(emapic.getAllCountriesDataBbox(), emapic.getVotedCountriesDataNoGeom()).done(function() {
             votedCountriesSpinner.stop();
             var specificVotesHtml = '<tr>\n' +
                 "<td colspan='2'><small>" + emapic.utils.getI18n('js_country_of_origin', 'País de origen') + "</small></td>\n",
@@ -249,7 +249,7 @@ var emapic = emapic || {};
     }
 
     function populateSidebarDataAllCountries() {
-        emapic.getAllCountriesData().then(function() {
+        emapic.getAllCountriesDataBbox().then(function() {
             allCountriesSpinner.stop();
             $.each(emapic.allCountriesData, function(code, country) {
                 $('#all_countries tbody').append("<tr>\n" +

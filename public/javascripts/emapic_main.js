@@ -6,8 +6,8 @@ var emapic = emapic || {};
 
 (function(emapic) {
 
-    var allCountriesDataDfd = null,
-        votedCountriesDataDfd = null;
+    var allCountriesDataBboxDfd = null,
+        votedCountriesDataNoGeomDfd = null;
 
     emapic.map = null;
     emapic.position = null;
@@ -30,7 +30,7 @@ var emapic = emapic || {};
     emapic.userLoggedIn = false;
     emapic.logicAlreadyStarted = false;
 
-    emapic.getCountryBboxesJsonUrl = function() {
+    emapic.getCountriesJsonBboxUrl = function() {
         return "/api/baselayers/countries/bbox";
     };
 
@@ -42,51 +42,51 @@ var emapic = emapic || {};
         return "/api/survey/" + emapic.surveyId + "/legend";
     };
 
-    emapic.getStatsCountriesJsonUrl = function() {
+    emapic.getStatsCountriesJsonNoGeomUrl = function() {
         return "/api/survey/" + emapic.surveyId + "/totals/countries/nogeom";
     };
 
     // Methods for loading additional JSON data. If we want to preload them, we
     // can simply call the methods and ignore the returned values.
-    emapic.getAllCountriesData = function() {
-        if (allCountriesDataDfd === null) {
-            allCountriesDataDfd = $.Deferred();
-            var countryBboxesUrl = emapic.getCountryBboxesJsonUrl();
-            if (countryBboxesUrl) {
-                $.getJSON(countryBboxesUrl, function(data) {
+    emapic.getAllCountriesDataBbox = function() {
+        if (allCountriesDataBboxDfd === null) {
+            allCountriesDataBboxDfd = $.Deferred();
+            var countriesBboxUrl = emapic.getCountriesJsonBboxUrl();
+            if (countriesBboxUrl) {
+                $.getJSON(countriesBboxUrl, function(data) {
                     $.each(data.features, function(i, country) {
                         emapic.allCountriesData[country.properties.iso_code] = {};
                         emapic.allCountriesData[country.properties.iso_code].properties = country.properties;
                         emapic.allCountriesData[country.properties.iso_code].bbox = [[country.geometry.coordinates[0][0][1], country.geometry.coordinates[0][0][0]],
                             [country.geometry.coordinates[0][2][1], country.geometry.coordinates[0][2][0]]];
                     });
-                    allCountriesDataDfd.resolve(data);
+                    allCountriesDataBboxDfd.resolve(data);
                 });
             } else {
-                allCountriesDataDfd.reject();
+                allCountriesDataBboxDfd.reject();
             }
         }
-        return allCountriesDataDfd.promise();
+        return allCountriesDataBboxDfd.promise();
     };
 
-    emapic.getVotedCountriesData = function() {
-        if (votedCountriesDataDfd === null) {
-            votedCountriesDataDfd = $.Deferred();
-            var statsCountriesUrl = emapic.getStatsCountriesJsonUrl();
+    emapic.getVotedCountriesDataNoGeom = function() {
+        if (votedCountriesDataNoGeomDfd === null) {
+            votedCountriesDataNoGeomDfd = $.Deferred();
+            var statsCountriesUrl = emapic.getStatsCountriesJsonNoGeomUrl();
             if (statsCountriesUrl) {
                 $.getJSON(statsCountriesUrl, function(data) {
                     emapic.votedCountriesData = data;
-                    votedCountriesDataDfd.resolve(data);
+                    votedCountriesDataNoGeomDfd.resolve(data);
                 });
             } else {
-                votedCountriesDataDfd.reject();
+                votedCountriesDataNoGeomDfd.reject();
             }
         }
-        return votedCountriesDataDfd.promise();
+        return votedCountriesDataNoGeomDfd.promise();
     };
 
     emapic.preinitEmapic = function() {
-        emapic.getAllCountriesData();
+        emapic.getAllCountriesDataBbox();
         emapic.loadLegend();
         if (emapic.map === null) {
             emapic.initializeMap();
@@ -209,7 +209,7 @@ var emapic = emapic || {};
     };
 
     emapic.centerViewCountryBounds = function(countryCode) {
-        emapic.getAllCountriesData().done(function() {
+        emapic.getAllCountriesDataBbox().done(function() {
             //~ Country codes as in "ISO 3166-1 alfa-2"
             if (countryCode in emapic.allCountriesData) {
                 emapic.map.fitBounds(emapic.allCountriesData[countryCode].bbox);
