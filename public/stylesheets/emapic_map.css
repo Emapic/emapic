@@ -16,6 +16,13 @@
 .flag-container .flag-icon {
     width: 100%;
 }
+.table-scroll {
+    overflow: auto;
+    width: 100%;
+}
+.table-scroll .table {
+    margin: 0px;
+}
 body {
     font-family: hero,sans-serif;
     background-color: #004F71;
@@ -838,14 +845,15 @@ select#sex-select.mas {
 .leaflet-sidebar {
     padding-bottom: 20px;
 }
-.leaflet-sidebar .btn-group {
+.leaflet-sidebar .btn-group,
+.leaflet-sidebar input {
     margin-bottom: 15px;
 }
 .leaflet-sidebar > .leaflet-control {
-		background-color: #FAFAFA !important;
+	background-color: #FAFAFA !important;
 }
 .leaflet-sidebar .btn-group button {
-		background-color: #A2C73A;
+	background-color: #A2C73A;
     color: white;
 }
 .leaflet-sidebar .search-countries {
@@ -896,59 +904,54 @@ select#sex-select.mas {
 }
 .leaflet-sidebar #voted_countries,
 .leaflet-sidebar #all_countries {
-    display: table;
+    display: flex;
+    flex-flow: column;
     height: 100%;
     width: 100%;
-}
-.leaflet-sidebar #voted_countries > div,
-.leaflet-sidebar #all_countries > div {
-    display: table-row;
 }
 .leaflet-sidebar #voted_countries > div:last-child,
 .leaflet-sidebar #all_countries > div:last-child {
-    display: table-row;
-    height: 100%;
+    flex-grow: 1;
+    display: flex;
+    flex-flow: column;
 }
 .leaflet-sidebar #voted_countries > div:last-child > div,
 .leaflet-sidebar #all_countries > div:last-child > div {
-    height: 100%;
-    position: relative;
-    width: 100%;
+    flex-grow: 1;
 }
-.leaflet-sidebar #voted_countries > div:last-child > div > div,
-.leaflet-sidebar #all_countries > div:last-child > div > div {
+.leaflet-sidebar #voted_countries .floatThead-wrapper {
+    height: 100%;
+}
+.leaflet-sidebar #voted_countries div .table-scroll {
     bottom: 0;
     left: 0;
     position: absolute;
     right: 0;
     top: 0;
 }
-.table-scroll .table {
-    margin: 0px;
-}
-.leaflet-sidebar #voted_countries .table-scroll,
-.leaflet-sidebar #all_countries .table-scroll {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    overflow: auto;
-    margin-top: 15px;
-    margin-bottom: 20px;
-}
-.leaflet-sidebar table#countries-table tbody tr {
+.leaflet-sidebar #voted_countries table tbody tr {
     border-bottom: none !important;
 }
-.leaflet-sidebar table#countries-table thead tr th {
+.leaflet-sidebar #voted_countries table thead tr th {
     border-bottom: 3px double #dddddd;
+    background-color: #ffffff;
+    font-weight: bold;
 }
-.leaflet-sidebar table#countries-table tbody td.country-flag {
+.leaflet-sidebar #voted_countries table tbody tr:first-child td {
+    border-bottom: 3px double #dddddd;
+    font-weight: bold;
+}
+.leaflet-sidebar #voted_countries table tbody td.country-flag {
     padding: 0px;
 }
-.leaflet-sidebar table#countries-table tbody tr.province td {
-    font-size: 0.8em;
+.leaflet-sidebar #voted_countries table tbody tr.province td {
     padding: 4px;
 }
-.leaflet-sidebar table#countries-table-all tbody tr:first-child td {
+.leaflet-sidebar #voted_countries table tbody tr.province td,
+.leaflet-sidebar #voted_countries table tbody tr td div.province-count {
+    font-size: 0.8em;
+}
+.leaflet-sidebar #all_countries table tbody tr:first-child td {
     border-top-width: 0px;
 }
 .leaflet-sidebar .flag-container {
@@ -1197,9 +1200,9 @@ select#sex-select.mas {
     .survey-answer.explanatory-text p {
         font-size: 16px;
     }
-    .leaflet-sidebar table#countries-table td:not(.show-provinces),
-    .leaflet-sidebar table#countries-table th,
-    .leaflet-sidebar table#countries-table-all td {
+    .leaflet-sidebar #voted_countries table td:not(.show-provinces),
+    .leaflet-sidebar #voted_countries table th,
+    .leaflet-sidebar #all_countries table td {
         padding: 4px;
     }
 }

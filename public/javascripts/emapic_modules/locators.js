@@ -37,12 +37,8 @@ var emapic = emapic || {};
             "</div>\n" +
             "</div>\n" +
             "</div>\n" +
-            "<div>\n" +
-            "<div>\n" +
             "<div class='table-scroll'>\n" +
             "<table class='table table-responsive' id='countries-table-all'><tbody></tbody></table>\n" +
-            "</div>\n" +
-            "</div>\n" +
             "</div>\n",
         votedCountriesHtml = "<div><h3>" + emapic.utils.getI18n('js_see_country', 'Ver país') + "</h3>\n" +
             "<div class='row'>\n" +
@@ -57,15 +53,11 @@ var emapic = emapic || {};
             "</div>\n" +
             "</div>\n" +
             "</div>\n" +
-            "<div>\n" +
-            "<div>\n" +
             "<div class='table-scroll'>\n" +
             "<table class='table table-responsive text-center' id='countries-table'>\n" +
             "<thead></thead>\n" +
             "<tbody></tbody>\n" +
             "</table>\n" +
-            "</div>\n" +
-            "</div>\n" +
             "</div>\n";
 
     emapic.modules = emapic.modules || {};
@@ -74,6 +66,12 @@ var emapic = emapic || {};
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
         sidebar = L.control.sidebar('sidebar', {
             position: 'right'
+        });
+        sidebar.on('hide', function() {
+            resetFixedTableHeader('#voted_countries table');
+        });
+        sidebar.on('shown', function() {
+            setFixedTableHeader('#voted_countries table');
         });
         emapic.map.addControl(sidebar);
     });
@@ -93,26 +91,36 @@ var emapic = emapic || {};
     emapic.modules.locators.searchCountries = function(component) {
         search = $('#' + component + ' .search-countries').val().toLowerCase();
         if (search === null || search.trim().length === 0) {
-        $('#' + component + ' tbody tr').each(
+        $('#' + component + ' tbody tr.country').each(
             function() {
+                var countryCode = $(this).find('.stats-country-label').html(),
+                    provincesShown = $(this).find('i.fa-caret-down').hasClass('fa-caret-up');
                 $(this).show();
+                if (countryCode !== '' && provincesShown) {
+                    $('tr.province-' + countryCode).show();
+                }
             }
         );
         }
         terms = search.split(' ');
-        $('#' + component + ' tbody tr').each(
+        $('#' + component + ' tbody tr.country').each(
             function() {
-                var countryName = $(this).find('.country-name').html().toLowerCase();
-                matches = true;
+                var countryName = $(this).find('.country-name').html().toLowerCase(),
+                    countryCode = $(this).find('.stats-country-label').html(),
+                    provincesShown = $(this).find('i.fa-caret-down').hasClass('fa-caret-up'),
+                    matches = true;
                 for (i = 0, len = terms.length; i < len; i++) {
                     if (countryName.indexOf(terms[i]) == -1) {
+                        if (countryCode !== '' && provincesShown) {
+                            $('tr.province-' + countryCode).hide();
+                        }
                         $(this).hide();
-                        matches = false;
-                        break;
+                        return;
                     }
                 }
-                if (matches) {
-                    $(this).show();
+                $(this).show();
+                if (countryCode !== '' && provincesShown) {
+                    $('tr.province-' + countryCode).show();
                 }
             }
         );
@@ -137,13 +145,16 @@ var emapic = emapic || {};
     };
 
     emapic.modules.locators.showSidebarAllCountries = function() {
+        resetFixedTableHeader('#voted_countries table');
         votedCountries.hide();
         allCountries.show();
     };
 
     emapic.modules.locators.showSidebarVotedCountries = function() {
         allCountries.hide();
-        votedCountries.show();
+        votedCountries.show(0, function() {
+            setFixedTableHeader('#voted_countries table');
+        });
     };
 
     function populateSidebar() {
@@ -151,17 +162,13 @@ var emapic = emapic || {};
         allCountriesSpinner = new Spinner().spin($('#all_countries tbody')[0]);
         votedCountries.html(votedCountriesHtml);
         votedCountriesSpinner = new Spinner().spin($('#voted_countries tbody')[0]);
-        emapic.modules.locators.showSidebarAllCountries();
+        emapic.modules.locators.showSidebarVotedCountries();
         populateSidebarData();
     }
 
     function populateSidebarData() {
         populateSidebarDataAllCountries();
         populateSidebarDataVotedCountries();
-        if (emapic.votedCountriesData &&
-            emapic.votedCountriesData.length > 0) {
-            emapic.modules.locators.showSidebarVotedCountries();
-        }
     }
 
     function populateSidebarDataVotedCountries() {
@@ -194,7 +201,7 @@ var emapic = emapic || {};
     		$.each(emapic.votedCountriesData, function(i, stat) {
     			if (emapic.allCountriesData[stat.iso_code] !== undefined) {
     				var specificVotesHtml = '',
-                        provincesShown = $('tr.province-' + stat.iso_code + ':visible').length > 0;
+                        provincesShown = $('tr.country-' + stat.iso_code + ' i.fa-caret-down').hasClass('fa-caret-up');
                     if (emapic.legend && emapic.legend.color) {
                         var votes;
                         for (i=0, len=emapic.legend.color.responses_array.length; i<len; i++) {
@@ -225,7 +232,7 @@ var emapic = emapic || {};
                             allCountriesBbox[1][1] = emapic.allCountriesData[stat.iso_code].bbox[1][1];
                         }
                     }
-                    countriesHtml += "<tr class='country'>\n" +
+                    countriesHtml += "<tr class='country country-" + stat.iso_code + "'>\n" +
                         "<td class='stats-country-label'>" + stat.iso_code + "</td>\n" +
                         "<td class='show-provinces'><i class='fa fa-caret-down" +
                         (provincesShown ? ' fa-caret-up' : '') + "' aria-hidden='true'></i></td>\n" +
@@ -259,22 +266,22 @@ var emapic = emapic || {};
             var totalsHtml = "";
             if (emapic.legend && emapic.legend.color) {
                 for (var j=0, leng=emapic.legend.color.responses_array.length; j<leng; j++) {
-                    totalsHtml += "<th><small>" + totals[j] + "</small></th>\n";
+                    totalsHtml += "<td><small>" + totals[j] + "</small></td>\n";
                 }
             }
-            $('#voted_countries thead').append("<tr class='stats-country-totals'>\n" +
-                "<th class='stats-country-label'></th>\n" +
-                "<th colspan='3'>" + emapic.votedCountriesData.length +
+            $('#voted_countries tbody').html("<tr class='stats-country-totals'>\n" +
+                "<td class='stats-country-label'></td>\n" +
+                "<td colspan='3'><div>" + emapic.votedCountriesData.length +
                 " " + (emapic.votedCountriesData.length == 1 ?
                 emapic.utils.getI18n('js_totals_country', 'país') :
                 emapic.utils.getI18n('js_totals_countries', 'países')) +
-                " / " + Object.keys(emapic.votedProvincesData).length + " " +
+                "</div><div class='province-count'>" + Object.keys(emapic.votedProvincesData).length + " " +
                 (emapic.votedCountriesData.length == 1 ?
                 emapic.utils.getI18n('js_totals_region', 'región') :
-                emapic.utils.getI18n('js_totals_regions', 'regiones')) + "</th>\n" +
-                totalsHtml + "<th><small>" + total + "</small></th>\n</tr>");
+                emapic.utils.getI18n('js_totals_regions', 'regiones')) + "</div></td>\n" +
+                totalsHtml + "<td><small>" + total + "</small></td>\n</tr>");
 
-            $('#voted_countries tbody').html(countriesHtml);
+            $('#voted_countries tbody').append(countriesHtml);
 
             $('#voted_countries tbody tr.country td:not(.show-provinces)').on("click", function() {
                 var countryCode = $(this).parent().find('.stats-country-label').html();
@@ -300,6 +307,9 @@ var emapic = emapic || {};
                     emapic.map.fitBounds(emapic.votedProvincesData[provinceCode].bbox);
                 }
             });
+
+            resetFixedTableHeader('#voted_countries table');
+            setFixedTableHeader('#voted_countries table');
         });
     }
 
@@ -307,7 +317,7 @@ var emapic = emapic || {};
         emapic.getAllCountriesDataBbox().then(function() {
             allCountriesSpinner.stop();
             $.each(emapic.allCountriesData, function(code, country) {
-                $('#all_countries tbody').append("<tr>\n" +
+                $('#all_countries tbody').append("<tr class='country country-" + code +"'>\n" +
                     "<td><span class='label label-default pull-left'>" + code + "</span></td>\n" +
                     "<td class='country-name'>" + emapic.allCountriesData[code].properties.name + "</td>\n" +
                     "<td><div class='flag-container'><span class='flag-icon flag-icon-" + code + "'></span></div></td>\n" +
@@ -318,6 +328,30 @@ var emapic = emapic || {};
                 emapic.centerViewCountryBounds(countryCode);
             });
         });
+    }
+
+    function setFixedTableHeader(selector) {
+        // If the table data has been already loaded and it's
+        // visible, then we set its fixed header
+        if ($(selector + ':visible td').length > 0) {
+            var $table = $(selector);
+            $table.closest('.table-scroll').scrollTop(0);
+            $table.floatThead({
+                scrollContainer: function($table){
+                    return $table.closest('.table-scroll');
+                }
+            });
+        }
+    }
+
+    function resetFixedTableHeader(selector) {
+        // If the table data has been already loaded and it's
+        // visible, then we reset its fixed header
+        if ($(selector + ':visible td').length > 0) {
+            var $table = $(selector);
+            $table.closest('.table-scroll').scrollTop(0);
+            $table.floatThead('destroy');
+        }
     }
 
     emapic.updateIndivVotesLayerControls = emapic.utils.overrideFunction(emapic.updateIndivVotesLayerControls, null, populateSidebarDataVotedCountries);

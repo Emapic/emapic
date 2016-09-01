@@ -115,25 +115,25 @@ L.Control.Sidebar = L.Control.extend({
 
     show: function () {
         if (!this.isVisible()) {
+            this.fire('show');
             L.DomUtil.addClass(this._container, 'visible');
             if (this.options.autoPan) {
                 this._map.panBy([-this.getOffset() / 2, 0], {
                     duration: 0.5
                 });
             }
-            this.fire('show');
         }
     },
 
     hide: function (e) {
         if (this.isVisible()) {
+            this.fire('hide');
             L.DomUtil.removeClass(this._container, 'visible');
             if (this.options.autoPan) {
                 this._map.panBy([this.getOffset() / 2, 0], {
                     duration: 0.5
                 });
             }
-            this.fire('hide');
         }
         if(e) {
             L.DomEvent.stopPropagation(e);
