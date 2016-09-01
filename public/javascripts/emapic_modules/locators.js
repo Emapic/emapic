@@ -326,9 +326,9 @@ var emapic = emapic || {};
             allCountriesSpinner.stop();
             $.each(emapic.allCountriesData, function(code, country) {
                 $('#all_countries tbody').append("<tr class='country country-" + code +"'>\n" +
-                    "<td><span class='label label-default pull-left'>" + code + "</span></td>\n" +
+                    "<td class='country-flag'><div class='flag-container'><span class='flag-icon flag-icon-" + code + "'></span></div></td>\n" +
                     "<td class='country-name'>" + emapic.allCountriesData[code].properties.name + "</td>\n" +
-                    "<td><div class='flag-container'><span class='flag-icon flag-icon-" + code + "'></span></div></td>\n" +
+                    "<td><span class='label label-default pull-left'>" + code + "</span></td>\n" +
                     "</tr>");
             });
             $('#all_countries .table-scroll').perfectScrollbar();

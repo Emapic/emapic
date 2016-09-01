@@ -904,6 +904,7 @@ select#sex-select.mas {
     font-size: 80%;
     min-width: 32px;
     min-height: 16px;
+    padding: 0.3em 0.6em 0.2em;
 }
 .leaflet-sidebar #voted_countries,
 .leaflet-sidebar #all_countries {
@@ -942,7 +943,8 @@ select#sex-select.mas {
     border-bottom: 3px double #dddddd;
     font-weight: bold;
 }
-.leaflet-sidebar #voted_countries table tbody td.country-flag {
+.leaflet-sidebar table tbody td.country-flag {
+    width: 25px;
     padding: 0px;
 }
 .leaflet-sidebar #voted_countries table tbody tr.province td {
@@ -954,6 +956,9 @@ select#sex-select.mas {
 }
 .leaflet-sidebar #all_countries table tbody tr:first-child td {
     border-top-width: 0px;
+}
+.leaflet-sidebar #all_countries table tbody tr td:last-child {
+    width: 40px;
 }
 .leaflet-sidebar .flag-container {
     height: 14px;
