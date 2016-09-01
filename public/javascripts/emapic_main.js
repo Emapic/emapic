@@ -193,7 +193,9 @@ var emapic = emapic || {};
 
     emapic.loadData = function() {
         if (emapic.map !== null) {
-            emapic.map.spin(true);
+            emapic.map.spin(true, {
+                zIndex: 10
+            });
         }
         var allLayersLoadedPromise = emapic.addAllMarkers();
         emapic.addViewsControls();
