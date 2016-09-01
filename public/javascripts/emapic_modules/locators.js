@@ -65,7 +65,8 @@ var emapic = emapic || {};
 
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
         sidebar = L.control.sidebar('sidebar', {
-            position: 'right'
+            position: 'right',
+            autoPan: false
         });
         sidebar.on('hide', function() {
             resetFixedTableHeader('#voted_countries table');
