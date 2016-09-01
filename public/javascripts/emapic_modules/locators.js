@@ -299,6 +299,7 @@ var emapic = emapic || {};
                 if (countryCode !== '') {
                     $this.find('.fa.fa-caret-down').toggleClass('fa-caret-up');
                     $('tr.province-' + countryCode).toggle();
+                    $('#voted_countries .table-scroll').perfectScrollbar('update');
                 }
             });
 
@@ -309,6 +310,7 @@ var emapic = emapic || {};
                 }
             });
 
+            $('#voted_countries .table-scroll').perfectScrollbar();
             resetFixedTableHeader('#voted_countries table');
             setFixedTableHeader('#voted_countries table');
         });
@@ -324,6 +326,7 @@ var emapic = emapic || {};
                     "<td><div class='flag-container'><span class='flag-icon flag-icon-" + code + "'></span></div></td>\n" +
                     "</tr>");
             });
+            $('#all_countries .table-scroll').perfectScrollbar();
             $('#all_countries tbody tr').on("click", function() {
                 var countryCode = $(this).find('.label').html();
                 emapic.centerViewCountryBounds(countryCode);
@@ -342,6 +345,7 @@ var emapic = emapic || {};
                     return $table.closest('.table-scroll');
                 }
             });
+            $table.closest('.table-scroll').perfectScrollbar('update');
         }
     }
 

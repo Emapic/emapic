@@ -23,6 +23,9 @@
 .table-scroll .table {
     margin: 0px;
 }
+.ps-container>.ps-scrollbar-y-rail {
+    z-index: 1002;
+}
 body {
     font-family: hero,sans-serif;
     background-color: #004F71;
@@ -912,22 +915,19 @@ select#sex-select.mas {
 .leaflet-sidebar #voted_countries > div:last-child,
 .leaflet-sidebar #all_countries > div:last-child {
     flex-grow: 1;
-    display: flex;
-    flex-flow: column;
-}
-.leaflet-sidebar #voted_countries > div:last-child > div,
-.leaflet-sidebar #all_countries > div:last-child > div {
-    flex-grow: 1;
 }
 .leaflet-sidebar #voted_countries .floatThead-wrapper {
     height: 100%;
 }
-.leaflet-sidebar #voted_countries div .table-scroll {
+.leaflet-sidebar #voted_countries .table-scroll {
     bottom: 0;
     left: 0;
-    position: absolute;
     right: 0;
     top: 0;
+    position: absolute;
+}
+.leaflet-sidebar #all_countries .table-scroll {
+    position: relative;
 }
 .leaflet-sidebar #voted_countries table tbody tr {
     border-bottom: none !important;

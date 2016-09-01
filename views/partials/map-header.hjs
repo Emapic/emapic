@@ -1,19 +1,20 @@
 {{> base_header}}
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
 
     <!-- Emapic Styles -->
     <link rel="stylesheet" type="text/css" href="/stylesheets/emapic_map.css">
     <!-- Jquery-UI Styles -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.0/themes/ui-lightness/jquery-ui.min.css">
     <!-- DC styles -->
-    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/dc/2.0.0-beta.30/dc.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dc/2.0.0-beta.30/dc.min.css">
     <!-- Leaflet Styles -->
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.2/leaflet.css">
     <link rel="stylesheet" type="text/css" href="/libs/leaflet/css/L.Control.Sidebar.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/MarkerCluster.Default.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/MarkerCluster.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jScrollPane/2.0.22/style/jquery.jscrollpane.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/0.6.12/css/perfect-scrollbar.min.css">
 
 {{{yield-styles}}}
 
