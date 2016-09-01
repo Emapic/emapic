@@ -31,12 +31,6 @@
                 el.html(date.format('{{#__}}js_full_date_format{{/__}}'));
             });
         });
-    {{#success}}
-        notifications.push("{{{success}}}");
-    {{/success}}
-    {{#error}}
-        errors.push("{{{error}}}");
-    {{/error}}
     </script>
     {{{yield-scripts}}}
 

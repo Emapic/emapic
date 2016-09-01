@@ -201,7 +201,7 @@
         }, {
             type: 'warning',
             delay: 15000,
-            z_index: 1200
+            z_index: 12000
         });
         {{/survey.active}}
         {{/user}}
