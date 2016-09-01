@@ -91,40 +91,45 @@ var emapic = emapic || {};
 
     emapic.modules.locators.searchCountries = function(component) {
         search = $('#' + component + ' .search-countries').val().toLowerCase();
+        var promise;
         if (search === null || search.trim().length === 0) {
-        $('#' + component + ' tbody tr.country').each(
-            function() {
-                var countryCode = $(this).find('.stats-country-label').html(),
-                    provincesShown = $(this).find('i.fa-caret-down').hasClass('fa-caret-up');
-                $(this).show();
-                if (countryCode !== '' && provincesShown) {
-                    $('tr.province-' + countryCode).show();
-                }
-            }
-        );
-        }
-        terms = search.split(' ');
-        $('#' + component + ' tbody tr.country').each(
-            function() {
-                var countryName = $(this).find('.country-name').html().toLowerCase(),
-                    countryCode = $(this).find('.stats-country-label').html(),
-                    provincesShown = $(this).find('i.fa-caret-down').hasClass('fa-caret-up'),
-                    matches = true;
-                for (i = 0, len = terms.length; i < len; i++) {
-                    if (countryName.indexOf(terms[i]) == -1) {
-                        if (countryCode !== '' && provincesShown) {
-                            $('tr.province-' + countryCode).hide();
-                        }
-                        $(this).hide();
-                        return;
+            promise = $('#' + component + ' tbody tr.country').each(
+                function() {
+                    var countryCode = $(this).find('.stats-country-label').html(),
+                        provincesShown = $(this).find('i.fa-caret-down').hasClass('fa-caret-up');
+                    $(this).show();
+                    if (countryCode !== '' && provincesShown) {
+                        $('tr.province-' + countryCode).show();
                     }
                 }
-                $(this).show();
-                if (countryCode !== '' && provincesShown) {
-                    $('tr.province-' + countryCode).show();
+            ).promise();
+        } else {
+            terms = search.split(' ');
+            promise = $('#' + component + ' tbody tr.country').each(
+                function() {
+                    var countryName = $(this).find('.country-name').html().toLowerCase(),
+                        countryCode = $(this).find('.stats-country-label').html(),
+                        provincesShown = $(this).find('i.fa-caret-down').hasClass('fa-caret-up'),
+                        matches = true;
+                    for (i = 0, len = terms.length; i < len; i++) {
+                        if (countryName.indexOf(terms[i]) == -1) {
+                            if (countryCode !== '' && provincesShown) {
+                                $('tr.province-' + countryCode).hide();
+                            }
+                            $(this).hide();
+                            return;
+                        }
+                    }
+                    $(this).show();
+                    if (countryCode !== '' && provincesShown) {
+                        $('tr.province-' + countryCode).show();
+                    }
                 }
-            }
-        );
+            ).promise();
+        }
+        promise.done(function() {
+            $('#' + component + ' .table-scroll').perfectScrollbar('update');
+        });
     };
 
     emapic.modules.locators.controlViewTo = function(view) {
