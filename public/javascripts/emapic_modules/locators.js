@@ -73,6 +73,7 @@ var emapic = emapic || {};
         });
         sidebar.on('shown', function() {
             setFixedTableHeader('#voted_countries table');
+            emapic.modules.locators.searchCountries('voted_countries');
         });
         emapic.map.addControl(sidebar);
     });
@@ -160,6 +161,7 @@ var emapic = emapic || {};
         allCountries.hide();
         votedCountries.show(0, function() {
             setFixedTableHeader('#voted_countries table');
+            emapic.modules.locators.searchCountries('voted_countries');
         });
     };
 
@@ -167,6 +169,7 @@ var emapic = emapic || {};
         allCountries.html(allCountriesHtml);
         allCountriesSpinner = new Spinner().spin($('#all_countries tbody')[0]);
         votedCountries.html(votedCountriesHtml);
+        $('#voted_countries .table-scroll').perfectScrollbar();
         votedCountriesSpinner = new Spinner().spin($('#voted_countries tbody')[0]);
         emapic.modules.locators.showSidebarVotedCountries();
         populateSidebarData();
@@ -315,9 +318,11 @@ var emapic = emapic || {};
                 }
             });
 
-            $('#voted_countries .table-scroll').perfectScrollbar();
-            resetFixedTableHeader('#voted_countries table');
-            setFixedTableHeader('#voted_countries table');
+            if ($('#voted_countries table').is(':visible')) {
+                resetFixedTableHeader('#voted_countries table');
+                setFixedTableHeader('#voted_countries table');
+                emapic.modules.locators.searchCountries('voted_countries');
+            }
         });
     }
 
