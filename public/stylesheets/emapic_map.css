@@ -926,7 +926,8 @@ select#sex-select.mas {
     top: 0;
     position: absolute;
 }
-.leaflet-sidebar #all_countries .table-scroll {
+.leaflet-sidebar #voted_countries > div:last-child,
+.leaflet-sidebar #all_countries > div:last-child {
     position: relative;
 }
 .leaflet-sidebar #voted_countries table tbody tr {
