@@ -33,6 +33,7 @@
     "nodemailer-smtp-transport": "^1.0.3",
     "nodemailer-wellknown": "^0.1.5",
     "node-schedule": "^1.0.0",
+    "optipng-bin": "^3.1.2",
     "pagination": "^0.4.4",
     "passport": "^0.2.1",
     "passport-facebook": "^2.1.0",

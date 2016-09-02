@@ -11,9 +11,39 @@ var nodemailer = require('nodemailer'),
     bases = require('bases'),
     path = require('path'),
     childProcess = Promise.promisifyAll(require('child_process')),
+    optipng = require('optipng-bin'),
     phantomjs = require('phantomjs-prebuilt'),
     surveyIdEncr = nconf.get('app').surveyIdEncr,
     smtpConfig = nconf.get('smtp');
+
+function takeSnapshotRaw(url, imgPath, width, height, wait, minSize, tries) {
+    tries = (tries) ? tries : 0;
+    var childArgs = [
+            '--ignore-ssl-errors=true',
+            path.join(__dirname, 'scripts' + path.sep + 'phantomjs-survey_snapshot.js'),
+            url,
+            imgPath,
+            width,
+            height,
+            wait
+        ];
+    return childProcess.execFileAsync(phantomjs.path, childArgs).then(function(stdout) {
+        if (!minSize || fs.statSync(imgPath).size >= minSize) {
+            return Promise.resolve(imgPath);
+        } else {
+            // If the image file is very small, it probably wasn't well rendered,
+            if (tries >= 3) {
+                // If we already tried the process at least 3 times, we simply inform of the anomaly
+                logger.warn('Snapshot from url ' + url + ' has an unusual small size and could be wrong.');
+                return Promise.resolve(imgPath);
+            } else {
+                // We retry the process (2 more times at most)
+                logger.debug('Snapshot from url ' + url + ' seems to be wrong. Retrying...');
+                return takeSnapshotRaw(url, imgPath, width, height, wait, minSize, tries + 1);
+            }
+        }
+    });
+}
 
 module.exports = function(app) {
     sendMail = function(mail) {
@@ -144,33 +174,14 @@ module.exports = function(app) {
         return props;
     },
 
-    takeSnapshot = function(url, imgPath, width, height, wait, minSize, tries) {
-        tries = (tries) ? tries : 0;
-        var childArgs = [
-            '--ignore-ssl-errors=true',
-            path.join(__dirname, 'scripts/phantomjs-survey_snapshot.js'),
-            url,
-            imgPath,
-            width,
-            height,
-            wait
-        ];
-        return childProcess.execFileAsync(phantomjs.path, childArgs).then(function(stdout) {
-            if (!minSize || fs.statSync(imgPath).size >= minSize) {
-                return Promise.resolve(imgPath);
-            } else {
-                // If the image file is very small, it probably wasn't well rendered,
-                if (tries >= 3) {
-                    // If we already tried the process at least 3 times, we simply inform of the anomaly
-                    logger.warn('Snapshot from url ' + url + ' has an unusual small size and could be wrong.');
-                    return Promise.resolve(imgPath);
-                } else {
-                    // We retry the process (2 more times at most)
-                    logger.debug('Snapshot from url ' + url + ' seems to be wrong. Retrying...');
-                    return takeSnapshot(url, imgPath, width, height, wait, minSize, tries + 1);
-                }
-            }
-        });
+    takeSnapshot = function(url, imgPath, width, height, wait, minSize) {
+        return takeSnapshotRaw(url, imgPath, width, height, wait, minSize).then(function() {
+            // Compress the image content
+            return childProcess.execFileAsync(optipng, [
+                    '-o7',
+                    imgPath
+                ]);
+        }).return(imgPath);
     },
 
     randomString = function(len) {

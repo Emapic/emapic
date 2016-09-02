@@ -1,6 +1,7 @@
 var Promise = require('bluebird'),
     searchEngineLang = require('nconf').get('app').searchEngineLang,
-    fsp = require('fs-promise');
+    fsp = require('fs-promise'),
+    path = require('path');
 
 module.exports = function(sequelize, DataTypes) {
     var Survey = sequelize.define('Survey', {
@@ -240,9 +241,12 @@ module.exports = function(sequelize, DataTypes) {
             generateThumbnails: function() {
                 return Promise.map(models.Survey.scope('alreadyOpened').findAll({where: {nr_votes: {gte: 5}}}), function(survey) {
                     var encrId = survey.encr_id;
+                    // TODO resize the snapshots from the optimal size (512x288 / 512x512) to the smaller possible sizes (256x144 / 400x400)
                     return Promise.all([
-                        takeSnapshot('http://localhost:3001/survey/' + encrId + '/results', 'thumbnails/survey/small/' + encrId + '.png', 256, 144, 25000, 5000),
-                        takeSnapshot('http://localhost:3001/survey/' + encrId + '/results', 'thumbnails/survey/share/' + encrId + '.png', 400, 400, 35000, 20000)
+                        takeSnapshot('http://localhost:3001/survey/' + encrId + '/results',
+                            'thumbnails' + path.sep + 'survey' + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 30000, 20000),
+                        takeSnapshot('http://localhost:3001/survey/' + encrId + '/results',
+                            'thumbnails' + path.sep + 'survey' + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 40000, 30000)
                     ]);
                 // If we take snapshots with multiple sizes, we should lower the concurrency
                 }, {concurrency: 3});
