@@ -1305,6 +1305,10 @@ div.legal-text ol > li {
     .survey-list-author .avatar {
         margin-right: 10px;
     }
+    .survey-list-thumbnail {
+        width: 128px;
+        height: 72px;
+    }
     div.panel-footer {
         padding: 10px;
     }
@@ -1336,7 +1340,7 @@ div.legal-text ol > li {
     display: none;
 }
 
-@media screen and (max-device-width: 359px), screen and (max-device-height: 549px) {
+@media screen and (max-device-width: 360px), screen and (max-device-height: 550px) {
     .show-extrasmall {
         display: initial;
     }

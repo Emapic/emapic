@@ -16,7 +16,7 @@
                 </div>
                 <div class="panel-body">
                     <a href="/survey/{{encr_id}}">
-                        <img class="hide-small survey-list-thumbnail" src="/thumbnails/survey/small/{{encr_id}}"></img>
+                        <img class="survey-list-thumbnail" src="https://emapic.es/thumbnails/survey/small/{{encr_id}}"></img>
                     </a>
                     <div id="survey-descrip">
                         <h4>
@@ -59,7 +59,6 @@
                                 </button>
                             </a>
                         </div>
-                        
                         {{#public_results}}
                         <div class="pull-left">
                             <a href="/survey/{{encr_id}}/results">
