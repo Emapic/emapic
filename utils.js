@@ -179,6 +179,7 @@ module.exports = function(app) {
             // Compress the image content
             return childProcess.execFileAsync(optipng, [
                     '-o7',
+                    '-clobber',
                     imgPath
                 ]);
         }).return(imgPath);
