@@ -238,16 +238,9 @@ module.exports = function(sequelize, DataTypes) {
                 return 'tsv';
             },
 
-            generateThumbnails: function() {
-                return Promise.map(models.Survey.scope('alreadyOpened').findAll({where: {nr_votes: {gte: 5}}}), function(survey) {
-                    var encrId = survey.encr_id;
-                    // TODO resize the snapshots from the optimal size (512x288 / 512x512) to the smaller possible sizes (256x144 / 400x400)
-                    return Promise.all([
-                        takeSnapshot('http://localhost:3001/survey/' + encrId + '/results',
-                            'thumbnails' + path.sep + 'survey' + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 30000, 20000),
-                        takeSnapshot('http://localhost:3001/survey/' + encrId + '/results',
-                            'thumbnails' + path.sep + 'survey' + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 40000, 30000)
-                    ]);
+            updateAllThumbnails: function() {
+                return Promise.map(models.Survey.scope('alreadyOpened').findAll(), function(survey) {
+                    return survey.updateThumbnails();
                 // If we take snapshots with multiple sizes, we should lower the concurrency
                 }, {concurrency: 3});
             }
@@ -313,6 +306,21 @@ module.exports = function(sequelize, DataTypes) {
 
             clearVotes: function() {
                 return Promise.all([this.clearTable(), this.clearAuxVotes()]);
+            },
+
+            updateThumbnails: function() {
+                return (this.nr_votes >= 5) ? this.generateThumbnails() : this.deleteThumbnails();
+            },
+
+            generateThumbnails: function() {
+                var encrId = this.encr_id;
+                // TODO resize the snapshots from the optimal size (512x288 / 512x512) to the smaller possible sizes (256x144 / 400x400)
+                return Promise.all([
+                    takeSnapshot('http://localhost:3001/survey/' + encrId + '/results',
+                        'thumbnails' + path.sep + 'survey' + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 30000, 20000),
+                    takeSnapshot('http://localhost:3001/survey/' + encrId + '/results',
+                        'thumbnails' + path.sep + 'survey' + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 40000, 30000)
+                ]);
             },
 
             deleteThumbnails: function() {

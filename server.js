@@ -318,11 +318,11 @@ var SampleApp = function() {
         });
 
         require('node-schedule').scheduleJob('0 3 * * *', function() {
-            logger.info('Generating survey thumbnails...');
-            models.Survey.generateThumbnails().then(function() {
-                logger.info('Survey thumbnails generated.');
+            logger.info('Updating survey thumbnails...');
+            models.Survey.updateAllThumbnails().then(function() {
+                logger.info('Survey thumbnails updated.');
             }).catch(function(err) {
-                logger.error('Some error happened while generating survey thumbnails: ' + err);
+                logger.error('Some error happened while updating survey thumbnails: ' + err);
             });
         });
     };
