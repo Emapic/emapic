@@ -108,8 +108,14 @@ module.exports = function(app) {
                 question;
             // We order the votes in descending order
             for (var j in results[i]) {
-                if (j != 'name' && j != 'total_responses' && j != 'iso_code' && j != 'geojson') {
+                if (j != 'name' && j != 'total_responses' && j != 'iso_code' &&
+                    j != 'country_id' && j != 'adm_code' && j != 'adm_type' &&
+                    j != 'country_iso_code' &&  j != 'geojson') {
                     question = j.split('_')[0];
+                    if (isNaN(question.replace('q', '')) ||
+                        isNaN(j.split('_')[1])) {
+                        continue;
+                    }
                     if (!orderedVotes[question]) {
                         orderedVotes[question] = [];
                     }

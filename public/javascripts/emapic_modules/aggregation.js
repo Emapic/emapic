@@ -97,13 +97,20 @@ var emapic = emapic || {};
     	if (feature.properties.popup_msg) {
     		return feature.properties.popup_msg;
     	}
-        var popup = '<h4><small>' + feature.properties.name + '</small></h4>';
-        var popupProperties = '';
-        var orderedVotes = {};
+        var popup = '<h4><small>' + feature.properties.name + '</small></h4>',
+            popupProperties = '',
+            orderedVotes = {},
+            question;
         // We order the votes in descending order
         for (var i in feature.properties) {
-            if (i != 'name' && i != 'total_responses' && i != 'iso_code') {
-    			var question = i.split('_')[0];
+            if (i != 'name' && i != 'total_responses' && i != 'iso_code' &&
+                i != 'country_id' && i != 'adm_code' && i != 'adm_type' &&
+                i != 'country_iso_code' && i.split('_')[0] == emapic.legend.color.question) {
+                question = i.split('_')[0];
+                if (isNaN(question.replace('q', '')) ||
+                    isNaN(i.split('_')[1])) {
+                    continue;
+                }
     			if (!orderedVotes[question]) {
     				orderedVotes[question] = [];
     			}
@@ -133,12 +140,13 @@ var emapic = emapic || {};
     	if (feature.properties.popup_msg) {
     		return feature.properties.popup_msg;
     	}
-        var popup = '<h4><small>' + feature.properties.name + '</small></h4>';
-        var popupProperties = '';
-        var orderedVotes = [];
+        var popup = '<h4><small>' + feature.properties.name + '</small></h4>',
+            popupProperties = '',
+            orderedVotes = [];
         // We order the votes in descending order
         for (var i in feature.properties) {
-            if (i != 'name' && i != 'total_responses' && i != 'iso_code' && i.split('_')[0] == emapic.legend.color.question) {
+            if (i != 'name' && i != 'total_responses' && i != 'iso_code' &&
+                i.split('_')[0] == emapic.legend.color.question) {
                 var position = orderedVotes.length;
                 for (var j in orderedVotes) {
                     if (orderedVotes[j].nr < parseInt(feature.properties[i])) {
