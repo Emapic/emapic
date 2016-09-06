@@ -65,8 +65,9 @@ var emapic = emapic || {};
             }
             emapic.map.removeLayer(emapic.indivVotesLayer);
             emapic.map.removeLayer(countriesLayer);
-            if (emapic.map.getZoom() > 8) {
-                emapic.map.setZoom(6);
+            var provincesBounds = provincesLayer.getBounds();
+            if (!emapic.map.getBounds().contains(provincesBounds)) {
+                emapic.map.fitBounds(provincesBounds);
             }
             emapic.map.addLayer(provincesLayer);
         } else {
@@ -83,8 +84,9 @@ var emapic = emapic || {};
             }
             emapic.map.removeLayer(emapic.indivVotesLayer);
             emapic.map.removeLayer(provincesLayer);
-            if (emapic.map.getZoom() > 5) {
-                emapic.map.setZoom(3);
+            var countriesBounds = countriesLayer.getBounds();
+            if (!emapic.map.getBounds().contains(countriesBounds)) {
+                emapic.map.fitBounds(countriesBounds);
             }
             emapic.map.addLayer(countriesLayer);
         } else {
