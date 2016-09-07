@@ -24,8 +24,9 @@ var express = require('express'),
 var SampleApp = function() {
 
     //  Scope.
-    var self = this;
-    var serverConfig;
+    var self = this,
+        serverConfig,
+        socialConfig;
 
 
     /*  ================================================================  */
@@ -42,6 +43,7 @@ var SampleApp = function() {
         // Then load configuration from a designated file.
         nconf.file({ file: 'config.json' });
         serverConfig = nconf.get('server');
+        socialConfig = nconf.get('social');
     };
 
     /**
@@ -124,21 +126,18 @@ var SampleApp = function() {
           cookieName: 'locale'
         });
         self.app.use(function(req, res, next) {
-          req.i18n.setLocale(req.i18n.preferredLocale());
-          req.i18n.setLocaleFromQuery();
-          req.i18n.setLocaleFromCookie();
-          res.locals.web_locale = req.i18n.getLocale();
-          switch(res.locals.web_locale) {
-              case 'en':
-                // We use United Kingdom as reference for english
-                res.locals.web_locale_iso = 'gb';
-                break;
-              default:
-                res.locals.web_locale_iso = res.locals.web_locale;
-          }
-          next();
-        });
-        self.app.use(function(req, res, next) {
+            req.i18n.setLocale(req.i18n.preferredLocale());
+            req.i18n.setLocaleFromQuery();
+            req.i18n.setLocaleFromCookie();
+            res.locals.web_locale = req.i18n.getLocale();
+            switch(res.locals.web_locale) {
+                case 'en':
+                    // We use United Kingdom as reference for english
+                    res.locals.web_locale_iso = 'gb';
+                    break;
+                default:
+                    res.locals.web_locale_iso = res.locals.web_locale;
+            }
             var baseLocals = res.locals;
             // Add the i18n function to all rendering contexts
             res.locals.__ = function() {
@@ -167,6 +166,15 @@ var SampleApp = function() {
                     this.title = text;
                 };
             };
+
+            res.locals.addThisId = ('addThisId' in socialConfig &&
+                socialConfig.addThisId !== '') ? socialConfig.addThisId : null;
+
+            res.locals.twitterVia = ('twitterVia' in socialConfig &&
+                socialConfig.twitterVia !== '') ? socialConfig.twitterVia : null;
+
+            res.locals.ogSiteName = ('ogSiteName' in socialConfig &&
+                socialConfig.ogSiteName !== '') ? socialConfig.ogSiteName : null;
 
             next();
         });

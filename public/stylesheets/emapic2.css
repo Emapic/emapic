@@ -742,6 +742,7 @@ span.user-inline {
 
 .dropdown-menu.share-url {
 	min-width: none;
+    text-align: center;
 	border: none;
 	box-shadow: none;
 	margin: 0;
@@ -749,6 +750,10 @@ span.user-inline {
     background: grey;
     background: rgba(150, 150, 150, .5);
     z-index: 1100;
+}
+
+.dropdown-menu.share-url.addThis {
+	min-width: 220px;
 }
 
 .share-url-box {
@@ -1318,6 +1323,9 @@ div.legal-text ol > li {
     .dropdown-menu.share-url {
         margin-left: -110px;
     }
+    .dropdown-menu.share-url.addThis {
+    	margin-left: -135px;
+    }
     .share-sq {
         font-size: 3em;
         padding-bottom: 3px;
@@ -1373,9 +1381,12 @@ div.legal-text ol > li {
     .dropdown-menu.share-url {
         position: fixed;
         left: 50%;
-        top: 50%;
+        top: 30%;
         margin-left: -151px;
         padding: 20px;
         background: rgba(150, 150, 150, 1);
+    }
+    .dropdown-menu.share-url input.share-url-box {
+        margin-bottom: 20px;
     }
 }

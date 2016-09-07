@@ -81,9 +81,8 @@ En esta carpeta se encuentra el fichero _sqitch.conf_, que contiene la configura
 
 * «uri» dentro de «[target "emapic"]»: aquí se especifica la cadena de conexión a la base de datos. Por defecto se intentará conectar con el usuario «postgres», contraseña «postgres» al servidor local en el puerto por defecto (5432).  
 Si alguno de estos datos no es correcto, deberás retocar la cadena de conexión con el siguiente formato (sustituir las cadenas de texto rodeadas por llaves por los valores correspondientes):  
- ```
- db:pg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}
- ```
+
+        db:pg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}
 
 * «emapic_db_user» dentro de «[deploy "variables"]», «[verify "variables"]» y «[revert "variables"]»: el nombre del usuario de base de datos con el que Emapic se conectará para acceder a los datos.  
 Por defecto, con el valor «emapic». En caso de querer darle un nombre distinto, puedes hacerlo simplemente editando este documento y cambiando el nombre de usuario, o añadiendo el parámetro «-s emapic_db_user={emapic_db_user}» a todas las ejecuciones de Sqitch, sustituyendo la cadena de texto entre llaves por el nombre de usuario deseado.
@@ -200,6 +199,26 @@ Se incluye un certificado auto-firmado para hacer pruebas en local.
 Es el servidor de correo saliente empleado para enviar correos a los usuarios para que activen su cuenta al registrarse y para que puedan resetear su contraseña en caso de olvidarla.  
 Debes consultar en tu cuenta de servicio de correo electrónico para activar el servicio de SMTP e introducir los datos que correspondan.
 
+#### Configuración de redes sociales (_social_)
+
+Parámetros opcionales relacionados con la compartición de contenidos a través de redes sociales:
+
+* ##### Id de widget para compartir en [AddThis](http://www.addthis.com) (_addThisId_)
+Identificador de nuestro widget para compartir configurado en [AddThis](http://www.addthis.com), que nos permitirá integrar su funcionalidad _Inline Share Buttons_ directamente sin necesidad de tocar el código[²](#markdown-header-notas).  
+Dicho identificador lo podemos encontrar tras configurar nuestro widget, en la página en la cual nos muestran el código a insertar en nuestra página, similar al siguiente ejemplo en el cual se indica la posición del identificador con la cadena _{id-addThis}_:  
+
+        <!-- Go to www.addthis.com/dashboard to customize your tools -->
+        <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={id-addThis}"></script>
+Este parámetro es totalmente opcional y en caso de no querer usar [AddThis](http://www.addthis.com), podemos simplemente dejarlo en blanco y en lugar del widget propio del servicio tendremos cuatro botones estándar para compartir en [Facebook](https://www.facebook.com), [Twitter](https://twitter.com), [Google+](https://plus.google.com) y [LinkedIn](https://www.linkedin.com).
+
+* ##### Configuración del parámetro _via_ al compartir en [Twitter](https://twitter.com) (_twitterVia_)
+Aquí podemos especificar de manera opcional un nombre de cuenta de [Twitter](https://twitter.com) para que se le referencie por defecto siempre que se comparten contenidos de la web por dicha red social. Si lo dejamos en blanco, simplemente no se empleará el parámetro.
+
+* ##### Configuración del nombre del sitio web al compartir por redes sociales (_ogSiteName_)
+Este parámetro nos permitirá definir un nombre para identificar nuestra web al compartir por redes sociales (tag _meta_ «og:site_name»). Podemos dejarlo en blanco y se ignorará dicho parámetro al compartir.
+
+La aplicación incluye una serie de tags por defecto que proporcionan información al compartir por redes sociales que consideramos correcta para cualquier instalación de Emapic que no varíe su comportamiento actual. Dichos tags se pueden encontrar en los archivos [_views/partials/base-header.hjs_](views/partials/base-header.hjs) y [_views/partials/map-header.hjs_](views/partials/map-header.hjs).
+
 ## Licencia
 
 El código se publica bajo la licencia GNU AFFERO GPL v3 (véase [LICENSE-AGPLv3.md](LICENSE-AGPLv3.md)).
@@ -230,4 +249,5 @@ Ante cualquier duda o problema con la aplicación, puedes contactar directamente
 ---
 
 ##### Notas
-¹: esperamos añadir más adelante una pequeña guía sobre cómo cambiar el idioma profundizando más en el tema.
+¹: esperamos añadir más adelante una pequeña guía sobre cómo cambiar el idioma profundizando más en el tema.  
+²: si queremos activar esta funcionalidad, es conveniente leer antes los [términos de servicio de AddThis](http://www.addthis.com/privacy/terms-of-service) para asegurarnos de que cumplimos sus requisitos, y su [política de privacidad](http://www.addthis.com/privacy/privacy-policy) para comprender qué datos manejan y con qué fines.

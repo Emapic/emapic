@@ -123,6 +123,7 @@ div.alert-warning a {
 }
 .dropdown-menu.share-url {
 	min-width: none;
+    text-align: center;
 	border: none;
 	box-shadow: none;
 	margin: 0;
@@ -132,6 +133,9 @@ div.alert-warning a {
     left: auto;
     right: 100%;
     top: 7px;
+}
+.dropdown-menu.share-url.addThis {
+    min-width: 220px;
 }
 .share-url-box {
 	background-color: #A2C73A;
@@ -1157,10 +1161,13 @@ select#sex-select.mas {
     .dropdown-menu.share-url {
         position: fixed;
         left: 50%;
-        top: 50%;
+        top: 30%;
         margin-left: -151px;
         padding: 20px;
         right: auto;
+    }
+    .dropdown-menu.share-url input.share-url-box {
+        margin-bottom: 20px;
     }
     #questions-wrapper, #thanks-msg {
         padding: 0 1em;

@@ -44,5 +44,10 @@
         "from": "dumb",
         "user": "dumb",
         "pass": "dumb"
+    },
+    "social": {
+        "addThisId": "",
+        "twitterVia": "",
+        "ogSiteName": ""
     }
 }

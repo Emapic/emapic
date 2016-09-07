@@ -1,4 +1,9 @@
 {{> base_header}}
+    <meta property="og:title" content="{{survey.title}}"/>
+    <meta property="og:description" content="{{survey.description_or_title}}"/>
+    <meta property="og:url" content="{{web_host}}/survey/{{survey.encr_id}}"/>
+    <meta name="twitter:card" content="summary"/>
+    <meta property="og:image" content="{{web_host}}/thumbnails/survey/share/{{survey.encr_id}}">
 
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
 

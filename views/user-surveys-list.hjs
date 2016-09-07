@@ -10,3 +10,23 @@
     {{> surveys_list}}
 
 </div> <!-- /content -->
+
+
+{{#yield-scripts}}
+{{#addThisId}}
+<!-- Go to www.addthis.com/dashboard to customize your tools -->
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={{addThisId}}"></script>
+{{#twitterVia}}
+<script type="text/javascript">
+	var addthis_share = addthis_share || {};
+	addthis_share = {
+		passthrough : {
+			twitter: {
+				via: "{{twitterVia}}"
+			}
+		}
+	};
+</script>
+{{/twitterVia}}
+{{/addThisId}}
+{{/yield-scripts}}

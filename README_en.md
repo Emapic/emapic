@@ -82,10 +82,9 @@ Inside this folder we can find file _sqitch.conf_, which contains the configurat
 
 
 * 'uri' inside '[target "emapic"]': here we specify the database connection string. By default it will try to connect with user "postgres", password "postgres" the local PostgreSQL server through default port (5432).  
-If any of these values is wrong, you must modify the connection string using the following format (replace the text strings surrounded by curly brackets with their respective values):  
- ```
- db:pg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}
- ```
+If any of these values is wrong, you must modify the connection string using the following format (replace the text strings surrounded by curly brackets with their respective values):
+
+        db:pg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}
 
 * «emapic_db_user» inside «[deploy "variables"]», «[verify "variables"]» and «[revert "variables"]»: the name of the database user Emapic will use to connect to the database.  
 By default, with the value "emapic". If you want to use a different name, you can simply edit this file and change its value, or add the parameter "-s emapic_db_user={emapic_db_user}" to all Sqitch executions, replacing the string surrounded by curly brackets with the desired user name.
@@ -202,6 +201,26 @@ A self-signed certificate is included for testing purposes in a localhost server
 The outgoing mail server used for sending mails to users in order to activate their accounts or reset their password in case they forgot it.  
 You must check your e-mail account service in order to activate the SMTP support and then set all the required fields.
 
+#### Social networks config (_social_)
+
+Optional parameters related to content sharing through social networks:
+
+* ##### [AddThis](http://www.addthis.com) sharing widget id (_addThisId_)
+Id of our configured sharing widget in [AddThis](http://www.addthis.com), which will allow us to include their funcionality _Inline Share Buttons_ without having to edit our code[²](#markdown-header-notas).  
+That id can be found after configuring our widget, in the page which shows us the code to paste in our page, similar to the following example in which we point the id location with the string _{id-addThis}_:
+
+        <!-- Go to www.addthis.com/dashboard to customize your tools -->
+        <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={id-addThis}"></script>
+This is a completely optional parameter and if we don't want to use [AddThis](http://www.addthis.com) we can simply leave it empty and instead of their widget we'll have four standard buttons for sharing through [Facebook](https://www.facebook.com), [Twitter](https://twitter.com), [Google+](https://plus.google.com) and [LinkedIn](https://www.linkedin.com).
+
+* ##### Configuration of [Twitter](https://twitter.com)'s _via_ parameter (_twitterVia_)
+Here we can specify an optional [Twitter](https://twitter.com) account name in order to link it everytime any content is shared through that social network. If we leave it empty, the parameter will simply be ignored.
+
+* ##### Configuration of the website name when sharing through social networks (_ogSiteName_)
+This parameter allows us to define a name for our website when sharing through social networks (tag _meta_ «og:site_name»). We can simply leave it blank in order to ignore it when sharing.
+
+This application includes a list of tags which provide info when sharing through social networks that we consider accurate for any installation of Emapic which doesn't alter its current features. Those tags can be found inside files [_views/partials/base-header.hjs_](views/partials/base-header.hjs) and [_views/partials/map-header.hjs_](views/partials/map-header.hjs).
+
 ## License
 
 Code is published under the GNU AFFERO GPL v3 license (see [LICENSE-AGPLv3.md](LICENSE-AGPLv3.md)).
@@ -232,4 +251,5 @@ If you have any doubt or problem regarding the application, you can contact dire
 ---
 
 ##### Footnotes
-¹: in the future we hope to add a brief guide about how to change the search engine language while also diving a little into this subject.
+¹: in the future we hope to add a brief guide about how to change the search engine language while also diving a little into this subject.  
+²: if we want to activate this feature, we should first read [AddThis' terms of service](http://www.addthis.com/privacy/terms-of-service) in order to make sure we comply with them, and their [privacy policy](http://www.addthis.com/privacy/privacy-policy) so we understand which data they use and with what purposes.
