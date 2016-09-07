@@ -116,7 +116,7 @@ module.exports = function(app) {
             }
             prelink = this.preparePreLink(result.prelink);
             //html += '<li class="pagination-previous' + (result.previous ? '' : ' disabled"') + '"><a' + (result.previous ? ' href="' + prelink + result.previous + '"' : '') + '>' + result.translations.PREVIOUS + '</a></li>';
-            html += '<li class="pagination-previous' + (result.previous ? '' : ' disabled"') + '"><a' + (result.previous ? ' href="' + prelink + result.previous + '"' : '') + '><span class="glyphicon glyphicon-menu-left"></span></a></li>';
+            html += '<li class="pagination-previous' + (result.previous ? '' : ' disabled') + '"><a' + (result.previous ? ' href="' + prelink + result.previous + '"' : '') + '><span class="glyphicon glyphicon-menu-left"></span></a></li>';
             if (result.previous && result.range[0] !== result.first) {
                 html += '<li class="pagination-first"><a href="' + prelink + result.first + '">' + result.first + '</a></li>' +
                 (result.range[0] - 1 !== result.first ? '<li class="pagination-more-before disabled"><a></a></li>' : '');
