@@ -1,5 +1,5 @@
 
-![Logo of Emapic](public/images/logo_bluefont.svg)
+![Logo of Emapic](public/images/logo_bluefont.png)
 
 ##### [English](README_en.md)
 
