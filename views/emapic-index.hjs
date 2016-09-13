@@ -32,6 +32,7 @@
 				<img class="img-responsive center-block" id="marker-what-icon" src="/images/intro-marker.png" alt="emapic marker" />
 				<h2>{{#__}}map_your_opinions{{/__}}</h2>
 				<p class="col-md-8 col-md-push-2 text-center">{{#__}}map_your_opinions_desc{{/__}}</p>
+				<p class="col-md-12"><a href="/surveys/list"><button type="button" class="btn btn-primary btn-lg">{{#__}}gallery{{/__}}</button></a></p>
 			</div>
 		</div>
 		</div>
