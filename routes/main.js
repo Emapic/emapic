@@ -175,9 +175,6 @@ module.exports = function(app) {
 
     app.post('/surveys/new', requireRole(null), function(req, res){
         req.user.isAdmin().then(function(isAdmin) {
-            if (!isAdmin && ('dont_list' in req.body)) {
-                delete req.body.dont_list;
-            }
             // Max survey images' file size is 1 MB
             for (var file in req.files) {
                 if (req.files[file].size > 1000000) {
@@ -209,9 +206,6 @@ module.exports = function(app) {
 
     app.post('/surveys/edit', requireRole(null), function(req, res){
         req.user.isAdmin().then(function(isAdmin) {
-            if (!isAdmin && ('dont_list' in req.body)) {
-                delete req.body.dont_list;
-            }
             if (!('survey_id' in req.body) || isNaN(req.body.survey_id)) {
                 return res.redirect('/surveys/own');
             }
