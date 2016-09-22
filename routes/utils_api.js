@@ -229,7 +229,7 @@ module.exports = function(app) {
                         csv += ';';
                         break;
                     case 'text-answer':
-                        csv += '"' + escapeCsvString(results[k]['q' + questions[l].question_order + '.value']) + '"';
+                        csv += '"' + escapeCsvString(results[k]['q' + questions[l].question_order + '.value']) + '";';
                         break;
                     case 'explanatory-text':
                         break;
