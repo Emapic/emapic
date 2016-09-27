@@ -49,15 +49,9 @@ page.open(url, function(status) {
   if(status === "success") {
     page.evaluate(function() {
         // Remove the cookie warning
-        var cookie = document.getElementsByClassName('cc_banner-wrapper');
-        for (var i=0; i < cookie.length; i++) {
-           cookie[i].style.display="none";
-        }
+        $('<style>.cc_banner-wrapper { display: none; }</style>').appendTo('head');
         // Remove the login message
-        var alert = document.getElementsByClassName('alert');
-        for (var j=0; j < alert.length; j++) {
-           alert[j].style.display="none";
-        }
+        $('<style>.alert { display: none; }</style>').appendTo('head');
     });
     window.setTimeout(function () {
         page.evaluate(function() {
