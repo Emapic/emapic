@@ -27,6 +27,7 @@ var emapic = emapic || {};
     // We'll use this color, for example, in ties
     emapic.neutralColor = 'grey';
     emapic.fallbackColor = 'black';
+    emapic.allLayersLoadedPromise = $.Deferred();
 
     emapic.oldResponses = {};
     emapic.userLoggedIn = false;
@@ -197,18 +198,20 @@ var emapic = emapic || {};
                 zIndex: 10
             });
         }
-        var allLayersLoadedPromise = emapic.addAllMarkers();
+        emapic.allLayersLoadedPromise.then(function() {
+            if (emapic.map !== null) {
+                emapic.map.spin(false);
+            }
+        });
+        emapic.addAllMarkers().then(function() {
+            emapic.allLayersLoadedPromise.resolve();
+        });
         emapic.addViewsControls();
         // If we have more than one set of legend, we display a question selector
         if (emapic.fullLegend && emapic.fullLegend.color && emapic.fullLegend.color.length > 1) {
     		emapic.addQuestionSelector();
     	}
         emapic.addTooltips();
-        allLayersLoadedPromise.then(function() {
-            if (emapic.map !== null) {
-                emapic.map.spin(false);
-            }
-        });
     };
 
     emapic.addTooltips = function() {
