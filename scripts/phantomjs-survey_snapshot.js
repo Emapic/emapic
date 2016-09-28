@@ -13,7 +13,7 @@ var page = require('webpage').create(),
     destination = 'snapshot.png',
     width = 1024,
     height = 768,
-    wait = 10000,
+    wait = 3000,
     headerHeight = 85;
 
 if (args.length >= 3) {
@@ -45,26 +45,28 @@ page.clipRect = {
     width: width,
     height: height - headerHeight
 };
-page.open(url, function(status) {
-  if(status === "success") {
+page.onCallback = function(data){
     page.evaluate(function() {
-        // Remove the cookie warning
-        $('<style>.cc_banner-wrapper { display: none; }</style>').appendTo('head');
-        // Remove the login message
-        $('<style>.alert { display: none; }</style>').appendTo('head');
+        // Disable clustering
+        emapic.modules.clustering.toggleClustering($('#clustering-control-activate'));
     });
     window.setTimeout(function () {
-        page.evaluate(function() {
-            // Disable clustering
-            emapic.modules.clustering.toggleClustering($('#clustering-control-activate'));
-            // Remove the controls
-            var control = document.getElementsByClassName('leaflet-control-container');
-            for (var i=0; i < control.length; i++) {
-               control[i].style.display="none";
-            }
-        });
         page.render(destination);
         phantom.exit();
     }, wait);
-  }
+};
+page.open(url, function(status) {
+    if(status === "success") {
+        page.evaluate(function() {
+            // Remove the cookie warning
+            $('<style>.cc_banner-wrapper { display: none !important; }</style>').appendTo('head');
+            // Remove the login message
+            $('<style>.alert { display: none !important; }</style>').appendTo('head');
+            // Remove the controls
+            $('<style>.leaflet-control-container { display: none !important; }</style>').appendTo('head');
+            emapic.allLayersLoadedPromise.then(function() {
+                window.callPhantom();
+            });
+        });
+    }
 });

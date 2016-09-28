@@ -317,9 +317,9 @@ module.exports = function(sequelize, DataTypes) {
                 // TODO resize the snapshots from the optimal size (512x288 / 512x512) to the smaller possible sizes (256x144 / 400x400)
                 return Promise.all([
                     takeSnapshot('http://localhost:3001/survey/' + encrId + '/results',
-                        'thumbnails' + path.sep + 'survey' + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 30000, 20000),
+                        'thumbnails' + path.sep + 'survey' + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 3000, 20000),
                     takeSnapshot('http://localhost:3001/survey/' + encrId + '/results',
-                        'thumbnails' + path.sep + 'survey' + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 40000, 30000)
+                        'thumbnails' + path.sep + 'survey' + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 3000, 30000)
                 ]);
             },
 
