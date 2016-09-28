@@ -2,8 +2,12 @@
     <!-- Footer -->
     <div id="footer">
 			<div class="container text-center">
-				<div class="col-xs-12 col-sm-5 col-sm-offset-4" id="footer-emapic-desc">
-					<h5>{{#__}}powered_by{{/__}} <a class="logos" href="/"><img class="" src="/images/emapic_descriptor.svg" title="Emapic" alt="desc Emapic" /></a></h5>
+				<div class="col-xs-12 col-sm-5 pull-left" id="footer-emapic-desc">
+					<h5>{{#__}}source_code_available_at{{/__}}</h5>
+    				<h5>{{#__}}source_code_under_license{{/__}}</h5>
+				</div>
+				<div class="col-xs-12 col-sm-3" id="footer-emapic-desc">
+					<h5>{{#__}}powered_by{{/__}} <a class="logos" href="https://emapic.es"><img src="/images/emapic_descriptor.svg" title="Emapic" alt="desc Emapic" /></a></h5>
 				</div>
 				<div class="col-xs-12 col-sm-3 pull-right" id="carto-ets-udc">
 					<a class="logos" href="http://www.udc.es/"><img src="/images/simbolo_UDC.svg" title="Universidade da Coruña" alt="simbolo UDC" /></a>

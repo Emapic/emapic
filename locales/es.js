@@ -8,6 +8,8 @@
 	"Facebook": "Facebook",
 	"facebook_language": "es_ES",
 	"emapic_index_title": "Emapic",
+	"source_code_available_at": "Código fuente original disponible en <a id='github_link' href='https://github.com/Emapic/emapic'><span class='fa fa-github'></span> github</a>",
+	"source_code_under_license": "Código liberado bajo licencia <a href='https://github.com/Emapic/emapic/blob/master/LICENSE-AGPLv3.md'>Affero General Public License V3</a>",
 	"powered_by": "Con la tecnología de",
 	"cookies_message_body": "Este sitio web utiliza cookies propias y de terceros para recabar información estadística sobre las visitas y poder ofrecerte una mejor experiencia y servicio. Al navegar o utilizar nuestros servicios, aceptas el uso que hacemos de las cookies.",
 	"cookies_dismiss": "Acepto",
