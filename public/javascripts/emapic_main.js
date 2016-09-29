@@ -171,6 +171,7 @@ var emapic = emapic || {};
             "Satélite (Mapbox)" : mapboxSatellite
         };
         L.control.layers(baseMaps, null, {position: 'bottomright'}).addTo(emapic.map);
+        emapic.addTooltips();
     };
 
     emapic.startMapLogic = function() {
@@ -205,6 +206,7 @@ var emapic = emapic || {};
     };
 
     emapic.addTooltips = function() {
+        $('.leaflet-bar > a').data('bs.tooltip', false);
         $('.leaflet-bar > a').tooltip({
             placement: 'right'
         });
