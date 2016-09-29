@@ -62,7 +62,7 @@ var emapic = emapic || {};
                 if (emapic.geoapi.geoapiLat === null && emapic.geoapi.geoapiLon === null) {
                     defaultPosition.coords.latitude = data.latitude;
                     defaultPosition.coords.longitude = data.longitude;
-                    if (map === null) {
+                    if (emapic.map === null) {
                         emapic.initializeMap();
                     }
                     emapic.geoapi.processUserCountry(emapic.geoapi.userCountryCode);
@@ -168,7 +168,7 @@ var emapic = emapic || {};
             if (emapic.geoapi.userDefaultPosition) {
                 $('#geoposmanualdefault').show();
             } else if (ipLocationFail) {
-                if (map === null) {
+                if (emapic.map === null) {
                     emapic.initializeMap();
                 }
                 $('#geoposmanual').show();
@@ -183,7 +183,7 @@ var emapic = emapic || {};
             emapic.geoapi.manualGeolocation = true;
             $('#geoposwarn').modal("hide");
             if (ipLocationFail) {
-                if (map === null) {
+                if (emapic.map === null) {
                     emapic.initializeMap();
                 }
                 $('#geoposallerror').show();

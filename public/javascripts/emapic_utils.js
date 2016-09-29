@@ -47,30 +47,40 @@ if (typeof $.fn.validator !== 'undefined' &&
             .on(element, 'click', L.DomEvent.preventDefault);
     };
 
-    emapic.utils.disableMapInteraction = function(disableZoomBtns) {
-        emapic.map.dragging.disable();
-        $( ".leaflet-container" ).addClass('force-disable');
-        emapic.map.touchZoom.disable();
-        emapic.map.doubleClickZoom.disable();
-        emapic.map.scrollWheelZoom.disable();
-        emapic.map.boxZoom.disable();
-        emapic.map.keyboard.disable();
-        if (emapic.map.tap) emapic.map.tap.disable();
-        if (disableZoomBtns) {
-            $('.leaflet-control-zoom a').addClass('force-disable');
+    emapic.utils.disableMapInteraction = function(spinner) {
+        if (emapic.map !== null) {
+            if (spinner) {
+                emapic.map.spin(true, {
+                    zIndex: 10
+                });
+                $('#map').addClass('disable-all');
+            }
+            emapic.map.dragging.disable();
+            $('.leaflet-container').addClass('force-disable');
+            emapic.map.touchZoom.disable();
+            emapic.map.doubleClickZoom.disable();
+            emapic.map.scrollWheelZoom.disable();
+            emapic.map.boxZoom.disable();
+            emapic.map.keyboard.disable();
+            if (emapic.map.tap) emapic.map.tap.disable();
+            $('.leaflet-control-container').addClass('force-disable');
         }
     };
 
     emapic.utils.enableMapInteraction = function() {
-        emapic.map.dragging.enable();
-        emapic.map.touchZoom.enable();
-        emapic.map.doubleClickZoom.enable();
-        emapic.map.scrollWheelZoom.enable();
-        emapic.map.boxZoom.enable();
-        emapic.map.keyboard.enable();
-        if (emapic.map.tap) emapic.map.tap.enable();
-        $( ".leaflet-container" ).removeClass('force-disable');
-        $('.leaflet-control-zoom a').removeClass('force-disable');
+        if (emapic.map !== null) {
+            emapic.map.dragging.enable();
+            emapic.map.touchZoom.enable();
+            emapic.map.doubleClickZoom.enable();
+            emapic.map.scrollWheelZoom.enable();
+            emapic.map.boxZoom.enable();
+            emapic.map.keyboard.enable();
+            if (emapic.map.tap) emapic.map.tap.enable();
+            $('.leaflet-container').removeClass('force-disable');
+            $('#map').removeClass('disable-all');
+            $('.leaflet-control-container').removeClass('force-disable');
+            emapic.map.spin(false);
+        }
     };
 
     emapic.utils.disableAllEventsPropagation = function(element) {

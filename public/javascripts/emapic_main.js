@@ -114,11 +114,7 @@ var emapic = emapic || {};
     };
 
     emapic.preinitEmapic = function() {
-        emapic.getAllCountriesDataBbox();
         emapic.loadLegend();
-        if (emapic.map === null) {
-            emapic.initializeMap();
-        }
     };
 
     emapic.initEmapic = function() {
@@ -193,15 +189,9 @@ var emapic = emapic || {};
     };
 
     emapic.loadData = function() {
-        if (emapic.map !== null) {
-            emapic.map.spin(true, {
-                zIndex: 10
-            });
-        }
+        emapic.utils.disableMapInteraction(true);
         emapic.allLayersLoadedPromise.then(function() {
-            if (emapic.map !== null) {
-                emapic.map.spin(false);
-            }
+            emapic.utils.enableMapInteraction();
         });
         emapic.addAllMarkers().then(function() {
             emapic.allLayersLoadedPromise.resolve();

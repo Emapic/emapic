@@ -53,9 +53,12 @@ label {
 .leaflet-container {
     font-family: hero,sans-serif !important;
 }
-.force-disable {
+.force-disable, .leaflet-control-container.force-disable a {
     cursor: default !important;
     pointer-events: none;
+}
+#map.disable-all > div:not(.spinner) {
+    opacity: 0.4;
 }
 a:link {
 	text-decoration: none;
