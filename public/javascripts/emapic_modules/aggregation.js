@@ -7,9 +7,9 @@ var emapic = emapic || {};
 (function(emapic) {
 
     var provincesLayer,
-        provincesLayerData,
+        provincesLayerData = null,
         countriesLayer,
-        countriesLayerData,
+        countriesLayerData = null,
         aggregationButtonsHtml = "<a id='grouping-control-region' title='" + emapic.utils.getI18n('js_total_votes_region', 'Ver total de votos por región') + "' class='exclusive-control' href='javascript:void(0)' onclick='emapic.modules.aggregation.showVotesByProvince(this)'><img src='/images/icon-agg_region.png' style='width: 16px; height: 16px;'/></a>\n"+
             "<a id='grouping-control-country' class='exclusive-control' title='" + emapic.utils.getI18n('js_total_votes_country', 'Ver total de votos por país') + "' href='javascript:void(0)' onclick='emapic.modules.aggregation.showVotesByCountry(this)'><img src='/images/icon-agg_country.png' style='width: 16px; height: 16px;'/></a>";
 
@@ -59,17 +59,33 @@ var emapic = emapic || {};
 
     emapic.modules.aggregation.showVotesByProvince = function(element) {
         if (!emapic.map.hasLayer(provincesLayer)) {
-            emapic.disableIndivLayerExclusiveComponents();
-            if (element !== null) {
-                emapic.activateExclusiveButton(element);
+            var provinceResultsDfd = $.Deferred();
+            if (provincesLayerData === null) {
+                emapic.utils.disableMapInteraction(true);
+                $.getJSON(emapic.modules.aggregation.getProvinceResultsUrl(), function(data) {
+                    provincesLayerData = data;
+                    updateAggregatedProvinceLayer();
+                    emapic.utils.enableMapInteraction();
+                    provinceResultsDfd.resolve();
+                });
+            } else {
+                provinceResultsDfd.resolve();
             }
-            emapic.map.removeLayer(emapic.indivVotesLayer);
-            emapic.map.removeLayer(countriesLayer);
-            var provincesBounds = provincesLayer.getBounds();
-            if (!emapic.map.getBounds().contains(provincesBounds)) {
-                emapic.map.fitBounds(provincesBounds);
-            }
-            emapic.map.addLayer(provincesLayer);
+            provinceResultsDfd.then(function() {
+                emapic.disableIndivLayerExclusiveComponents();
+                if (element !== null) {
+                    emapic.activateExclusiveButton(element);
+                }
+                emapic.map.removeLayer(emapic.indivVotesLayer);
+                if (countriesLayerData !== null) {
+                    emapic.map.removeLayer(countriesLayer);
+                }
+                var provincesBounds = provincesLayer.getBounds();
+                if (!emapic.map.getBounds().contains(provincesBounds)) {
+                    emapic.map.fitBounds(provincesBounds);
+                }
+                emapic.map.addLayer(provincesLayer);
+            });
         } else {
             emapic.deactivateButton(element);
             hideAggregatedLayers();
@@ -78,17 +94,33 @@ var emapic = emapic || {};
 
     emapic.modules.aggregation.showVotesByCountry = function(element) {
         if (!emapic.map.hasLayer(countriesLayer)) {
-            emapic.disableIndivLayerExclusiveComponents();
-            if (element !== null) {
-                emapic.activateExclusiveButton(element);
+            var countryResultsDfd = $.Deferred();
+            if (countriesLayerData === null) {
+                emapic.utils.disableMapInteraction(true);
+                $.getJSON(emapic.modules.aggregation.getCountryResultsUrl(), function(data) {
+                    countriesLayerData = data;
+                    updateAggregatedCountryLayer();
+                    emapic.utils.enableMapInteraction();
+                    countryResultsDfd.resolve();
+                });
+            } else {
+                countryResultsDfd.resolve();
             }
-            emapic.map.removeLayer(emapic.indivVotesLayer);
-            emapic.map.removeLayer(provincesLayer);
-            var countriesBounds = countriesLayer.getBounds();
-            if (!emapic.map.getBounds().contains(countriesBounds)) {
-                emapic.map.fitBounds(countriesBounds);
-            }
-            emapic.map.addLayer(countriesLayer);
+            countryResultsDfd.then(function() {
+                emapic.disableIndivLayerExclusiveComponents();
+                if (element !== null) {
+                    emapic.activateExclusiveButton(element);
+                }
+                emapic.map.removeLayer(emapic.indivVotesLayer);
+                if (provincesLayerData !== null) {
+                    emapic.map.removeLayer(provincesLayer);
+                }
+                var countriesBounds = countriesLayer.getBounds();
+                if (!emapic.map.getBounds().contains(countriesBounds)) {
+                    emapic.map.fitBounds(countriesBounds);
+                }
+                emapic.map.addLayer(countriesLayer);
+            });
         } else {
             emapic.deactivateButton(element);
             hideAggregatedLayers();
@@ -204,8 +236,12 @@ var emapic = emapic || {};
     }
 
     function updateAggregatedLayers() {
-    	updateAggregatedProvinceLayer();
-    	updateAggregatedCountryLayer();
+        if (provincesLayerData !== null) {
+    	    updateAggregatedProvinceLayer();
+        }
+        if (countriesLayerData !== null) {
+    	    updateAggregatedCountryLayer();
+        }
     }
 
     function updateAggregatedProvinceLayer() {
@@ -245,24 +281,6 @@ var emapic = emapic || {};
     		emapic.map.addLayer(countriesLayer);
     	}
     }
-
-    emapic.addAllMarkers = emapic.utils.overrideFunction(emapic.addAllMarkers, null, function(promise) {
-            var provinceResultsDfd = $.Deferred();
-            $.getJSON(emapic.modules.aggregation.getProvinceResultsUrl(), function(data) {
-                provincesLayerData = data;
-                updateAggregatedProvinceLayer();
-                provinceResultsDfd.resolve();
-            });
-
-            var countryResultsDfd = $.Deferred();
-            $.getJSON(emapic.modules.aggregation.getCountryResultsUrl(), function(data) {
-                countriesLayerData = data;
-                updateAggregatedCountryLayer();
-                countryResultsDfd.resolve();
-            });
-
-            return $.when(promise, provinceResultsDfd.promise(), countryResultsDfd.promise());
-    });
 
     emapic.reloadLegend = emapic.utils.overrideFunction(emapic.reloadLegend, null, function() {
     	updateAggregatedLayers();
