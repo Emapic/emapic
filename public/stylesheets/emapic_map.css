@@ -121,6 +121,10 @@ div.alert, div.alert a {
 div.alert-warning a {
     color: brown;
 }
+div.alert-info a,
+div.alert-danger a {
+    color: darkblue;
+}
 #share-url-btn {
     margin-right: 5px;
 }

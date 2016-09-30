@@ -311,4 +311,17 @@ if (typeof $.fn.validator !== 'undefined' &&
         return true;
     };
 
+    emapic.utils.getJsonAlertError = function(url, errorMsg) {
+        return $.getJSON(url).fail(function(jqxhr, textStatus, error) {
+            console.error("JSON request for url '" + url + "' failed: " + textStatus + ", " + error );
+            $.notify({
+                message: emapic.utils.getI18n(errorMsg) || emapic.utils.getI18n('js_error_loading_data')
+            }, {
+                type: 'danger',
+                delay: 0,
+                z_index: 12000
+            });
+        });
+    };
+
 })(emapic);

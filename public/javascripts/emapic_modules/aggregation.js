@@ -63,11 +63,12 @@ var emapic = emapic || {};
         if (!emapic.map.hasLayer(provincesLayer)) {
             if (provinceResultsDfd === null) {
                 emapic.utils.disableMapInteraction(true);
-                provinceResultsDfd = $.getJSON(emapic.modules.aggregation.getProvinceResultsUrl()).done(function(data) {
+                provinceResultsDfd = emapic.utils.getJsonAlertError(
+                    emapic.modules.aggregation.getProvinceResultsUrl()
+                ).done(function(data) {
                     provincesLayerData = data;
                     updateAggregatedProvinceLayer();
-                    emapic.utils.enableMapInteraction();
-                });
+                }).always(emapic.utils.enableMapInteraction);
             }
             provinceResultsDfd.done(function() {
                 emapic.disableIndivLayerExclusiveComponents();
@@ -94,11 +95,12 @@ var emapic = emapic || {};
         if (!emapic.map.hasLayer(countriesLayer)) {
             if (countryResultsDfd === null) {
                 emapic.utils.disableMapInteraction(true);
-                countryResultsDfd = $.getJSON(emapic.modules.aggregation.getCountryResultsUrl()).done(function(data) {
+                countryResultsDfd = emapic.utils.getJsonAlertError(
+                    emapic.modules.aggregation.getCountryResultsUrl()
+                ).done(function(data) {
                     countriesLayerData = data;
                     updateAggregatedCountryLayer();
-                    emapic.utils.enableMapInteraction();
-                });
+                }).always(emapic.utils.enableMapInteraction);
             }
             countryResultsDfd.done(function() {
                 emapic.disableIndivLayerExclusiveComponents();

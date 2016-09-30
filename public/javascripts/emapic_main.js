@@ -27,7 +27,6 @@ var emapic = emapic || {};
     // We'll use this color, for example, in ties
     emapic.neutralColor = 'grey';
     emapic.fallbackColor = 'black';
-    emapic.allLayersLoadedPromise = $.Deferred();
 
     emapic.oldResponses = {};
     emapic.userLoggedIn = false;
@@ -57,7 +56,9 @@ var emapic = emapic || {};
     // can simply call the methods and ignore the returned values.
     emapic.getAllCountriesDataBbox = function() {
         if (allCountriesDataBboxDfd === null) {
-            allCountriesDataBboxDfd = $.getJSON(emapic.getCountriesJsonBboxUrl()).done(function(data) {
+            allCountriesDataBboxDfd = emapic.utils.getJsonAlertError(
+                emapic.getCountriesJsonBboxUrl()
+            ).done(function(data) {
                 $.each(data.features, function(i, country) {
                     emapic.allCountriesData[country.properties.iso_code] = {};
                     emapic.allCountriesData[country.properties.iso_code].properties = country.properties;
@@ -71,7 +72,9 @@ var emapic = emapic || {};
 
     emapic.getVotedCountriesDataNoGeom = function() {
         if (votedCountriesDataNoGeomDfd === null) {
-            votedCountriesDataNoGeomDfd = $.getJSON(emapic.getStatsCountriesJsonNoGeomUrl()).done(function(data) {
+            votedCountriesDataNoGeomDfd = emapic.utils.getJsonAlertError(
+                emapic.getStatsCountriesJsonNoGeomUrl()
+            ).done(function(data) {
                 emapic.votedCountriesData = data;
             });
         }
@@ -80,7 +83,9 @@ var emapic = emapic || {};
 
     emapic.getVotedProvincesDataBbox = function() {
         if (votedProvincesDataBboxDfd === null) {
-            votedProvincesDataBboxDfd = $.getJSON(emapic.getStatsProvincesJsonBboxUrl()).done(function(data) {
+            votedProvincesDataBboxDfd = emapic.utils.getJsonAlertError(
+                emapic.getStatsProvincesJsonBboxUrl()
+            ).done(function(data) {
                 $.each(data.features, function(i, province) {
                     emapic.votedProvincesData[province.properties.adm_code] = {};
                     emapic.votedProvincesData[province.properties.adm_code].properties = province.properties;
@@ -170,11 +175,8 @@ var emapic = emapic || {};
 
     emapic.loadData = function() {
         emapic.utils.disableMapInteraction(true);
-        emapic.allLayersLoadedPromise.always(function() {
+        emapic.addAllMarkers().always(function() {
             emapic.utils.enableMapInteraction();
-        });
-        emapic.addAllMarkers().done(function() {
-            emapic.allLayersLoadedPromise.resolve();
         });
         emapic.addViewsControls();
         // If we have more than one set of legend, we display a question selector
@@ -340,12 +342,9 @@ var emapic = emapic || {};
     };
 
     emapic.loadLegend = function() {
-        var legendUrl = emapic.getLegendJsonUrl();
-        if (legendUrl) {
-            $.getJSON(legendUrl).done(emapic.processLegendData);
-        } else {
-            emapic.initEmapic();
-        }
+        emapic.utils.getJsonAlertError(
+            emapic.getLegendJsonUrl()
+        ).done(emapic.processLegendData);
     };
 
     emapic.addAllMarkers = function() {
@@ -366,7 +365,9 @@ var emapic = emapic || {};
     };
 
     emapic.addIndivMarkers = function() {
-        return $.getJSON(emapic.getResultsJsonUrl()).done(emapic.processMainLayerData);
+        return emapic.utils.getJsonAlertError(
+            emapic.getResultsJsonUrl()
+        ).done(emapic.processMainLayerData);
     };
 
     emapic.processLegendData = function(data) {

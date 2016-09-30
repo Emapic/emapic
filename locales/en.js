@@ -172,6 +172,7 @@
 	"js_spectrum_cancel": "Cancel",
 	"js_spectrum_more": "more",
 	"js_spectrum_less": "less",
+	"js_error_loading_data": "An error has occured while loading the map data and therefore it probably won't function properly. Try reloading the page and if the problem persists, you can contact us at <a href='mailto:info@emapic.es'>info@emapic.es</a>.",
 	"signup_notification_mail_subject": "[Emapic] Confirm your sign-up",
 	"signup_notification_mail_html_body": "<html>    <head></head>    <body>    <p>Hello %s!<br><br>Thank you for registering with Emapic.<br><br>Confirm your register by clicking on <a href=\"%s\">this link</a>.</p><br><br><p>Regards<br>Emapic Team<br><a href=\"www.emapic.es\">www.emapic.es</a></p></body></html>",
 	"signup_notification_mail_text_body": "Hello %s!\n\nThank you for registering with Emapic.\n\nConfirm your register on: %s\n\nRegards\nEmapic Team\nwww.emapic.es",

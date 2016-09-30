@@ -219,7 +219,8 @@ div.alert-warning a {
     color: brown;
 }
 
-div.alert-info a {
+div.alert-info a,
+div.alert-danger a {
     color: darkblue;
 }
 

@@ -33,4 +33,5 @@
     emapic.utils.registerI18n('js_emapic_legal_terms', '{{#__}}js_emapic_legal_terms{{/__}}');
     emapic.utils.registerI18n('js_geolocate', '{{#__}}js_geolocate{{/__}}');
     emapic.utils.registerI18n('js_geolocate_text', '{{#__}}js_geolocate_text{{/__}}');
+    emapic.utils.registerI18n('js_error_loading_data', "{{#__}}js_error_loading_data{{/__}}");
 </script>
