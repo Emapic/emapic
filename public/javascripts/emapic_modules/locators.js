@@ -327,7 +327,7 @@ var emapic = emapic || {};
     }
 
     function populateSidebarDataAllCountries() {
-        emapic.getAllCountriesDataBbox().then(function() {
+        emapic.getAllCountriesDataBbox().done(function() {
             allCountriesSpinner.stop();
             $.each(emapic.allCountriesData, function(code, country) {
                 $('#all_countries tbody').append("<tr class='country country-" + code +"'>\n" +

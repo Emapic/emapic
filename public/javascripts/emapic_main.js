@@ -57,60 +57,39 @@ var emapic = emapic || {};
     // can simply call the methods and ignore the returned values.
     emapic.getAllCountriesDataBbox = function() {
         if (allCountriesDataBboxDfd === null) {
-            allCountriesDataBboxDfd = $.Deferred();
-            var countriesBboxUrl = emapic.getCountriesJsonBboxUrl();
-            if (countriesBboxUrl) {
-                $.getJSON(countriesBboxUrl, function(data) {
-                    $.each(data.features, function(i, country) {
-                        emapic.allCountriesData[country.properties.iso_code] = {};
-                        emapic.allCountriesData[country.properties.iso_code].properties = country.properties;
-                        emapic.allCountriesData[country.properties.iso_code].bbox = [[country.geometry.coordinates[0][0][1], country.geometry.coordinates[0][0][0]],
-                            [country.geometry.coordinates[0][2][1], country.geometry.coordinates[0][2][0]]];
-                    });
-                    allCountriesDataBboxDfd.resolve(emapic.allCountriesData);
+            allCountriesDataBboxDfd = $.getJSON(emapic.getCountriesJsonBboxUrl()).done(function(data) {
+                $.each(data.features, function(i, country) {
+                    emapic.allCountriesData[country.properties.iso_code] = {};
+                    emapic.allCountriesData[country.properties.iso_code].properties = country.properties;
+                    emapic.allCountriesData[country.properties.iso_code].bbox = [[country.geometry.coordinates[0][0][1], country.geometry.coordinates[0][0][0]],
+                        [country.geometry.coordinates[0][2][1], country.geometry.coordinates[0][2][0]]];
                 });
-            } else {
-                allCountriesDataBboxDfd.reject();
-            }
+            });
         }
-        return allCountriesDataBboxDfd.promise();
+        return allCountriesDataBboxDfd;
     };
 
     emapic.getVotedCountriesDataNoGeom = function() {
         if (votedCountriesDataNoGeomDfd === null) {
-            votedCountriesDataNoGeomDfd = $.Deferred();
-            var statsCountriesUrl = emapic.getStatsCountriesJsonNoGeomUrl();
-            if (statsCountriesUrl) {
-                $.getJSON(statsCountriesUrl, function(data) {
-                    emapic.votedCountriesData = data;
-                    votedCountriesDataNoGeomDfd.resolve(data);
-                });
-            } else {
-                votedCountriesDataNoGeomDfd.reject();
-            }
+            votedCountriesDataNoGeomDfd = $.getJSON(emapic.getStatsCountriesJsonNoGeomUrl()).done(function(data) {
+                emapic.votedCountriesData = data;
+            });
         }
-        return votedCountriesDataNoGeomDfd.promise();
+        return votedCountriesDataNoGeomDfd;
     };
 
     emapic.getVotedProvincesDataBbox = function() {
         if (votedProvincesDataBboxDfd === null) {
-            votedProvincesDataBboxDfd = $.Deferred();
-            var statsProvincesUrl = emapic.getStatsProvincesJsonBboxUrl();
-            if (statsProvincesUrl) {
-                $.getJSON(statsProvincesUrl, function(data) {
-                    $.each(data.features, function(i, province) {
-                        emapic.votedProvincesData[province.properties.adm_code] = {};
-                        emapic.votedProvincesData[province.properties.adm_code].properties = province.properties;
-                        emapic.votedProvincesData[province.properties.adm_code].bbox = [[province.geometry.coordinates[0][0][1], province.geometry.coordinates[0][0][0]],
-                            [province.geometry.coordinates[0][2][1], province.geometry.coordinates[0][2][0]]];
-                    });
-                    votedProvincesDataBboxDfd.resolve(emapic.votedProvincesData);
+            votedProvincesDataBboxDfd = $.getJSON(emapic.getStatsProvincesJsonBboxUrl()).done(function(data) {
+                $.each(data.features, function(i, province) {
+                    emapic.votedProvincesData[province.properties.adm_code] = {};
+                    emapic.votedProvincesData[province.properties.adm_code].properties = province.properties;
+                    emapic.votedProvincesData[province.properties.adm_code].bbox = [[province.geometry.coordinates[0][0][1], province.geometry.coordinates[0][0][0]],
+                        [province.geometry.coordinates[0][2][1], province.geometry.coordinates[0][2][0]]];
                 });
-            } else {
-                votedProvincesDataBboxDfd.reject();
-            }
+            });
         }
-        return votedProvincesDataBboxDfd.promise();
+        return votedProvincesDataBboxDfd;
     };
 
     emapic.preinitEmapic = function() {
@@ -191,10 +170,10 @@ var emapic = emapic || {};
 
     emapic.loadData = function() {
         emapic.utils.disableMapInteraction(true);
-        emapic.allLayersLoadedPromise.then(function() {
+        emapic.allLayersLoadedPromise.always(function() {
             emapic.utils.enableMapInteraction();
         });
-        emapic.addAllMarkers().then(function() {
+        emapic.addAllMarkers().done(function() {
             emapic.allLayersLoadedPromise.resolve();
         });
         emapic.addViewsControls();
@@ -363,7 +342,7 @@ var emapic = emapic || {};
     emapic.loadLegend = function() {
         var legendUrl = emapic.getLegendJsonUrl();
         if (legendUrl) {
-            $.getJSON(legendUrl, emapic.processLegendData);
+            $.getJSON(legendUrl).done(emapic.processLegendData);
         } else {
             emapic.initEmapic();
         }
@@ -387,12 +366,7 @@ var emapic = emapic || {};
     };
 
     emapic.addIndivMarkers = function() {
-        var indivMarkersDfd = $.Deferred();
-        $.getJSON(emapic.getResultsJsonUrl(), function(data) {
-            emapic.processMainLayerData(data);
-            indivMarkersDfd.resolve();
-        });
-        return indivMarkersDfd.promise();
+        return $.getJSON(emapic.getResultsJsonUrl()).done(emapic.processMainLayerData);
     };
 
     emapic.processLegendData = function(data) {

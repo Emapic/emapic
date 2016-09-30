@@ -6,10 +6,12 @@ var emapic = emapic || {};
 
 (function(emapic) {
 
-    var provincesLayer,
-        provincesLayerData = null,
-        countriesLayer,
-        countriesLayerData = null,
+    var provincesLayer = null,
+        provincesLayerData,
+        provinceResultsDfd = null,
+        countriesLayer = null,
+        countriesLayerData,
+        countryResultsDfd = null,
         aggregationButtonsHtml = "<a id='grouping-control-region' title='" + emapic.utils.getI18n('js_total_votes_region', 'Ver total de votos por región') + "' class='exclusive-control' href='javascript:void(0)' onclick='emapic.modules.aggregation.showVotesByProvince(this)'><img src='/images/icon-agg_region.png' style='width: 16px; height: 16px;'/></a>\n"+
             "<a id='grouping-control-country' class='exclusive-control' title='" + emapic.utils.getI18n('js_total_votes_country', 'Ver total de votos por país') + "' href='javascript:void(0)' onclick='emapic.modules.aggregation.showVotesByCountry(this)'><img src='/images/icon-agg_country.png' style='width: 16px; height: 16px;'/></a>";
 
@@ -59,25 +61,21 @@ var emapic = emapic || {};
 
     emapic.modules.aggregation.showVotesByProvince = function(element) {
         if (!emapic.map.hasLayer(provincesLayer)) {
-            var provinceResultsDfd = $.Deferred();
-            if (provincesLayerData === null) {
+            if (provinceResultsDfd === null) {
                 emapic.utils.disableMapInteraction(true);
-                $.getJSON(emapic.modules.aggregation.getProvinceResultsUrl(), function(data) {
+                provinceResultsDfd = $.getJSON(emapic.modules.aggregation.getProvinceResultsUrl()).done(function(data) {
                     provincesLayerData = data;
                     updateAggregatedProvinceLayer();
                     emapic.utils.enableMapInteraction();
-                    provinceResultsDfd.resolve();
                 });
-            } else {
-                provinceResultsDfd.resolve();
             }
-            provinceResultsDfd.then(function() {
+            provinceResultsDfd.done(function() {
                 emapic.disableIndivLayerExclusiveComponents();
                 if (element !== null) {
                     emapic.activateExclusiveButton(element);
                 }
                 emapic.map.removeLayer(emapic.indivVotesLayer);
-                if (countriesLayerData !== null) {
+                if (countriesLayer !== null) {
                     emapic.map.removeLayer(countriesLayer);
                 }
                 var provincesBounds = provincesLayer.getBounds();
@@ -94,25 +92,21 @@ var emapic = emapic || {};
 
     emapic.modules.aggregation.showVotesByCountry = function(element) {
         if (!emapic.map.hasLayer(countriesLayer)) {
-            var countryResultsDfd = $.Deferred();
-            if (countriesLayerData === null) {
+            if (countryResultsDfd === null) {
                 emapic.utils.disableMapInteraction(true);
-                $.getJSON(emapic.modules.aggregation.getCountryResultsUrl(), function(data) {
+                countryResultsDfd = $.getJSON(emapic.modules.aggregation.getCountryResultsUrl()).done(function(data) {
                     countriesLayerData = data;
                     updateAggregatedCountryLayer();
                     emapic.utils.enableMapInteraction();
-                    countryResultsDfd.resolve();
                 });
-            } else {
-                countryResultsDfd.resolve();
             }
-            countryResultsDfd.then(function() {
+            countryResultsDfd.done(function() {
                 emapic.disableIndivLayerExclusiveComponents();
                 if (element !== null) {
                     emapic.activateExclusiveButton(element);
                 }
                 emapic.map.removeLayer(emapic.indivVotesLayer);
-                if (provincesLayerData !== null) {
+                if (provincesLayer !== null) {
                     emapic.map.removeLayer(provincesLayer);
                 }
                 var countriesBounds = countriesLayer.getBounds();

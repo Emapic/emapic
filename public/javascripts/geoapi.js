@@ -55,7 +55,7 @@ var emapic = emapic || {};
     };
 
     function getIpLocation() {
-        var json = $.getJSON( "https://www.freegeoip.net/json/",
+        var json = $.getJSON( "https://www.freegeoip.net/json/").done(
             function(data) {
                 //~ Country codes as in "ISO 3166-1 alfa-2"
                 emapic.geoapi.userCountryCode = data.country_code.toLowerCase() || emapic.geoapi.userCountryCode;
@@ -72,7 +72,7 @@ var emapic = emapic || {};
             }).fail(function() {
                 ipLocationFinished = true;
                 ipLocationFail = true;
-                console.log("not able to connect to freegeoip");
+                console.log("Not able to connect to freegeoip");
                 autolocationFailed();
             });
     }
@@ -89,7 +89,7 @@ var emapic = emapic || {};
             apiLocationFail = true;
             switch (error.code) {
                 case error.PERMISSION_DENIED:
-                message = "This website does not have permission to use " + "the Geolocation API";
+                message = "This website does not have permission to use the Geolocation API";
                 break;
 
                 case error.POSITION_UNAVAILABLE:
@@ -97,7 +97,7 @@ var emapic = emapic || {};
                 break;
 
                 case error.PERMISSION_DENIED_TIMEOUT:
-                message = "The current position could not be determined " + "within the specified timeout period.";
+                message = "The current position could not be determined within the specified timeout period.";
                 break;
 
                 case error.TIMEOUT:
@@ -136,11 +136,11 @@ var emapic = emapic || {};
             console.log("GEOLOCATION ERROR: Standard Geolocation API no available");
             apidfd.reject();
         }
-        apidfd.promise().then(function(pos) {
+        apidfd.promise().done(function(pos) {
             emapic.geoapi.geoapiLat = pos.coords.latitude;
             emapic.geoapi.geoapiLon = pos.coords.longitude;
             successCallback(pos);
-        }, failCallback);
+        }).fail(failCallback);
     };
 
     emapic.geoapi.getApiLocation = function() {
