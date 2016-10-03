@@ -27,6 +27,7 @@ var emapic = emapic || {};
     // We'll use this color, for example, in ties
     emapic.neutralColor = 'grey';
     emapic.fallbackColor = 'black';
+    emapic.allLayersLoadedPromise = $.Deferred();
 
     emapic.oldResponses = {};
     emapic.userLoggedIn = false;
@@ -180,7 +181,11 @@ var emapic = emapic || {};
 
     emapic.loadData = function() {
         emapic.utils.disableMapInteraction(true);
-        emapic.addAllMarkers().always(function() {
+        emapic.addAllMarkers().done(function() {
+            emapic.allLayersLoadedPromise.resolve();
+        }).fail(function() {
+            emapic.allLayersLoadedPromise.reject();
+        }).always(function() {
             emapic.utils.enableMapInteraction();
         });
         emapic.addViewsControls();
