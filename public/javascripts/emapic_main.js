@@ -98,7 +98,12 @@ var emapic = emapic || {};
     };
 
     emapic.preinitEmapic = function() {
-        emapic.loadLegend();
+        // If we have a legend, we load it. Otherwise, we init the map.
+        if (emapic.getLegendJsonUrl() !== null) {
+            emapic.loadLegend();
+        } else {
+            emapic.initEmapic();
+        }
     };
 
     emapic.initEmapic = function() {
