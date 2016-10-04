@@ -336,6 +336,7 @@
 	"tooltip_survey_opened_date": "This survey is active since this date.",
 	"tooltip_survey_closed_date": "This survey is currently closed and was active between these dates.",
 	"tooltip_survey_answered_date": "Date of your latest vote in this survey.",
+	"tooltip_not_listed_survey": "This survey doesn't show in public lists inside this website.",
 	"share": "Share",
 	"tweet_survey_link_text": "Check out this survey",
 	"localization": "Localisation",

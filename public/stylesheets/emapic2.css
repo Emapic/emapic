@@ -563,17 +563,12 @@ span.user-inline {
     margin-bottom: 25px;
 }
 
-.survey-panel-header .fb-share-button {
-    vertical-align: top;
+.survey-panel-header .glyphicon {
+    font-size: 16px;
 }
 
-.survey-panel-header .fb-share-button > span {
-    vertical-align: top !important;
-}
-
-.survey-panel-header .social-btns {
-    height: 20px;
-    padding: 2px;
+.survey-panel-header .pull-right {
+    padding-right: 5px;
 }
 
 .surveys-list div.panel-body {

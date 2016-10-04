@@ -336,6 +336,7 @@
 	"tooltip_survey_opened_date": "La encuesta está activa desde esta fecha.",
 	"tooltip_survey_closed_date": "La encuesta se encuentra actualmente cerrada y estuvo activa entre estas fechas.",
 	"tooltip_survey_answered_date": "Fecha de la última vez que respondiste a esta encuesta.",
+	"tooltip_not_listed_survey": "La encuesta no aparece en listados públicos de la web.",
 	"share": "Compartir",
 	"tweet_survey_link_text": "Mira esta encuesta",
 	"localization": "Localización",

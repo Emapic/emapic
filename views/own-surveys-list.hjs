@@ -24,6 +24,9 @@
                             {{/date_closed}}
                             </span>
                         {{/date_opened}}
+						{{#dont_list}}
+							<div class="pull-right glyphicon glyphicon-eye-close" data-toggle="tooltip" data-placement="left" title="{{#__}}tooltip_not_listed_survey{{/__}}"></div>
+						{{/dont_list}}
                     </div>
 					<div class="panel-body">
                         {{#already_opened}}
