@@ -378,10 +378,10 @@ module.exports = function(app) {
                     Promise.join(survey.getFullResponses(), survey.getQuestions({
                         scope: 'includeAnswers'
                     }), function(responses, questions) {
-                        res.setHeader('Content-disposition', 'attachment; filename=' + survey.title + '.csv');
-                        res.setHeader('Content-Type', 'text/csv');
                         res.attachment(survey.title + '.csv');
-                        res.send(pgQueryFullResultsToCsv(responses, questions));
+                        pgQueryFullResultsToCsv(responses, questions).then(function(csv) {
+                            res.send(csv);
+                        });
                     });
                 } else {
                     res.end();

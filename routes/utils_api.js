@@ -1,4 +1,5 @@
-var Promise = require('bluebird');
+var Promise = require('bluebird'),
+    csv = Promise.promisifyAll(require('fast-csv'));
 
 module.exports = function(app) {
 
@@ -170,11 +171,11 @@ module.exports = function(app) {
     };
 
     pgQueryFullResultsToCsv = function(results, questions) {
-        var csv = '"Date/Time";"Lat";"Lon";"Country";"Country ISO code";"Province";';
+        var headers = ['Date/Time', 'Lat', 'Lon', 'Country', 'Country ISO code', 'Province'];
         for (var i = 0, iLen = questions.length; i < iLen; i++) {
             switch (questions[i].type) {
                 case 'list-radio':
-                    csv += '"' + escapeCsvString(questions[i].question) + '";';
+                    headers.push(questions[i].question);
                     break;
                 case 'list-radio-other':
                     var otherAns = null;
@@ -185,10 +186,10 @@ module.exports = function(app) {
                         }
                     }
                     var otherName = (otherAns === null) ? 'other value' : otherAns.answer;
-                    csv += '"' + escapeCsvString(questions[i].question) + '";"' + escapeCsvString(questions[i].question) + ' - ' + otherName + '";';
+                    headers.push(questions[i].question, questions[i].question + ' - ' + otherName);
                     break;
                 case 'text-answer':
-                    csv += '"' + escapeCsvString(questions[i].question) + '";';
+                    headers.push(questions[i].question);
                     break;
                 case 'explanatory-text':
                     break;
@@ -196,67 +197,60 @@ module.exports = function(app) {
                     return new Error("Question type not contemplated.");
             }
         }
-        for (var k = 0, kLen = results.length; k < kLen; k++) {
-            csv += "\n" + new Date(parseInt(results[k].timestamp)).toISOString() + ';' +
-                results[k].lat + ';' + results[k].lon + ';' + results[k].country + ';' +
-                results[k].country_iso + ';' + results[k].province + ';';
-            for (var l = 0, lLen = questions.length; l < lLen; l++) {
-                var ansId, ans;
-                switch (questions[l].type) {
-                    case 'list-radio':
-                        ansId = results[k]['q' + questions[l].question_order + '.id'];
-                        ans = ansId;
-                        for (var m = 0, mLen = questions[l].Answers.length; m < mLen; m++) {
-                            if (ansId == questions[l].Answers[m].sortorder) {
-                                ans = questions[l].Answers[m].answer;
-                            }
+        return csv.writeToStringAsync(
+            results,
+            {
+                headers: headers,
+                delimiter: ';',
+                transform: function(result) {
+                    var data = [];
+                    data.push(new Date(parseInt(result.timestamp)).toISOString(),
+                        result.lat, result.lon, result.country, result.country_iso,
+                        result.province);
+                    for (var l = 0, lLen = questions.length; l < lLen; l++) {
+                        var ansId, ans;
+                        switch (questions[l].type) {
+                            case 'list-radio':
+                                ans = ansId = result['q' + questions[l].question_order + '.id'];
+                                for (var m = 0, mLen = questions[l].Answers.length; m < mLen; m++) {
+                                    if (ansId == questions[l].Answers[m].sortorder) {
+                                        ans = questions[l].Answers[m].answer;
+                                    }
+                                }
+                                data.push(ans);
+                                break;
+                            case 'list-radio-other':
+                                ans = ansId = result['q' + questions[l].question_order + '.id'];
+                                for (var n = 0, nLen = questions[l].Answers.length; n < nLen; n++) {
+                                    if (ansId == questions[l].Answers[n].sortorder) {
+                                        ans = questions[l].Answers[n].answer;
+                                    }
+                                }
+                                data.push(ans, (ansId == -1) ? result['q' + questions[l].question_order + '.value'] : null);
+                                break;
+                            case 'text-answer':
+                                data.push(result['q' + questions[l].question_order + '.value']);
+                                break;
+                            case 'explanatory-text':
+                                break;
+                            default:
+                                return new Error("Question type not contemplated.");
                         }
-                        csv += '"' + escapeCsvString(ans) + '";';
-                        break;
-                    case 'list-radio-other':
-                        ansId = results[k]['q' + questions[l].question_order + '.id'];
-                        ans = ansId;
-                        for (var n = 0, nLen = questions[l].Answers.length; n < nLen; n++) {
-                            if (ansId == questions[l].Answers[n].sortorder) {
-                                ans = questions[l].Answers[n].answer;
-                            }
-                        }
-
-                        csv += '"' + escapeCsvString(ans) + '";';
-                        if (ansId == -1) {
-                            csv += '"' + escapeCsvString(results[k]['q' + questions[l].question_order + '.value']) + '"';
-                        }
-                        csv += ';';
-                        break;
-                    case 'text-answer':
-                        csv += '"' + escapeCsvString(results[k]['q' + questions[l].question_order + '.value']) + '";';
-                        break;
-                    case 'explanatory-text':
-                        break;
-                    default:
-                        return new Error("Question type not contemplated.");
+                    }
+                    return data;
                 }
             }
-        }
-        return csv;
-    };
-
-    escapeCsvString = function(string) {
-        return string.replace(/"/g, '""');
+        );
     };
 
     pgQueryToCsv = function(queryResult) {
-        var csv = '';
-        for (var i = 0, iLen = queryResult.fields.length; i < iLen; i++) {
-            csv += queryResult.fields[i].name + ';';
-        }
-        for (var j = 0, jLen = queryResult.rows.length; j < jLen; j++) {
-            csv += "\n";
-            for (var k = 0, kLen = queryResult.fields.length; k < kLen; k++) {
-                csv += queryResult.rows[j][queryResult.fields[k].name] + ';';
+        return csv.writeToStringAsync(
+            queryResult.rows,
+            {
+                headers: true,
+                delimiter: ';'
             }
-        }
-        return csv;
+        );
     };
 
     extractQuestionsMapFromRequest = function(req) {
