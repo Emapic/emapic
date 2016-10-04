@@ -137,7 +137,7 @@ Aquí se incluyen los parámetros de configuración de Emapic que afectan a la e
 
 * ##### Idioma de búsqueda (_searchEngineLang_)
 El idioma que se supone principal para las búsquedas realizadas sobre las encuestas, por defecto en español.  
-La inmensa mayoría funcionarán igualmente en español y en idiomas «cercanos» (francés, inglés, portugués...), por lo que no se recomienda cambiarlo si no se tienen conocimientos sobre los motores de búsqueda en PostgreSQL[¹](#markdown-header-notas).
+La inmensa mayoría funcionarán igualmente en español y en idiomas «cercanos» (francés, inglés, portugués...), por lo que no se recomienda cambiarlo si no se tienen conocimientos sobre los motores de búsqueda en PostgreSQL[¹](#notas).
 
 * ##### Frecuencia de la encuesta sobre la experiencia de usuario (_emapicOpinionFreq_)
 Emapic incluye una encuesta sobre la experiencia de usuario respecto al proceso de geolocalización que se muestra con cierta probabilidad tras responder a cualquier encuesta.  
@@ -207,7 +207,7 @@ Debes consultar en tu cuenta de servicio de correo electrónico para activar el 
 Parámetros opcionales relacionados con la compartición de contenidos a través de redes sociales:
 
 * ##### Id de widget para compartir en [AddThis](http://www.addthis.com) (_addThisId_)
-Identificador de nuestro widget para compartir configurado en [AddThis](http://www.addthis.com), que nos permitirá integrar su funcionalidad _Inline Share Buttons_ directamente sin necesidad de tocar el código[²](#markdown-header-notas).  
+Identificador de nuestro widget para compartir configurado en [AddThis](http://www.addthis.com), que nos permitirá integrar su funcionalidad _Inline Share Buttons_ directamente sin necesidad de tocar el código[²](#notas).  
 Dicho identificador lo podemos encontrar tras configurar nuestro widget, en la página en la cual nos muestran el código a insertar en nuestra página, similar al siguiente ejemplo en el cual se indica la posición del identificador con la cadena _{id-addThis}_:  
 
         <!-- Go to www.addthis.com/dashboard to customize your tools -->

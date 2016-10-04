@@ -139,7 +139,7 @@ Here we have the config parameters that directly affect the Emapic user experien
 
 * ##### Search language (_searchEngineLang_)
 Main language for the searches done in our surveys gallery, by default in spanish.  
-They will work mostly the same in both spanish and any "similar" language (french, english, portuguese...), thus we don't recommend changing it if you are not familiar with PostgreSQL search engines[¹](#markdown-header-notas).
+They will work mostly the same in both spanish and any "similar" language (french, english, portuguese...), thus we don't recommend changing it if you are not familiar with PostgreSQL search engines[¹](#footnotes).
 
 * ##### User experience survey frequency (_emapicOpinionFreq_)
 Emapic has a user experience survey about the geolocation process which is shown with a configured probability after answering any survey.  
@@ -209,7 +209,7 @@ You must check your e-mail account service in order to activate the SMTP support
 Optional parameters related to content sharing through social networks:
 
 * ##### [AddThis](http://www.addthis.com) sharing widget id (_addThisId_)
-Id of our configured sharing widget in [AddThis](http://www.addthis.com), which will allow us to include their funcionality _Inline Share Buttons_ without having to edit our code[²](#markdown-header-notas).  
+Id of our configured sharing widget in [AddThis](http://www.addthis.com), which will allow us to include their funcionality _Inline Share Buttons_ without having to edit our code[²](#footnotes).  
 That id can be found after configuring our widget, in the page which shows us the code to paste in our page, similar to the following example in which we point the id location with the string _{id-addThis}_:
 
         <!-- Go to www.addthis.com/dashboard to customize your tools -->
