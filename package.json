@@ -1,7 +1,11 @@
 {
-  "name": "dia-ciencia",
-  "version": "0.0.1",
-  "private": true,
+  "name": "emapic",
+  "version": "0.5.0-alpha",
+  "private": false,
+  "license": "AGPLV3",
+  "author": "Jorge López",
+  "author": "Adrián Eirís",
+  "author": "Francisco Puga",
   "scripts": {
     "debug": "./node_modules/.bin/supervisor server.js",
     "test": "./node_modules/.bin/mocha -u tdd -w",
@@ -58,7 +62,5 @@
     "sinon": "*",
     "superagent": "*",
     "supervisor": "*"
-  },
-  "author": "Jorge López",
-  "author": "Adrián Eirís"
+  }
 }
