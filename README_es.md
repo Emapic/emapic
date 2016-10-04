@@ -33,6 +33,9 @@ Para poder ejecutar Emapic en local en un entorno Unix necesitas antes de empeza
 * [PostgreSQL](https://www.postgresql.org/) (>=9.2)
 * [PostGIS](http://postgis.net/) (>=2.0)
 
+Además se necesita el módulo _unaccent_ de PostgreSQL con el fin de poder ejecutar búsquedas sobre textos con tildes y similares. Éste se puede instalar fácilmente en sistemas Debian y derivados mediante el paquete __postgresql-contrib__.  
+Recomendamos encarecidamente su instalación, pero en caso de considerar que no necesitas la extensión por algún motivo (e.g. se va a instalar de manera privada y el idioma del usuario no emplea acentos), puedes eliminar su uso borrando los comandos SQL que la crean y la borran en los archivos _db/deploy/extensions.sql_ y _db/revert/extensions.sql_, eliminando su SELECT en _db/verify/extensions.sql_, y quitando su referencia al crear la configuración de búsqueda en _db/deploy/extensions.sql_.
+
 También recomendamos para desarrolladores que quieran trabajar sobre nuestro código:
 
 * [Sqitch](http://sqitch.org/) >= 0.9994  

@@ -33,6 +33,9 @@ For launching Emapic locally you need before starting:
 * [PostgreSQL](https://www.postgresql.org/) (>=9.2)
 * [PostGIS](http://postgis.net/) (>=2.0)
 
+You also need the PostgreSQL module _unaccent_ in order to search through texts with accents and similar signs. This can be easily installed in Debian and derived systems via the __postgresql-contrib__ package.  
+We strongly encourage to install it, but in case you consider it's not actually required for any reason (e.g. it's a private installation and the user's main language doesn't use accents), you can prevent its use by removing the SQL commands that create and delete it from files _db/deploy/extensions.sql_ and _db/revert/extensions.sql_, delete its SELECT in _db/verify/extensions.sql_ and remove its reference when creating the text search configuration in _db/deploy/extensions.sql_.
+
 We also recommend for developers who wish to work with our code:
 
 * [Sqitch](http://sqitch.org/) >= 0.9994  
