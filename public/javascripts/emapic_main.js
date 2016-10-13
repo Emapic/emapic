@@ -11,6 +11,7 @@ var emapic = emapic || {};
         votedProvincesDataBboxDfd = null;
 
     emapic.map = null;
+    emapic.currentBaseLayer = null;
     emapic.position = null;
     emapic.precision = null;
     emapic.indivVotesLayer = null;
@@ -28,6 +29,10 @@ var emapic = emapic || {};
     emapic.neutralColor = 'grey';
     emapic.fallbackColor = 'black';
     emapic.allLayersLoadedPromise = $.Deferred();
+    // Take care when using this promise as any pan/zoom made by the user
+    // would restart it completely. It will prove more useful when changing the
+    // map programmatically.
+    emapic.baseLayerLoadedPromise = $.Deferred();
 
     emapic.oldResponses = {};
     emapic.userLoggedIn = false;
@@ -153,6 +158,7 @@ var emapic = emapic || {};
                 L.latLng(-85, 180)
             )
         );
+        emapic.currentBaseLayer = osmMapnikBW;
         emapic.map.addLayer(osmMapnikBW);
 
         var baseMaps = {
@@ -160,7 +166,25 @@ var emapic = emapic || {};
             "Color (OSM)" : osmMapnik,
             "Satélite (Mapbox)" : mapboxSatellite
         };
+        $.each(baseMaps, function(index, value) {
+            value.on('loading', function() {
+                if (emapic.baseLayerLoadedPromise === null) {
+                    emapic.baseLayerLoadedPromise = $.Deferred();
+                }
+            });
+            value.on('load', function() {
+                if (emapic.baseLayerLoadedPromise !== null) {
+                    emapic.baseLayerLoadedPromise.resolve();
+                }
+            });
+        });
         L.control.layers(baseMaps, null, {position: 'bottomright'}).addTo(emapic.map);
+        emapic.map.on('baselayerchange', function(layer) {
+            if (emapic.currentBaseLayer != layer.layer) {
+                emapic.baseLayerLoadedPromise = null;
+                emapic.currentBaseLayer = layer;
+            }
+        });
         emapic.addTooltips();
     };
 
