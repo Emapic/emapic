@@ -13,7 +13,7 @@ var page = require('webpage').create(),
     destination = 'snapshot.png',
     width = 1024,
     height = 768,
-    wait = 3000,
+    wait = 1000,
     headerHeight = 85;
 
 if (args.length >= 3) {
@@ -46,10 +46,6 @@ page.clipRect = {
     height: height - headerHeight
 };
 page.onCallback = function(data){
-    page.evaluate(function() {
-        // Disable clustering
-        emapic.modules.clustering.toggleClustering($('#clustering-control-activate'));
-    });
     window.setTimeout(function () {
         page.render(destination);
         phantom.exit();
@@ -64,7 +60,10 @@ page.open(url, function(status) {
             $('<style>.alert { display: none !important; }</style>').appendTo('head');
             // Remove the controls
             $('<style>.leaflet-control-container { display: none !important; }</style>').appendTo('head');
-            emapic.allLayersLoadedPromise.then(function() {
+
+            $.when(emapic.allLayersLoadedPromise, emapic.baseLayerLoadedPromise).done(function() {
+                // Disable clustering
+                emapic.modules.clustering.toggleClustering($('#clustering-control-activate'));
                 window.callPhantom();
             });
         });
