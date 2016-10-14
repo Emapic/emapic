@@ -79,10 +79,6 @@ var emapic = emapic || {};
                 if (countriesLayer !== null) {
                     emapic.map.removeLayer(countriesLayer);
                 }
-                var provincesBounds = provincesLayer.getBounds();
-                if (!emapic.map.getBounds().contains(provincesBounds)) {
-                    emapic.map.fitBounds(provincesBounds);
-                }
                 emapic.map.addLayer(provincesLayer);
             });
         } else {
@@ -110,10 +106,6 @@ var emapic = emapic || {};
                 emapic.map.removeLayer(emapic.indivVotesLayer);
                 if (provincesLayer !== null) {
                     emapic.map.removeLayer(provincesLayer);
-                }
-                var countriesBounds = countriesLayer.getBounds();
-                if (!emapic.map.getBounds().contains(countriesBounds)) {
-                    emapic.map.fitBounds(countriesBounds);
                 }
                 emapic.map.addLayer(countriesLayer);
             });
