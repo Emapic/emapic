@@ -186,6 +186,10 @@
 
         emapic.position = {{{ position }}};
 
+        {{#mapboxToken}}
+        emapic.mapboxToken = "{{{ mapboxToken }}}";
+        {{/mapboxToken}}
+
         {{#results}}
         emapic.surveyResults = true;
         {{#survey.already_opened}}

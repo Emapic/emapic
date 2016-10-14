@@ -11,6 +11,7 @@ var emapic = emapic || {};
         votedProvincesDataBboxDfd = null;
 
     emapic.map = null;
+    emapic.mapboxToken = null;
     emapic.currentBaseLayer = null;
     emapic.position = null;
     emapic.precision = null;
@@ -134,11 +135,19 @@ var emapic = emapic || {};
             maxZoom : 18,
             attribution : osmAttrib
         });
-        var mapboxSatellite = new L.TileLayer('https://{s}.tiles.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiamxmZXJuYW5kZXoiLCJhIjoiOGU2OWRkMmIyZDU0NWI4Y2MyYWM5YWYxZTY4NzM5YTkifQ.0ROMoDjx2pHr3rFFcn26rw', {
-            minZoom : 1,
-            maxZoom : 18,
-            attribution : mapboxAttrib
-        });
+
+        var baseMaps = {};
+        baseMaps[emapic.utils.getI18n('js_grayscale_osm_baselayer')] = osmMapnikBW;
+        baseMaps[emapic.utils.getI18n('js_color_osm_baselayer')] = osmMapnik;
+
+        if (emapic.mapboxToken !== null) {
+            var mapboxSatellite = new L.TileLayer('https://{s}.tiles.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=' + emapic.mapboxToken, {
+                minZoom : 1,
+                maxZoom : 18,
+                attribution : mapboxAttrib
+            });
+            baseMaps[emapic.utils.getI18n('js_satellite_mapbox_baselayer')] = mapboxSatellite;
+        }
 
         emapic.map = L.map('map', {
             attributionControl: false,
@@ -161,11 +170,6 @@ var emapic = emapic || {};
         emapic.currentBaseLayer = osmMapnikBW;
         emapic.map.addLayer(osmMapnikBW);
 
-        var baseMaps = {
-            "Escala de grises (OSM)" : osmMapnikBW,
-            "Color (OSM)" : osmMapnik,
-            "Satélite (Mapbox)" : mapboxSatellite
-        };
         $.each(baseMaps, function(index, value) {
             value.on('loading', function() {
                 if (emapic.baseLayerLoadedPromise === null) {

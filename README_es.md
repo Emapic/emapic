@@ -162,6 +162,13 @@ Por ejemplo, con los valores por defecto:
 postgresql://emapic:emapic@localhost:5432/emapic
 ```
 
+#### Configuración de servicios externos con componente geográfico (_geoServices_)
+
+Aquí se incluyen los parámetros de configuración necesarios para servicios externos con componente geográfico, principalmente empleados en el visor:
+
+* ##### Token de Mapbox (_mapboxToken_)
+Token de identificación de nuestra cuenta de Mapbox que nos permitirá cargar la capa de satélite que ofrecen. Si no tenemos cuenta y/o no vemos necesario disponer de dicha capa, podemos simplemente dejarlo en blanco y se ignorará.
+
 #### OAuth (_oAuth_)
 
 Para autenticarte a través de Google o Facebook es necesario cambiar los parámetros de los grupos _oAuth.google_ y _oAuth.facebook_ respectivamente. Para ello deberemos tener registrada una aplicación en la sección de desarrolladores de sus respectivas webs y poner en el fichero el __id__ y el __secreto__.

@@ -26,7 +26,8 @@ var SampleApp = function() {
     //  Scope.
     var self = this,
         serverConfig,
-        socialConfig;
+        socialConfig,
+        geoConfig;
 
 
     /*  ================================================================  */
@@ -44,6 +45,7 @@ var SampleApp = function() {
         nconf.file({ file: 'config.json' });
         serverConfig = nconf.get('server');
         socialConfig = nconf.get('social');
+        geoConfig = nconf.get('geoServices');
     };
 
     /**
@@ -175,6 +177,9 @@ var SampleApp = function() {
 
             res.locals.ogSiteName = ('ogSiteName' in socialConfig &&
                 socialConfig.ogSiteName !== '') ? socialConfig.ogSiteName : null;
+
+            res.locals.mapboxToken = ('mapboxToken' in geoConfig &&
+                geoConfig.mapboxToken !== '') ? geoConfig.mapboxToken : null;
 
             next();
         });
