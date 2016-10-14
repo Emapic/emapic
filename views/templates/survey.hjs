@@ -96,6 +96,10 @@
               <h2>{{#__}}survey_thanks{{/__}}</h2>
           </div>
           <div id="check-loc" class="check-loc text-center" hidden>
+              <div class="loc-description" style="display: none;">
+                  <label>{{#__}}we_have_located_you_at{{/__}}:</label>
+                  <span class="loc-description-text"></span>
+              </div>
               <h2>{{#__}}is_your_position_ok{{/__}}</h2>
               {{#user.geom}}<button id="geolocate-btn" type="button" class="btn btn-warning" onclick="emapic.modules.survey.useApiGeolocation()">{{#__}}no_geolocate{{/__}}</button>{{/user.geom}}
               <button type="button" class="btn btn-danger" onclick="emapic.modules.survey.editPosition()">{{#__}}no_edit_manually{{/__}}</button>
@@ -187,8 +191,12 @@
         emapic.position = {{{ position }}};
 
         {{#mapboxToken}}
-        emapic.mapboxToken = "{{{ mapboxToken }}}";
+        emapic.mapboxToken = "{{{mapboxToken}}}";
         {{/mapboxToken}}
+
+        {{#nominatimEmail}}
+        emapic.utils.nominatimEmail = "{{{nominatimEmail}}}";
+        {{/nominatimEmail}}
 
         {{#results}}
         emapic.surveyResults = true;

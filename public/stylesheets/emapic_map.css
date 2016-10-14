@@ -808,12 +808,21 @@ select#sex-select.mas {
 }
 .check-loc {
     width: 100%;
-    padding: 0.5em 2em 1em 2em;
+    padding: 1em 2em;
     background-color: #004F71;
     position: absolute;
     z-index: 1001;
     margin-top: -15%;
     margin-top: -30vh;
+}
+.check-loc h2 {
+    margin-top: 5px;
+}
+.check-loc .loc-description-text {
+    color: white;
+}
+.check-loc .loc-description label {
+    margin-right: 5px;
 }
 #edit-question-btn, #block-nav-btns, #survey-nav-btns, #section-nav-btns {
     margin: 20px 0;

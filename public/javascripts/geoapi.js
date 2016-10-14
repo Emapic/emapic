@@ -139,6 +139,7 @@ var emapic = emapic || {};
         apidfd.promise().done(function(pos) {
             emapic.geoapi.geoapiLat = pos.coords.latitude;
             emapic.geoapi.geoapiLon = pos.coords.longitude;
+            reverseGeocodeRetrievedPosition(emapic.geoapi.geoapiLat, emapic.geoapi.geoapiLon);
             successCallback(pos);
         }).fail(failCallback);
     };
@@ -173,6 +174,7 @@ var emapic = emapic || {};
                 }
                 $('#geoposmanual').show();
             } else {
+                reverseGeocodeRetrievedPosition(defaultPosition.coords.latitude, defaultPosition.coords.longitude);
                 $('#geoposmanualip').show();
             }
             $('#geoposmanual-title').show();
@@ -188,6 +190,7 @@ var emapic = emapic || {};
                 }
                 $('#geoposallerror').show();
             } else {
+                reverseGeocodeRetrievedPosition(defaultPosition.coords.latitude, defaultPosition.coords.longitude);
                 $('#geoposapierror').show();
             }
             $('#geoposerror-title').show();
@@ -205,5 +208,14 @@ var emapic = emapic || {};
             }
         }
     };
+
+    function reverseGeocodeRetrievedPosition(lat, lon) {
+        if ($('.loc-description').length) {
+            emapic.utils.reverseGeocodePosition(lat, lon).done(function(data) {
+                $('.loc-description-text').html(data.display_name);
+                $('.loc-description').show();
+            });
+        }
+    }
 
 })(emapic);

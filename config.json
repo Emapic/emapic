@@ -15,7 +15,8 @@
         "password": "emapic"
     },
     "geoServices": {
-        "mapboxToken": ""
+        "mapboxToken": "",
+        "nominatimEmail": ""
     },
     "oAuth": {
         "google": {

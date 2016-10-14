@@ -82,6 +82,7 @@
 	"download_data_csv": "Download data on .csv",
 	"vote_stats_title": "Vote",
 	"survey_thanks": "Thank you very much for participating in this survey.",
+	"we_have_located_you_at": "We have located you at",
 	"is_your_position_ok": " Is your location ok?",
 	"no_edit_manually": "No, edit manually",
 	"yes": "Yes",

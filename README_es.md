@@ -166,8 +166,13 @@ postgresql://emapic:emapic@localhost:5432/emapic
 
 Aquí se incluyen los parámetros de configuración necesarios para servicios externos con componente geográfico, principalmente empleados en el visor:
 
-* ##### Token de Mapbox (_mapboxToken_)
-Token de identificación de nuestra cuenta de Mapbox que nos permitirá cargar la capa de satélite que ofrecen. Si no tenemos cuenta y/o no vemos necesario disponer de dicha capa, podemos simplemente dejarlo en blanco y se ignorará.
+* ##### Token de [Mapbox](https://www.mapbox.com/) (_mapboxToken_)
+Token de identificación de nuestra cuenta de [Mapbox](https://www.mapbox.com/) que nos permitirá cargar la capa de satélite que ofrecen.  
+Si no tenemos cuenta y/o no vemos necesario disponer de dicha capa, podemos simplemente dejarlo en blanco y se ignorará.
+
+* ##### E-mail de contacto para [Nominatim](http://wiki.openstreetmap.org/wiki/Nominatim) (_nominatimEmail_)
+Dirección de e-mail de contacto que se pasará en las peticiones hechas a [Nominatim](http://wiki.openstreetmap.org/wiki/Nominatim).  
+Se puede dejar en blanco para entornos de prueba o controlados, pero si se pone la aplicación de manera pública, se recomienda especificar un e-mail con el que puedan contactar en caso de que haya algún problema con las peticiones o su volumen sea muy alto.
 
 #### OAuth (_oAuth_)
 

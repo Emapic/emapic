@@ -181,6 +181,9 @@ var SampleApp = function() {
             res.locals.mapboxToken = ('mapboxToken' in geoConfig &&
                 geoConfig.mapboxToken !== '') ? geoConfig.mapboxToken : null;
 
+            res.locals.nominatimEmail = ('nominatimEmail' in geoConfig &&
+                geoConfig.nominatimEmail !== '') ? geoConfig.nominatimEmail : null;
+
             next();
         });
 

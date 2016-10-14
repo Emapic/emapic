@@ -22,6 +22,8 @@ if (typeof $.fn.validator !== 'undefined' &&
 
     emapic.utils = emapic.utils || {};
 
+    emapic.utils.nominatimEmail = null;
+
     emapic.utils.escapeHtml = function(text) {
         return $("<div>").text(text).html();
     };
@@ -322,6 +324,19 @@ if (typeof $.fn.validator !== 'undefined' &&
                 z_index: 12000
             });
         });
+    };
+
+    emapic.utils.reverseGeocodePosition = function(lat, lon, zoom) {
+        var params = {
+            format: 'json',
+            lat: lat,
+            lon: lon,
+            zoom: zoom || 12
+        };
+        if (emapic.utils.nominatimEmail !== null) {
+            params.email = emapic.utils.nominatimEmail;
+        }
+        return $.getJSON('https://nominatim.openstreetmap.org/reverse', params);
     };
 
 })(emapic);

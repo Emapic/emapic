@@ -168,8 +168,13 @@ postgresql://emapic:emapic@localhost:5432/emapic
 
 Here we have the configuration parameters required for external services with geographic component, mainly used by the viewer:
 
-* ##### Mapbox token (_mapboxToken_)
-ID token from our Mapbox account which will allow us to load the satellite layer they offer. If we don't have an account and/or we don't require that layer, we can simply leave this field blank and it will be ignored.
+* ##### [Mapbox](https://www.mapbox.com/) token (_mapboxToken_)
+ID token from our [Mapbox](https://www.mapbox.com/) account which will allow us to load the satellite layer they offer.  
+If we don't have an account and/or we don't require that layer, we can simply leave this field blank and it will be ignored.
+
+* ##### Contact e-mail for [Nominatim](http://wiki.openstreetmap.org/wiki/Nominatim) (_nominatimEmail_)
+E-mail address which will be passed in the requests made to [Nominatim](http://wiki.openstreetmap.org/wiki/Nominatim).  
+It can be left blank for testing or controlled environments, but if the application goes public, they advise to specify an e-mail for contacting in case some problem arises or if there happens to be a very high number of requests.
 
 #### OAuth (_oAuth_)
 
