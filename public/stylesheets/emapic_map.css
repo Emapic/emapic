@@ -818,6 +818,9 @@ select#sex-select.mas {
 .check-loc h2 {
     margin-top: 5px;
 }
+.check-loc label {
+    margin-bottom: 0;
+}
 .check-loc .loc-description-text {
     color: white;
 }
@@ -1080,6 +1083,9 @@ select#sex-select.mas {
     #survey-subtitle {
         font-size: 13px;
     }
+    .check-loc {
+        margin-top: -40vh;
+    }
     /* Make the votes list smaller */
     #app-total-counter {
         max-width: 150px;
@@ -1165,6 +1171,9 @@ select#sex-select.mas {
     }
     #survey-subtitle {
         font-size: 9px;
+    }
+    .check-loc h2 {
+        font-size: 24px;
     }
     .share-sq {
         font-size: 3em;
