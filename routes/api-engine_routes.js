@@ -390,159 +390,75 @@ module.exports = function(app) {
         });
     });
 
-	app.get('/api/baselayer/:id', function(req, res) {
-        var layerId = req.params.id;
-		var client = new pg.Client(conString);
-
-        sequelize.query("SELECT 'SELECT ' || array_to_string(array_prepend('st_asgeojson(geom) as geojson', " +
-            "ARRAY(SELECT c.column_name::varchar FROM information_schema.columns As c " +
-            "WHERE table_schema = 'base_layers' AND table_name = :table AND c.column_name NOT IN('geom', 'gid') " +
-            "AND c.column_name NOT IN (SELECT kcu.column_name FROM information_schema.table_constraints AS tc " +
-            "JOIN information_schema.key_column_usage AS kcu USING (constraint_schema, constraint_name) JOIN " +
-            "information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name) " +
-            "WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name=:table AND tc.table_schema='base_layers'))), ', ') " +
-            "|| ' FROM base_layers.' || :table As sqlstmt;", {
-            replacements: { table: layerId },
-            type: sequelize.QueryTypes.SELECT
-        }).then(function(results) {
-            return sequelize.query(results[0].sqlstmt, {
-                type: sequelize.QueryTypes.SELECT
+    app.get('/api/baselayers/:layer', function(req, res) {
+        var layer = req.params.layer,
+            params = req.query,
+            sql,
+            where = [],
+            geom = ', st_asgeojson(geom) as geojson',
+            replacements = {},
+            namePromise;
+        if ('geom' in params) {
+            switch (params.geom) {
+                case 'full':
+                    break;
+                case 'bbox':
+                    geom = ', st_asgeojson(st_envelope(geom)) as geojson';
+                    break;
+                case 'centroid':
+                    geom = ', st_asgeojson(st_centroid(geom)) as geojson';
+                    break;
+                case 'none':
+                    geom = '';
+                    break;
+                default:
+                    logger.info("Requested invalid geom type '" + params.geom + "' for base layer '" + layer + "'.");
+                    return res.status(404).json({ error: "requested invalid geom type." });
+            }
+        }
+        if ('lang' in params) {
+            namePromise = checkColumnExists('name_' + params.lang, layer, 'base_layers').then(function(result) {
+                return (result[0].exists) ? 'name_' + params.lang : 'name';
             });
-        }).then(function(rows) {
-            var json = postGISQueryToFeatureCollection(rows),
-                size = Buffer.byteLength(JSON.stringify(json));
-            if (size > 25000000) {
-                res.status(404).json({ error: "layer is too big for being served as geojson." });
-                return logger.warn("Layer ''" + layerId + "' is too big to serve it as geojson.");
-            }
-            res.json(json);
-        }).catch(function(err) {
-            res.status(500).json({ error: "couldn't retrieve layer." });
-            if (err.message.indexOf('does not exist') > -1) {
-                logger.warn("Requested base layer '" + layerId + "' does not exist.");
-            } else {
-                logger.error("Error while retrieving base layer '" + layerId + "': " + err);
-            }
-        });
-	});
-
-    app.get('/api/baselayers/countries', function(req, res) {
-        sequelize.query("SELECT lower(iso_code_2) AS iso_code, name, st_asgeojson(geom) as geojson FROM base_layers.countries WHERE iso_code_2 IS NOT NULL ORDER BY iso_code;",
-            { type: sequelize.QueryTypes.SELECT }).then(function(responses) {
-            if (!responses) {
-                return res.json([]);
-            }
-            res.json(postGISQueryToFeatureCollection(responses));
-        });
-    });
-
-    app.get('/api/baselayers/countries/bbox', function(req, res) {
-        sequelize.query("SELECT lower(iso_code_2) AS iso_code, name, st_asgeojson(st_envelope(geom)) as geojson FROM base_layers.countries WHERE iso_code_2 IS NOT NULL ORDER BY iso_code;",
-            { type: sequelize.QueryTypes.SELECT }).then(function(responses) {
-            if (!responses) {
-                return res.json([]);
-            }
-            res.json(postGISQueryToFeatureCollection(responses));
-        });
-    });
-
-    app.get('/api/baselayers/countries/centroid', function(req, res) {
-        sequelize.query("SELECT lower(iso_code_2) AS iso_code, name, st_asgeojson(st_centroid(geom)) as geojson FROM base_layers.countries WHERE iso_code_2 IS NOT NULL ORDER BY iso_code;",
-            { type: sequelize.QueryTypes.SELECT }).then(function(responses) {
-            if (!responses) {
-                return res.json([]);
-            }
-            res.json(postGISQueryToFeatureCollection(responses));
-        });
-    });
-
-    app.get('/api/baselayers/countries/nogeom', function(req, res) {
-        sequelize.query("SELECT lower(iso_code_2) AS iso_code, name FROM base_layers.countries WHERE iso_code_2 IS NOT NULL ORDER BY iso_code;",
-            { type: sequelize.QueryTypes.SELECT }).then(function(responses) {
-            if (!responses) {
-                return res.json([]);
-            }
-            res.json(responses);
-        });
-    });
-
-    app.get('/api/baselayers/provinces', function(req, res) {
-        var query,
-            replacements = {};
-        if (req.query.country) {
-            query = "SELECT diss_me AS province_id, iso_3166_2 AS iso_code, adm1_code as adm_code, name, type_en AS type, lower(iso_a2) AS country_iso_code, st_asgeojson(geom) as geojson FROM base_layers.provinces WHERE lower(iso_a2) = lower(:country) ORDER BY adm_code;";
-            replacements.country = req.query.country;
         } else {
-            query = "SELECT diss_me AS province_id, iso_3166_2 AS iso_code, adm1_code as adm_code, name, type_en AS type, lower(iso_a2) AS country_iso_code, st_asgeojson(geom) as geojson FROM base_layers.provinces WHERE iso_a2 IS NOT NULL ORDER BY adm_code;";
+            namePromise = Promise.resolve('name');
         }
-        sequelize.query(query, {
-            replacements: replacements,
-            type: sequelize.QueryTypes.SELECT
-        }).then(function(responses) {
-            if (!responses) {
-                return res.json([]);
+        namePromise.then(function(nameCol) {
+            switch (layer) {
+                case 'provinces':
+                    if ('country' in params) {
+                        where.push('lower(iso_a2) = lower(:country)');
+                        replacements.country = params.country;
+                    }
+                    sql = 'SELECT diss_me AS province_id, iso_3166_2 AS iso_code, adm1_code as adm_code, ' + nameCol + ' AS name, type_en AS type, lower(iso_a2) AS country_iso_code' + geom + ' FROM base_layers.provinces' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY adm_code;';
+                    break;
+                case 'countries':
+                    where.push('iso_code_2 IS NOT NULL');
+                    sql = 'SELECT lower(iso_code_2) AS iso_code, ' + nameCol + ' AS name' + geom + ' FROM base_layers.countries' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY iso_code;';
+                    break;
+                default:
+                    logger.info("Requested base layer '" + layer + "' doesn't exist.");
+                    return res.status(404).json({ error: "requested layer doesn't exist." });
             }
-            res.json(postGISQueryToFeatureCollection(responses));
-        });
-    });
-
-    app.get('/api/baselayers/provinces/bbox', function(req, res) {
-        var query,
-            replacements = {};
-        if (req.query.country) {
-            query = "SELECT diss_me AS province_id, iso_3166_2 AS iso_code, adm1_code as adm_code, name, type_en AS type, lower(iso_a2) AS country_iso_code, st_asgeojson(st_envelope(geom)) as geojson FROM base_layers.provinces WHERE lower(iso_a2) = lower(:country) ORDER BY adm_code;";
-            replacements.country = req.query.country;
-        } else {
-            query = "SELECT diss_me AS province_id, iso_3166_2 AS iso_code, adm1_code as adm_code, name, type_en AS type, lower(iso_a2) AS country_iso_code, st_asgeojson(st_envelope(geom)) as geojson FROM base_layers.provinces WHERE iso_a2 IS NOT NULL ORDER BY adm_code;";
-        }
-        sequelize.query(query, {
-            replacements: replacements,
-            type: sequelize.QueryTypes.SELECT
-        }).then(function(responses) {
-            if (!responses) {
-                return res.json([]);
-            }
-            res.json(postGISQueryToFeatureCollection(responses));
-        });
-    });
-
-    app.get('/api/baselayers/provinces/centroid', function(req, res) {
-        var query,
-            replacements = {};
-        if (req.query.country) {
-            query = "SELECT diss_me AS province_id, iso_3166_2 AS iso_code, adm1_code as adm_code, name, type_en AS type, lower(iso_a2) AS country_iso_code, st_asgeojson(st_centroid(geom)) as geojson FROM base_layers.provinces WHERE lower(iso_a2) = lower(:country) ORDER BY adm_code;";
-            replacements.country = req.query.country;
-        } else {
-            query = "SELECT diss_me AS province_id, iso_3166_2 AS iso_code, adm1_code as adm_code, name, type_en AS type, lower(iso_a2) AS country_iso_code, st_asgeojson(st_centroid(geom)) as geojson FROM base_layers.provinces WHERE iso_a2 IS NOT NULL ORDER BY adm_code;";
-        }
-        sequelize.query(query, {
-            replacements: replacements,
-            type: sequelize.QueryTypes.SELECT
-        }).then(function(responses) {
-            if (!responses) {
-                return res.json([]);
-            }
-            res.json(postGISQueryToFeatureCollection(responses));
-        });
-    });
-
-    app.get('/api/baselayers/provinces/nogeom', function(req, res) {
-        var query,
-            replacements = {};
-        if (req.query.country) {
-            query = "SELECT diss_me AS province_id, iso_3166_2 AS iso_code, adm1_code as adm_code, name, type_en AS type, lower(iso_a2) AS country_iso_code FROM base_layers.provinces WHERE lower(iso_a2) = lower(:country) ORDER BY adm_code;";
-            replacements.country = req.query.country;
-        } else {
-            query = "SELECT diss_me AS province_id, iso_3166_2 AS iso_code, adm1_code as adm_code, name, type_en AS type, lower(iso_a2) AS country_iso_code FROM base_layers.provinces WHERE iso_a2 IS NOT NULL ORDER BY adm_code;";
-        }
-        sequelize.query(query, {
-            replacements: replacements,
-            type: sequelize.QueryTypes.SELECT
-        }).then(function(responses) {
-            if (!responses) {
-                return res.json([]);
-            }
-            res.json(responses);
+            sequelize.query(sql, {
+                replacements: replacements,
+                type: sequelize.QueryTypes.SELECT
+            }).then(function(features) {
+                var results = [];
+                if (features && features.length > 0) {
+                    if ('geojson' in features[0]) {
+                        results = postGISQueryToFeatureCollection(features);
+                    } else {
+                        results = features;
+                    }
+                }
+                var size = Buffer.byteLength(JSON.stringify(results)) / 1000000;
+                if (size > 25) {
+                    logger.warn("Requested layer '" + layer + "' with " + (('geom' in params) ? params.geom : 'full') + " geom, which is too big for being served as geojson (" + size + " MB).");
+                    return res.status(404).json({ error: "requested layer is too big for being served as geojson." });
+                }
+                res.json(results);
+            });
         });
     });
 

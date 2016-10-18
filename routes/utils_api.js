@@ -1,5 +1,6 @@
 var Promise = require('bluebird'),
-    csv = Promise.promisifyAll(require('fast-csv'));
+    csv = Promise.promisifyAll(require('fast-csv')),
+    sequelize = models.sequelize;
 
 module.exports = function(app) {
 
@@ -354,6 +355,17 @@ module.exports = function(app) {
                     };
                 default:
                     return new Error("Question type not contemplated.");
+            }
+        });
+    };
+
+    checkColumnExists = function(column, table, schema) {
+        return sequelize.query("SELECT count(*) > 0 AS exists FROM information_schema.columns WHERE table_schema = :schema and table_name = :table and column_name = :column;", {
+            type: sequelize.QueryTypes.SELECT,
+            replacements: {
+                schema: schema,
+                table: table,
+                column: column
             }
         });
     };

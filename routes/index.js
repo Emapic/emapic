@@ -7,8 +7,8 @@ conString = process.env.POSTGRESQL_DB_CONN_STRING ||
 
 module.exports = function(app) {
 
-    require('./utils_api')(app);
     models  = require('../models');
+    require('./utils_api')(app);
     require('./auth')(app);
 
     require('./main')(app);

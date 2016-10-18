@@ -40,7 +40,7 @@ var emapic = emapic || {};
     emapic.logicAlreadyStarted = false;
 
     emapic.getCountriesJsonBboxUrl = function() {
-        return "/api/baselayers/countries/bbox";
+        return "/api/baselayers/countries?geom=bbox";
     };
 
     emapic.getResultsJsonUrl = function() {
@@ -67,8 +67,10 @@ var emapic = emapic || {};
                 emapic.getCountriesJsonBboxUrl()
             ).done(function(data) {
                 $.each(data.features, function(i, country) {
-                    emapic.allCountriesData[country.properties.iso_code] = {};
-                    emapic.allCountriesData[country.properties.iso_code].properties = country.properties;
+                    if (!(country.properties.iso_code in emapic.allCountriesData)) {
+                        emapic.allCountriesData[country.properties.iso_code] = {};
+                        emapic.allCountriesData[country.properties.iso_code].properties = country.properties;
+                    }
                     emapic.allCountriesData[country.properties.iso_code].bbox = [[country.geometry.coordinates[0][0][1], country.geometry.coordinates[0][0][0]],
                         [country.geometry.coordinates[0][2][1], country.geometry.coordinates[0][2][0]]];
                 });
