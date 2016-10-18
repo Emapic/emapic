@@ -52,11 +52,11 @@ var emapic = emapic || {};
     };
 
     emapic.getStatsCountriesJsonNoGeomUrl = function() {
-        return "/api/survey/" + emapic.surveyId + "/totals/countries/nogeom";
+        return "/api/survey/" + emapic.surveyId + "/totals/countries?geom=none";
     };
 
     emapic.getStatsProvincesJsonBboxUrl = function() {
-        return "/api/survey/" + emapic.surveyId + "/totals/provinces/bbox";
+        return "/api/survey/" + emapic.surveyId + "/totals/provinces?geom=bbox";
     };
 
     // Methods for loading additional JSON data. If we want to preload them, we
