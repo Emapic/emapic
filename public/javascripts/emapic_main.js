@@ -29,6 +29,7 @@ var emapic = emapic || {};
     // We'll use this color, for example, in ties
     emapic.neutralColor = 'grey';
     emapic.fallbackColor = 'black';
+    emapic.locale = 'en';
     emapic.allLayersLoadedPromise = $.Deferred();
     // Take care when using this promise as any pan/zoom made by the user
     // would restart it completely. It will prove more useful when changing the
@@ -40,7 +41,7 @@ var emapic = emapic || {};
     emapic.logicAlreadyStarted = false;
 
     emapic.getCountriesJsonBboxUrl = function() {
-        return "/api/baselayers/countries?geom=bbox";
+        return "/api/baselayers/countries?geom=bbox&lang=" + emapic.locale;
     };
 
     emapic.getResultsJsonUrl = function() {
@@ -52,11 +53,11 @@ var emapic = emapic || {};
     };
 
     emapic.getStatsCountriesJsonNoGeomUrl = function() {
-        return "/api/survey/" + emapic.surveyId + "/totals/countries?geom=none";
+        return "/api/survey/" + emapic.surveyId + "/totals/countries?geom=none&lang=" + emapic.locale;
     };
 
     emapic.getStatsProvincesJsonBboxUrl = function() {
-        return "/api/survey/" + emapic.surveyId + "/totals/provinces?geom=bbox";
+        return "/api/survey/" + emapic.surveyId + "/totals/provinces?geom=bbox&lang=" + emapic.locale;
     };
 
     // Methods for loading additional JSON data. If we want to preload them, we

@@ -190,6 +190,8 @@
 
         emapic.position = {{{ position }}};
 
+        emapic.locale = '{{web_locale}}';
+
         {{#mapboxToken}}
         emapic.mapboxToken = "{{{mapboxToken}}}";
         {{/mapboxToken}}

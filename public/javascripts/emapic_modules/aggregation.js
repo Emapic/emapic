@@ -19,11 +19,11 @@ var emapic = emapic || {};
     emapic.modules.aggregation = emapic.modules.aggregation || {};
 
     emapic.modules.aggregation.getProvinceResultsUrl = function() {
-        return "/api/survey/" + emapic.surveyId + "/totals/provinces";
+        return "/api/survey/" + emapic.surveyId + "/totals/provinces?lang=" + emapic.locale;
     };
 
     emapic.modules.aggregation.getCountryResultsUrl = function() {
-        return "/api/survey/" + emapic.surveyId + "/totals/countries";
+        return "/api/survey/" + emapic.surveyId + "/totals/countries?lang=" + emapic.locale;
     };
 
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
