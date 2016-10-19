@@ -6,3 +6,4 @@ extensions 2016-07-13T12:46:26Z Jorge López Fernández <jlopez@emapic.es> # Cre
 base_layers [extensions] 2016-07-13T14:42:38Z Jorge López Fernández <jlopez@emapic.es> # Create base layers tables and load their data.
 emapic_tables [base_layers] 2016-07-13T15:41:23Z Jorge López Fernández <jlopez@emapic.es> # Create all core emapic tables.
 emapic_db_user [emapic_tables] 2016-07-13T17:00:14Z Jorge López Fernández <jlopez@emapic.es> # Create emapic user for DB access.
+country_names_es 2016-10-19T13:30:15Z Jorge López Fernández <lopez.fernandez.jorge@gmail.com> # Added spanish translations of country names\n\nAlso updated some of the original english names.
