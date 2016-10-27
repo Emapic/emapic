@@ -102,7 +102,7 @@ sqitch deploy
 
 DB should be operative once the process has finished.
 
-This method doesn't add any default iser for our application. If we want to do so, we must execute onto our DB the SQL script _emapic\_test\_user.sql_, which will add a test with name "emapic" and password "emapic" for logging into the web application itself.
+This method doesn't add any default user for our application. If we want to do so, we must execute onto our DB the SQL script _emapic\_test\_user.sql_, which will add a test with name "emapic" and password "emapic" for logging into the web application itself.
 
 
 #### Server code
