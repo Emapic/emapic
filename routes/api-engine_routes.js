@@ -262,7 +262,7 @@ module.exports = function(app) {
             params = req.query,
             sql,
             where = [],
-            geom = ', st_asgeojson(geom) as geojson',
+            geom = ', st_asgeojson(a.geom) as geojson',
             replacements = {},
             namePromise;
         if ('geom' in params) {
@@ -270,10 +270,10 @@ module.exports = function(app) {
                 case 'full':
                     break;
                 case 'bbox':
-                    geom = ', st_asgeojson(st_envelope(geom)) as geojson';
+                    geom = ', st_asgeojson(st_envelope(a.geom)) as geojson';
                     break;
                 case 'centroid':
-                    geom = ', st_asgeojson(st_centroid(geom)) as geojson';
+                    geom = ', st_asgeojson(st_centroid(a.geom)) as geojson';
                     break;
                 case 'none':
                     geom = '';
@@ -285,23 +285,33 @@ module.exports = function(app) {
         }
         if ('lang' in params) {
             namePromise = checkColumnExists('name_' + params.lang, layer, 'base_layers').then(function(result) {
-                return (result[0].exists) ? 'name_' + params.lang : 'name';
+                return (result[0].exists) ? 'a.name_' + params.lang : 'a.name';
             });
         } else {
-            namePromise = Promise.resolve('name');
+            namePromise = Promise.resolve('a.name');
         }
         namePromise.then(function(nameCol) {
             switch (layer) {
+                case 'municipalities':
+                    if ('prov' in params && !(isNaN(params.prov))) {
+                        where.push('a.cod_prov = :prov');
+                        replacements.prov = params.prov;
+                    } else if ('ccaa' in params && !(isNaN(params.ccaa))) {
+                        where.push('a.cod_ccaa = :ccaa');
+                        replacements.ccaa = params.ccaa;
+                    }
+                    sql = 'SELECT a.codigo AS adm_code, ' + nameCol + ' AS name, a.cod_prov, a.provincia, a.cod_ccaa, a.comautonom, a.pobmun15_p AS pobumn15, a.pobmun15_h, a.pobmun15_m, lower(b.iso_a2) AS country_iso_code' + geom + ' FROM base_layers.municipalities a JOIN base_layers.provinces b ON a.province_gid = b.gid' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY adm_code;';
+                    break;
                 case 'provinces':
                     if ('country' in params) {
-                        where.push('lower(iso_a2) = lower(:country)');
+                        where.push('lower(a.iso_a2) = lower(:country)');
                         replacements.country = params.country;
                     }
-                    sql = 'SELECT diss_me AS province_id, iso_3166_2 AS iso_code, adm1_code as adm_code, ' + nameCol + ' AS name, type_en AS type, lower(iso_a2) AS country_iso_code' + geom + ' FROM base_layers.provinces' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY adm_code;';
+                    sql = 'SELECT a.diss_me AS province_id, a.iso_3166_2 AS iso_code, a.adm1_code AS adm_code, ' + nameCol + ' AS name, a.type_en AS type, lower(a.iso_a2) AS country_iso_code' + geom + ' FROM base_layers.provinces a' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY adm_code;';
                     break;
                 case 'countries':
                     where.push('iso_code_2 IS NOT NULL');
-                    sql = 'SELECT lower(iso_code_2) AS iso_code, ' + nameCol + ' AS name' + geom + ' FROM base_layers.countries' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY iso_code;';
+                    sql = 'SELECT lower(a.iso_code_2) AS iso_code, ' + nameCol + ' AS name' + geom + ' FROM base_layers.countries a' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY iso_code;';
                     break;
                 default:
                     logger.info("Requested base layer '" + layer + "' doesn't exist.");
@@ -322,7 +332,7 @@ module.exports = function(app) {
                 var size = Buffer.byteLength(JSON.stringify(results)) / 1000000;
                 if (size > 25) {
                     logger.warn("Requested layer '" + layer + "' with " + (('geom' in params) ? params.geom : 'full') + " geom, which is too big for being served as geojson (" + size + " MB).");
-                    return res.status(404).json({ error: "requested layer is too big for being served as geojson." });
+                    return res.status(404).json({ error: "requested layer is too big for being served as geojson (25 MB max)." });
                 }
                 res.json(results);
             });
