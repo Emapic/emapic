@@ -262,12 +262,15 @@ module.exports = function(app) {
             params = req.query,
             sql,
             where = [],
-            geom = ', st_asgeojson(a.geom) as geojson',
+            geom = ', st_asgeojson(a.simp_geom) as geojson',
             replacements = {},
             namePromise;
         if ('geom' in params) {
             switch (params.geom) {
+                case 'simple':
+                    break;
                 case 'full':
+                    geom = ', st_asgeojson(a.geom) as geojson';
                     break;
                 case 'bbox':
                     geom = ', st_asgeojson(st_envelope(a.geom)) as geojson';
