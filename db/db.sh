@@ -58,7 +58,13 @@ psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -c "GRANT USAGE ON SCHEMA m
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -c "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA metadata TO $EMAPIC_USER;" 1> /dev/null
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -c "GRANT SELECT, USAGE ON ALL SEQUENCES IN SCHEMA metadata TO $EMAPIC_USER;" 1> /dev/null
 
-echo "5- Creating test user..."
+echo "5- Updating database with various fixes & improvements..."
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/country_names_es.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/update_province_names.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/update_municipalities_geoms.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_simplified_geoms.sql 1> /dev/null
+
+echo "6- Creating test user..."
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f emapic_test_user.sql 1> /dev/null
 
 echo "-- Emapic database ready! :-)"
