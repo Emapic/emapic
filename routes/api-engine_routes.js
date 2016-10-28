@@ -262,12 +262,14 @@ module.exports = function(app) {
             params = req.query,
             sql,
             where = [],
-            geom = ', st_asgeojson(a.simp_geom) as geojson',
+            geom,
             replacements = {},
             namePromise;
+        params.geom = params.geom || 'simple';
         if ('geom' in params) {
             switch (params.geom) {
                 case 'simple':
+                    geom = ', st_asgeojson(a.simp_geom) as geojson';
                     break;
                 case 'full':
                     geom = ', st_asgeojson(a.geom) as geojson';
@@ -334,7 +336,7 @@ module.exports = function(app) {
                 }
                 var size = Buffer.byteLength(JSON.stringify(results)) / 1000000;
                 if (size > 25) {
-                    logger.warn("Requested layer '" + layer + "' with " + (('geom' in params) ? params.geom : 'full') + " geom, which is too big for being served as geojson (" + size + " MB).");
+                    logger.warn("Requested layer '" + layer + "' with " + (('geom' in params) ? params.geom : 'simple') + " geom, which is too big for being served as geojson (" + size + " MB).");
                     return res.status(404).json({ error: "requested layer is too big for being served as geojson (25 MB max)." });
                 }
                 res.json(results);

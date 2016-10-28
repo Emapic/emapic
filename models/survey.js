@@ -533,9 +533,10 @@ module.exports = function(sequelize, DataTypes) {
 
             getAggregatedTotals: function(layer, params) {
                 var survey = this,
-                    geom = ', st_asgeojson(a.simp_geom) as geojson',
+                    geom,
                     sql1,
                     sql2;
+                params.geom = params.geom || 'simple';
                 switch (layer) {
                     case 'countries':
                         sql1 = "SELECT lower(a.iso_code_2) AS iso_code, count(b.gid) AS total_responses";
@@ -551,6 +552,7 @@ module.exports = function(sequelize, DataTypes) {
                 if ('geom' in params) {
                     switch (params.geom) {
                         case 'simple':
+                            geom = ', st_asgeojson(a.simp_geom) as geojson';
                             break;
                         case 'full':
                             geom = ', st_asgeojson(a.geom) as geojson';
