@@ -1,5 +1,6 @@
 var Promise = require('bluebird'),
     bases = require('bases'),
+    RateLimit = require('express-rate-limit'),
     logger = require('../utils/logger'),
     nconf = require('nconf'),
     emapicOpinionFreq = parseFloat(nconf.get('app').emapicOpinionFreq),
@@ -257,7 +258,29 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/api/baselayers/:layer', function(req, res) {
+    // One request per minute limit for full/simple geom requests as data can be
+    // quite big
+    var baseLayerFullGeomLimiter = new RateLimit({
+        windowMs: 60*1000,
+        max: 1,
+        delayMs: 0,
+        handler: function (req, res, next) {
+            return res.status(429).json({ warning: "Base layer API full/simple geom requests limited to 1 per minute." });
+        }
+    });
+
+    app.get('/api/baselayers/:layer', function(req, res, next) {
+        // Limit full/simple geom requests in production environmentes only
+        if ('production' == app.get('env')) {
+            switch (req.query.geom) {
+                case 'simple':
+                case 'full':
+                    return baseLayerFullGeomLimiter(req, res, next);
+            }
+        }
+        next();
+
+    }, function(req, res) {
         var layer = req.params.layer,
             params = req.query,
             sql,

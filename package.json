@@ -24,6 +24,7 @@
     "escape-html": "^1.0.3",
     "express": "3.4.8",
     "express-error-handler": "^1.0.1",
+    "express-rate-limit": "^2.5.0",
     "express-session": "^1.8.2",
     "fast-csv": "^2.3.0",
     "fs-promise": "^0.4.1",
