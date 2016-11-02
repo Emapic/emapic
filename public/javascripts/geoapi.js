@@ -9,28 +9,35 @@ var emapic = emapic || {};
     var ipLocationFinished = false,
         ipLocationFail = false,
         apiLocationFail = false,
-        defaultPosition = {
-            coords: {
-                latitude: 40.416763,
-                longitude: -3.703403,
-                accuracy: 0
-            }
-        },
         apiTimeout = 30000000,
         apidfd = null;
 
     emapic.geoapi = emapic.geoapi || {};
 
+    emapic.geoapi.defaultPosition = {
+        coords: {
+            latitude: 40.416763,
+            longitude: -3.703403,
+            accuracy: 0
+        }
+    };
+
     emapic.geoapi.geoapiLat = null;
     emapic.geoapi.geoapiLon = null;
     emapic.geoapi.position0 = null;
 
+    emapic.geoapi.useDefaultOverIp = false;
     emapic.geoapi.manualGeolocation = false;
     emapic.geoapi.userDefaultPosition = null;
     emapic.geoapi.userCountryCode = 'es';
 
     emapic.geoapi.getLocation = function(callApi) {
-        getIpLocation();
+        if (emapic.geoapi.useDefaultOverIp) {
+            ipLocationFinished = true;
+            ipLocationFail = true;
+        } else {
+            getIpLocation();
+        }
         $('#geoposwarn').modal("show");
         $('#dismiss-btn').click(function() {
             emapic.geoapi.manualGeolocation = true;
@@ -60,8 +67,8 @@ var emapic = emapic || {};
                 //~ Country codes as in "ISO 3166-1 alfa-2"
                 emapic.geoapi.userCountryCode = data.country_code.toLowerCase() || emapic.geoapi.userCountryCode;
                 if (emapic.geoapi.geoapiLat === null && emapic.geoapi.geoapiLon === null) {
-                    defaultPosition.coords.latitude = data.latitude;
-                    defaultPosition.coords.longitude = data.longitude;
+                    emapic.geoapi.defaultPosition.coords.latitude = data.latitude;
+                    emapic.geoapi.defaultPosition.coords.longitude = data.longitude;
                     if (emapic.map === null) {
                         emapic.initializeMap();
                     }
@@ -174,7 +181,8 @@ var emapic = emapic || {};
                 }
                 $('#geoposmanual').show();
             } else {
-                reverseGeocodeRetrievedPosition(defaultPosition.coords.latitude, defaultPosition.coords.longitude);
+                reverseGeocodeRetrievedPosition(emapic.geoapi.defaultPosition.coords.latitude,
+                    emapic.geoapi.defaultPosition.coords.longitude);
                 $('#geoposmanualip').show();
             }
             $('#geoposmanual-title').show();
@@ -190,7 +198,8 @@ var emapic = emapic || {};
                 }
                 $('#geoposallerror').show();
             } else {
-                reverseGeocodeRetrievedPosition(defaultPosition.coords.latitude, defaultPosition.coords.longitude);
+                reverseGeocodeRetrievedPosition(emapic.geoapi.defaultPosition.coords.latitude,
+                    emapic.geoapi.defaultPosition.coords.longitude);
                 $('#geoposapierror').show();
             }
             $('#geoposerror-title').show();
@@ -201,11 +210,8 @@ var emapic = emapic || {};
     emapic.geoapi.autolocationFailedAck = function() {
         $('#geoposresult').modal('hide');
         if (emapic.position === null) {
-            emapic.geoapi.setPosition(emapic.geoapi.userDefaultPosition || defaultPosition);
+            emapic.geoapi.setPosition(emapic.geoapi.userDefaultPosition || emapic.geoapi.defaultPosition);
             emapic.geoapi.position0 = [null, null];
-            if (!emapic.geoapi.userDefaultPosition && ipLocationFail) {
-                emapic.geoapi.processUserCountry(emapic.geoapi.userCountryCode);
-            }
         }
     };
 
