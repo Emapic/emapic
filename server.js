@@ -321,7 +321,7 @@ var SampleApp = function() {
             logger.info('Node server started on %s:%d ...', self.ipaddr, self.httpsport);
         });
 
-        if (self.ipaddr != '127.0.0.1') {
+        if (self.ipaddr != '127.0.0.1' && self.ipaddr != '0.0.0.0') {
             // Redirect from http port (80) to https (443)
             http.createServer(function (req, res) {
                 res.writeHead(301, { "Location": "https://" + req.headers.host + req.url });
