@@ -1,0 +1,17 @@
+db/deploy/base_layers.sql linguist-vendored
+db/verify/base_layers.sql linguist-vendored
+db/revert/base_layers.sql linguist-vendored
+db/deploy/country_names_es.sql linguist-vendored
+db/verify/country_names_es.sql linguist-vendored
+db/revert/country_names_es.sql linguist-vendored
+db/deploy/update_municipalities_geoms.sql linguist-vendored
+db/verify/update_municipalities_geoms.sql linguist-vendored
+db/revert/update_municipalities_geoms.sql linguist-vendored
+db/deploy/update_province_names.sql linguist-vendored
+db/verify/update_province_names.sql linguist-vendored
+db/revert/update_province_names.sql linguist-vendored
+db/deploy/add_simplified_geoms.sql linguist-vendored
+db/verify/add_simplified_geoms.sql linguist-vendored
+db/revert/add_simplified_geoms.sql linguist-vendored
+
+*.hjs linguist-language=HTML
