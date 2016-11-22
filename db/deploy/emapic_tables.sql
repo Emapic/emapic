@@ -70,7 +70,7 @@ CREATE TABLE metadata.surveys (
     tsv TSVECTOR
 );
 
-CREATE TYPE question_type AS ENUM ('text-answer', 'yes-no', 'list-radio', 'list-radio-other');
+CREATE TYPE question_type AS ENUM ('text-answer', 'yes-no', 'list-radio', 'list-radio-other', 'explanatory-text');
 
 CREATE TABLE metadata.questions (
     id BIGSERIAL PRIMARY KEY,
