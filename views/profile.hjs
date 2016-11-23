@@ -16,6 +16,7 @@
         <button id="btn-password" onclick="changeProfileSection(this, '#profile-password')" type="button" class="btn btn-default">{{#__}}password_cap{{/__}}</button>
         <button id="btn-avatar" onclick="changeProfileSection(this, '#profile-avatar')" type="button" class="btn btn-default">{{#__}}image{{/__}}</button>
         <button id="btn-localization" onclick="changeProfileSection(this, '#profile-localization')" type="button" class="btn btn-default">{{#__}}localization{{/__}}</button>
+        <button id="btn-delete" onclick="changeProfileSection(this, '#profile-api')" type="button" class="btn btn-default">{{#__}}api{{/__}}</button>
         <button id="btn-delete" onclick="changeProfileSection(this, '#profile-delete')" type="button" class="btn btn-default">{{#__}}account{{/__}}</button>
     </div>
 
@@ -155,6 +156,39 @@
         </div>
     </div>
 
+
+    <div class="col-xs-12 col-sm-9 panel panel-default" id="profile-api" style="display: none;">
+        <div class="panel-body">
+            <form class="form-horizontal" role="form" id="position-update" action="/profile" method="post">
+
+                <div class="form-group form-group-sm">
+                    <label class="col-xs-12 col-sm-4 control-label" for="app_id">{{#__}}app_id{{/__}}</label>
+                    <div class="col-xs-12 col-sm-8 col-md-6 col-lg-5">
+                        <input class="form-control" type="text" name="app_id" value="app_id" readonly="readonly">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </div>
+                <div class="form-group form-group-sm">
+                    <label class="col-xs-12 col-sm-4 control-label" for="secret_key">{{#__}}secret_key{{/__}}</label>
+                    <div class="col-xs-12 col-sm-8 col-md-6 col-lg-5">
+                        <input class="form-control" type="text"  name="secret_key" value="secret_key" readonly="readonly">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </div>
+
+                <div>
+
+                    <button id="regenerate-api-btn" type="button" class="btn btn-primary btn-md col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-5 col-lg-offset-4" onclick="deletePosition();">
+                      {{#__}}regenerate_api{{/__}}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+
     <div class="col-xs-12 col-sm-9 panel panel-default" id="profile-delete" style="display: none;">
         <div class="panel-body">
             <form class="form-horizontal" role="form" id="delete-account" action="/profile/delete" method="post">
@@ -242,7 +276,8 @@
 
         map = L.map('map', {
             attributionControl: false,
-            zoomControl: false
+            zoomControl: false,
+            scrollWheelZoom: false
         });
         map.addControl(L.control.zoom({
             zoomInTitle: emapic.utils.getI18n('js_zoom_in', 'Zoom más'),

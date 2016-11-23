@@ -79,7 +79,7 @@
 			    <h3 class="signup-subtitle">{{#__}}general_conditions_accept_subtitle{{/__}}</h3>
 			    <div class="form-group">
 						<div class="col-xs-12 access" id="signup-disclaimer">
-							<p><input required type="checkbox" name="accept_general_conditions">{{#__}}signup_disclaimer_header{{/__}}<a href="/legal/general_conditions">{{#__}}signup_disclaimer_general_conditions{{/__}}</a></p>
+							<p><label><input required type="checkbox" name="accept_general_conditions">{{#__}}signup_disclaimer_header{{/__}}<a href="/legal/general_conditions">{{#__}}signup_disclaimer_general_conditions{{/__}}</a></label></p>
 						</div>
 						<button type="submit" class="col-xs-12 col-sm-10 col-sm-offset-1 btn btn-primary btn-lg">{{#__}}accept{{/__}}</button>
 			    </div>
@@ -145,7 +145,8 @@
 
         map = L.map('map', {
             attributionControl: false,
-            zoomControl: false
+            zoomControl: false,
+            scrollWheelZoom: false
         });
         map.addControl(L.control.zoom({
             zoomInTitle: emapic.utils.getI18n('js_zoom_in', 'Zoom más'),
