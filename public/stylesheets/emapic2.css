@@ -871,6 +871,10 @@ span.user-inline {
     text-transform: capitalize
 }
 
+#profile-api input {
+    font-size:1.1em;
+}
+
 .avatar-wrapper {
 	max-width: 250px;
 	max-height: 250px;

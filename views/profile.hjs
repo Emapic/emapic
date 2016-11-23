@@ -15,7 +15,7 @@
         <button id="btn-id" onclick="changeProfileSection(this, '#profile-id')" type="button" class="btn btn-default btn-section-active">{{#__}}identification{{/__}}</button>
         <button id="btn-password" onclick="changeProfileSection(this, '#profile-password')" type="button" class="btn btn-default">{{#__}}password_cap{{/__}}</button>
         <button id="btn-avatar" onclick="changeProfileSection(this, '#profile-avatar')" type="button" class="btn btn-default">{{#__}}image{{/__}}</button>
-        <button id="btn-localization" onclick="changeProfileSection(this, '#profile-localization')" type="button" class="btn btn-default">{{#__}}localization{{/__}}</button>
+        <button id="btn-location" onclick="changeProfileSection(this, '#profile-location')" type="button" class="btn btn-default">{{#__}}location{{/__}}</button>
         <button id="btn-delete" onclick="changeProfileSection(this, '#profile-api')" type="button" class="btn btn-default">{{#__}}api{{/__}}</button>
         <button id="btn-delete" onclick="changeProfileSection(this, '#profile-delete')" type="button" class="btn btn-default">{{#__}}account{{/__}}</button>
     </div>
@@ -140,7 +140,7 @@
         </div>
     </div>
 
-    <div class="col-xs-12 col-sm-9 panel panel-default" id="profile-localization" style="display: none;">
+    <div class="col-xs-12 col-sm-9 panel panel-default" id="profile-location" style="display: none;">
         <div class="panel-body">
             <form class="form-horizontal" role="form" id="position-update" action="/profile" method="post">
                 <input class="form-control" type="hidden" name="email" value="{{ userFormData.email }}">
@@ -164,16 +164,16 @@
                 <input class="form-control" type="hidden" name="email" value="{{ userFormData.email }}">
 
                 <div class="form-group form-group-sm">
-                    <label class="col-xs-12 col-sm-4 control-label" for="api_id">{{#__}}api_id{{/__}}</label>
-                    <div class="col-xs-12 col-sm-8 col-md-6 col-lg-5">
-                        <input class="form-control" type="text" name="api_id" value="{{ userFormData.api_id }}" readonly="readonly">
+                    <label class="control-label" for="api_id">{{#__}}api_id{{/__}}</label>
+                    <div class="">
+                        <input class="form-control" type="text" name="api_id" value="{{ userFormData.api_id }}" readonly="readonly" class="select_on_focus">
                         <div class="help-block with-errors"></div>
                     </div>
                 </div>
                 <div class="form-group form-group-sm">
-                    <label class="col-xs-12 col-sm-4 control-label" for="api_secret">{{#__}}api_secret{{/__}}</label>
-                    <div class="col-xs-12 col-sm-8 col-md-6 col-lg-5">
-                        <input class="form-control" type="text"  name="api_secret" value="{{ userFormData.api_secret }}" readonly="readonly">
+                    <label class="control-label" for="api_secret">{{#__}}api_secret{{/__}}</label>
+                    <div class="">
+                        <input class="form-control" type="text"  name="api_secret" value="{{ userFormData.api_secret }}" readonly="readonly" class="select_on_focus">
                         <div class="help-block with-errors"></div>
                     </div>
                 </div>
@@ -325,7 +325,7 @@
     function changeProfileSection(elmnt, section) {
             $('.panel').hide();
             $(section).show();
-            if (section == '#profile-localization' && map == null) {
+            if (section == '#profile-location' && map == null) {
                 initializeMap();
             }
             $('#profile-menu > button').removeClass('btn-section-active');
@@ -338,6 +338,12 @@
             readURL(this);
         });
         $('.help-tooltip').tooltip({placement: 'left', html: true});
+
+        <!-- Select input value on focus -->
+        $(document).on('focus click','input', function(e) {
+          e.stopPropagation();
+          $(this).select();
+        })
     });
 </script>
 {{/yield-scripts}}
