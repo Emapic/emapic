@@ -1,5 +1,6 @@
 var Promise = require('bluebird'),
     Map = require("collections/map"),
+    randomstring = require('randomstring'),
     logger = require('../utils/logger');
 
 module.exports = function(sequelize, DataTypes) {
@@ -13,6 +14,8 @@ module.exports = function(sequelize, DataTypes) {
         facebook_token: { type: DataTypes.STRING },
         name: { type:  DataTypes.STRING },
         password: { type: DataTypes.STRING },
+        api_id: { type: DataTypes.STRING, allowNull: false, unique: true },
+        api_secret: { type: DataTypes.STRING, allowNull: false },
         join_date: { type: DataTypes.DATE },
         url: { type: DataTypes.STRING },
         salt: { type: DataTypes.STRING },
@@ -114,6 +117,20 @@ module.exports = function(sequelize, DataTypes) {
                         count: total,
                         rows: rows.slice(offset, limit)
                     };
+                });
+            },
+
+            resetApiIdSecret: function() {
+                this.api_id = randomstring.generate(32);
+                this.api_secret = randomstring.generate(64);
+                return this.save().catch(function(err) {
+                    if (err && err.name == 'SequelizeUniqueConstraintError' &&
+                        ((err.errors && err.errors.constructor === Array && err.errors[0].path == 'api_id') ||
+                        (err.message.indexOf('users_api_id_key') > -1))) {
+                        logger.debug('App ID already in use: ' + err);
+                        return this.resetApiIdSecret();
+                    }
+                    throw err;
                 });
             }
         },

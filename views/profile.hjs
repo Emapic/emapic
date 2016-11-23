@@ -161,24 +161,26 @@
         <div class="panel-body">
             <form class="form-horizontal" role="form" id="position-update" action="/profile" method="post">
 
+                <input class="form-control" type="hidden" name="email" value="{{ userFormData.email }}">
+
                 <div class="form-group form-group-sm">
-                    <label class="col-xs-12 col-sm-4 control-label" for="app_id">{{#__}}app_id{{/__}}</label>
+                    <label class="col-xs-12 col-sm-4 control-label" for="api_id">{{#__}}api_id{{/__}}</label>
                     <div class="col-xs-12 col-sm-8 col-md-6 col-lg-5">
-                        <input class="form-control" type="text" name="app_id" value="app_id" readonly="readonly">
+                        <input class="form-control" type="text" name="api_id" value="{{ userFormData.api_id }}" readonly="readonly">
                         <div class="help-block with-errors"></div>
                     </div>
                 </div>
                 <div class="form-group form-group-sm">
-                    <label class="col-xs-12 col-sm-4 control-label" for="secret_key">{{#__}}secret_key{{/__}}</label>
+                    <label class="col-xs-12 col-sm-4 control-label" for="api_secret">{{#__}}api_secret{{/__}}</label>
                     <div class="col-xs-12 col-sm-8 col-md-6 col-lg-5">
-                        <input class="form-control" type="text"  name="secret_key" value="secret_key" readonly="readonly">
+                        <input class="form-control" type="text"  name="api_secret" value="{{ userFormData.api_secret }}" readonly="readonly">
                         <div class="help-block with-errors"></div>
                     </div>
                 </div>
 
                 <div>
 
-                    <button id="regenerate-api-btn" type="button" class="btn btn-primary btn-md col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-5 col-lg-offset-4" onclick="deletePosition();">
+                    <button id="regenerate-api-btn" type="submit" class="btn btn-primary btn-md col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-5 col-lg-offset-4">
                       {{#__}}regenerate_api{{/__}}
                     </button>
                 </div>

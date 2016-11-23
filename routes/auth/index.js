@@ -81,7 +81,9 @@ module.exports = function(app) {
             login : req.body.login.substring(0, 25).trim(),
             name : (req.body.name !== null) ? req.body.name.substring(0, 100).trim() : null,
             password : req.body.password.substring(0, 50).trim(),
-            url : (req.body.url ? req.body.url.substring(0, 300).trim() : null)
+            url : (req.body.url ? req.body.url.substring(0, 300).trim() : null),
+            api_id : randomstring.generate(32),
+            api_secret : randomstring.generate(64)
         };
 
         if (req.files.avatar) {
@@ -344,6 +346,18 @@ module.exports = function(app) {
                     return res.render('profile', {layout: 'layouts/main'});
                 });
             });
+
+        } else if (req.body.api_id && req.body.api_secret) {
+
+            req.user.resetApiIdSecret().then(function(user) {
+                req.session.success = 'update_api_success_msg';
+                logger.info("Sucessfully updated API ID/Secret.");
+                return res.redirect('/profile');
+            }).catch(function(err) {
+                req.session.error = 'update_user_error_msg';
+                logger.error('Error while updating user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
+            });
+
         } else {
             return res.redirect('/profile');
         }
