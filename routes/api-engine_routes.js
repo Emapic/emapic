@@ -1,4 +1,5 @@
 var Promise = require('bluebird'),
+    passport = require('passport'),
     bases = require('bases'),
     RateLimit = require('express-rate-limit'),
     logger = require('../utils/logger'),
@@ -366,5 +367,16 @@ module.exports = function(app) {
             });
         });
     });
+
+    app.post('/api/test', passport.authenticate('api'),
+        function(req, res, next) {
+            models.LocationGroup.createFromPost(req).then(function(locationGroup) {
+                logger.info("Sucessfully created location group");
+                res.end();
+            }).catch(function(err) {
+                logger.error("Error while creating location group" + err);
+            });
+        }
+    );
 
 };

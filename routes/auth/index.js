@@ -1,4 +1,5 @@
 var passport = require('passport'),
+    BasicStrategy = require('passport-http').BasicStrategy,
     LocalStrategy = require('passport-local').Strategy,
     GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
     FacebookStrategy = require('passport-facebook').Strategy,
@@ -515,6 +516,24 @@ module.exports = function(app) {
         });
     }
 
+    //used in API signin strategy
+    function apiHttpAuth(apiId, apiSecret) {
+        return models.User.find({
+            where: {
+                api_id: apiId,
+                api_secret: apiSecret,
+                activated: true
+            }
+        }).then(function(user) {
+            if (user === null) {
+                logger.debug("Could not find api ID + api secret in db for signin: " + apiId);
+                return Promise.resolve(false);
+            }
+            logger.debug("Api ID + api secret match");
+            return Promise.resolve(user);
+        });
+    }
+
     //used in google signin strategy
     function googleAuth (req, profile, token) {
         var usr;
@@ -744,6 +763,21 @@ module.exports = function(app) {
             });
         }
     ));
+
+    passport.use('api', new BasicStrategy(
+        function(userid, password, done) {
+            apiHttpAuth(userid, password)
+            .then(function (user) {
+                if (user) {
+                    logger.debug("Logged into the API as: " + user.email);
+                }
+                done(null, user);
+            }).catch(function (err){
+                logger.error('Error while logging in: ' + err);
+                done(null, null);
+            });
+        })
+    );
 
     function issueToken(user, done) {
         var token = randomString(64);

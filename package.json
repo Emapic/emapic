@@ -42,6 +42,7 @@
     "optipng-bin": "^3.1.2",
     "pagination": "^0.4.4",
     "passport": "^0.2.1",
+    "passport-http": "^0.3.0",
     "passport-facebook": "^2.1.0",
     "passport-google-oauth": "^1.0.0",
     "passport-local": "^1.0.0",
