@@ -368,7 +368,7 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/api/test', passport.authenticate('api'),
+    app.post('/api/locationgroup', passport.authenticate('api'),
         function(req, res, next) {
             models.LocationGroup.createFromPost(req).then(function(locationGroup) {
                 logger.info("Sucessfully created location group");
@@ -379,4 +379,44 @@ module.exports = function(app) {
         }
     );
 
+    app.post('/api/locationgroup/:id', passport.authenticate('api'),
+        function(req, res, next) {
+            var id = req.params.id;
+
+            models.LocationGroup.find({
+                where: {
+                    owner_id: req.user.id,
+                    external_id: id
+                }
+            }).then(function(locationGroup) {
+                //logger.info(locationGroup);
+                console.log(locationGroup);
+                // Add vote in LocationGroup
+                locationGroup.saveLocation(req).then(function() {
+                  res.end();
+                });
+            });
+        }
+    );
+
+    app.get('/api/locationgroup/:id', passport.authenticate('api'),
+        function(req, res, next) {
+            var id = req.params.id;
+
+            models.LocationGroup.find({
+                where: {
+                    owner_id: req.user.id,
+                    external_id: id
+                }
+            }).then(function(locationGroup) {
+
+                  if (locationGroup === null) {
+                      return res.end();
+                  }
+                  locationGroup.getLocations().then(function(locations) {
+                    res.json(postGISQueryToFeatureCollection(locations));
+                  });
+            });
+        }
+    );
 };

@@ -42,13 +42,17 @@ module.exports = function(sequelize, DataTypes) {
                     owner_id:  req.user.id,
                     title : 'xx',
                     external_id:  req.body.external_id
+                }).then(function(locationGroup) {
+                    // We create the location_group specific table and triggers
+                    return locationGroup.createTable();
                 });
+
             }
         },
         instanceMethods: {
             createTable: function() {
                 var locationGroup = this;
-                sequelize.query('CREATE TABLE locations.location_group_' + locationGroup.id + '(gid bigserial NOT NULL PRIMARY KEY, geom GEOMETRY(Point, 4326), "precision" integer, province_gid integer REFERENCES base_layers.provinces (gid) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION, "timestamp" timestamp without time zone, usr_id VARCHAR UNIQUE;')
+                sequelize.query('CREATE TABLE locations.location_group_' + locationGroup.id + '(gid bigserial NOT NULL PRIMARY KEY, geom GEOMETRY(Point, 4326), "precision" integer, province_gid integer REFERENCES base_layers.provinces (gid) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION, "timestamp" timestamp without time zone, usr_id VARCHAR UNIQUE);')
                 .spread(function(results, metadata) {
                     // We create the trigger for assigning provinces
                     return sequelize.query('CREATE TRIGGER assign_province_trigger BEFORE INSERT OR UPDATE ON locations.location_group_' + locationGroup.id + ' FOR EACH ROW EXECUTE PROCEDURE assign_province();');
@@ -114,18 +118,33 @@ module.exports = function(sequelize, DataTypes) {
                 });
             },
 
-            getResponses: function() {
-                var id = this.id;
-                return this.getQuestions().then(function(questions) {
-                    var questions_fields = '';
-                    for (var i = 0, iLen = questions.length; i<iLen; i++) {
-                        var select = questions[i].getSelectSql();
-                        questions_fields += ((select !== '') ? ',' : '') + select;
+            saveLocation: function(req) {
+                var locationGroup = this,
+                    date = new Date(),
+                    dateUtc = date.toISOString().replace(/T/, ' ').replace(/Z/, '');
+                return Promise.join(this.getOwner(), function(owner) {
+                    // If the locationGroup is closed, or it's a draft and the
+                    // vote doesn't come from its owner, we reject the vote
+                    if (locationGroup.active === false) {
+                        return Promise.reject();
                     }
-                    return sequelize.query("SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + questions_fields + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id ORDER BY timestamp",
-                        { type: sequelize.QueryTypes.SELECT }
+                    //
+                    var body = req.body;
+
+                    var insert_query = 'INSERT INTO locations.location_group_' + locationGroup.id + ' (usr_id, precision, timestamp, geom) VALUES (?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326))';
+                    insert_params = [body.usr_id, body.precision, dateUtc, body.lng, body.lat];
+
+                    return sequelize.query(insert_query,
+                        { replacements: insert_params, type: sequelize.QueryTypes.INSERT }
                     );
                 });
+            },
+
+            getLocations: function() {
+                var id = this.id;
+                return sequelize.query("SELECT (extract(epoch from timestamp) * 1000)::bigint as timestamp, st_asgeojson(geom) as geojson, usr_id FROM locations.location_group_" + id,
+                    { type: sequelize.QueryTypes.SELECT }
+                );
             }
         },
         hooks: {
