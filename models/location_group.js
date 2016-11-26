@@ -40,7 +40,7 @@ module.exports = function(sequelize, DataTypes) {
 
                 return LocationGroup.create({
                     owner_id:  req.user.id,
-                    title : 'xx',
+                    title : req.body.title,
                     external_id:  req.body.external_id
                 }).then(function(locationGroup) {
                     // We create the location_group specific table and triggers
@@ -52,10 +52,11 @@ module.exports = function(sequelize, DataTypes) {
         instanceMethods: {
             createTable: function() {
                 var locationGroup = this;
-                sequelize.query('CREATE TABLE locations.location_group_' + locationGroup.id + '(gid bigserial NOT NULL PRIMARY KEY, geom GEOMETRY(Point, 4326), "precision" integer, province_gid integer REFERENCES base_layers.provinces (gid) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION, "timestamp" timestamp without time zone, usr_id VARCHAR UNIQUE);')
+                sequelize.query('CREATE TABLE locations.location_group_' + locationGroup.id + '(gid bigserial NOT NULL PRIMARY KEY, geom GEOMETRY(Point, 4326), "precision" integer, province_gid integer REFERENCES base_layers.provinces (gid) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION, madrid_barrio_gid integer REFERENCES base_layers.madrid_barrios (gid) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION, "timestamp" timestamp without time zone, usr_id VARCHAR UNIQUE);')
                 .spread(function(results, metadata) {
                     // We create the trigger for assigning provinces
-                    return sequelize.query('CREATE TRIGGER assign_province_trigger BEFORE INSERT OR UPDATE ON locations.location_group_' + locationGroup.id + ' FOR EACH ROW EXECUTE PROCEDURE assign_province();');
+                    return sequelize.query('CREATE TRIGGER assign_province_trigger BEFORE INSERT OR UPDATE ON locations.location_group_' + locationGroup.id + ' FOR EACH ROW EXECUTE PROCEDURE assign_province();' +
+                        'CREATE TRIGGER assign_madrid_barrio_trigger BEFORE INSERT OR UPDATE ON locations.location_group_' + locationGroup.id + ' FOR EACH ROW EXECUTE PROCEDURE assign_madrid_barrio();');
                 });
             },
 
@@ -69,53 +70,6 @@ module.exports = function(sequelize, DataTypes) {
 
             clearVotes: function() {
                 return this.clearTable();
-            },
-
-            saveResponse: function(req) {
-                var survey = this,
-                    date = new Date(),
-                    dateUtc = date.toISOString().replace(/T/, ' ').replace(/Z/, '');
-                return Promise.join(this.getOwner(), this.getQuestions(), function(owner, questions) {
-                    var usr_id = (req.user) ? parseInt(req.user.id) : null;
-                    // If the survey is closed, or it's a draft and the
-                    // vote doesn't come from its owner, we reject the vote
-                    if (survey.active === false || (survey.active === null && usr_id != owner.id)) {
-                        return Promise.reject();
-                    }
-                    // If the survey is a draft, then its owner's votes are stored as anonymous
-                    usr_id = (survey.active === null && usr_id == owner.id) ? null : usr_id;
-                    var body = req.body;
-                    // If there is an emapic opinion, we save it
-                    // We don't need it for anything, so we don't even handle
-                    // its promise.
-                    Survey.saveEmapicOpinion(req);
-                    // If geolocation was used, we save the distance between
-                    // the original position and the selected one.
-                    // We don't need it for anything, so we don't even handle
-                    // its promise.
-                    Survey.saveGeolocationDistance(req);
-
-                    var insert_query1 = 'INSERT INTO opinions.survey_' + survey.id + ' (usr_id, precision, timestamp, geom',
-                    insert_query2 = ') VALUES (?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326)',
-                    insert_params = [usr_id, body.precision, dateUtc, body.lng, body.lat];
-                    for (var i = 0, iLen = questions.length; i<iLen; i++) {
-                        var vars = questions[i].getInsertSql(body.responses);
-                        insert_query1 += (vars[0] !== '' ? ', ' : '') + vars[0];
-                        insert_query2 += (vars[1] !== '' ? ', ' : '') + vars[1];
-                        insert_params = insert_params.concat(vars[2]);
-                    }
-                    insert_query1 += insert_query2 + ');';
-
-                    return sequelize.query(insert_query1,
-                        { replacements: insert_params, type: sequelize.QueryTypes.INSERT }
-                    ).then(function() {
-                        return models.Vote.create({
-                            user_id : usr_id,
-                            survey_id : survey.id,
-                            vote_date : date
-                        });
-                    });
-                });
             },
 
             saveLocation: function(req) {
