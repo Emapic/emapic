@@ -12,3 +12,4 @@ update_municipalities_geoms 2016-10-25T17:13:53Z Jorge López Fernández <jlopez
 add_simplified_geoms 2016-10-27T11:34:16Z Jorge López Fernández <jlopez@emapic.es> # Add simplified geoms to base layers\n\nWe add a new column with the simplified geoms\nfor countries, provinces and municipalities.
 api_fields 2016-11-23T12:46:18Z arnaupc <arnaupc@hotmail.com> # Add API fields to Users table
 add_locations_tables 2016-11-23T18:39:50Z Jorge López Fernández <jlopez@emapic.es> # Add locations schema & tables\n\nNow we'll support storage of plain locations,\nso we add a new metadata table and a schema
+add_madrid_layers 2016-11-26T15:03:23Z Jorge López Fernández <jlopez@emapic.es> # Added layers with Madrid districts & neighborhoods
