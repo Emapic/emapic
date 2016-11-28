@@ -1,4 +1,5 @@
 var Promise = require('bluebird'),
+    rp = require('request-promise'),
     passport = require('passport'),
     bases = require('bases'),
     RateLimit = require('express-rate-limit'),
@@ -372,29 +373,71 @@ module.exports = function(app) {
         function(req, res, next) {
             models.LocationGroup.createFromPost(req).then(function(locationGroup) {
                 logger.info("Sucessfully created location group");
-                res.end();
+                res.json({ status: 'ok'});
             }).catch(function(err) {
-                logger.error("Error while creating location group" + err);
+                if (err && err.name == 'SequelizeUniqueConstraintError' &&
+                    ((err.errors && err.errors.constructor === Array && err.errors[0].path == 'external_id') ||
+                    (err.message.indexOf('location_groups_external_id_key') > -1))) {
+                    logger.info('Duplicated external id for location group: ' + err);
+                    return res.status(400).json({ status: 'error', content: 'duplicated location group external id.' });
+                }
+                return res.status(500).json({ status: 'error', content: 'the server experienced an internal error.' });
             });
         }
     );
 
     app.post('/api/locationgroup/:id', passport.authenticate('api'),
         function(req, res, next) {
-            var id = req.params.id;
-
+            if (!('id' in req.params) ||
+                !((('lat' in req.body) && ('lng' in req.body)) || ('address' in req.body)) ||
+                !('usr_id' in req.body)) {
+                return res.status(400).json({ status: 'error', content: 'request is missing mandatory fields.' });
+            }
+            var id = req.params.id,
+                locationGroup;
             models.LocationGroup.find({
                 where: {
                     owner_id: req.user.id,
                     external_id: id
                 }
-            }).then(function(locationGroup) {
-                //logger.info(locationGroup);
-                console.log(locationGroup);
-                // Add vote in LocationGroup
-                locationGroup.saveLocation(req).then(function() {
-                  res.end();
-                });
+            }).then(function(locGroup) {
+                if (locGroup === null) {
+                    res.status(400).json({ status: 'error', content: "requested location group doesn't exist." });
+                    return;
+                }
+                locationGroup = locGroup;
+                if ('lat' in req.body && 'lng' in req.body) {
+                    return req;
+                } else if ('address' in req.body) {
+                    return rp({
+                        uri: 'http://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(req.body.address),
+                        headers: {
+                            'User-Agent': 'Request-Promise'
+                        },
+                        json: true
+                    }).then(function (coords) {
+                        req.body.lat = coords[0].lat;
+                        req.body.lng = coords[0].lon;
+                        req.body.precision = null;
+                        return req;
+                    });
+                }
+            }).then(function(req) {
+                if (req) {
+                    // Add vote in LocationGroup
+                    return locationGroup.saveLocation(req).then(function() {
+                        res.json({ status: 'ok'});
+                    });
+                }
+            }).catch(function (err) {
+                if (err && err.name == 'SequelizeUniqueConstraintError' &&
+                    ((err.errors && err.errors.constructor === Array && err.errors[0].path == 'usr_id') ||
+                    (err.message.indexOf('_usr_id_key') > -1))) {
+                    logger.info('Duplicated user id for location in a location group: ' + err);
+                    return res.status(400).json({ status: 'error', content: 'duplicated user id for location group.' });
+                }
+                logger.error("Error while saving a location in a location group: " + err);
+                return res.status(500).json({ status: 'error', content: 'the server experienced an internal error.' });
             });
         }
     );
@@ -402,20 +445,69 @@ module.exports = function(app) {
     app.get('/api/locationgroup/:id', passport.authenticate('api'),
         function(req, res, next) {
             var id = req.params.id;
-
             models.LocationGroup.find({
                 where: {
                     owner_id: req.user.id,
                     external_id: id
                 }
             }).then(function(locationGroup) {
+                if (locationGroup === null) {
+                    return res.status(400).json({ status: 'error', content: "requested location group doesn't exist." });
+                }
+                return locationGroup.getLocations().then(function(locations) {
+                    return res.json(postGISQueryToFeatureCollection(locations));
+                });
+            }).catch(function (err) {
+                logger.error("Error while retrieving locations from a location group: " + err);
+                return res.status(500).json({ status: 'error', content: 'the server experienced an internal error.' });
+            });
+        }
+    );
 
-                  if (locationGroup === null) {
-                      return res.end();
-                  }
-                  locationGroup.getLocations().then(function(locations) {
-                    res.json(postGISQueryToFeatureCollection(locations));
-                  });
+    app.get('/api/madrid/test',
+        function(req, res, next) {
+            sequelize.query('SELECT st_asgeojson(geom) as geojson, nombre, codbar, coddistrit, poblacion::int, trunc(random() * poblacion + 1) as apoyos FROM base_layers.madrid_barrios;', {
+                type: sequelize.QueryTypes.SELECT
+            }).then(function(features) {
+                var results = [];
+                if (features && features.length > 0) {
+                    if ('geojson' in features[0]) {
+                        results = postGISQueryToFeatureCollection(features);
+                    } else {
+                        results = features;
+                    }
+                }
+                res.json(results);
+            });
+        }
+    );
+
+    app.get('/api/randomMadrid',
+        function(req, res, next) {
+            sequelize.query("select st_asgeojson(RandomPoint(geom)) as geojson from base_layers.municipalities where name = 'Madrid';", {
+                type: sequelize.QueryTypes.SELECT
+            }).then(function(features) {
+                var result = postGISQueryToFeatureCollection(features),
+                    coords = result.features[0].geometry.coordinates;
+                rp({
+                    uri: 'http://nominatim.openstreetmap.org/reverse?format=json&lat=' + coords[1] + '&lon=' + coords[0] + '&zoom=18',
+                    headers: {
+                        'User-Agent': 'Request-Promise'
+                    },
+                    json: true
+                }).then(function (address) {
+                    res.json(address);
+                }).catch(function (err) {
+                    res.status(500);
+                });
+            });
+        }
+    );
+
+    app.get('/api/test', passport.authenticate('api'),
+        function(req, res, next) {
+            res.json({
+                prueba: 'prueba'
             });
         }
     );
