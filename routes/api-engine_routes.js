@@ -464,6 +464,52 @@ module.exports = function(app) {
         }
     );
 
+    app.get('/api/locationgroup/:id/totals/:layer', passport.authenticate('api'),
+        function(req, res, next) {
+            var id = req.params.id,
+                layer = req.params.layer,
+                params = req.query;
+            models.LocationGroup.find({
+                where: {
+                    owner_id: req.user.id,
+                    external_id: id
+                }
+            }).then(function(locationGroup) {
+                if (locationGroup === null) {
+                    return res.status(400).json({ status: 'error', content: "requested location group doesn't exist." });
+                }
+                return locationGroup.getAggregatedTotals(layer, params).then(function(features) {
+                    var results = [];
+                    if (features && features.length > 0) {
+                        if ('geojson' in features[0]) {
+                            results = postGISQueryToFeatureCollection(features);
+                        } else {
+                            results = features;
+                        }
+                    }
+                    res.json(results);
+                });
+            }).catch(function(err) {
+                var errorMsg;
+                switch (err.message) {
+                    case 'INVALID GEOM TYPE':
+                        errorMsg = 'requested invalid geom type.';
+                        logger.info("Requested invalid aggregation by geom type '" + params.geom + "' for base layer '" + layer + "'.");
+                        break;
+                    case 'INVALID BASE LAYER':
+                        errorMsg = 'requested invalid base layer.';
+                        logger.info("Requested invalid aggregation by base layer '" + layer + "'.");
+                        break;
+                    default:
+                        errorMsg = 'an error happened while aggregating the data.';
+                        logger.info("Requested aggregation by geom type '" + params.geom + "' for base layer '" + layer + "' raised error: " + err.message);
+                }
+                logger.error("Error while retrieving locations from a location group: " + err);
+                return res.status(500).json({ status: 'error', content: 'the server experienced an internal error.' });
+            });
+        }
+    );
+
     app.get('/api/madrid/test',
         function(req, res, next) {
             sequelize.query('SELECT st_asgeojson(geom) as geojson, nombre, codbar, coddistrit, poblacion::int, trunc(random() * poblacion + 1) as apoyos FROM base_layers.madrid_barrios;', {

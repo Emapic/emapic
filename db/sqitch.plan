@@ -14,3 +14,4 @@ api_fields 2016-11-23T12:46:18Z arnaupc <arnaupc@hotmail.com> # Add API fields t
 add_locations_tables 2016-11-23T18:39:50Z Jorge López Fernández <jlopez@emapic.es> # Add locations schema & tables\n\nNow we'll support storage of plain locations,\nso we add a new metadata table and a schema
 add_madrid_layers 2016-11-26T15:03:23Z Jorge López Fernández <jlopez@emapic.es> # Added layers with Madrid districts & neighborhoods
 add_random_point_function 2016-11-29T15:58:45Z Jorge López Fernández <jlopez@emapic.es> # Add random points function\n\nCustom function for obtaining random points from\na polygon. There is a very small chance it won't\nwork.
+rename_madrid_nombre_columns 2016-11-29T17:10:05Z Jorge López Fernández <jlopez@emapic.es> # Rename Madrid's layers nombre to name

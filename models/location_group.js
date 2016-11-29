@@ -96,6 +96,73 @@ module.exports = function(sequelize, DataTypes) {
                 return sequelize.query("SELECT (extract(epoch from timestamp) * 1000)::bigint as timestamp, st_asgeojson(geom) as geojson, usr_id FROM locations.location_group_" + id,
                     { type: sequelize.QueryTypes.SELECT }
                 );
+            },
+
+            getAggregatedTotals: function(layer, params) {
+                var locationGroup = this,
+                    geom,
+                    sql1,
+                    sql2;
+                params.geom = params.geom || 'simple';
+                switch (layer) {
+                    case 'countries':
+                        sql1 = "SELECT lower(a.iso_code_2) AS iso_code, count(b.gid) AS total_locations";
+                        sql2 = " FROM base_layers.countries a JOIN base_layers.provinces c ON a.gid = c.country_gid JOIN locations.location_group_" + locationGroup.id + " b ON c.gid = b.province_gid GROUP BY a.gid ORDER BY total_locations DESC, iso_code ASC;";
+                        break;
+                    case 'provinces':
+                        sql1 = "SELECT gns_adm1 AS country_id, iso_3166_2 AS iso_code, adm1_code as adm_code, type_en AS adm_type, lower(iso_a2) AS country_iso_code, count(b.gid) AS total_locations";
+                        sql2 = " FROM base_layers.provinces a JOIN locations.location_group_" + locationGroup.id + " b ON a.gid = b.province_gid GROUP BY a.gid ORDER BY total_locations DESC, a.name ASC;";
+                        break;
+                    case 'madrid_barrios':
+                        if (params.geom == 'simple') {
+                            params.geom = 'full';
+                        }
+                        sql1 = "SELECT name, codbar as cod_barrio, coddistrit as cod_distrito, codbarrio as cod_total, poblacion as population, count(b.gid) AS total_locations";
+                        sql2 = " FROM base_layers.madrid_barrios a JOIN locations.location_group_" + locationGroup.id + " b ON a.gid = b.madrid_barrio_gid GROUP BY a.gid ORDER BY total_locations DESC, a.name ASC;";
+                        break;
+                    case 'madrid_distritos':
+                        if (params.geom == 'simple') {
+                            params.geom = 'full';
+                        }
+                        sql1 = "SELECT a.name, a.coddistrit as cod_distrito, a.poblacion as population, count(c.gid) AS total_locations";
+                        sql2 = " FROM base_layers.madrid_distritos a JOIN base_layers.madrid_barrios b ON a.coddistrit = b.coddistrit JOIN locations.location_group_" + locationGroup.id + " c ON b.gid = c.madrid_barrio_gid GROUP BY a.gid ORDER BY total_locations DESC, a.name ASC;";
+                        break;
+                    default:
+                        return Promise.reject(new Error('INVALID BASE LAYER'));
+                }
+                if ('geom' in params) {
+                    switch (params.geom) {
+                        case 'simple':
+                            geom = ', st_asgeojson(a.simp_geom) as geojson';
+                            break;
+                        case 'full':
+                            geom = ', st_asgeojson(a.geom) as geojson';
+                            break;
+                        case 'bbox':
+                            geom = ', st_asgeojson(st_envelope(a.geom)) as geojson';
+                            break;
+                        case 'centroid':
+                            geom = ', st_asgeojson(st_centroid(a.geom)) as geojson';
+                            break;
+                        case 'none':
+                            geom = '';
+                            break;
+                        default:
+                            return Promise.reject(new Error('INVALID GEOM TYPE'));
+                    }
+                }
+                if ('lang' in params) {
+                    namePromise = checkColumnExists('name_' + params.lang, layer, 'base_layers').then(function(result) {
+                        return (result[0].exists) ? 'name_' + params.lang : 'name';
+                    });
+                } else {
+                    namePromise = Promise.resolve('name');
+                }
+                return namePromise.then(function(nameCol) {
+                    var query = sql1 + ', a.' + nameCol + ' AS name';
+                    query += geom + sql2;
+                    return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+                });
             }
         },
         hooks: {
