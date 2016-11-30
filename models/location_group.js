@@ -118,14 +118,14 @@ module.exports = function(sequelize, DataTypes) {
                             params.geom = 'full';
                         }
                         sql1 = "SELECT name, codbar as cod_barrio, coddistrit as cod_distrito, codbarrio as cod_total, poblacion as population, count(b.gid) AS total_locations";
-                        sql2 = " FROM base_layers.madrid_barrios a JOIN locations.location_group_" + locationGroup.id + " b ON a.gid = b.madrid_barrio_gid GROUP BY a.gid ORDER BY total_locations DESC, a.name ASC;";
+                        sql2 = " FROM base_layers.madrid_barrios a LEFT JOIN locations.location_group_" + locationGroup.id + " b ON a.gid = b.madrid_barrio_gid GROUP BY a.gid ORDER BY total_locations DESC, a.name ASC;";
                         break;
                     case 'madrid_distritos':
                         if (params.geom == 'simple') {
                             params.geom = 'full';
                         }
                         sql1 = "SELECT a.name, a.coddistrit as cod_distrito, a.poblacion as population, count(c.gid) AS total_locations";
-                        sql2 = " FROM base_layers.madrid_distritos a JOIN base_layers.madrid_barrios b ON a.coddistrit = b.coddistrit JOIN locations.location_group_" + locationGroup.id + " c ON b.gid = c.madrid_barrio_gid GROUP BY a.gid ORDER BY total_locations DESC, a.name ASC;";
+                        sql2 = " FROM base_layers.madrid_distritos a JOIN base_layers.madrid_barrios b ON a.coddistrit = b.coddistrit LEFT JOIN locations.location_group_" + locationGroup.id + " c ON b.gid = c.madrid_barrio_gid GROUP BY a.gid ORDER BY total_locations DESC, a.name ASC;";
                         break;
                     default:
                         return Promise.reject(new Error('INVALID BASE LAYER'));
