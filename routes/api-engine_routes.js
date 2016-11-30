@@ -369,29 +369,35 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/api/locationgroup', passport.authenticate('api'),
+    app.post('/api/locationgroup/:userlogin', passport.authenticate('api'),
         function(req, res, next) {
+            if (req.user.login != req.params.userlogin) {
+                return res.status(401);
+            }
             models.LocationGroup.createFromPost(req).then(function(locationGroup) {
                 logger.info("Sucessfully created location group");
-                res.json({ status: 'ok'});
+                res.jsonp({ status: 'ok'});
             }).catch(function(err) {
                 if (err && err.name == 'SequelizeUniqueConstraintError' &&
                     ((err.errors && err.errors.constructor === Array && err.errors[0].path == 'external_id') ||
                     (err.message.indexOf('location_groups_external_id_key') > -1))) {
                     logger.info('Duplicated external id for location group: ' + err);
-                    return res.status(400).json({ status: 'error', content: 'duplicated location group external id.' });
+                    return res.status(400).jsonp({ status: 'error', content: 'duplicated location group external id.' });
                 }
-                return res.status(500).json({ status: 'error', content: 'the server experienced an internal error.' });
+                return res.status(500).jsonp({ status: 'error', content: 'the server experienced an internal error.' });
             });
         }
     );
 
-    app.post('/api/locationgroup/:id', passport.authenticate('api'),
+    app.post('/api/locationgroup/:userlogin/:id', passport.authenticate('api'),
         function(req, res, next) {
+            if (req.user.login != req.params.userlogin) {
+                return res.status(401);
+            }
             if (!('id' in req.params) ||
                 !((('lat' in req.body) && ('lng' in req.body)) || ('address' in req.body)) ||
                 !('usr_id' in req.body)) {
-                return res.status(400).json({ status: 'error', content: 'request is missing mandatory fields.' });
+                return res.status(400).jsonp({ status: 'error', content: 'request is missing mandatory fields.' });
             }
             var id = req.params.id,
                 locationGroup;
@@ -402,7 +408,7 @@ module.exports = function(app) {
                 }
             }).then(function(locGroup) {
                 if (locGroup === null) {
-                    res.status(400).json({ status: 'error', content: "requested location group doesn't exist." });
+                    res.status(404).jsonp({ status: 'error', content: "requested location group doesn't exist." });
                     return;
                 }
                 locationGroup = locGroup;
@@ -426,7 +432,7 @@ module.exports = function(app) {
                 if (req) {
                     // Add vote in LocationGroup
                     return locationGroup.saveLocation(req).then(function() {
-                        res.json({ status: 'ok'});
+                        res.jsonp({ status: 'ok'});
                     });
                 }
             }).catch(function (err) {
@@ -434,78 +440,84 @@ module.exports = function(app) {
                     ((err.errors && err.errors.constructor === Array && err.errors[0].path == 'usr_id') ||
                     (err.message.indexOf('_usr_id_key') > -1))) {
                     logger.info('Duplicated user id for location in a location group: ' + err);
-                    return res.status(400).json({ status: 'error', content: 'duplicated user id for location group.' });
+                    return res.status(400).jsonp({ status: 'error', content: 'duplicated user id for location group.' });
                 }
                 logger.error("Error while saving a location in a location group: " + err);
-                return res.status(500).json({ status: 'error', content: 'the server experienced an internal error.' });
+                return res.status(500).jsonp({ status: 'error', content: 'the server experienced an internal error.' });
             });
         }
     );
 
-    app.get('/api/locationgroup/:id', passport.authenticate('api'),
+    app.get('/api/locationgroup/:userlogin/:id',
         function(req, res, next) {
-            var id = req.params.id;
-            models.LocationGroup.find({
-                where: {
-                    owner_id: req.user.id,
-                    external_id: id
+            models.User.scope({method: ['findByLogin', req.params.userlogin]}).findOne().then(function(usr) {
+                if (usr === null) {
+                    res.status(404).jsonp({ status: 'error', content: "requested location group doesn't exist." });
                 }
-            }).then(function(locationGroup) {
-                if (locationGroup === null) {
-                    return res.status(400).json({ status: 'error', content: "requested location group doesn't exist." });
-                }
-                return locationGroup.getLocations().then(function(locations) {
-                    return res.json(postGISQueryToFeatureCollection(locations));
-                });
-            }).catch(function (err) {
-                logger.error("Error while retrieving locations from a location group: " + err);
-                return res.status(500).json({ status: 'error', content: 'the server experienced an internal error.' });
-            });
-        }
-    );
-
-    app.get('/api/locationgroup/:id/totals/:layer', passport.authenticate('api'),
-        function(req, res, next) {
-            var id = req.params.id,
-                layer = req.params.layer,
-                params = req.query;
-            models.LocationGroup.find({
-                where: {
-                    owner_id: req.user.id,
-                    external_id: id
-                }
-            }).then(function(locationGroup) {
-                if (locationGroup === null) {
-                    return res.status(400).json({ status: 'error', content: "requested location group doesn't exist." });
-                }
-                return locationGroup.getAggregatedTotals(layer, params).then(function(features) {
-                    var results = [];
-                    if (features && features.length > 0) {
-                        if ('geojson' in features[0]) {
-                            results = postGISQueryToFeatureCollection(features);
-                        } else {
-                            results = features;
-                        }
+                usr.getLocationGroups({
+                    where: {
+                        external_id: req.params.id
                     }
-                    res.json(results);
+                }).then(function(locationGroups) {
+                    if (locationGroups.length === 0) {
+                        return res.status(404).jsonp({ status: 'error', content: "requested location group doesn't exist." });
+                    }
+                    return locationGroups[0].getLocations().then(function(locations) {
+                        return res.jsonp(postGISQueryToFeatureCollection(locations));
+                    });
+                }).catch(function (err) {
+                    logger.error("Error while retrieving locations from a location group: " + err);
+                    return res.status(500).jsonp({ status: 'error', content: 'the server experienced an internal error.' });
                 });
-            }).catch(function(err) {
-                var errorMsg;
-                switch (err.message) {
-                    case 'INVALID GEOM TYPE':
-                        errorMsg = 'requested invalid geom type.';
-                        logger.info("Requested invalid aggregation by geom type '" + params.geom + "' for base layer '" + layer + "'.");
-                        break;
-                    case 'INVALID BASE LAYER':
-                        errorMsg = 'requested invalid base layer.';
-                        logger.info("Requested invalid aggregation by base layer '" + layer + "'.");
-                        break;
-                    default:
-                        errorMsg = 'an error happened while aggregating the data.';
-                        logger.info("Requested aggregation by geom type '" + params.geom + "' for base layer '" + layer + "' raised error: " + err.message);
+            });
+        }
+    );
+
+    app.get('/api/locationgroup/:userlogin/:id/totals/:layer',
+        function(req, res, next) {
+            var layer = req.params.layer,
+                params = req.query;
+            models.User.scope({method: ['findByLogin', req.params.userlogin]}).findOne().then(function(usr) {
+                if (usr === null) {
+                    res.status(404).jsonp({ status: 'error', content: "requested location group doesn't exist." });
                 }
-                logger.error("Error while retrieving locations from a location group: " + err);
-                return res.status(500).json({ status: 'error', content: 'the server experienced an internal error.' });
+                usr.getLocationGroups({
+                    where: {
+                        external_id: req.params.id
+                    }
+                }).then(function(locationGroups) {
+                    if (locationGroups.length === 0) {
+                        return res.status(400).jsonp({ status: 'error', content: "requested location group doesn't exist." });
+                    }
+                    return locationGroups[0].getAggregatedTotals(layer, params).then(function(features) {
+                        var results = [];
+                        if (features && features.length > 0) {
+                            if ('geojson' in features[0]) {
+                                results = postGISQueryToFeatureCollection(features);
+                            } else {
+                                results = features;
+                            }
+                        }
+                        res.jsonp(results);
+                    });
+                }).catch(function(err) {
+                    var errorMsg = 'the server experienced an internal error.';
+                    switch (err.message) {
+                        case 'INVALID GEOM TYPE':
+                            errorMsg = 'requested invalid geom type.';
+                            logger.info("Requested invalid aggregation by geom type '" + params.geom + "' for base layer '" + layer + "'.");
+                            break;
+                        case 'INVALID BASE LAYER':
+                            errorMsg = 'requested invalid base layer.';
+                            logger.info("Requested invalid aggregation by base layer '" + layer + "'.");
+                            break;
+                        default:
+                            errorMsg = 'an error happened while aggregating the data.';
+                            logger.info("Requested aggregation by geom type '" + params.geom + "' for base layer '" + layer + "' raised error: " + err.message);
+                    }
+                    logger.error("Error while retrieving locations from a location group: " + err);
+                    return res.status(500).jsonp({ status: 'error', content: errorMsg });
+                });
             });
         }
     );
@@ -523,7 +535,7 @@ module.exports = function(app) {
                         results = features;
                     }
                 }
-                res.json(results);
+                res.jsonp(results);
             });
         }
     );
@@ -542,7 +554,7 @@ module.exports = function(app) {
                     },
                     json: true
                 }).then(function (address) {
-                    res.json(address);
+                    res.jsonp(address);
                 }).catch(function (err) {
                     res.status(500);
                 });
@@ -552,7 +564,7 @@ module.exports = function(app) {
 
     app.get('/api/test', passport.authenticate('api'),
         function(req, res, next) {
-            res.json({
+            res.jsonp({
                 prueba: 'prueba'
             });
         }
