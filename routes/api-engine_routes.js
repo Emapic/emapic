@@ -395,8 +395,7 @@ module.exports = function(app) {
                 return res.status(401);
             }
             if (!('id' in req.params) ||
-                !((('lat' in req.body) && ('lng' in req.body)) || ('address' in req.body)) ||
-                !('usr_id' in req.body)) {
+                !((('lat' in req.body) && ('lng' in req.body)) || ('address' in req.body))) {
                 return res.status(400).jsonp({ status: 'error', content: 'request is missing mandatory fields.' });
             }
             var id = req.params.id,
@@ -479,7 +478,7 @@ module.exports = function(app) {
                 params = req.query;
             models.User.scope({method: ['findByLogin', req.params.userlogin]}).findOne().then(function(usr) {
                 if (usr === null) {
-                    res.status(404).jsonp({ status: 'error', content: "requested location group doesn't exist." });
+                    return res.status(404).jsonp({ status: 'error', content: "requested location group doesn't exist." });
                 }
                 usr.getLocationGroups({
                     where: {
@@ -558,14 +557,6 @@ module.exports = function(app) {
                 }).catch(function (err) {
                     res.status(500);
                 });
-            });
-        }
-    );
-
-    app.get('/api/test', passport.authenticate('api'),
-        function(req, res, next) {
-            res.jsonp({
-                prueba: 'prueba'
             });
         }
     );
