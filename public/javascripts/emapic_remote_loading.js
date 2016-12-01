@@ -6,6 +6,25 @@ var emapic = emapic || {};
 
 (function(emapic) {
 
+    emapic.dependencies = emapic.dependencies || [];
+
+    emapic.leafletDep = emapic.leafletDep || function() {
+        var leaflet = $.Deferred();
+        if (typeof L === 'undefined') {
+            $('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css') );
+            $.getScript("https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js", function() {
+                leaflet.resolve(true);
+            });
+        } else {
+            leaflet.resolve(true);
+        }
+        return leaflet;
+    }();
+
+    if (!(emapic.leafletDep in emapic.dependencies)) {
+        emapic.dependencies.push(emapic.leafletDep);
+    }
+
     var maps = {},
         emapicServer = (function() {
         var scripts = document.getElementsByTagName("script"),
@@ -68,6 +87,19 @@ var emapic = emapic || {};
         }
     }
 
+    emapic.loadEmapicMapsLoadDependencies = function() {
+        var leaflet = $.Deferred();
+
+        if (typeof L === 'undefined') {
+            $('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css') );
+            $.getScript("https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js");
+        } else {
+            leaflet.resolve(true);
+        }
+
+        return $.when( leaflet );
+    };
+
     emapic.loadEmapicMaps = function() {
         $('.emapic-map.location-group').each(function(idx) {
             var $map = $(this),
@@ -77,9 +109,9 @@ var emapic = emapic || {};
             if (userLogin !== null && locationGroupId !== null) {
                 var osmMap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
                     landMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'),
-                    indivLayer = L.geoJSON(),
-                    barriosLayer = L.geoJSON(),
-                    distritosLayer = L.geoJSON(),
+                    indivLayer = L.geoJson(),
+                    barriosLayer = L.geoJson(),
+                    distritosLayer = L.geoJson(),
                     map = L.map(this, {
                       layers: [osmMap, indivLayer],
                       scrollWheelZoom: false,
@@ -144,4 +176,6 @@ var emapic = emapic || {};
     };
 })(emapic);
 
-$(emapic.loadEmapicMaps);
+$(function() {
+    $.when.apply($, emapic.dependencies).then(emapic.loadEmapicMaps);
+});
