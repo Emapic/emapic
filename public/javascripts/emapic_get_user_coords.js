@@ -96,9 +96,9 @@ var emapic = emapic || {};
         };
     });
 
-    emapic.btnSelector = null;
+    emapic.btnSelector = emapic.btnSelector || null;
 
-    emapic.processUserLatLng = function(lat, lng)  {
+    emapic.processUserLatLng = emapic.processUserLatLng || function(lat, lng)  {
     };
 
     emapic.prepareEmapicGetUserCoordsSupport = function() {
