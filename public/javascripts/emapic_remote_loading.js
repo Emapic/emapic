@@ -75,9 +75,7 @@ var emapic = emapic || {};
     function addLayerData(map, layer, data) {
         if (data.status != 'error') {
           layer.addData(data);
-          if (layer.getLayers().length === 0) {
-            map.setView([40.4167, -3.7037], 13);
-          } else {
+          if (layer.getLayers().length !== 0) {
             $(map.getContainer()).show();
             map.fitBounds(layer.getBounds(),
             {
@@ -126,6 +124,8 @@ var emapic = emapic || {};
                     "Barrios": barriosLayer,
                     "Distritos": distritosLayer,
                 }).addTo(map);
+                $(map.getContainer()).show();
+                map.setView([40.4167, -3.7037], 13);
                 loadIndivLayer(map, indivLayer, userLogin, locationGroupId);
                 loadBarriosLayer(map, barriosLayer, userLogin, locationGroupId);
                 loadDistritosLayer(map, distritosLayer, userLogin, locationGroupId);
