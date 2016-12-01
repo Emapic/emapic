@@ -317,7 +317,7 @@ var emapic = emapic || {};
         emapic.legendBarrios = L.control({position: 'bottomleft'});
         emapic.legendDistritos = L.control({position: 'bottomleft'});
         emapic.loadDataIndivLayerCluster = L.markerClusterGroup({
-          showCoverageOnHover: false,
+          showCoverageOnHover: true,
           spiderfyOnMaxZoom: true,
           removeOutsideVisibleBounds: true
         });
