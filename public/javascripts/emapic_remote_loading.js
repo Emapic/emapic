@@ -83,6 +83,22 @@ var emapic = emapic || {};
         emapic.dependencies.push(emapic.leafletGroupedLayer);
     }
 
+    emapic.d3Dep = emapic.d3Dep || function() {
+        var deferred = $.Deferred();
+        if (typeof d3 === 'undefined') {
+            $.getScript("https://d3js.org/d3.v4.min.js", function() {
+                deferred.resolve(true);
+            });
+        } else {
+            deferred.resolve(true);
+        }
+        return deferred;
+    }();
+
+    if (!(emapic.d3Dep in emapic.dependencies)) {
+        emapic.dependencies.push(emapic.d3Dep);
+    }
+
     emapic.callbacks = [];
 
     function loadIndivLayer(map, layer, userLogin, locationGroupId) {
