@@ -10,6 +10,18 @@ var emapic = emapic || {};
         var scripts = document.getElementsByTagName("script"),
             fullPath = scripts[scripts.length-1].src,
             parser = document.createElement('a');
+        // Workaround for a strange bug in Firefox where
+        // after following a link it returns all the script tags
+        // instead of only the already loaded ones
+        if (!(fullPath.endsWith('emapic_get_user_coords.js'))) {
+            fullPath = '';
+            for (var i = 0, len = scripts.length; i<len; i++) {
+                if (scripts[i].src.endsWith('emapic_remote_loading.js')) {
+                    fullPath = scripts[i].src;
+                    break;
+                }
+            }
+        }
         parser.href = fullPath;
         return parser.origin;
     })();
