@@ -117,8 +117,8 @@ var emapic = emapic || {};
         $.getScript(emapicServer + "/api/locationgroup/" + userLogin + "/" + locationGroupId + "?callback=emapic.callbacks[" + (emapic.callbacks.length - 1) + "]");
     }
 
-    function reloadIndivLayer(map, layer, userLogin, locationGroupId) {
-        layer.clearLayers();
+    function reloadIndivLayer(map, clusterLayer, layer, userLogin, locationGroupId) {
+        clusterLayer.clearLayers();
         loadIndivLayer(map, layer, userLogin, locationGroupId);
     }
 
@@ -143,7 +143,9 @@ var emapic = emapic || {};
             {
                padding: [10, 10]
             });
-            map.addControl(emapic.legendBarrios);
+            if (map.hasLayer(layer) && typeof emapic.legendBarrios._map == 'undefined') {
+                map.addControl(emapic.legendBarrios);
+            }
           }
         });
         $.getScript(emapicServer + "/api/locationgroup/" + userLogin + "/" + locationGroupId + "/totals/madrid_barrios?callback=emapic.callbacks[" + (emapic.callbacks.length - 1) + "]");
@@ -438,6 +440,7 @@ var emapic = emapic || {};
                     maps[mapId] = {
                         'map' : map,
                         'indivLayer': indivLayer,
+                        'clusterLayer': emapic.loadDataIndivLayerCluster,
                         'barriosLayer': barriosLayer,
                         'distritosLayer': distritosLayer
                     };
@@ -463,13 +466,14 @@ var emapic = emapic || {};
         if (mapId in maps) {
             var map = maps[mapId].map,
                 indivLayer = maps[mapId].indivLayer,
+                clusterLayer = maps[mapId].clusterLayer,
                 barriosLayer = maps[mapId].barriosLayer,
                 distritosLayer = maps[mapId].distritosLayer,
                 $map = $(map.getContainer()),
                 userLogin = $map.attr('emapic-login'),
                 locationGroupId = $map.attr('emapic-location-group-id');
             if (userLogin !== null && locationGroupId !== null) {
-                reloadIndivLayer(map, indivLayer, userLogin, locationGroupId);
+                reloadIndivLayer(map, clusterLayer, indivLayer, userLogin, locationGroupId);
                 reloadBarriosLayer(map, barriosLayer, userLogin, locationGroupId);
                 reloadDistritosLayer(map, distritosLayer, userLogin, locationGroupId);
             }
@@ -480,13 +484,14 @@ var emapic = emapic || {};
         for (var mapId in maps) {
             var map = maps[mapId].map,
                 indivLayer = maps[mapId].indivLayer,
+                clusterLayer = maps[mapId].clusterLayer,
                 barriosLayer = maps[mapId].barriosLayer,
                 distritosLayer = maps[mapId].distritosLayer,
                 $map = $(map.getContainer()),
                 userLogin = $map.attr('emapic-login'),
                 locationGroupId = $map.attr('emapic-location-group-id');
             if (userLogin !== null && locationGroupId !== null) {
-                reloadIndivLayer(map, indivLayer, userLogin, locationGroupId);
+                reloadIndivLayer(map, clusterLayer, indivLayer, userLogin, locationGroupId);
                 reloadBarriosLayer(map, barriosLayer, userLogin, locationGroupId);
                 reloadDistritosLayer(map, distritosLayer, userLogin, locationGroupId);
             }
