@@ -84,7 +84,7 @@ module.exports = function(sequelize, DataTypes) {
                     }
                     var body = req.body,
                         insert_query = 'INSERT INTO locations.location_group_' + locationGroup.id + ' (usr_id, precision, address, timestamp, geom) VALUES (?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326))',
-                        insert_params = [body.usr_id, body.precision, ('address' in body) ? body.address : null, dateUtc, body.lng, body.lat];
+                        insert_params = [('usr_id' in body && body.usr_id.trim() !== '') ? body.usr_id : null, body.precision, ('address' in body) ? body.address : null, dateUtc, body.lng, body.lat];
                     return sequelize.query(insert_query,
                         { replacements: insert_params, type: sequelize.QueryTypes.INSERT }
                     );
