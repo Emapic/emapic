@@ -99,6 +99,18 @@ var emapic = emapic || {};
         emapic.dependencies.push(emapic.d3Dep);
     }
 
+    emapic.emapicUtilsDep = emapic.emapicUtilsDep || function() {
+        var defer = $.Deferred();
+        $.getScript(emapicServer + "/javascripts/emapic_utils.js", function() {
+            defer.resolve(true);
+        });
+        return defer;
+    }();
+
+    if (!(emapic.emapicUtilsDep in emapic.dependencies)) {
+        emapic.dependencies.push(emapic.emapicUtilsDep);
+    }
+
     emapic.callbacks = [];
 
     function loadIndivLayer(map, layer, userLogin, locationGroupId) {
@@ -379,12 +391,17 @@ var emapic = emapic || {};
                 mapId = $map.attr('id'),
                 locationGroupId = $map.attr('emapic-location-group-id');
             if (userLogin !== null && locationGroupId !== null) {
-                var osmMap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-                    landMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'),
+                var osmMap = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution : 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+                    }),
+                    landMap = new L.TileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	                    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                    }),
                     indivLayer = L.geoJson(),
                     barriosLayer = L.geoJson(),
                     distritosLayer = L.geoJson(),
                     map = L.map(this, {
+                      attributionControl: false,
                       layers: [osmMap, emapic.loadDataIndivLayerCluster, barriosLayer],
                       scrollWheelZoom: false,
                       maxZoom: 18,
@@ -395,15 +412,18 @@ var emapic = emapic || {};
                       "Landscape": landMap
                     },
                     groupedOverlays = {
-                    '': {
-                      'Apoyos': emapic.loadDataIndivLayerCluster,
-                    },
-                    'Zonas': {
-                      'Barrios': barriosLayer,
-                      'Distritos': distritosLayer,
-                      'Ninguna': L.layerGroup()
-                    }
-                };
+                        '': {
+                          'Apoyos': emapic.loadDataIndivLayerCluster,
+                        },
+                        'Zonas': {
+                          'Barrios': barriosLayer,
+                          'Distritos': distritosLayer,
+                          'Ninguna': L.layerGroup()
+                        }
+                    };
+                map.addControl(L.control.attribution({
+                    prefix: '<a href="' + emapicServer + '/legal/terms" title="' + emapic.utils.getI18n('js_open_legal_terms_another_tab', 'Abrir cláusulas legales en otra pestaña') + '" target="_blank">' + emapic.utils.getI18n('js_emapic_legal_terms', 'Cláusulas legales de emapic') + '</a> | <a title="A JS library for interactive maps" href="http://leafletjs.com">Leaflet</a>'
+                }));
 
                 var options = {
                     // Make the "Landmarks" group exclusive (use radio inputs)

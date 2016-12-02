@@ -201,7 +201,7 @@ var emapic = emapic || {};
                 zoomOutTitle: emapic.utils.getI18n('js_zoom_out', 'Zoom menos'),
             }));
             emapic.userLocationMap.addControl(L.control.attribution({
-                prefix: '<a href="/legal/terms" title="' + emapic.utils.getI18n('js_open_legal_terms_another_tab', 'Abrir cláusulas legales en otra pestaña') + '" target="_blank">' + emapic.utils.getI18n('js_emapic_legal_terms', 'Cláusulas legales de emapic') + '</a> | <a title="A JS library for interactive maps" href="http://leafletjs.com">Leaflet</a>'
+                prefix: '<a href="' + emapicServer + '/legal/terms" title="' + emapic.utils.getI18n('js_open_legal_terms_another_tab', 'Abrir cláusulas legales en otra pestaña') + '" target="_blank">' + emapic.utils.getI18n('js_emapic_legal_terms', 'Cláusulas legales de emapic') + '</a> | <a title="A JS library for interactive maps" href="http://leafletjs.com">Leaflet</a>'
             }));
             var geolocationControl = L.control({position: 'topright'});
             geolocationControl.onAdd = function () {
