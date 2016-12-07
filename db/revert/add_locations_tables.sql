@@ -2,7 +2,7 @@
 
 BEGIN;
 
-    DROP SCHEMA locations;
+    DROP SCHEMA locations CASCADE;
 
     DROP TABLE metadata.location_groups;
 
