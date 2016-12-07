@@ -232,7 +232,8 @@ var emapic = emapic || {};
 
     emapic.clearFilters = emapic.utils.overrideFunction(emapic.clearFilters, null, function() {
         var slider = $("#time-slider");
-        if (slider !== null && sliderDates[sliderLevel][0].length > 0) {
+        if (slider !== null && typeof sliderDates[sliderLevel] !== 'undefined' &&
+            sliderDates[sliderLevel][0].length > 0) {
             $("#time-slider").slider('values', [0, sliderDates[sliderLevel][1].length - 1]);
             filterDates = [sliderDates[sliderLevel][0][0], sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]];
             $('.ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
