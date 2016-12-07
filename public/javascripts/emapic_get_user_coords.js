@@ -4,6 +4,48 @@
 
 var emapic = emapic || {};
 
+emapic.dependencies = emapic.dependencies || {};
+
+emapic.dependenciesLoaded = emapic.dependenciesLoaded || function() {
+    var deps = [];
+    for (var name in emapic.dependencies) {
+        deps.push(emapic.dependencies[name]);
+    }
+    return $.when.apply($, deps);
+};
+
+emapic.addDependency = emapic.addDependency || function(name, route, css, dependencies, variableCheck) {
+    if (name in emapic.dependencies) {
+        return;
+    }
+    css = css || [];
+    dependencies = dependencies || [];
+    for (var i = 0, len = css.length; i<len; i++) {
+        $('head').append($('<link rel="stylesheet" type="text/css" />').attr('href', css[i]));
+    }
+    var defer = $.Deferred(),
+        dependenciesDefers = [],
+        args = arguments;
+    if (args.length >= 4) {
+        for (i = 0, len = dependencies.length; i<len; i++) {
+            if (dependencies[i] in emapic.dependencies) {
+                dependenciesDefers.push(emapic.dependencies[dependencies[i]]);
+            }
+        }
+    }
+    $.when.apply($, dependenciesDefers).then(function() {
+        if (args.length == 5) {
+            if (eval('typeof ' + variableCheck) !== 'undefined') {
+                defer.resolve(true);
+            }
+        }
+        $.getScript(route, function() {
+            defer.resolve(true);
+        });
+    });
+    emapic.dependencies[name] = defer;
+};
+
 (function(emapic) {
 
     var emapicServer = (function() {
@@ -26,69 +68,14 @@ var emapic = emapic || {};
         return parser.origin;
     })();
 
-    emapic.dependencies = emapic.dependencies || [];
-    emapic.blockBtn = true;
-    emapic.userLocationMap = null;
+    emapic.addDependency('emapicUtils', emapicServer + '/javascripts/emapic_utils.js', null, 'emapic.utils');
+    emapic.addDependency('emapicGeoapi', emapicServer + '/javascripts/geoapi.js', null, 'emapic.geoapi');
+    emapic.addDependency('leaflet', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js',
+        ['https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css'], null, 'L');
+    emapic.addDependency('jqueryModal', 'https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.8.0/jquery.modal.min.js',
+        ['https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.8.0/jquery.modal.min.css'], null, '$.modal');
 
-    emapic.leafletDep = emapic.leafletDep || function() {
-        var defer = $.Deferred();
-        if (typeof L === 'undefined') {
-            $('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css') );
-            $.getScript("https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js", function() {
-                defer.resolve(true);
-            });
-        } else {
-            defer.resolve(true);
-        }
-        return defer;
-    }();
-
-    if (!(emapic.leafletDep in emapic.dependencies)) {
-        emapic.dependencies.push(emapic.leafletDep);
-    }
-
-    emapic.jqueryModalDep = emapic.jqueryModalDep || function() {
-        var defer = $.Deferred();
-        if (typeof $.modal === 'undefined') {
-            $('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.8.0/jquery.modal.min.css') );
-            $.getScript("https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.8.0/jquery.modal.min.js", function() {
-                defer.resolve(true);
-            });
-        } else {
-            defer.resolve(true);
-        }
-        return defer;
-    }();
-
-    if (!(emapic.jqueryModalDep in emapic.dependencies)) {
-        emapic.dependencies.push(emapic.jqueryModalDep);
-    }
-
-    emapic.emapicUtilsDep = emapic.emapicUtilsDep || function() {
-        var defer = $.Deferred();
-        $.getScript(emapicServer + "/javascripts/emapic_utils.js", function() {
-            defer.resolve(true);
-        });
-        return defer;
-    }();
-
-    if (!(emapic.emapicUtilsDep in emapic.dependencies)) {
-        emapic.dependencies.push(emapic.emapicUtilsDep);
-    }
-
-    emapic.emapicGeoapiDep = emapic.emapicGeoapiDep || function() {
-        var defer = $.Deferred();
-        $.getScript(emapicServer + "/javascripts/geoapi.js", function() {
-            defer.resolve(true);
-        });
-        return defer;
-    }();
-
-    if (!(emapic.emapicGeoapiDep in emapic.dependencies)) {
-        emapic.dependencies.push(emapic.emapicGeoapiDep);
-    }
-
-    $.when(emapic.emapicGeoapiDep).then(function() {
+    $.when(emapic.dependencies.emapicGeoapi).then(function() {
         emapic.geoapi.afterGeopos = function() {
             var position = [emapic.geoapi.geoapiLat, emapic.geoapi.geoapiLon];
             emapic.setMarker(position);
@@ -96,40 +83,42 @@ var emapic = emapic || {};
         };
     });
 
+    emapic.blockBtn = true;
+    emapic.userLocationMap = null;
     emapic.btnSelector = emapic.btnSelector || null;
 
     emapic.processUserLatLng = emapic.processUserLatLng || function(lat, lng)  {
     };
 
     emapic.prepareEmapicGetUserCoordsSupport = function() {
-        $('head').append('<style>\
-            #emapic-user-location #geolocation-control {\
-                padding: 0 4px;\
-                width: inherit;\
-            }\
-            #emapic-user-location {\
-                width: 100%;\
-                height: 300px;\
-                margin-bottom: 10px;\
-            }\
-            #user-location-btns {\
-                text-align: center;\
-            }\
-            #user-location-btns > a {\
-                margin-bottom: 0;\
-            }\
-            #user-location-ok {\
-                margin-right: 25px;\
-            }\
-        </style>');
+        $('head').append('<style>' +
+            '#emapic-user-location #geolocation-control {' +
+                'padding: 0 4px;' +
+                'width: inherit;' +
+            '}' +
+            '#emapic-user-location {' +
+                'width: 100%;' +
+                'height: 300px;' +
+                'margin-bottom: 10px;' +
+            '}' +
+            '#user-location-btns {' +
+                'text-align: center;' +
+            '}' +
+            '#user-location-btns > a {' +
+                'margin-bottom: 0;' +
+            '}' +
+            '#user-location-ok {' +
+                'margin-right: 25px;' +
+            '}' +
+        '</style>');
 
-        $('body').append('<div id="user-location" class="modal" style="display: none;">\
-            <div id="emapic-user-location"></div>\
-            <div id="user-location-btns">\
-                <a id="user-location-ok" disabled class="button" href="#">Aceptar</a>\
-                <a id="user-location-cancel" class="button" href="#" rel="modal:close">No quiero compartir mi posición</a>\
-            </div>\
-        </div>');
+        $('body').append('<div id="user-location" class="modal" style="display: none;">' +
+            '<div id="emapic-user-location"></div>' +
+            '<div id="user-location-btns">' +
+                '<a id="user-location-ok" disabled class="button" href="#">Aceptar</a>' +
+                '<a id="user-location-cancel" class="button" href="#" rel="modal:close">No quiero compartir mi posición</a>' +
+            '</div>' +
+        '</div>');
 
         $('#user-location').on($.modal.AFTER_CLOSE, function(event, modal) {
             emapic.blockBtn = false;
@@ -235,7 +224,7 @@ var emapic = emapic || {};
 
 $(function() {
     if (emapic.btnSelector !== null) {
-        $.when.apply($, emapic.dependencies).then(function() {
+        emapic.dependenciesLoaded().then(function() {
             emapic.prepareEmapicGetUserCoordsSupport();
             $(emapic.btnSelector).attr('disabled', false);
         });

@@ -4,6 +4,48 @@
 
 var emapic = emapic || {};
 
+emapic.dependencies = emapic.dependencies || {};
+
+emapic.dependenciesLoaded = emapic.dependenciesLoaded || function() {
+    var deps = [];
+    for (var name in emapic.dependencies) {
+        deps.push(emapic.dependencies[name]);
+    }
+    return $.when.apply($, deps);
+};
+
+emapic.addDependency = emapic.addDependency || function(name, route, css, dependencies, variableCheck) {
+    if (name in emapic.dependencies) {
+        return;
+    }
+    css = css || [];
+    dependencies = dependencies || [];
+    for (var i = 0, len = css.length; i<len; i++) {
+        $('head').append($('<link rel="stylesheet" type="text/css" />').attr('href', css[i]));
+    }
+    var defer = $.Deferred(),
+        dependenciesDefers = [],
+        args = arguments;
+    if (args.length >= 4) {
+        for (i = 0, len = dependencies.length; i<len; i++) {
+            if (dependencies[i] in emapic.dependencies) {
+                dependenciesDefers.push(emapic.dependencies[dependencies[i]]);
+            }
+        }
+    }
+    $.when.apply($, dependenciesDefers).then(function() {
+        if (args.length == 5) {
+            if (eval('typeof ' + variableCheck) !== 'undefined') {
+                defer.resolve(true);
+            }
+        }
+        $.getScript(route, function() {
+            defer.resolve(true);
+        });
+    });
+    emapic.dependencies[name] = defer;
+};
+
 (function(emapic) {
 
     var maps = {},
@@ -27,7 +69,14 @@ var emapic = emapic || {};
         return parser.origin;
     })();
 
-    emapic.dependencies = emapic.dependencies || [];
+    emapic.addDependency('emapicUtils', emapicServer + '/javascripts/emapic_utils.js', null, 'emapic.utils');
+    emapic.addDependency('leaflet', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js',
+        ['https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css'], null, 'L');
+    emapic.addDependency('leafletMarkerCluster', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/leaflet.markercluster.js',
+        ['https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/MarkerCluster.css', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/MarkerCluster.Default.css'], ['leaflet']);
+    emapic.addDependency('leafletGroupedLayerControl', 'https://cdn.jsdelivr.net/leaflet.groupedlayercontrol/0.5.0/leaflet.groupedlayercontrol.min.js', null, ['leaflet']);
+    emapic.addDependency('d3', 'https://d3js.org/d3.v4.min.js', null, null, 'd3');
+
     emapic.loadDataMap = null;
     emapic.loadDataIndivLayer = null;
     emapic.loadDataIndivLayerCluster = null;
@@ -35,81 +84,6 @@ var emapic = emapic || {};
     emapic.loadDataDistritosLayer = null;
     emapic.legendBarrios = null;
     emapic.legendDistritos = null;
-
-    emapic.leafletDep = emapic.leafletDep || function() {
-        var deferred = $.Deferred();
-        if (typeof L === 'undefined') {
-            $('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css') );
-            $.getScript("https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js", function() {
-                deferred.resolve(true);
-            });
-        } else {
-            deferred.resolve(true);
-        }
-        return deferred;
-    }();
-
-    if (!(emapic.leafletDep in emapic.dependencies)) {
-        emapic.dependencies.push(emapic.leafletDep);
-    }
-
-    emapic.leafletMarkerCluster = emapic.leafletMarkerCluster || function() {
-        var deferred = $.Deferred();
-        $.when(emapic.leafletDep).then(function() {
-            $('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/MarkerCluster.css') );
-            $('head').append( $('<link rel="stylesheet" type="text/css" />').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/MarkerCluster.Default.css') );
-            $.getScript("https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/leaflet.markercluster.js", function() {
-                deferred.resolve(true);
-            });
-        });
-        return deferred;
-    }();
-
-    if (!(emapic.leafletMarkerCluster in emapic.dependencies)) {
-        emapic.dependencies.push(emapic.leafletMarkerCluster);
-    }
-
-    emapic.leafletGroupedLayer = emapic.leafletGroupedLayer || function() {
-        var deferred = $.Deferred();
-        $.when(emapic.leafletDep).then(function() {
-            $.getScript("https://cdn.jsdelivr.net/leaflet.groupedlayercontrol/0.5.0/leaflet.groupedlayercontrol.min.js", function() {
-                deferred.resolve(true);
-            });
-        });
-        return deferred;
-    }();
-
-    if (!(emapic.leafletGroupedLayer in emapic.dependencies)) {
-        emapic.dependencies.push(emapic.leafletGroupedLayer);
-    }
-
-    emapic.d3Dep = emapic.d3Dep || function() {
-        var deferred = $.Deferred();
-        if (typeof d3 === 'undefined') {
-            $.getScript("https://d3js.org/d3.v4.min.js", function() {
-                deferred.resolve(true);
-            });
-        } else {
-            deferred.resolve(true);
-        }
-        return deferred;
-    }();
-
-    if (!(emapic.d3Dep in emapic.dependencies)) {
-        emapic.dependencies.push(emapic.d3Dep);
-    }
-
-    emapic.emapicUtilsDep = emapic.emapicUtilsDep || function() {
-        var defer = $.Deferred();
-        $.getScript(emapicServer + "/javascripts/emapic_utils.js", function() {
-            defer.resolve(true);
-        });
-        return defer;
-    }();
-
-    if (!(emapic.emapicUtilsDep in emapic.dependencies)) {
-        emapic.dependencies.push(emapic.emapicUtilsDep);
-    }
 
     emapic.callbacks = [];
 
@@ -260,21 +234,21 @@ var emapic = emapic || {};
 
 
     function featurePopupContent(data) {
-        return  '<h4 style="margin-bottom: 0px;margin-top: 0px;">'
-        +  data.feature.properties.name
-        + '</h4>'
-        + '<hr/>'
-        + '<h5>'
-        + 'Apoyos: '
-        + formatNumber(data.feature.properties.total_locations)
-        + '</h5><h5>'
-        + 'Población: '
-        + formatNumber(data.feature.properties.population)
-        + '</h5>'
-        + '<hr/>'
-        + '<h5> Aprobación (*): '
-        + formatNumber(data.feature.properties.valor) + ' %'
-        + '</h5>';
+        return  '<h4 style="margin-bottom: 0px;margin-top: 0px;">' +
+        data.feature.properties.name +
+        '</h4>' +
+        '<hr/>' +
+        '<h5>' +
+        'Apoyos: ' +
+        formatNumber(data.feature.properties.total_locations) +
+        '</h5><h5>' +
+        'Población: ' +
+        formatNumber(data.feature.properties.population) +
+        '</h5>' +
+        '<hr/>' +
+        '<h5> Aprobación (*): ' +
+        formatNumber(data.feature.properties.valor) + ' %' +
+        '</h5>';
     }
 
     function styleLayer(layer,colorScale) {
@@ -315,14 +289,14 @@ var emapic = emapic || {};
           }
         }
 
-        div.innerHTML = '<div class="info"' + (isMobile ? ' style="display:none;"' : '') +'">'
-        + '<h5>% de Aprobación&nbsp;&nbsp;&nbsp;'
-        + '<span class="legend-close-btn">&times;</span>'
-        + '</h5><hr/>'+labels.join('<br>')
-        + '</div>'
-        + '<div class="btn legend-open-btn"'  + (isMobile ?  '' : ' style="display:none;"') + '>&raquo;</div>';
+        div.innerHTML = '<div class="info"' + (isMobile ? ' style="display:none;"' : '') + '">' +
+        '<h5>% de Aprobación&nbsp;&nbsp;&nbsp;' +
+        '<span class="legend-close-btn">&times;</span>' +
+        '</h5><hr/>'+labels.join('<br>') +
+        '</div>' +
+        '<div class="btn legend-open-btn"  '+ (isMobile ?  '' : ' style="display:none;"') + '>&raquo;</div>';
         return div;
-      }
+    };
     }
 
     emapic.loadEmapicMaps = function() {
@@ -333,58 +307,58 @@ var emapic = emapic || {};
           spiderfyOnMaxZoom: true,
           removeOutsideVisibleBounds: true
         });
-        $('head').append('<style>\
-            .leaflet-control form label {\
-                font-size: 12px;\
-                vertical-align:bottom;\
-            }\
-            .leaflet-control form input,\
-            .leaflet-control form input[type="radio"],\
-            .leaflet-control form input[type="checkbox"] {\
-              height:15px;\
-              margin:0px;\
-            }\
-            .leaflet-container hr { margin:5px 0px 15px; }\
-            .legend .info {\
-              padding: 6px 8px;\
-              font-size: 14px;\
-              background: rgba(255,255,255,0.8);\
-              box-shadow: 0 0 15px rgba(0,0,0,0.4);\
-              border-radius: 5px;\
-            }\
-            .legend .btn {\
-              padding: 5px 7px 7px 9px;\
-              font-size: 32px;\
-              background: rgba(255,255,255,0.9);\
-              box-shadow: 0 0 15px rgba(0,0,0,0.4);\
-              border-radius: 5px;\
-              width:36px;\
-              height:36px;\
-              float:right;\
-              text-align:center;\
-            }\
-            .info h4 {\
-              margin:0;\
-              color: #777;\
-            }\
-            .legend {\
-              text-align: left;\
-              line-height: 22px;\
-              color: #555;\
-            }\
-            .legend i {\
-              width: 18px;\
-              height: 18px;\
-              float: left;\
-              margin-right: 8px;\
-              opacity: 0.7;\
-            }\
-            .legend-close-btn{\
-              font-size: 20px;\
-              cursor: pointer;\
-            }\
-            .hide { display:none; }\
-        </style>');
+        $('head').append('<style>' +
+            '.leaflet-control form label {' +
+                'font-size: 12px;' +
+                'vertical-align:bottom;' +
+            '}' +
+            '.leaflet-control form input,' +
+            '.leaflet-control form input[type="radio"],' +
+            '.leaflet-control form input[type="checkbox"] {' +
+             ' height:15px;' +
+             ' margin:0px;' +
+            '}' +
+            '.leaflet-container hr { margin:5px 0px 15px; }' +
+            '.legend .info {' +
+             ' padding: 6px 8px;' +
+             ' font-size: 14px;' +
+             ' background: rgba(255,255,255,0.8);' +
+             ' box-shadow: 0 0 15px rgba(0,0,0,0.4);' +
+             ' border-radius: 5px;' +
+            '}' +
+            '.legend .btn {' +
+             ' padding: 5px 7px 7px 9px;' +
+             ' font-size: 32px;' +
+             ' background: rgba(255,255,255,0.9);' +
+             ' box-shadow: 0 0 15px rgba(0,0,0,0.4);' +
+             ' border-radius: 5px;' +
+             ' width:36px;' +
+             ' height:36px;' +
+             ' float:right;' +
+             ' text-align:center;' +
+            '}' +
+            '.info h4 {' +
+             ' margin:0;' +
+             ' color: #777;' +
+            '}' +
+            '.legend {' +
+             ' text-align: left;' +
+             ' line-height: 22px;' +
+             ' color: #555;' +
+            '}' +
+            '.legend i {' +
+             ' width: 18px;' +
+             ' height: 18px;' +
+             ' float: left;' +
+             ' margin-right: 8px;' +
+             ' opacity: 0.7;' +
+            '}' +
+            '.legend-close-btn{' +
+             ' font-size: 20px;' +
+             ' cursor: pointer;' +
+            '}' +
+            '.hide { display:none; }' +
+       ' </style>');
         $('.emapic-map.location-group').each(function(idx) {
             var $map = $(this),
                 userLogin = $map.attr('emapic-login'),
@@ -520,5 +494,5 @@ var emapic = emapic || {};
 })(emapic);
 
 $(function() {
-    $.when.apply($, emapic.dependencies).then(emapic.loadEmapicMaps);
+    emapic.dependenciesLoaded().then(emapic.loadEmapicMaps);
 });
