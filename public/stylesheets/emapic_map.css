@@ -992,6 +992,9 @@ select#sex-select.mas {
 .leaflet-sidebar .stats-province-label {
     display: none;
 }
+.leaflet-control-layers-base label span {
+	vertical-align: text-bottom;
+}
 /* Fix a small problem with popup messages over leaflet buttons */
 .leaflet-bar a:last-of-type {
 	border-bottom-left-radius: 4px;
