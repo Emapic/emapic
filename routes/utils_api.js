@@ -198,12 +198,17 @@ module.exports = function(app) {
                     return new Error("Question type not contemplated.");
             }
         }
+        results.splice(0, 0, headers);
         return csv.writeToStringAsync(
             results,
             {
-                headers: headers,
+                headers: true,
                 delimiter: ';',
                 transform: function(result) {
+                    // First line is always the header, which doesn't need transforming
+                    if (results.indexOf(result) === 0) {
+                        return result;
+                    }
                     var data = [];
                     data.push(new Date(parseInt(result.timestamp)).toISOString(),
                         result.lat, result.lon, result.country, result.country_iso,
