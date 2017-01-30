@@ -31,6 +31,7 @@
         {{#results}}
         <button type="button" class="btn btn-responsive btn-primary navbar-btn pull-right" onclick="answerSurvey()"><span class="glyphicon glyphicon-comment"></span> <span class="hide-small">{{#__}}answer_survey{{/__}}</span></button>
         {{/results}}
+        {{#survey.already_opened}}
         <div class="dropdown pull-right">
             <button class="btn btn-responsive btn-primary navbar-btn dropdown-toggle" type="button" id="share-url-btn" survey-id="{{survey.encr_id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 <span class="glyphicon glyphicon-share" aria-hidden="true"></span>  <span class="hide-small">{{#__}}share{{/__}}</span>
@@ -63,6 +64,7 @@
                 {{/addThisId}}
             </ul>
         </div>
+        {{/survey.already_opened}}
       </div>
       <div class="navbar-header">
         <a class="navbar-brand" href="/"><img src="/images/logo.svg" alt="emapic logo" /></a>
@@ -166,10 +168,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/leaflet.markercluster.js"></script>
     <script src="/javascripts/emapic_modules/clustering.js"></script>
 
+    {{#survey.already_opened}}
     {{#addThisId}}
     <!-- Go to www.addthis.com/dashboard to customize your tools -->
     <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={{addThisId}}"></script>
     {{/addThisId}}
+    {{/survey.already_opened}}
 
     <script type="text/javascript">
     	{{#addThisId}}
