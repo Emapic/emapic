@@ -339,9 +339,15 @@ module.exports = function(sequelize, DataTypes) {
                         case 'explanatory-text':
                             return Promise.resolve();
                         default:
-                            return new Error("Question type not contemplated.");
+                            return Promise.reject({
+                                message: "Question type not contemplated.",
+                                status: 500
+                            });
                     }
-                    return Promise.reject(new Error("Invalid answer for question nr " + question.question_order + " / id " + question.id + ": " + answer));
+                    return Promise.reject({
+                        message: "Invalid answer for question nr " + question.question_order + " / id " + question.id + ": " + answer,
+                        status: 400
+                    });
                 });
             },
 

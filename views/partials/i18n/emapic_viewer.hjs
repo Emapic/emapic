@@ -39,4 +39,5 @@
     emapic.utils.registerI18n('js_geolocate', '{{#__}}js_geolocate{{/__}}');
     emapic.utils.registerI18n('js_geolocate_text', '{{#__}}js_geolocate_text{{/__}}');
     emapic.utils.registerI18n('js_error_loading_data', "{{#__}}js_error_loading_data{{/__}}");
+    emapic.utils.registerI18n('js_error_saving_vote', "{{#__}}js_error_saving_vote{{/__}}");
 </script>

@@ -177,6 +177,7 @@
 	"js_spectrum_more": "más",
 	"js_spectrum_less": "menos",
 	"js_error_loading_data": "Ha ocurrido un error al cargar los datos del mapa y probablemente éste no funcione de manera correcta. Prueba a recargar la página y si el problema persiste, puedes contactar con nosotros en <a href='mailto:info@emapic.es'>info@emapic.es</a>.",
+	"js_error_saving_vote": "Ha ocurrido un error al guardar tu voto. Prueba a recargar la página y si el problema persiste, puedes contactar con nosotros en <a href='mailto:info@emapic.es'>info@emapic.es</a>.",
 	"signup_notification_mail_subject": "[Emapic] Confirma tu Alta",
 	"signup_notification_mail_html_body": "<html>    <head></head>    <body>    <p>¡Hola %s!<br><br>Gracias por tu registro en Emapic.<br><br>Confirma tu alta pulsando en <a href=\"%s\">este enlace</a>.</p><br><br><p>Saludos<br>Equipo Emapic<br><a href=\"www.emapic.es\">www.emapic.es</a></p></body></html>",
 	"signup_notification_mail_text_body": "¡Hola %s!\n\nGracias por tu registro en Emapic.\n\nConfirma tu alta en: %s\n\nSaludos\nEquipo Emapic\nwww.emapic.es",

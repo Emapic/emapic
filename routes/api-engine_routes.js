@@ -220,8 +220,12 @@ module.exports = function(app) {
                 return res.end();
             }
             survey.saveResponse(req).catch(function(err) {
-                logger.error('Error while saving response for survey with id ' + survey.id + ' : ' + err);
-                res.status(400);
+                logger.error('Error while saving response for survey with id ' + survey.id + ' : ' + err.message);
+                if ('status' in err) {
+                    res.status(err.status);
+                } else {
+                    res.status(500);
+                }
             }).lastly(function(response) {
                 res.end();
             });
