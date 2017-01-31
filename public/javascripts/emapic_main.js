@@ -193,6 +193,11 @@ var emapic = emapic || {};
             }
         });
         emapic.addTooltips();
+        emapic.map.on('popupopen', function(e) {
+            $(e.popup.getContent()).find("img").load(function() {
+                e.popup.update();
+            });
+        });
     };
 
     emapic.startMapLogic = function() {

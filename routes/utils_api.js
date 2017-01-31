@@ -90,6 +90,10 @@ module.exports = function(app) {
                     case 'text-answer':
                         msg += "<b>" + questions[j].question + ':</b> ' + results[i]['q' + questions[j].question_order + '.value'] + '<br/>';
                         break;
+                    case 'image-url':
+                        msg += "<b>" + questions[j].question + ':</b><a href="' + results[i]['q' + questions[j].question_order + '.value'] +
+                            '" target="_blank"><img class="image-url-answer" src="' + results[i]['q' + questions[j].question_order + '.value'] + '"><img/></a>';
+                        break;
                     case 'explanatory-text':
                         break;
                     default:
@@ -190,6 +194,7 @@ module.exports = function(app) {
                     headers.push(questions[i].question, questions[i].question + ' - ' + otherName);
                     break;
                 case 'text-answer':
+                case 'image-url':
                     headers.push(questions[i].question);
                     break;
                 case 'explanatory-text':
@@ -235,6 +240,7 @@ module.exports = function(app) {
                                 data.push(ans, (ansId == -1) ? result['q' + questions[l].question_order + '.value'] : null);
                                 break;
                             case 'text-answer':
+                            case 'image-url':
                                 data.push(result['q' + questions[l].question_order + '.value']);
                                 break;
                             case 'explanatory-text':
@@ -301,6 +307,7 @@ module.exports = function(app) {
                     break;
                 case 'text-answer':
                 case 'explanatory-text':
+                case 'image-url':
                     if (req.body['question_' + i].trim() === '') {
                         break;
                     }
@@ -354,6 +361,7 @@ module.exports = function(app) {
                     };
                 case 'text-answer':
                 case 'explanatory-text':
+                case 'image-url':
                     return {
                         question: question.question,
                         type: question.type
