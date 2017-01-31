@@ -300,6 +300,51 @@ module.exports = function(sequelize, DataTypes) {
                 }
             },
 
+            checkValidResponse: function(responses) {
+                var question = this;
+                if (typeof this.Answers !== 'undefined') {
+                    // Answers have been eagerly loaded
+                    promise = Promise.resolve(this.Answers);
+                } else {
+                    // We must retrieve the answers
+                    promise = this.getAnswers();
+                }
+                return promise.then(function(answers) {
+                    var answer = null;
+                    switch (question.type) {
+                        case 'list-radio-other':
+                            if (('q' + question.question_order + '.id') in responses) {
+                                answer = responses['q' + question.question_order + '.id'];
+                                if (answer == -1 && ('q' + question.question_order + '.value') in responses &&
+                                responses['q' + question.question_order + '.value'].trim() !== '') {
+                                    return Promise.resolve();
+                                }
+                            }
+                            /* falls through */
+                        case 'list-radio':
+                            if (('q' + question.question_order + '.id') in responses) {
+                                answer = responses['q' + question.question_order + '.id'];
+                                for (var i = 0, len = answers.length; i<len; i++) {
+                                    if (answers[i].sortorder == answer) {
+                                        return Promise.resolve();
+                                    }
+                                }
+                            }
+                            break;
+                        case 'text-answer':
+                            if (('q' + question.question_order + '.value') in responses) {
+                                return Promise.resolve();
+                            }
+                            break;
+                        case 'explanatory-text':
+                            return Promise.resolve();
+                        default:
+                            return new Error("Question type not contemplated.");
+                    }
+                    return Promise.reject(new Error("Invalid answer for question nr " + question.question_order + " / id " + question.id + ": " + answer));
+                });
+            },
+
             getInsertSql: function(responses) {
                 switch (this.type) {
                     case 'list-radio-other':

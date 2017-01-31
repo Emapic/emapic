@@ -367,45 +367,54 @@ module.exports = function(sequelize, DataTypes) {
             saveResponse: function(req) {
                 var survey = this,
                     date = new Date(),
-                    dateUtc = date.toISOString().replace(/T/, ' ').replace(/Z/, '');
-                return Promise.join(this.getOwner(), this.getQuestions(), function(owner, questions) {
-                    var usr_id = (req.user) ? parseInt(req.user.id) : null;
-                    // If the survey is closed, or it's a draft and the
-                    // vote doesn't come from its owner, we reject the vote
-                    if (survey.active === false || (survey.active === null && usr_id != owner.id)) {
-                        return Promise.reject();
+                    dateUtc = date.toISOString().replace(/T/, ' ').replace(/Z/, ''),
+                    body = req.body;
+                return Promise.join(this.getOwner(), this.getQuestions({
+                    scope: 'includeAnswers'
+                }), function(owner, questions) {
+                    var validAnswers = [];
+                    for (var j = 0, jLen = questions.length; j<jLen; j++) {
+                        // We first check that the answers are valid for its questions
+                        validAnswers.push(questions[j].checkValidResponse(body.responses));
                     }
-                    // If the survey is a draft, then its owner's votes are stored as anonymous
-                    usr_id = (survey.active === null && usr_id == owner.id) ? null : usr_id;
-                    var body = req.body;
-                    // If there is an emapic opinion, we save it
-                    // We don't need it for anything, so we don't even handle
-                    // its promise.
-                    Survey.saveEmapicOpinion(req);
-                    // If geolocation was used, we save the distance between
-                    // the original position and the selected one.
-                    // We don't need it for anything, so we don't even handle
-                    // its promise.
-                    Survey.saveGeolocationDistance(req);
+                    return Promise.all(validAnswers).then(function() {
+                        var usr_id = (req.user) ? parseInt(req.user.id) : null;
+                        // If the survey is closed, or it's a draft and the
+                        // vote doesn't come from its owner, we reject the vote
+                        if (survey.active === false || (survey.active === null && usr_id != owner.id)) {
+                            return Promise.reject(new Error("Survey is no longer open or it's in draft mode."));
+                        }
+                        // If the survey is a draft, then its owner's votes are stored as anonymous
+                        usr_id = (survey.active === null && usr_id == owner.id) ? null : usr_id;
+                        // If there is an emapic opinion, we save it
+                        // We don't need it for anything, so we don't even handle
+                        // its promise.
+                        Survey.saveEmapicOpinion(req);
+                        // If geolocation was used, we save the distance between
+                        // the original position and the selected one.
+                        // We don't need it for anything, so we don't even handle
+                        // its promise.
+                        Survey.saveGeolocationDistance(req);
 
-                    var insert_query1 = 'INSERT INTO opinions.survey_' + survey.id + ' (usr_id, precision, timestamp, geom',
-                    insert_query2 = ') VALUES (?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326)',
-                    insert_params = [usr_id, body.precision, dateUtc, body.lng, body.lat];
-                    for (var i = 0, iLen = questions.length; i<iLen; i++) {
-                        var vars = questions[i].getInsertSql(body.responses);
-                        insert_query1 += (vars[0] !== '' ? ', ' : '') + vars[0];
-                        insert_query2 += (vars[1] !== '' ? ', ' : '') + vars[1];
-                        insert_params = insert_params.concat(vars[2]);
-                    }
-                    insert_query1 += insert_query2 + ');';
+                        var insert_query1 = 'INSERT INTO opinions.survey_' + survey.id + ' (usr_id, precision, timestamp, geom',
+                        insert_query2 = ') VALUES (?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326)',
+                        insert_params = [usr_id, body.precision, dateUtc, body.lng, body.lat];
+                        for (var i = 0, iLen = questions.length; i<iLen; i++) {
+                            var vars = questions[i].getInsertSql(body.responses);
+                            insert_query1 += (vars[0] !== '' ? ', ' : '') + vars[0];
+                            insert_query2 += (vars[1] !== '' ? ', ' : '') + vars[1];
+                            insert_params = insert_params.concat(vars[2]);
+                        }
+                        insert_query1 += insert_query2 + ');';
 
-                    return sequelize.query(insert_query1,
-                        { replacements: insert_params, type: sequelize.QueryTypes.INSERT }
-                    ).then(function() {
-                        return models.Vote.create({
-                            user_id : usr_id,
-                            survey_id : survey.id,
-                            vote_date : date
+                        return sequelize.query(insert_query1,
+                            { replacements: insert_params, type: sequelize.QueryTypes.INSERT }
+                        ).then(function() {
+                            return models.Vote.create({
+                                user_id : usr_id,
+                                survey_id : survey.id,
+                                vote_date : date
+                            });
                         });
                     });
                 });
