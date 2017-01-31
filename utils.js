@@ -10,6 +10,9 @@ var nodemailer = require('nodemailer'),
     logger = require('./utils/logger'),
     bases = require('bases'),
     path = require('path'),
+    imageType = require('image-type'),
+    http = require('http'),
+    https = require('https'),
     childProcess = Promise.promisifyAll(require('child_process')),
     optipng = require('optipng-bin'),
     phantomjs = require('phantomjs-prebuilt'),
@@ -199,5 +202,26 @@ module.exports = function(app) {
 
     getRandomInt = function(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+
+    checkUrlIsImage = function(url) {
+        if (url.lastIndexOf('http', 0) !== 0) {
+            url = 'http://' + url;
+        }
+        var dfd = Promise.defer(),
+            protocol = (url.lastIndexOf('https:', 0) === 0) ? https : http;
+        protocol.get(url, function(res) {
+            res.on('data', function(chunk) {
+                res.destroy();
+                if (imageType(chunk) !== null) {
+                    dfd.resolve();
+                } else {
+                    dfd.reject();
+                }
+            });
+        }).on('error', function(err) {
+            dfd.reject(err);
+        });
+        return dfd.promise;
     };
 };

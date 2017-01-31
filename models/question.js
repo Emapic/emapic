@@ -61,6 +61,7 @@ module.exports = function(sequelize, DataTypes) {
                             });
                             break;
                         case 'text-answer':
+                        case 'image-url':
                             if (req.body['question_' + i].trim() === '') {
                                 break;
                             }
@@ -119,7 +120,8 @@ module.exports = function(sequelize, DataTypes) {
                                 break;
                             case 'text-answer':
                             case 'explanatory-text':
-                                // Text answer and explanatory text types have no predefined answers
+                            case 'image-url':
+                                // These question types have no predefined answers
                                 break;
                             default:
                                 return new Error("Question type not contemplated.");
@@ -169,6 +171,17 @@ module.exports = function(sequelize, DataTypes) {
                                 });
                                 break;
                             case 'text-answer':
+                            case 'image-url':
+                                if (req.body['question_' + i].trim() === '') {
+                                    break;
+                                }
+                                questions.push({
+                                    survey_id : survey.id,
+                                    type : questionType,
+                                    question : (req.body['question_' + i] ? req.body['question_' + i].substring(0, 150).trim() : null),
+                                    question_order : i - 1
+                                });
+                                break;
                             case 'explanatory-text':
                                 if (req.body['question_' + i].trim() === '') {
                                     break;
@@ -260,7 +273,8 @@ module.exports = function(sequelize, DataTypes) {
                                 break;
                             case 'text-answer':
                             case 'explanatory-text':
-                                // Text answer and explanatory text types have no predefined answers
+                            case 'image-url':
+                                // These question types have no predefined answers
                                 break;
                             default:
                                 return new Error("Question type not contemplated.");
@@ -277,6 +291,7 @@ module.exports = function(sequelize, DataTypes) {
                         return "q" + this.question_order + " text NOT NULL, q" + this.question_order + "_other text";
                     case 'list-radio':
                     case 'text-answer':
+                    case 'image-url':
                         return "q" + this.question_order + " text NOT NULL";
                     case 'explanatory-text':
                         return "";
@@ -292,6 +307,7 @@ module.exports = function(sequelize, DataTypes) {
                     case 'list-radio':
                         return 'a.q' + this.question_order + ' AS "q' + this.question_order + '.id"';
                     case 'text-answer':
+                    case 'image-url':
                         return 'a.q' + this.question_order + ' AS "q' + this.question_order + '.value"';
                     case 'explanatory-text':
                         return '';
@@ -338,6 +354,15 @@ module.exports = function(sequelize, DataTypes) {
                             break;
                         case 'explanatory-text':
                             return Promise.resolve();
+                        case 'image-url':
+                            if (('q' + question.question_order + '.value') in responses) {
+                                answer = responses['q' + question.question_order + '.value'];
+                                if (answer.lastIndexOf('http', 0) !== 0) {
+                                    responses['q' + question.question_order + '.value'] = answer = 'http://' + answer;
+                                }
+                                return checkUrlIsImage(responses['q' + question.question_order + '.value']);
+                            }
+                            break;
                         default:
                             return Promise.reject({
                                 message: "Question type not contemplated.",
@@ -370,6 +395,7 @@ module.exports = function(sequelize, DataTypes) {
                         }
                         break;
                     case 'text-answer':
+                    case 'image-url':
                         if ('q' + this.question_order + '.value' in responses) {
                             return ['q' + this.question_order, '?', [responses['q' + this.question_order + '.value']]];
                         }
@@ -558,6 +584,15 @@ module.exports = function(sequelize, DataTypes) {
                             ' class="col-xs-12 btn btn-lg survey-answer text-answer"><div class="flex-container"><input autocomplete="off" id="q' +
                             parent.question_order + '-input" type="text" target="q' + parent.question_order +
                             '-ok" onkeydown="emapic.utils.inputEnterToClick(event)" onkeyup="emapic.utils.checkInputNotVoid(this)"/><button id="q' + parent.question_order +
+                            '-ok" autocomplete="off" disabled class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order +
+                            '\', \'q' + parent.question_order + '-input\')">OK</button></div></div></div>\n</div>';
+                    case 'image-url':
+                        return '<div class="main-question" id="question-' + parent.question_order + '">\n<h2>' + escape(parent.question) + '</h2>\n' +
+                            '<div class="col-xs-12 text-left"><div id="q' + parent.question_order + '-other"' +
+                            ' class="col-xs-12 btn btn-lg survey-answer text-answer"><div class="flex-container"><input autocomplete="off" id="q' +
+                            parent.question_order + '-input" type="text" target="q' + parent.question_order +
+                            '-ok" onkeydown="emapic.utils.inputEnterToClick(event)" onchange="emapic.utils.checkInputUrlIsImage(this)"' +
+                            ' onkeyup="emapic.utils.checkInputUrlIsImage(this)"/><button id="q' + parent.question_order +
                             '-ok" autocomplete="off" disabled class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order +
                             '\', \'q' + parent.question_order + '-input\')">OK</button></div></div></div>\n</div>';
                     case 'explanatory-text':

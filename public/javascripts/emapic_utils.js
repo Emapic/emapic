@@ -339,4 +339,47 @@ if (typeof $.fn.validator !== 'undefined' &&
         return $.getJSON('https://nominatim.openstreetmap.org/reverse', params);
     };
 
+    emapic.utils.checkInputUrlIsImage = function(input) {
+        var $input = $(input),
+            val = $input.val(),
+            $tgt = $('#' + $input.attr('target'));
+        $tgt.attr('disabled', true);
+        if ($tgt !== null) {
+            if (val !== null && val.trim() !== '') {
+                val = val.trim();
+                if (val.lastIndexOf('http', 0) !== 0) {
+                    val = 'http://' + val;
+                }
+                emapic.utils.checkUrlIsImage(val).done(function(result) {
+                    $tgt.attr('disabled', !result);
+                }).fail(function(error) {
+                    console.error(error);
+                    $tgt.attr('disabled', true);
+                });
+            }
+        }
+    };
+
+    emapic.utils.checkUrlIsImage = function(url, timeout) {
+        var dfd = $.Deferred();
+        timeout = timeout || 5000;
+        var timer, img = new Image();
+        img.onerror = img.onabort = function () {
+            clearTimeout(timer);
+            dfd.resolve(false);
+        };
+        img.onload = function () {
+            clearTimeout(timer);
+            dfd.resolve(true);
+        };
+        timer = setTimeout(function () {
+            // reset .src to invalid URL so it stops previous
+            // loading, but doesn't trigger new load
+            img.src = "//!!!!/!!!!.jpg";
+            dfd.resolve(false);
+        }, timeout);
+        img.src = url;
+        return dfd.promise();
+    };
+
 })(emapic);

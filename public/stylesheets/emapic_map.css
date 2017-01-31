@@ -551,6 +551,10 @@ input.form-control[type="radio"] {
     margin-bottom: 3px;
     margin-top: 3px;
 }
+.leaflet-popup-content img.image-url-answer {
+    max-width: 300px !important;
+    border: 1px solid black;
+}
 #popup-form {
     display: none;
 }
