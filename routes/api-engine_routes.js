@@ -221,6 +221,7 @@ module.exports = function(app) {
             }
             survey.saveResponse(req).catch(function(err) {
                 logger.error('Error while saving response for survey with id ' + survey.id + ' : ' + err);
+                res.status(400);
             }).lastly(function(response) {
                 res.end();
             });
