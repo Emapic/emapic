@@ -7,7 +7,7 @@
 
 __Geolocated surveys engine.__
 
-[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0) [![Dependency Status](https://gemnasium.com/badges/github.com/Emapic/emapic.svg)](https://gemnasium.com/github.com/Emapic/emapic)
+[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0) [![Dependency Status](https://gemnasium.com/badges/github.com/Emapic/emapic.svg)](https://gemnasium.com/github.com/Emapic/emapic) [![Code Climate](https://codeclimate.com/github/Emapic/emapic/badges/gpa.svg)](https://codeclimate.com/github/Emapic/emapic)
 
 Open source repository with the source code of the geolocated surveys engine Emapic, developed by the laboratory [CartoLAB](http://cartolab.udc.es/cartoweb/) of the [Universidade da Coruña](http://www.udc.es/). Live version at the website [emapic.es](https://emapic.es).
 
