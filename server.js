@@ -5,6 +5,8 @@ var express = require('express'),
     http = require('http'),
     https = require('https'),
     Hogan = require('hjs'),
+    hoganExpress = require('hogan-express'),
+    morgan = require('morgan'),
     path = require('path'),
     slashes = require('connect-slashes'),
     i18n = require('i18n-2'),
@@ -13,15 +15,23 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     methodOverride = require('method-override'),
     passport = require('passport'),
-    nconf = require('nconf'),
+    // Load configuration:
+    // First consider commandline arguments and environment variables, respectively,
+    // and then load configuration from a designated file
+    nconf = require('nconf').argv().env().file({ file: 'config.json' }),
     multiparty = require('connect-multiparty'),
     errorhandler = require('errorhandler'),
-    httpErrorHandler = require('express-error-handler');
+    httpErrorHandler = require('express-error-handler'),
+    nodeSchedule = require('node-schedule'),
+    utils = require('./utils'),
+    routes = require('./routes');
+
+require('pg').defaults.parseInt8 = true;
 
 /**
- *  Define the sample application.
+ *  Define the Emapic application.
  */
-var SampleApp = function() {
+var EmapicApp = function() {
 
     //  Scope.
     var self = this,
@@ -35,14 +45,9 @@ var SampleApp = function() {
     /*  ================================================================  */
 
     /**
-     *  Load configuration file & parameters.
+     *  Load configuration parameters.
      */
     self.loadConfig = function() {
-        // First consider commandline arguments and environment variables, respectively.
-        nconf.argv().env();
-
-        // Then load configuration from a designated file.
-        nconf.file({ file: 'config.json' });
         serverConfig = nconf.get('server');
         socialConfig = nconf.get('social');
         geoConfig = nconf.get('geoServices');
@@ -86,10 +91,10 @@ var SampleApp = function() {
      */
     self.terminator = function(sig){
         if (typeof sig === "string") {
-           logger.info('Received %s - terminating sample app ...', sig);
-           process.exit(1);
+           logger.info('Received %s - terminating app ...', sig);
+           process.exit(); // eslint-disable-line no-process-exit
+           logger.info('Node server stopped.');
         }
-        logger.info('Node server stopped.');
     };
 
 
@@ -213,9 +218,9 @@ var SampleApp = function() {
         self.app.set('ipaddr', self.ipaddr);
         self.app.set('views', path.join(__dirname, 'views'));
         self.app.set('view engine', 'hjs');
-        self.app.engine('hjs', require('hogan-express'));
+        self.app.engine('hjs', hoganExpress);
         self.app.use(express.favicon());
-        self.app.use(require('morgan')('{"remote_addr": ":remote-addr", "remote_user": ":remote-user", "method": ":method", "url": ":url", "http_version": ":http-version", "status": ":status", "result_length": ":res[content-length]", "referrer": ":referrer", "user_agent": ":user-agent", "response_time": ":response-time"}',
+        self.app.use(morgan('{"remote_addr": ":remote-addr", "remote_user": ":remote-user", "method": ":method", "url": ":url", "http_version": ":http-version", "status": ":status", "result_length": ":res[content-length]", "referrer": ":referrer", "user_agent": ":user-agent", "response_time": ":response-time"}',
             { "stream": logger.stream }
         ));
         self.app.use(express.json());
@@ -260,14 +265,15 @@ var SampleApp = function() {
         self.app.use(bodyParser.urlencoded({ extended: false }));
         self.app.use(bodyParser.json());
 
-        require('./utils')(self.app);
-        require('./routes')(self.app);
+        utils(self.app);
+        routes(self.app);
 
         self.app.use(httpErrorHandler.httpError(404));
 
         self.app.use(httpErrorHandler({
             handlers: {
                 '404': function err404(err, req, res) {
+                    logger.warn('404 request: ' + err);
                     res.status(404);
                     res.render('error/404', {
                         title : req.i18n.__('404_title')
@@ -283,9 +289,9 @@ var SampleApp = function() {
         });
 
         // development only
-        if ('development' == self.app.get('env')) {
+        if ('development' === self.app.get('env')) {
             self.app.use(errorhandler({log: function (err, str, req) {
-                logger.error(str);
+                logger.error(str + ': ' + err);
             }}));
         }
     };
@@ -322,7 +328,7 @@ var SampleApp = function() {
             logger.info('Node server started on %s:%d ...', self.ipaddr, self.httpsport);
         });
 
-        if (self.ipaddr != '127.0.0.1' && self.ipaddr != '0.0.0.0') {
+        if (self.ipaddr !== '127.0.0.1' && self.ipaddr !== '0.0.0.0') {
             // Redirect from http port (80) to https (443)
             http.createServer(function (req, res) {
                 res.writeHead(301, { "Location": "https://" + req.headers.host + req.url });
@@ -334,7 +340,7 @@ var SampleApp = function() {
             logger.info('Node localhost server started on %s:%d ...', '127.0.0.1', 3001);
         });
 
-        require('node-schedule').scheduleJob('0 3 * * *', function() {
+        nodeSchedule.scheduleJob('0 3 * * *', function() {
             logger.info('Updating survey thumbnails...');
             models.Survey.updateAllThumbnails().then(function() {
                 logger.info('Survey thumbnails updated.');
@@ -349,6 +355,6 @@ var SampleApp = function() {
 /**
  *  main():  Main code.
  */
-var zapp = new SampleApp();
-zapp.initialize();
-zapp.start();
+var emapic = new EmapicApp();
+emapic.initialize();
+emapic.start();

@@ -4,6 +4,35 @@ var Promise = require('bluebird'),
 
 module.exports = function(app) {
 
+    // Function for ordering the votes in descending order
+    function orderVotesDesc(results) {
+        var orderedVotes = {},
+            question;
+        for (var j in results) {
+            if (j !== 'name' && j !== 'total_responses' && j !== 'iso_code' &&
+                j !== 'country_id' && j !== 'adm_code' && j !== 'adm_type' &&
+                j !== 'country_iso_code' &&  j !== 'geojson') {
+                question = j.split('_')[0];
+                if (isNaN(question.replace('q', '')) ||
+                    isNaN(j.split('_')[1])) {
+                    continue;
+                }
+                if (!orderedVotes[question]) {
+                    orderedVotes[question] = [];
+                }
+                var position = orderedVotes[question].length;
+                for (var k in orderedVotes[question]) {
+                    if (orderedVotes[question][k].nr < parseInt(results[j], 10)) {
+                        position = k;
+                        break;
+                    }
+                }
+                orderedVotes[question].splice(position, 0, {nr: parseInt(results[j], 10), name: j});
+            }
+        }
+        return orderedVotes;
+    }
+
     /*
     *   A function that converts a PostGIS query into a GeoJSON object.
     *   Copyright (C) 2012  Samuel Giles <sam@sam-giles.co.uk>
@@ -71,13 +100,13 @@ module.exports = function(app) {
                         var value;
                         var answer = null;
                         for (var k = 0, kLen = answers[questions[j].question_order].length; k<kLen; k++) {
-                            if (answers[questions[j].question_order][k].sortorder == results[i]['q' + questions[j].question_order + '.id']) {
+                            if (answers[questions[j].question_order][k].sortorder === results[i]['q' + questions[j].question_order + '.id']) {
                                 answer = answers[questions[j].question_order][k];
                                 break;
                             }
                         }
                         if (answer !== null) {
-                            if ((results[i]['q' + questions[j].question_order + '.id'] == -1) && (('q' + questions[j].question_order + '.value') in results[i])) {
+                            if ((results[i]['q' + questions[j].question_order + '.id'] === -1) && (('q' + questions[j].question_order + '.value') in results[i])) {
                                 value = answer.answer + ' (' + results[i]['q' + questions[j].question_order + '.value'] + ')';
                             } else {
                                 value = answer.answer;
@@ -110,64 +139,43 @@ module.exports = function(app) {
         for (var i = 0, iLen = results.length; i<iLen; i++) {
             var popup = '<h3><small>' + results[i].name + '</small></h3>',
                 popupProperties = '',
-                orderedVotes = {},
+                orderedVotes = orderVotesDesc(results[i]),
                 question;
-            // We order the votes in descending order
-            for (var j in results[i]) {
-                if (j != 'name' && j != 'total_responses' && j != 'iso_code' &&
-                    j != 'country_id' && j != 'adm_code' && j != 'adm_type' &&
-                    j != 'country_iso_code' &&  j != 'geojson') {
-                    question = j.split('_')[0];
-                    if (isNaN(question.replace('q', '')) ||
-                        isNaN(j.split('_')[1])) {
-                        continue;
-                    }
-                    if (!orderedVotes[question]) {
-                        orderedVotes[question] = [];
-                    }
-                    var position = orderedVotes[question].length;
-                    for (var k in orderedVotes[question]) {
-                        if (orderedVotes[question][k].nr < parseInt(results[i][j])) {
-                            position = k;
+            for (var l in orderedVotes) {
+                if ({}.hasOwnProperty.call(orderedVotes, l)) {
+                    question = null;
+                    for (var q = 0, qLen = questions.length; q<qLen; q++) {
+                        if ('q' + questions[q].question_order === l) {
+                            question = questions[q];
                             break;
                         }
                     }
-                    orderedVotes[question].splice(position, 0, {nr: parseInt(results[i][j]), name: j});
-                }
-            }
-            for (var l in orderedVotes) {
-                question = null;
-                for (var q = 0, qLen = questions.length; q<qLen; q++) {
-                    if ('q' + questions[q].question_order == l) {
-                        question = questions[q];
-                        break;
-                    }
-                }
-                if (question !== null) {
-                    popupProperties += '<b><small>' + question.question + '</small></b><br/>';
-                }
-                for (var m = 0, mLen = orderedVotes[l].length; m<mLen; m++) {
-                    var name;
                     if (question !== null) {
-                        var answer = null;
-                        for (var n = 0, nLen = answers[question.question_order].length; n<nLen; n++) {
-                            if (answers[question.question_order][n].sortorder == orderedVotes[l][m].name.split('_')[1]) {
-                                answer = answers[question.question_order][n];
-                                break;
+                        popupProperties += '<b><small>' + question.question + '</small></b><br/>';
+                    }
+                    for (var m = 0, mLen = orderedVotes[l].length; m<mLen; m++) {
+                        var name;
+                        if (question !== null) {
+                            var answer = null;
+                            for (var n = 0, nLen = answers[question.question_order].length; n<nLen; n++) {
+                                if (answers[question.question_order][n].sortorder === orderedVotes[l][m].name.split('_')[1]) {
+                                    answer = answers[question.question_order][n];
+                                    break;
+                                }
                             }
-                        }
-                        if (answer !== null) {
-                            name = answer.answer;
+                            if (answer !== null) {
+                                name = answer.answer;
+                            } else {
+                                name = orderedVotes[l][m].name;
+                            }
                         } else {
                             name = orderedVotes[l][m].name;
                         }
-                    } else {
-                        name = orderedVotes[l][m].name;
+                        popupProperties += '<small>' + name + ':</small> ' + orderedVotes[l][m].nr + '<br/>';
                     }
-                    popupProperties += '<small>' + name + ':</small> ' + orderedVotes[l][m].nr + '<br/>';
-                }
-                if (popupProperties !== '') {
-                    popupProperties = popupProperties.replace(new RegExp('<br/>$'), '<hr>');
+                    if (popupProperties !== '') {
+                        popupProperties = popupProperties.replace(new RegExp('<br/>$'), '<hr>');
+                    }
                 }
             }
             results[i].popup_msg = popup + popupProperties + '<small>Votos totales:</small> ' + results[i].total_responses;
@@ -185,7 +193,7 @@ module.exports = function(app) {
                 case 'list-radio-other':
                     var otherAns = null;
                     for (var j = 0, jLen = questions[i].Answers.length; j < jLen; j++) {
-                        if (questions[i].Answers[j].sortorder == -1) {
+                        if (questions[i].Answers[j].sortorder === -1) {
                             otherAns = questions[i].Answers[j];
                             break;
                         }
@@ -215,7 +223,7 @@ module.exports = function(app) {
                         return result;
                     }
                     var data = [];
-                    data.push(new Date(parseInt(result.timestamp)).toISOString(),
+                    data.push(new Date(parseInt(result.timestamp, 10)).toISOString(),
                         result.lat, result.lon, result.country, result.country_iso,
                         result.province);
                     for (var l = 0, lLen = questions.length; l < lLen; l++) {
@@ -224,7 +232,7 @@ module.exports = function(app) {
                             case 'list-radio':
                                 ans = ansId = result['q' + questions[l].question_order + '.id'];
                                 for (var m = 0, mLen = questions[l].Answers.length; m < mLen; m++) {
-                                    if (ansId == questions[l].Answers[m].sortorder) {
+                                    if (ansId === questions[l].Answers[m].sortorder) {
                                         ans = questions[l].Answers[m].answer;
                                     }
                                 }
@@ -233,11 +241,11 @@ module.exports = function(app) {
                             case 'list-radio-other':
                                 ans = ansId = result['q' + questions[l].question_order + '.id'];
                                 for (var n = 0, nLen = questions[l].Answers.length; n < nLen; n++) {
-                                    if (ansId == questions[l].Answers[n].sortorder) {
+                                    if (ansId === questions[l].Answers[n].sortorder) {
                                         ans = questions[l].Answers[n].answer;
                                     }
                                 }
-                                data.push(ans, (ansId == -1) ? result['q' + questions[l].question_order + '.value'] : null);
+                                data.push(ans, (ansId === -1) ? result['q' + questions[l].question_order + '.value'] : null);
                                 break;
                             case 'text-answer':
                             case 'image-url':
@@ -267,7 +275,7 @@ module.exports = function(app) {
 
     extractQuestionsMapFromRequest = function(req) {
         var questions = [];
-        for (var i = 1; true; i++) {
+        for (var i = 1;; i++) {
             if (!(('question_type_' + i) in req.body) || !(('question_' + i) in req.body)) {
                 break;
             }
@@ -278,7 +286,7 @@ module.exports = function(app) {
             switch (questionType) {
                 case 'list-radio':
                     var answers = [];
-                    for (var j = 1; true; j++) {
+                    for (var j = 1;; j++) {
                         if (!req.body['option_' + i + '_' + j]) {
                             break;
                         }
@@ -333,7 +341,7 @@ module.exports = function(app) {
                     var answers = [];
                     var otherAnswer = null;
                     for (var i = 0, iLen = question.Answers.length; i<iLen; i++) {
-                        if (question.Answers[i].sortorder != -1) {
+                        if (question.Answers[i].sortorder !== -1) {
                             answers.push({
                                 answer : question.Answers[i].answer,
                                 legend : question.Answers[i].legend,
@@ -356,7 +364,7 @@ module.exports = function(app) {
                     }
                     return {
                         question: question.question,
-                        type: (question.type == 'list-radio-other') ? 'list-radio' : question.type,
+                        type: (question.type === 'list-radio-other') ? 'list-radio' : question.type,
                         answers: answers
                     };
                 case 'text-answer':

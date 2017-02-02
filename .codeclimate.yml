@@ -28,10 +28,10 @@ ratings:
   - "**.rb"
 exclude_paths:
 - db/
+- public/libs/
+- public/javascripts/
 languages:
   Ruby: true
   JavaScript: true
   PHP: true
   Python: true
-exclude_paths:
-- "locales"

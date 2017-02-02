@@ -3,7 +3,7 @@ var Sequelize = require('sequelize'),
     path = require("path"),
     sequelize = new Sequelize(conString, {
         define: {
-            timestamps: false,
+            timestamps: false
         }
     }),
     db = {};
