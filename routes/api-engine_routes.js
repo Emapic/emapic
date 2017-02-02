@@ -15,7 +15,7 @@ module.exports = function(app) {
             }
             survey.getOwner().then(function(owner){
                 // Survey is in draft mode and it's not being tested by its owner
-                if ((survey.active === null) && (!req.user || (owner.id != req.user.id))) {
+                if ((survey.active === null) && (!req.user || (owner.id !== req.user.id))) {
                     return res.redirect('/');
                 }
                 // Survey is closed
@@ -50,11 +50,11 @@ module.exports = function(app) {
                 // Survey is closed
                 if ((survey.active === false) ||
                 // Data required by the owner
-                (req.user && owner.id == req.user.id) ||
+                (req.user && owner.id === req.user.id) ||
                 // Results are always public
                 survey.public_results ||
                 // It's a local request from the server itself
-                (req.ip == '127.0.0.1' && (req.host == '127.0.0.1' || req.host == 'localhost'))) {
+                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
                     return Promise.join(survey.getHtml(), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
                         // If the survey allows multiple answers, then we don't
                         // set an already voted position
@@ -86,13 +86,13 @@ module.exports = function(app) {
                 // Survey is closed
                 if ((survey.active === false) ||
                 // Data required by the owner
-                (req.user && owner.id == req.user.id) ||
+                (req.user && owner.id === req.user.id) ||
                 // Results are always public
                 survey.public_results ||
                 // Results after vote
                 survey.results_after_vote ||
                 // It's a local request from the server itself
-                (req.ip == '127.0.0.1' && (req.host == '127.0.0.1' || req.host == 'localhost'))) {
+                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
                     Promise.join(survey.getAnonymizedResponses(), survey.getQuestions({
                         scope: 'includeAnswers'
                     }), function(responses, questions) {
@@ -118,13 +118,13 @@ module.exports = function(app) {
                 // Survey is closed
                 if ((survey.active === false) ||
                 // Data required by the owner
-                (req.user && owner.id == req.user.id) ||
+                (req.user && owner.id === req.user.id) ||
                 // Results are always public
                 survey.public_results ||
                 // Results after vote
                 survey.results_after_vote ||
                 // It's a local request from the server itself
-                (req.ip == '127.0.0.1' && (req.host == '127.0.0.1' || req.host == 'localhost'))) {
+                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
                     survey.getTotals().then(function(response) {
                         res.json(response);
                     });
@@ -144,13 +144,13 @@ module.exports = function(app) {
                 // Survey is closed
                 if ((survey.active === false) ||
                 // Data required by the owner
-                (req.user && owner.id == req.user.id) ||
+                (req.user && owner.id === req.user.id) ||
                 // Results are always public
                 survey.public_results ||
                 // Results after vote
                 survey.results_after_vote ||
                 // It's a local request from the server itself
-                (req.ip == '127.0.0.1' && (req.host == '127.0.0.1' || req.host == 'localhost'))) {
+                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
                     var layer = req.params.layer,
                         params = req.query,
                         promise;
@@ -197,13 +197,13 @@ module.exports = function(app) {
                 // Survey is closed
                 if ((survey.active === false) ||
                 // Data required by the owner
-                (req.user && owner.id == req.user.id) ||
+                (req.user && owner.id === req.user.id) ||
                 // Results are always public
                 survey.public_results ||
                 // Results after vote
                 survey.results_after_vote ||
                 // It's a local request from the server itself
-                (req.ip == '127.0.0.1' && (req.host == '127.0.0.1' || req.host == 'localhost'))) {
+                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
                     survey.getLegend().then(function(legend) {
                         res.json(legend);
                     });
@@ -241,13 +241,13 @@ module.exports = function(app) {
                 // Survey is closed
                 if ((survey.active === false) ||
                 // Data required by the owner
-                (req.user && owner.id == req.user.id) ||
+                (req.user && owner.id === req.user.id) ||
                 // Results are always public
                 survey.public_results ||
                 // Results after vote
                 survey.results_after_vote ||
                 // It's a local request from the server itself
-                (req.ip == '127.0.0.1' && (req.host == '127.0.0.1' || req.host == 'localhost'))) {
+                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
                     Promise.join(survey.getFullResponses(), survey.getQuestions({
                         scope: 'includeAnswers'
                     }), function(responses, questions) {
@@ -276,7 +276,7 @@ module.exports = function(app) {
 
     app.get('/api/baselayers/:layer', function(req, res, next) {
         // Limit full/simple geom requests in production environmentes only
-        if ('production' == app.get('env')) {
+        if ('production' === app.get('env')) {
             switch (req.query.geom) {
                 case 'simple':
                 case 'full':
@@ -318,7 +318,11 @@ module.exports = function(app) {
         }
         if ('lang' in params) {
             namePromise = checkColumnExists('name_' + params.lang, layer, 'base_layers').then(function(result) {
-                return (result[0].exists) ? 'a.name_' + params.lang : 'a.name';
+                if (result[0].exists) {
+                    return 'a.name_' + params.lang;
+                } else {
+                    return 'a.name';
+                }
             });
         } else {
             namePromise = Promise.resolve('a.name');

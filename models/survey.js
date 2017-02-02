@@ -1,7 +1,77 @@
 var Promise = require('bluebird'),
     searchEngineLang = require('nconf').get('app').searchEngineLang,
     fsp = require('fs-promise'),
-    path = require('path');
+    path = require('path'),
+    answersRequestType = {
+        'normal': 0,
+        'full': 1,
+        'anonymized': 2
+    },
+    sqlType = {
+        'select': 0,
+        'ddl': 1
+    },
+    thumbnailsFolder = 'thumbnails' + path.sep + 'survey';
+
+function trimSubstringField(field, maxLength) {
+    if (maxLength !== null) {
+        return (field ? field.substring(0, maxLength).trim() : null);
+    }
+    return (field ? field.trim() : null);
+}
+
+function parseTagsFromPost(req) {
+    if (req.body.survey_tags && req.body.survey_tags.trim().length > 0) {
+        tags = req.body.survey_tags.substring(0, 150).trim();
+        var indivTags = tags.split(','),
+        indivTagsClean = [];
+        for (var i = 0, iLen = indivTags.length; i<iLen; i++) {
+            if (indivTags[i].trim().length > 0) {
+                indivTagsClean.push(indivTags[i].trim());
+            }
+        }
+        return (indivTagsClean.length > 0 ? ',' + indivTagsClean.join(',') + ',' : null);
+    } else {
+        return null;
+    }
+}
+
+function getAllFieldsSQL(qstns, type) {
+    var qstnsFields = '',
+        sql;
+    for (var j = 0, len = qstns.length; j<len; j++) {
+        switch (type) {
+            case sqlType.select:
+                sql = qstns[j].getSelectSql();
+                break;
+            case sqlType.ddl:
+                sql = qstns[j].getDdlSql();
+                break;
+        }
+        qstnsFields += ((sql !== '') ? ',' : '') + sql;
+    }
+    return qstnsFields;
+}
+
+function getSurveyResponsesSql(survey, type) {
+    var id = survey.id;
+    return survey.getQuestions().then(function(questions) {
+        var fieldsSql = getAllFieldsSQL(questions, sqlType.select),
+            sql;
+        switch (type) {
+            case answersRequestType.normal:
+                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id ORDER BY timestamp";
+                break;
+            case answersRequestType.full:
+                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_y(a.geom) as lat, st_x(a.geom) as lon, d.name as country, d.iso_code_2 as country_iso, c.name as province, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id LEFT JOIN base_layers.provinces c ON c.gid = a.province_gid LEFT JOIN base_layers.countries d ON c.country_gid = d.gid ORDER BY timestamp";
+                break;
+            case answersRequestType.anonymized:
+                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson" + fieldsSql + " FROM opinions.survey_" + id + " a ORDER BY timestamp";
+                break;
+        }
+        return sql;
+    });
+}
 
 module.exports = function(sequelize, DataTypes) {
     var Survey = sequelize.define('Survey', {
@@ -128,26 +198,12 @@ module.exports = function(sequelize, DataTypes) {
             },
 
             createFromPost: function(req) {
-                var survey,
-                    tags;
-                if (req.body.survey_tags && req.body.survey_tags.trim().length > 0) {
-                    tags = req.body.survey_tags.substring(0, 150).trim();
-                    var indivTags = tags.split(','),
-                    indivTagsClean = [];
-                    for (var i = 0, iLen = indivTags.length; i<iLen; i++) {
-                        if (indivTags[i].trim().length > 0) {
-                            indivTagsClean.push(indivTags[i].trim());
-                        }
-                    }
-                    tags = (indivTagsClean.length > 0 ? ',' + indivTagsClean.join(',') + ',' : null);
-                } else {
-                    tags = null;
-                }
+                var survey;
                 return Survey.create({
                     owner_id : req.user.id,
-                    title : (req.body.survey_title ? req.body.survey_title.substring(0, 150).trim() : null),
-                    description : (req.body.survey_description ? req.body.survey_description.substring(0, 500).trim() : null),
-                    tags : tags,
+                    title : trimSubstringField(req.body.survey_title, 150),
+                    description : trimSubstringField(req.body.survey_description, 500),
+                    tags : parseTagsFromPost(req),
                     welcome_text : 'Bienvenido',
                     multiple_answer : ('multiple_answer' in req.body),
                     public_results : ('public_results' in req.body),
@@ -169,27 +225,12 @@ module.exports = function(sequelize, DataTypes) {
             },
 
             updateFromPost: function(req) {
-                var survey,
-                    oldQuestions,
-                    tags;
-                if (req.body.survey_tags && req.body.survey_tags.trim().length > 0) {
-                    tags = req.body.survey_tags.substring(0, 150).trim();
-                    var indivTags = tags.split(','),
-                    indivTagsClean = [];
-                    for (var i = 0, iLen = indivTags.length; i<iLen; i++) {
-                        if (indivTags[i].trim().length > 0) {
-                            indivTagsClean.push(indivTags[i].trim());
-                        }
-                    }
-                    tags = (indivTagsClean.length > 0 ? ',' + indivTagsClean.join(',') + ',' : null);
-                } else {
-                    tags = null;
-                }
+                var survey;
                 return Survey.findById(req.body.survey_id).then(function(surv) {
                     survey = surv;
-                    survey.title = (req.body.survey_title ? req.body.survey_title.substring(0, 150).trim() : null);
-                    survey.description = (req.body.survey_description ? req.body.survey_description.substring(0, 500).trim() : null);
-                    survey.tags = tags;
+                    survey.title = trimSubstringField(req.body.survey_title, 150);
+                    survey.description = trimSubstringField(req.body.survey_description, 500);
+                    survey.tags = parseTagsFromPost(req);
                     survey.multiple_answer = ('multiple_answer' in req.body);
                     survey.public_results = ('public_results' in req.body);
                     survey.dont_list = ('dont_list' in req.body);
@@ -271,12 +312,7 @@ module.exports = function(sequelize, DataTypes) {
                 var survey = this;
                 return this.getQuestions().then(function(questions) {
                     // We create the survey specific table
-                    var questionsSql = "";
-                    for (var i = 0, iLen = questions.length; i<iLen; i++) {
-                        var ddl = questions[i].getDdlSql();
-                        questionsSql += ((ddl !== '') ? ", " : "") + ddl;
-                    }
-                    return sequelize.query('CREATE TABLE opinions.survey_' + survey.id + '(gid bigserial NOT NULL PRIMARY KEY' + questionsSql + ', geom GEOMETRY(Point, 4326), "precision" integer, province_gid integer REFERENCES base_layers.provinces (gid) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION, "timestamp" timestamp without time zone, usr_id bigint' + (survey.multiple_answer ? '' : ' UNIQUE') + ' REFERENCES users (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE SET NULL);');
+                    return sequelize.query('CREATE TABLE opinions.survey_' + survey.id + '(gid bigserial NOT NULL PRIMARY KEY' + getAllFieldsSQL(questions, sqlType.ddl) + ', geom GEOMETRY(Point, 4326), "precision" integer, province_gid integer REFERENCES base_layers.provinces (gid) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION, "timestamp" timestamp without time zone, usr_id bigint' + (survey.multiple_answer ? '' : ' UNIQUE') + ' REFERENCES users (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE SET NULL);');
                 }).spread(function(results, metadata) {
                     // We create the trigger for assigning provinces
                     return sequelize.query('CREATE TRIGGER assign_province_trigger BEFORE INSERT OR UPDATE ON opinions.survey_' + survey.id + ' FOR EACH ROW EXECUTE PROCEDURE assign_province();');
@@ -313,19 +349,18 @@ module.exports = function(sequelize, DataTypes) {
             },
 
             generateThumbnails: function() {
-                var encrId = this.encr_id;
+                var encrId = this.encr_id,
+                    url = 'http://localhost:3001/survey/' + encrId + '/results';
                 // TODO resize the snapshots from the optimal size (512x288 / 512x512) to the smaller possible sizes (256x144 / 400x400)
                 return Promise.all([
-                    takeSnapshot('http://localhost:3001/survey/' + encrId + '/results',
-                        'thumbnails' + path.sep + 'survey' + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 3000, 20000),
-                    takeSnapshot('http://localhost:3001/survey/' + encrId + '/results',
-                        'thumbnails' + path.sep + 'survey' + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 3000, 30000)
+                    takeSnapshot(url, thumbnailsFolder + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 3000, 20000),
+                    takeSnapshot(url, thumbnailsFolder + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 3000, 30000)
                 ]);
             },
 
             deleteThumbnails: function() {
-                var encrId = this.encr_id;
-                var paths = ['thumbnails/survey/small/' + encrId + '.png', 'thumbnails/survey/share/' + encrId + '.png'];
+                var encrId = this.encr_id,
+                    paths = ['thumbnails/survey/small/' + encrId + '.png', 'thumbnails/survey/share/' + encrId + '.png'];
                 return Promise.map(paths, function(path) {
                     return fsp.stat(path).catch(function(error) {
                         // We ignore the error when file doesn't exist
@@ -341,7 +376,7 @@ module.exports = function(sequelize, DataTypes) {
                 // The subTitle should serve as a description of the survey question(s)
                 return this.getQuestions().then(function(questions) {
                     // As of now we only return it if the survey has only one question
-                    if (questions.length != 1) {
+                    if (questions.length !== 1) {
                         return null;
                     } else {
                         return questions[0].question;
@@ -355,7 +390,7 @@ module.exports = function(sequelize, DataTypes) {
                 }), function(question) {
                     return question.getHtml();
                 }).then(function(results){
-                    if (results.length == 1) {
+                    if (results.length === 1) {
                         return results[0];
                     }
                     return '<div class="questions-block">' +
@@ -378,17 +413,18 @@ module.exports = function(sequelize, DataTypes) {
                         validAnswers.push(questions[j].checkValidResponse(body.responses));
                     }
                     return Promise.all(validAnswers).then(function() {
-                        var usr_id = (req.user) ? parseInt(req.user.id) : null;
+                        var usr_id = (req.user) ? parseInt(req.user.id, 10) : null;
                         // If the survey is closed, or it's a draft and the
                         // vote doesn't come from its owner, we reject the vote
-                        if (survey.active === false || (survey.active === null && usr_id != owner.id)) {
+                        console.log((typeof usr_id) + ' VS ' + (typeof owner.id));
+                        if (survey.active === false || (survey.active === null && usr_id !== owner.id)) {
                             return Promise.reject({
                                 message: "Survey is no longer open or it's in draft mode.",
                                 status: 403
                             });
                         }
                         // If the survey is a draft, then its owner's votes are stored as anonymous
-                        usr_id = (survey.active === null && usr_id == owner.id) ? null : usr_id;
+                        usr_id = (survey.active === null && usr_id === owner.id) ? null : usr_id;
                         // If there is an emapic opinion, we save it
                         // We don't need it for anything, so we don't even handle
                         // its promise.
@@ -431,8 +467,8 @@ module.exports = function(sequelize, DataTypes) {
                     order: 'vote_date DESC'
                 }).then(function(votes) {
                     var dates = [];
-                    for (var i = 0, iLen = votes.length; i<iLen; i++) {
-                        dates.push(votes[i].vote_date);
+                    for (var j = 0, jLen = votes.length; j<jLen; j++) {
+                        dates.push(votes[j].vote_date);
                     }
                     return dates;
                 });
@@ -447,77 +483,56 @@ module.exports = function(sequelize, DataTypes) {
             },
 
             getUserFullResponses: function(userId) {
-                var surv = this;
-                var id = this.id;
-                return this.getQuestions().then(function(questions) {
-                    var questions_fields = '';
-                    for (var i = 0, iLen = questions.length; i<iLen; i++) {
-                        var select = questions[i].getSelectSql();
-                        questions_fields += ((select !== '') ? ',' : '') + select;
-                    }
-                    return sequelize.query("SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + questions_fields + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id WHERE usr_id = ? LIMIT 1;", {
+                var surv = this,
+                    id = this.id,
+                    questions;
+                return this.getQuestions().then(function(qstns) {
+                    questions = qstns;
+                    return sequelize.query("SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + getAllFieldsSQL(questions, sqlType.select) + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id WHERE usr_id = ? LIMIT 1;", {
                         replacements: [userId],
                         type: sequelize.QueryTypes.SELECT
-                    }).then(function(responses) {
-                        // If the user has a response, then we return it
-                        if (responses.length > 0) {
-                            return postGISQueryToFeatureCollection(responses).features[0];
-                        } else {
-                        // If not, then we return an empty template with the questions structure
-                            var structure = {};
-                            for (var i = 0, iLen = questions.length; i<iLen; i++) {
-                                structure['q' + questions[i].question_order] = null;
-                            }
-                            return {
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'Point',
-                                    coordinates: null
-                                },
-                                properties: structure
-                            };
-                        }
                     });
+                }).then(function(responses) {
+                    // If the user has a response, then we return it
+                    if (responses.length > 0) {
+                        return postGISQueryToFeatureCollection(responses).features[0];
+                    } else {
+                    // If not, then we return an empty template with the questions structure
+                        var structure = {};
+                        for (var i = 0, iLen = questions.length; i<iLen; i++) {
+                            structure['q' + questions[i].question_order] = null;
+                        }
+                        return {
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: null
+                            },
+                            properties: structure
+                        };
+                    }
                 });
             },
 
             getFullResponses: function() {
-                var id = this.id;
-                return this.getQuestions().then(function(questions) {
-                    var questions_fields = '';
-                    for (var i = 0, iLen = questions.length; i<iLen; i++) {
-                        var select = questions[i].getSelectSql();
-                        questions_fields += ((select !== '') ? ',' : '') + select;
-                    }
-                    return sequelize.query("SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_y(a.geom) as lat, st_x(a.geom) as lon, d.name as country, d.iso_code_2 as country_iso, c.name as province, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + questions_fields + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id LEFT JOIN base_layers.provinces c ON c.gid = a.province_gid LEFT JOIN base_layers.countries d ON c.country_gid = d.gid ORDER BY timestamp",
+                return getSurveyResponsesSql(this, answersRequestType.full).then(function(sql) {
+                    return sequelize.query(sql,
                         { type: sequelize.QueryTypes.SELECT }
                     );
                 });
             },
 
             getResponses: function() {
-                var id = this.id;
-                return this.getQuestions().then(function(questions) {
-                    var questions_fields = '';
-                    for (var i = 0, iLen = questions.length; i<iLen; i++) {
-                        var select = questions[i].getSelectSql();
-                        questions_fields += ((select !== '') ? ',' : '') + select;
-                    }
-                    return sequelize.query("SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + questions_fields + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id ORDER BY timestamp",
+                return getSurveyResponsesSql(this, answersRequestType.normal).then(function(sql) {
+                    return sequelize.query(sql,
                         { type: sequelize.QueryTypes.SELECT }
                     );
                 });
             },
 
             getAnonymizedResponses: function() {
-                var id = this.id;
-                return this.getQuestions().then(function(questions) {
-                    var questions_fields = '';
-                    for (var i = 0, iLen = questions.length; i<iLen; i++) {
-                        var select = questions[i].getSelectSql();
-                        questions_fields += ((select !== '') ? ',' : '') + select;
-                    }
-                    return sequelize.query("SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson" + questions_fields + " FROM opinions.survey_" + id + " a ORDER BY timestamp",
+                return getSurveyResponsesSql(this, answersRequestType.anonymized).then(function(sql) {
+                    return sequelize.query(sql,
                         { type: sequelize.QueryTypes.SELECT }
                     );
                 });
@@ -526,12 +541,14 @@ module.exports = function(sequelize, DataTypes) {
             getTotals: function() {
                 var survey = this;
                 return this.getLegend().then(function(legend) {
-                    if (!legend.color) {
+                    if (!('color' in legend)) {
                         return Promise.resolve(null);
                     }
                     var query = "SELECT count(*) AS total_responses";
                     for (var i in legend.color.responses) {
-                        query += ", (SELECT count(*) FROM opinions.survey_" + survey.id + " WHERE " + legend.color.question + "::text = '" + i + "'::text) AS \"" + i + "\"";
+                        if ({}.hasOwnProperty.call(legend.color.responses, i)) {
+                            query += ", (SELECT count(*) FROM opinions.survey_" + survey.id + " WHERE " + legend.color.question + "::text = '" + i + "'::text) AS \"" + i + "\"";
+                        }
                     }
                     query += " FROM opinions.survey_" + survey.id + ";";
                     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
@@ -582,13 +599,9 @@ module.exports = function(sequelize, DataTypes) {
                             return Promise.reject(new Error('INVALID GEOM TYPE'));
                     }
                 }
-                if ('lang' in params) {
-                    namePromise = checkColumnExists('name_' + params.lang, layer, 'base_layers').then(function(result) {
-                        return (result[0].exists) ? 'name_' + params.lang : 'name';
-                    });
-                } else {
-                    namePromise = Promise.resolve('name');
-                }
+                namePromise = ('lang' in params) ? checkColumnExists('name_' + params.lang, layer, 'base_layers').then(function(result) {
+                    return (result[0].exists) ? 'name_' + params.lang : 'name';
+                }) : Promise.resolve('name');
                 return Promise.join(namePromise, this.getLegend(), function(nameCol, legend) {
                     var query = sql1 + ', a.' + nameCol + ' AS name';
                     if (legend && legend.color) {
@@ -637,19 +650,12 @@ module.exports = function(sequelize, DataTypes) {
                             var lastAnswers = [];
                             for (var k = 0, kLen = question.Answers.length; k<kLen; k++) {
                                 if (question.Answers[k].legend !== null) {
-                                    if (question.Answers[k].sortorder == -1) {
-                                        lastAnswers.push({
-                                            id: question.Answers[k].sortorder.toString(),
-                                            value: question.Answers[k].answer,
-                                            legend: question.Answers[k].legend
-                                        });
-                                    } else {
-                                        sublegend.responses_array.push({
-                                            id: question.Answers[k].sortorder.toString(),
-                                            value: question.Answers[k].answer,
-                                            legend: question.Answers[k].legend
-                                        });
-                                    }
+                                    ((question.Answers[k].sortorder === -1) ?
+                                    lastAnswers : sublegend.responses_array).push({
+                                        id: question.Answers[k].sortorder.toString(),
+                                        value: question.Answers[k].answer,
+                                        legend: question.Answers[k].legend
+                                    });
                                 }
                             }
                             sublegend.responses_array = sublegend.responses_array.concat(lastAnswers);

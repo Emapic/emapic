@@ -24,7 +24,7 @@ module.exports = function(sequelize, DataTypes) {
             get: function() {
                 return (this.name !== null && this.name.trim().length > 0) ? this.name : this.login;
             }
-        },
+        }
     }, {
         scopes: {
             findByLogin: function(userLogin) {
@@ -107,9 +107,9 @@ module.exports = function(sequelize, DataTypes) {
 
             getAnsweredSurveysAndCount: function(options) {
                 return this.getAnsweredSurveys().then(function(rows) {
-                    var total = rows.length;
-                    var offset = (options && options.offset && !isNaN(options.offset)) ? parseInt(options.offset) : 0;
-                    var limit = (options && options.limit && !isNaN(options.limit)) ? offset + parseInt(options.limit) : total;
+                    var total = rows.length,
+                        offset = (options && options.offset && !isNaN(options.offset)) ? parseInt(options.offset, 10) : 0,
+                        limit = (options && options.limit && !isNaN(options.limit)) ? offset + parseInt(options.limit, 10) : total;
                     return {
                         count: total,
                         rows: rows.slice(offset, limit)

@@ -5,13 +5,18 @@ var fs = require('fs'),
 conString = process.env.POSTGRESQL_DB_CONN_STRING ||
     ('postgresql://' + dbConn.user + ':'+ dbConn.password + '@' + dbConn.host + ':' + dbConn.port + '/' + dbConn.database);
 
+models  = require('../models');
+
+var utilsApi = require('./utils_api'),
+    auth = require('./auth'),
+    main = require('./main'),
+    apiEngineRoutes = require('./api-engine_routes');
+
 module.exports = function(app) {
 
-    models  = require('../models');
-    require('./utils_api')(app);
-    require('./auth')(app);
-
-    require('./main')(app);
-    require('./api-engine_routes')(app);
+    utilsApi(app);
+    auth(app);
+    main(app);
+    apiEngineRoutes(app);
 
 };

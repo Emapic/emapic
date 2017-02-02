@@ -1,5 +1,4 @@
 // utils.js/
-/*jshint -W030 */
 var nodemailer = require('nodemailer'),
     fs = require('fs'),
     smtpTransport = require('nodemailer-smtp-transport'),
@@ -50,7 +49,7 @@ function takeSnapshotRaw(url, imgPath, width, height, wait, minSize, tries) {
 
 module.exports = function(app) {
     sendMail = function(mail) {
-        if (typeof mail.from == 'undefined') {
+        if (typeof mail.from === 'undefined') {
             mail.from = smtpConfig.from;
         }
         var transporter = nodemailer.createTransport(smtpTransport({
@@ -75,30 +74,30 @@ module.exports = function(app) {
                 return resolve();
             });
         });
-    },
+    };
 
     encryptSurveyId = function(id) {
         return (id) ? bases.toBase(id * surveyIdEncr.factor, surveyIdEncr.base ) : null;
-    },
+    };
 
     decryptSurveyId = function(encrId) {
         for (var i=0, len=encrId.length; i<len; i++) {
-            if (bases.KNOWN_ALPHABETS[surveyIdEncr.base].indexOf(encrId[i]) == -1) {
+            if (bases.KNOWN_ALPHABETS[surveyIdEncr.base].indexOf(encrId[i]) === -1) {
                 return null;
             }
         }
         return (encrId) ? bases.fromBase62(encrId, surveyIdEncr.base) / surveyIdEncr.factor : null;
-    },
+    };
 
     getPaginationBasePath = function(req) {
         var dir = url.parse(req.url).pathname + '?';
         for (var i in req.query) {
-            if (i != 'page') {
+            if (i !== 'page') {
                 dir += i + '=' + req.query[i] + '&';
             }
         }
         return dir;
-    },
+    };
 
     getPaginationTranslations = function(req) {
         return {
@@ -107,10 +106,13 @@ module.exports = function(app) {
             'FIRST': req.i18n.__('pagination_first'),
             'LAST': req.i18n.__('pagination_last')
         };
-    },
+    };
 
     paginationTemplate = function(elementName) {
         return function(result) {
+            function getPrevNextLink(prelink, url, next) {
+                return '<li class="pagination-' + (next ? 'next' : 'previous') + (url ? '' : ' disabled') + '"><a' + (url ? ' href="' + prelink + url + '"' : '') + '><span class="glyphicon glyphicon-menu-' + (next ? 'right' : 'left') + '"></span></a></li>';
+            }
             var i, len, prelink;
             var html = '<div class="col-xs-12 pagination-container"><ul class="pagination">';
             if (result.pageCount < 2) {
@@ -118,33 +120,31 @@ module.exports = function(app) {
                 return html;
             }
             prelink = this.preparePreLink(result.prelink);
-            //html += '<li class="pagination-previous' + (result.previous ? '' : ' disabled"') + '"><a' + (result.previous ? ' href="' + prelink + result.previous + '"' : '') + '>' + result.translations.PREVIOUS + '</a></li>';
-            html += '<li class="pagination-previous' + (result.previous ? '' : ' disabled') + '"><a' + (result.previous ? ' href="' + prelink + result.previous + '"' : '') + '><span class="glyphicon glyphicon-menu-left"></span></a></li>';
+            html += getPrevNextLink(prelink, result.previous, false);
             if (result.previous && result.range[0] !== result.first) {
                 html += '<li class="pagination-first"><a href="' + prelink + result.first + '">' + result.first + '</a></li>' +
                 (result.range[0] - 1 !== result.first ? '<li class="pagination-more-before disabled"><a></a></li>' : '');
             }
             if (result.range.length) {
                 for( i = 0, len = result.range.length; i < len; i++) {
-                    if(result.range[i] === result.current) {
-                        html += '<li class="active"><a href="' + prelink + result.range[i] + '">' + result.range[i] + '</a></li>';
-                    } else {
-                        html += '<li><a href="' + prelink + result.range[i] + '">' + result.range[i] + '</a></li>';
+                    html += '<li'
+                    if (result.range[i] === result.current) {
+                        html += ' class="active"';
                     }
+                    html += '><a href="' + prelink + result.range[i] + '">' + result.range[i] + '</a></li>';
                 }
             }
             if (result.next && result.range[result.range.length - 1] !== result.last) {
                 html += (result.range[result.range.length - 1] + 1 !== result.last ? '<li class="pagination-more-after disabled"><a></a></li>' : '') +
                 '<li class="pagination-last' + (result.next ? '' : ' disabled') + '"><a href="' + prelink + result.last + '">' + result.last + '</a></li>';
             }
-            //html += '<li class="pagination-next' + (result.next ? '' : ' disabled') + '"><a' + (result.next ? ' href="' + prelink + result.next + '"' : '') + '>' + result.translations.NEXT + '</a></li>';
-            html += '<li class="pagination-next' + (result.next ? '' : ' disabled') + '"><a' + (result.next ? ' href="' + prelink + result.next + '"' : '') + '><span class="glyphicon glyphicon-menu-right"></span></a></li>';
+            html += getPrevNextLink(prelink, result.next, true);
             if (elementName) {
                 html += '</ul><span class="col-xs-12 pagination-totals">' + result.totalResult + ' ' + elementName + '</span></div>';
             }
             return html;
         };
-    },
+    };
 
     getPaginationHtml = function(req, pageNr, pageSize, totalResults, elementName) {
         return new pagination.TemplatePaginator({
@@ -157,17 +157,19 @@ module.exports = function(app) {
             },
             template: paginationTemplate(req.i18n.__(elementName))
         }).render();
-    },
+    };
 
     copyBodyToLocals = function(req, res) {
         copyAttributes(req.body, res.locals);
-    },
+    };
 
     copyAttributes = function(origin, dest) {
         for (var i in origin) {
-            dest[i] = origin[i];
+            if ({}.hasOwnProperty.call(origin, i)) {
+                dest[i] = origin[i];
+            }
         }
-    },
+    };
 
     extractProperties = function(object, deleteFields) {
         var props = object.get();
@@ -175,7 +177,7 @@ module.exports = function(app) {
             delete props[deleteFields[i]];
         }
         return props;
-    },
+    };
 
     takeSnapshot = function(url, imgPath, width, height, wait, minSize) {
         return takeSnapshotRaw(url, imgPath, width, height, wait, minSize).then(function() {
@@ -186,7 +188,7 @@ module.exports = function(app) {
                     imgPath
                 ]);
         }).return(imgPath);
-    },
+    };
 
     randomString = function(len) {
         var buf = [],
@@ -198,11 +200,11 @@ module.exports = function(app) {
         }
 
         return buf.join('');
-    },
+    };
 
     getRandomInt = function(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
-    },
+    };
 
     checkUrlIsImage = function(url) {
         if (url.lastIndexOf('http', 0) !== 0) {

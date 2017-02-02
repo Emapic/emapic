@@ -10,10 +10,11 @@ var passport = require('passport'),
     imgRequest = Promise.promisifyAll(require('request').defaults({ encoding: null }), {multiArgs: true}),
     randomstring = require('randomstring'),
     fs = require('fs'),
-    logger = require('../../utils/logger');
+    logger = require('../../utils/logger'),
+    utils = require('./utils_auth');
 
 module.exports = function(app) {
-    require('./utils_auth')(app);
+    utils(app);
 
     app.get('/pwd_reset', function(req, res){
         if (req.user) {
@@ -120,13 +121,13 @@ module.exports = function(app) {
                     return res.render('signup', {layout: 'layouts/main'});
                 });
             } else {
-                if (err && err.name == 'SequelizeUniqueConstraintError' &&
-                    ((err.errors && err.errors.constructor === Array && err.errors[0].path == 'email') ||
+                if (err && err.name === 'SequelizeUniqueConstraintError' &&
+                    ((err.errors && err.errors.constructor === Array && err.errors[0].path === 'email') ||
                     (err.message.indexOf('users_email_key') > -1))) {
                     req.session.error = 'email_duplicated_error_msg';
                     logger.debug('E-mail already exists: ' + err);
-                } else if (err && err.name == 'SequelizeUniqueConstraintError' &&
-                    ((err.errors && err.errors.constructor === Array && err.errors[0].path == 'login') ||
+                } else if (err && err.name === 'SequelizeUniqueConstraintError' &&
+                    ((err.errors && err.errors.constructor === Array && err.errors[0].path === 'login') ||
                     (err.message.indexOf('users_login_key') > -1))) {
                     req.session.error = 'username_duplicated_error_msg';
                     logger.debug('Login already in use: ' + err);
@@ -196,7 +197,7 @@ module.exports = function(app) {
             logger.info("Sucessfully unlinked service " + req.body.service + " from user account with email " + user.email + " and id " + user.id);
         }).catch(function(err) {
             req.session.success = 'unlink_ext_account_error_msg';
-            logger.error("Error while unlinking service " + req.body.service + " from user account with email " + user.email + " and id " + user.id);
+            logger.error("Error while unlinking service " + req.body.service + " from user account with email " + user.email + " and id " + user.id + ": " + err);
         }).lastly(function() {
             res.redirect('/profile');
         });
@@ -205,7 +206,7 @@ module.exports = function(app) {
     app.post('/profile', function(req, res) {
         // Checking for the very suspicious case when the posted email
         // is different from the one logged in
-        if (req.user.email != req.body.email) {
+        if (req.user.email !== req.body.email) {
             logger.warn("Trying to update an user profile different from the one logged in.");
             req.session.error = 'update_user_error_msg';
             copyAttributes({
@@ -275,7 +276,7 @@ module.exports = function(app) {
             });
         } else if (req.body.lat && req.body.lon) {
             // User default position update
-            var isNull = (req.body.lon == 'null' && req.body.lat == 'null');
+            var isNull = (req.body.lon === 'null' && req.body.lat === 'null');
             req.user.geom = !isNull ? {
                 type: 'Point',
                 coordinates: [ parseFloat(req.body.lon), parseFloat(req.body.lat) ],
@@ -328,8 +329,8 @@ module.exports = function(app) {
                 logger.info("Sucessfully updated user with mail " + user.email + " and id " + user.id);
                 return res.redirect('/profile');
             }).catch(function(err) {
-                if (err && err.name == 'SequelizeUniqueConstraintError' &&
-                    ((err.errors && err.errors.constructor === Array && err.errors[0].path == 'login') ||
+                if (err && err.name === 'SequelizeUniqueConstraintError' &&
+                    ((err.errors && err.errors.constructor === Array && err.errors[0].path === 'login') ||
                     (err.message.indexOf('users_login_key') > -1))) {
                     req.session.error = 'username_duplicated_error_msg';
                     logger.debug('Login already in use: ' + err);
@@ -622,8 +623,8 @@ module.exports = function(app) {
                     throw err;
                 });
             } else {
-                if (err && err.name == 'SequelizeUniqueConstraintError' &&
-                    ((err.errors && err.errors.constructor === Array && err.errors[0].path == 'login') ||
+                if (err && err.name === 'SequelizeUniqueConstraintError' &&
+                    ((err.errors && err.errors.constructor === Array && err.errors[0].path === 'login') ||
                     (err.message.indexOf('users_login_key') > -1))) {
                     user.login = originalLogin;
                     return nextLoginUserSignup(user, tryNr + 1);
