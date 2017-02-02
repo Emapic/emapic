@@ -124,6 +124,7 @@ var SampleApp = function() {
         i18n.expressBind(self.app, {
           // setup some locales - other locales default to en silently
           locales: ['en', 'es'],
+          extension: '.json',
           // set the cookie name
           cookieName: 'locale'
         });
