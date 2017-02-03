@@ -7,6 +7,8 @@
 
 __Motor de encuestas geolocalizadas.__
 
+[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0) [![Dependency Status](https://gemnasium.com/badges/github.com/Emapic/emapic.svg)](https://gemnasium.com/github.com/Emapic/emapic)
+
 Repositorio abierto del código fuente del motor de encuestas con componente geográfico Emapic, desarrollado por el laboratorio [CartoLAB](http://cartolab.udc.es/cartoweb/) de la [Universidade da Coruña](http://www.udc.es/). En producción en el sitio web [emapic.es](https://emapic.es).
 
 ## Estado actual
@@ -101,6 +103,16 @@ sqitch deploy
 Al terminar el proceso, la BDD ya debería estar operativa.
 
 Este método no añade ningún usuario por defecto a la aplicación. Para hacerlo deberemos ejecutar sobre la BDD el script SQL _emapic\_test\_user.sql_, que añadirá un usuario de prueba de nombre «emapic» y contraseña «emapic» para acceder a la propia aplicación web.
+
+##### Acerca de los cambios en _sqitch.plan_
+
+Aunque intentamos evitarlo, hemos tenido que actualizar algunos commits de sqitch antiguos dentro del fichero _sqitch.plan_. Esto provoca que sqitch lance un error si intentamos aplicar commits nuevos en una base de datos construida con la antigua versión de dichos commits. El hash empleado internamente por sqitch para identificar esos commits es el principal motivo, ya que su valor es distinto con cualquier cambio. Si esto ocurre, existen algunas estrategias para solucionar/evitar el problema:
+
+* La más sencilla es, obviamente, desplegar la base de datos de nuevo desde cero, probablemente la mejor opción si no tienes datos importantes almacenados o no te importa hacer una copia de seguridad de ellos y restaurarlos en la base de datos nueva. Ten en cuenta que perderás tu antiguo log de sqitch.
+
+* Puedes intentar hacer un rebase hasta los commits de sqitch actualizados (esto equivale a revertirlos y aplicarlos de nuevo). De nuevo es probable que necesites hacer una copia de seguridad de tus datos y restaurarlos si no los quieres perder (depende de los commits que haya que revertir).
+
+* Renombra/borra el esquema «sqitch» en tu base de datos de Emapic, despliega de nuevo la base de datos con un nombre distinto (o en un servidor distinto), haz una copia de seguridad del esquema «sqitch» de esta base de datos nueva y restáurala en la antigua. Si hubiere algún commit nuevo sin aplicar en tu base de datos antigua, deberías aplicarlos manualmente ejecutando su sql de despliegue. La mejor opción si eres un usuario avanzado y no puedes apagar la base de datos de Emapic temporalmente o simplemente no quieres manejar copias de seguridad complejas. Si despliegas de nuevo la base de datos con un nombre distinto en el mismo servidor, ten cuidado con el usuario de base de datos de Emapic.
 
 
 #### Código del servidor

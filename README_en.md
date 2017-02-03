@@ -7,6 +7,8 @@
 
 __Geolocated surveys engine.__
 
+[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0) [![Dependency Status](https://gemnasium.com/badges/github.com/Emapic/emapic.svg)](https://gemnasium.com/github.com/Emapic/emapic)
+
 Open source repository with the source code of the geolocated surveys engine Emapic, developed by the laboratory [CartoLAB](http://cartolab.udc.es/cartoweb/) of the [Universidade da Coruña](http://www.udc.es/). Live version at the website [emapic.es](https://emapic.es).
 
 ## Current state
@@ -89,9 +91,9 @@ If any of these values is wrong, you must modify the connection string using the
 
         db:pg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}
 
-* «emapic_db_user» inside «[deploy "variables"]», «[verify "variables"]» and «[revert "variables"]»: the name of the database user Emapic will use to connect to the database.  
+* 'emapic_db_user' inside '[deploy "variables"]', '[verify "variables"]' and '[revert "variables"]': the name of the database user Emapic will use to connect to the database.  
 By default, with the value "emapic". If you want to use a different name, you can simply edit this file and change its value, or add the parameter "-s emapic_db_user={emapic_db_user}" to all Sqitch executions, replacing the string surrounded by curly brackets with the desired user name.
-* «emapic_db_user_pass» dentro de «[deploy "variables"]»: the password of the database user Emapic will use to connect to the database.  
+* 'emapic_db_user_pass' inside '[deploy "variables"]': the password of the database user Emapic will use to connect to the database.  
 By default, with the value "emapic".You should replace it with a more secure password. In order to change it, you can simply edit this file and change its value, or add the parameter "-s emapic_db_user_pass={emapic_db_user_pass}" to the deploy Sqitch execution, replacing the string surrounded by curly brackets with the desired user name.
 
 Once the Sqitch configuration is complete, we execute:
@@ -104,6 +106,15 @@ DB should be operative once the process has finished.
 
 This method doesn't add any default user for our application. If we want to do so, we must execute onto our DB the SQL script _emapic\_test\_user.sql_, which will add a test with name "emapic" and password "emapic" for logging into the web application itself.
 
+##### About _sqitch.plan_ changes
+
+Though we try to avoid it, we've had to change some old sqitch commits inside the _sqitch.plan_ file. This causes sqitch to throw an error when trying to deploy new commits into a database that was built with the previous version of those commits. The hash used by sqitch to internally identify these commits is the main cause, as it results into a different value with any change. If this happens to you, there are some strategies for fixing/avoiding the problem:
+
+* The easiest one is obviously to deploy the database again from scratch, probably your best choice if you have no important Emapic data stored or you don't mind doing a backup and restoring it into a new database. Keep in mind you'll lose your old sqitch log.
+
+* You can try to do a sqitch rebase up to the updated commits (this amounts to a revert and a redeploy). Again in this case you'll probably have to backup and restore your data if you don't want to lose it (depends on the commits you have to revert).
+
+* Rename/delete the 'sqitch' schema of your Emapic database, redeploy the database with a different name (or into another database server), backup the sqitch schema of this new database and restore it into the old one. If there are any new commits which weren't applied to your old database, you should apply them manually by executing their deploy sql. This is your best choice if you are an advanced user and can't afford to shutdown the database for a short time or simply don't want to fuss around with big database backups. If you redeploy the database with a different name in the same server, be careful about the Emapic DB user.
 
 #### Server code
 
