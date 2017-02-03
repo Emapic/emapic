@@ -15,7 +15,7 @@ module.exports = function(app) {
                     req.user.getRoles().then(function(userRoles) {
                         for (var i = 0, iLen = userRoles.length; i < iLen; i++) {
                             for (var j = 0, jLen = roles.length; j < jLen; j++) {
-                                if (userRoles[i].name == roles[j]) {
+                                if (userRoles[i].name === roles[j]) {
                                     return next();
                                 }
                             }
@@ -29,7 +29,7 @@ module.exports = function(app) {
                 }
             } else {
                 if (req.user) {
-                    next();
+                    return next();
                 } else {
                     req.session.lastUnauthPage = req.path;
                     res.redirect('/login');

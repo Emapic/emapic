@@ -1,7 +1,7 @@
 module.exports = function(sequelize, DataTypes) {
     var Vote = sequelize.define('Vote', {
         gid: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
-        vote_date: { type: DataTypes.DATE },
+        vote_date: { type: DataTypes.DATE }
     }, {
         classMethods: {
             associate: function(models) {

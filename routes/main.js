@@ -367,7 +367,7 @@ module.exports = function(app) {
                 var imgDefault = fs.readFileSync('thumbnails/survey/' + req.params.size.trim() + '/default.png');
                 res.contentType("image/png");
                 res.send(imgDefault);
-            } catch (e) {
+            } catch (err) {
                 return res.send(404);   // HTTP status 404: NotFound
             }
         }

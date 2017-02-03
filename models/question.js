@@ -37,7 +37,7 @@ module.exports = function(sequelize, DataTypes) {
 
             createFromPost: function(req, survey) {
                 var questionsData = [];
-                for (var i = 1; true; i++) {
+                for (var i = 1;;i++) {
                     if (!(('question_type_' + i) in req.body) || !(('question_' + i) in req.body)) {
                         break;
                     }
@@ -96,7 +96,7 @@ module.exports = function(sequelize, DataTypes) {
                         switch(question.type) {
                             case 'list-radio':
                             case 'list-radio-other':
-                                for (var j = 1; true; j++) {
+                                for (var j = 1;; j++) {
                                     if (!(('option_' + i + '_' + j) in req.body) || req.body['option_' + i + '_' + j].trim() === '') {
                                         break;
                                     }
@@ -147,7 +147,7 @@ module.exports = function(sequelize, DataTypes) {
                     });
                 }).then(function() {
                     var questions = [];
-                    for (var i = 1; true; i++) {
+                    for (var i = 1;; i++) {
                         if (!(('question_type_' + i) in req.body) || !(('question_' + i) in req.body)) {
                             break;
                         }
@@ -207,7 +207,7 @@ module.exports = function(sequelize, DataTypes) {
                         switch(question.type) {
                             case 'list-radio':
                             case 'list-radio-other':
-                                for (var j = 1; true; j++) {
+                                for (var j = 1;; j++) {
                                     if (!(('option_' + i + '_' + j) in req.body) || req.body['option_' + i + '_' + j].trim() === '') {
                                         break;
                                     }
@@ -219,13 +219,13 @@ module.exports = function(sequelize, DataTypes) {
                                         } else {
                                             // If not, we recycle the image previously used for this answer
                                             if (!isNaN(req.body['id_' + i + '_' + j])) {
-                                                var originalId = parseInt(req.body['id_' + i + '_' + j]);
-                                                questions:
+                                                var originalId = parseInt(req.body['id_' + i + '_' + j], 10);
+                                                images:
                                                 for (var k = 0, kLen = oldAnswers.length; k<kLen; k++) {
                                                     for (var l = 0, lLen = oldAnswers[k].length; l<lLen; l++) {
-                                                        if (oldAnswers[k][l].id == originalId) {
+                                                        if (oldAnswers[k][l].id === originalId) {
                                                             answerImg = oldAnswers[k][l].img;
-                                                            break questions;
+                                                            break images;
                                                         }
                                                     }
                                                 }
@@ -249,13 +249,13 @@ module.exports = function(sequelize, DataTypes) {
                                         } else {
                                             // If not, we recycle the image previously used for this answer
                                             if (!isNaN(req.body['id_' + i + '_other'])) {
-                                                var originalOtherId = parseInt(req.body['id_' + i + '_other']);
-                                                questions:
+                                                var originalOtherId = parseInt(req.body['id_' + i + '_other'], 10);
+                                                images:
                                                 for (var m = 0, mLen = oldAnswers.length; m<mLen; m++) {
                                                     for (var n = 0, nLen = oldAnswers[m].length; n<nLen; n++) {
-                                                        if (oldAnswers[m][n].id == originalOtherId) {
+                                                        if (oldAnswers[m][n].id === originalOtherId) {
                                                             answerOtherImg = oldAnswers[m][n].img;
-                                                            break questions;
+                                                            break images;
                                                         }
                                                     }
                                                 }
@@ -330,8 +330,8 @@ module.exports = function(sequelize, DataTypes) {
                     switch (question.type) {
                         case 'list-radio-other':
                             if (('q' + question.question_order + '.id') in responses) {
-                                answer = responses['q' + question.question_order + '.id'];
-                                if (answer == -1 && ('q' + question.question_order + '.value') in responses &&
+                                answer = parseInt(responses['q' + question.question_order + '.id'], 10);
+                                if (answer === -1 && ('q' + question.question_order + '.value') in responses &&
                                 responses['q' + question.question_order + '.value'].trim() !== '') {
                                     return Promise.resolve();
                                 }
@@ -339,9 +339,9 @@ module.exports = function(sequelize, DataTypes) {
                             /* falls through */
                         case 'list-radio':
                             if (('q' + question.question_order + '.id') in responses) {
-                                answer = responses['q' + question.question_order + '.id'];
+                                answer = parseInt(responses['q' + question.question_order + '.id'], 10);
                                 for (var i = 0, len = answers.length; i<len; i++) {
-                                    if (answers[i].sortorder == answer) {
+                                    if (answers[i].sortorder === answer) {
                                         return Promise.resolve();
                                     }
                                 }
@@ -380,7 +380,7 @@ module.exports = function(sequelize, DataTypes) {
                 switch (this.type) {
                     case 'list-radio-other':
                         if ('q' + this.question_order + '.id' in responses) {
-                            if (responses['q' + this.question_order + '.id'] == -1) {
+                            if (responses['q' + this.question_order + '.id'] === -1) {
                                 if ('q' + this.question_order + '.value' in responses) {
                                     return ['q' + this.question_order + ', q' + this.question_order + '_other', '?, ?', [responses['q' + this.question_order + '.id'], responses['q' + this.question_order + '.value']]];
                                 }
@@ -457,7 +457,7 @@ module.exports = function(sequelize, DataTypes) {
                                                     html += '<div class="col-xs-12 text-left"><button id="btn-q' + parent.question_order + '-a' + answers[i].sortorder +
                                                         '" type="button" class="col-xs-12 btn btn-lg survey-answer outlined-text answer-with-image" value="' + escape(answers[i].answer) +
                                                         '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' + answers[i].sortorder +
-                                                        '\', \'' + answers[i].sortorder + '\')"' + ((parent.legend_question == 'color' && answers[i].legend !== null) ?
+                                                        '\', \'' + answers[i].sortorder + '\')"' + ((parent.legend_question === 'color' && answers[i].legend !== null) ?
                                                         (' style="border-color: ' + escape(answers[i].legend) + '"') : '' ) + '><div class="flex-container">' +
                                                         '<div class="answer-img" style="background-image: url(\'/answer_img/' + answers[i].id + '\');"></div><span>' +
                                                         escape(answers[i].answer) + '</span></div></button></div>\n';
@@ -466,14 +466,14 @@ module.exports = function(sequelize, DataTypes) {
                                                     html += '<div class="col-xs-12 text-left"><button id="btn-q' + parent.question_order + '-a' + answers[i].sortorder +
                                                         '" type="button" class="col-xs-12 btn btn-lg survey-answer outlined-text" value="' + escape(answers[i].answer) +
                                                         '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
-                                                        answers[i].sortorder + '\', \'' + answers[i].sortorder + '\')"' + ((parent.legend_question == 'color' &&
+                                                        answers[i].sortorder + '\', \'' + answers[i].sortorder + '\')"' + ((parent.legend_question === 'color' &&
                                                         answers[i].legend !== null) ? (' style="border-color: ' + escape(answers[i].legend) + '"') : '' ) +
                                                         '><div class="flex-container"><span>' + escape(answers[i].answer) + '</span></div></button></div>\n';
                                                 }
                                                 html += '<style>#btn-q' + parent.question_order + '-a' + answers[i].sortorder + ':hover,' +
                                                 '#btn-q' + parent.question_order + '-a' + answers[i].sortorder + ':focus,' +
                                                 '#btn-q' + parent.question_order + '-a' + answers[i].sortorder + '.active {' +
-                                                ((parent.legend_question == 'color' && escape(answers[i].legend) !== null) ? ('background-color: ' +
+                                                ((parent.legend_question === 'color' && escape(answers[i].legend) !== null) ? ('background-color: ' +
                                                 escape(answers[i].legend) + ';') : '' ) + '}</style>';
                                             }
                                         } else {
@@ -486,8 +486,8 @@ module.exports = function(sequelize, DataTypes) {
                                                         '" type="button" class="survey-answer outlined-text btn btn-lg answer-with-image" value="' + escape(answers[j].answer) +
                                                         '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
                                                         answers[j].sortorder + '\', \'' + answers[j].sortorder + '\')"' +
-                                                        ((parent.legend_question == 'color' && answers[j].legend !== null) ? (' style="border-color: ' +
-                                                        escape(answers[j].legend) + '"') : '' ) + ' title="' + escape(answers[j].answer) + '">' + '<div class="img-with-caption"><img src="/answer_img/' +
+                                                        ((parent.legend_question === 'color' && answers[j].legend !== null) ? (' style="border-color: ' +
+                                                        escape(answers[j].legend) + '"') : '' ) + ' title="' + escape(answers[j].answer) + '"><div class="img-with-caption"><img src="/answer_img/' +
                                                         answers[j].id + '" alt="' + escape(answers[j].answer) + '" title="' + escape(answers[j].answer) + '"/><div class="img-caption">' + escape(answers[j].answer) + '</div></button></div>\n';
                                                 } else {
                                                     // If we don't have an image, we simply put the text
@@ -495,13 +495,13 @@ module.exports = function(sequelize, DataTypes) {
                                                         '" type="button" class="survey-answer outlined-text btn btn-lg" value="' + escape(answers[j].answer) +
                                                         '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order +
                                                         '-a' + answers[j].sortorder + '\', \'' + answers[j].sortorder + '\')"' +
-                                                        ((parent.legend_question == 'color' && escape(answers[j].legend) !== null) ? (' style="border-color: ' +
+                                                        ((parent.legend_question === 'color' && escape(answers[j].legend) !== null) ? (' style="border-color: ' +
                                                         escape(answers[j].legend) + '"') : '' ) + '>' + escape(answers[j].answer) + '</button></div>\n';
                                                 }
                                                 html += '<style>#btn-q' + parent.question_order + '-a' + answers[j].sortorder + ':hover,' +
                                                 '#btn-q' + parent.question_order + '-a' + answers[j].sortorder + ':focus,' +
                                                 '#btn-q' + parent.question_order + '-a' + answers[j].sortorder + '.active {' +
-                                                ((parent.legend_question == 'color' && escape(answers[j].legend) !== null) ? ('background-color: ' +
+                                                ((parent.legend_question === 'color' && escape(answers[j].legend) !== null) ? ('background-color: ' +
                                                 escape(answers[j].legend) + ';') : '' ) + '}</style>';
                                             }
                                         }
@@ -511,7 +511,7 @@ module.exports = function(sequelize, DataTypes) {
                                         html += '<div class="listbtns row">\n';
                                         var otherAnswer = null;
                                         for (var k = 0, kLen = answers.length; k < kLen; k++) {
-                                            if (answers[k].sortorder == -1) {
+                                            if (answers[k].sortorder === -1) {
                                                 otherAnswer = answers[k];
                                                 continue;
                                             }
@@ -520,7 +520,7 @@ module.exports = function(sequelize, DataTypes) {
                                                 html += '<div class="col-xs-12 text-left"><button id="btn-q' + parent.question_order + '-a' + answers[k].sortorder +
                                                     '" type="button" class="col-xs-12 btn btn-lg survey-answer outlined-text answer-with-image" value="' + escape(answers[k].answer) +
                                                     '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
-                                                    answers[k].sortorder + '\', \'' + answers[k].sortorder + '\')"' + ((parent.legend_question == 'color' && answers[k].legend !== null) ?
+                                                    answers[k].sortorder + '\', \'' + answers[k].sortorder + '\')"' + ((parent.legend_question === 'color' && answers[k].legend !== null) ?
                                                     (' style="border-color: ' + escape(answers[k].legend) + '"') : '' ) + '><div class="flex-container">' +
                                                     '<div class="answer-img" style="background-image: url(\'/answer_img/' + answers[k].id +
                                                     '\');"></div><span>' + escape(answers[k].answer) + '</span></div></button></div>\n';
@@ -529,14 +529,14 @@ module.exports = function(sequelize, DataTypes) {
                                                 html += '<div class="col-xs-12 text-left"><button id="btn-q' + parent.question_order + '-a' + answers[k].sortorder +
                                                     '" type="button" class="col-xs-12 btn btn-lg survey-answer outlined-text" value="' + escape(answers[k].answer) +
                                                     '" onclick="emapic.modules.survey.addAnswer(\'q' + parent.question_order + '\', \'btn-q' + parent.question_order + '-a' +
-                                                    answers[k].sortorder + '\', \'' + answers[k].sortorder + '\')"' + ((parent.legend_question == 'color' &&
+                                                    answers[k].sortorder + '\', \'' + answers[k].sortorder + '\')"' + ((parent.legend_question === 'color' &&
                                                     answers[k].legend !== null) ? (' style="border-color: ' + escape(answers[k].legend) + '"') : '' ) +
                                                     '><div class="flex-container"><span>' + escape(answers[k].answer) + '</span></div></button></div>\n';
                                             }
                                             html += '<style>#btn-q' + parent.question_order + '-a' + answers[k].sortorder + ':hover,' +
                                             '#btn-q' + parent.question_order + '-a' + answers[k].sortorder + ':focus,' +
                                             '#btn-q' + parent.question_order + '-a' + answers[k].sortorder + '.active {' +
-                                            ((parent.legend_question == 'color' && escape(answers[k].legend) !== null) ? ('background-color: ' +
+                                            ((parent.legend_question === 'color' && escape(answers[k].legend) !== null) ? ('background-color: ' +
                                             escape(answers[k].legend) + ';') : '' ) + '}</style>';
                                         }
                                         if (otherAnswer !== null) {
@@ -544,7 +544,7 @@ module.exports = function(sequelize, DataTypes) {
                                                 // If we have an image for the answer, we display it inside a box with the legend color left of the answer's text
                                                 html += '<div class="col-xs-12 text-left"><div id="btn-q' + parent.question_order + '-other"' +
                                                     ' class="col-xs-12 btn btn-lg survey-answer outlined-text answer-with-image other-answer"' +
-                                                    ((parent.legend_question == 'color' && otherAnswer.legend !== null) ? (' style="border-color: ' +
+                                                    ((parent.legend_question === 'color' && otherAnswer.legend !== null) ? (' style="border-color: ' +
                                                     escape(otherAnswer.legend) + '"') : '' ) + '><div class="flex-container">' +
                                                     '<div class="answer-img" style="background-image: url(\'/answer_img/' + otherAnswer.id +
                                                     '\');"></div><input autocomplete="off" id="btn-q' + parent.question_order + '-other-input"' +
@@ -555,7 +555,7 @@ module.exports = function(sequelize, DataTypes) {
                                             } else {
                                                 // If we don't have an image, we simply put the text along with a box with the legend color
                                                 html += '<div class="col-xs-12 text-left"><div id="btn-q' + parent.question_order + '-other"' +
-                                                    ' class="col-xs-12 btn btn-lg survey-answer outlined-text other-answer"' + ((parent.legend_question == 'color' &&
+                                                    ' class="col-xs-12 btn btn-lg survey-answer outlined-text other-answer"' + ((parent.legend_question === 'color' &&
                                                     otherAnswer.legend !== null) ? (' style="border-color: ' + escape(otherAnswer.legend) + '"') : '' ) +
                                                     '><div class="flex-container"><input autocomplete="off" id="btn-q' + parent.question_order +
                                                     '-other-input" placeholder="' + escape(otherAnswer.answer) + '" type="text" target="btn-q' + parent.question_order +
@@ -567,7 +567,7 @@ module.exports = function(sequelize, DataTypes) {
                                             '#btn-q' + parent.question_order + '-other:focus,' +
                                             '#btn-q' + parent.question_order + '-other:active,' +
                                             '#btn-q' + parent.question_order + '-other.active {' +
-                                            ((parent.legend_question == 'color' && escape(otherAnswer.legend) !== null) ? ('background-color: ' +
+                                            ((parent.legend_question === 'color' && escape(otherAnswer.legend) !== null) ? ('background-color: ' +
                                             escape(otherAnswer.legend) + ';') : '' ) + '}</style>';
                                         }
                                         html += '</div>\n';
@@ -604,7 +604,7 @@ module.exports = function(sequelize, DataTypes) {
                     default:
                         return new Error("Question type not contemplated.");
                 }
-            },
+            }
         },
         tableName: 'questions',
         schema: 'metadata'

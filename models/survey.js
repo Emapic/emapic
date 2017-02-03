@@ -341,7 +341,7 @@ module.exports = function(sequelize, DataTypes) {
                 // The subTitle should serve as a description of the survey question(s)
                 return this.getQuestions().then(function(questions) {
                     // As of now we only return it if the survey has only one question
-                    if (questions.length != 1) {
+                    if (questions.length !== 1) {
                         return null;
                     } else {
                         return questions[0].question;
@@ -355,7 +355,7 @@ module.exports = function(sequelize, DataTypes) {
                 }), function(question) {
                     return question.getHtml();
                 }).then(function(results){
-                    if (results.length == 1) {
+                    if (results.length === 1) {
                         return results[0];
                     }
                     return '<div class="questions-block">' +
@@ -378,17 +378,18 @@ module.exports = function(sequelize, DataTypes) {
                         validAnswers.push(questions[j].checkValidResponse(body.responses));
                     }
                     return Promise.all(validAnswers).then(function() {
-                        var usr_id = (req.user) ? parseInt(req.user.id) : null;
+                        var usr_id = (req.user) ? parseInt(req.user.id, 10) : null;
                         // If the survey is closed, or it's a draft and the
                         // vote doesn't come from its owner, we reject the vote
-                        if (survey.active === false || (survey.active === null && usr_id != owner.id)) {
+                        console.log((typeof usr_id) + ' VS ' + (typeof owner.id));
+                        if (survey.active === false || (survey.active === null && usr_id !== owner.id)) {
                             return Promise.reject({
                                 message: "Survey is no longer open or it's in draft mode.",
                                 status: 403
                             });
                         }
                         // If the survey is a draft, then its owner's votes are stored as anonymous
-                        usr_id = (survey.active === null && usr_id == owner.id) ? null : usr_id;
+                        usr_id = (survey.active === null && usr_id === owner.id) ? null : usr_id;
                         // If there is an emapic opinion, we save it
                         // We don't need it for anything, so we don't even handle
                         // its promise.
@@ -526,12 +527,14 @@ module.exports = function(sequelize, DataTypes) {
             getTotals: function() {
                 var survey = this;
                 return this.getLegend().then(function(legend) {
-                    if (!legend.color) {
+                    if (!('color' in legend)) {
                         return Promise.resolve(null);
                     }
                     var query = "SELECT count(*) AS total_responses";
                     for (var i in legend.color.responses) {
-                        query += ", (SELECT count(*) FROM opinions.survey_" + survey.id + " WHERE " + legend.color.question + "::text = '" + i + "'::text) AS \"" + i + "\"";
+                        if ({}.hasOwnProperty.call(legend.color.responses, i)) {
+                            query += ", (SELECT count(*) FROM opinions.survey_" + survey.id + " WHERE " + legend.color.question + "::text = '" + i + "'::text) AS \"" + i + "\"";
+                        }
                     }
                     query += " FROM opinions.survey_" + survey.id + ";";
                     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
@@ -637,7 +640,7 @@ module.exports = function(sequelize, DataTypes) {
                             var lastAnswers = [];
                             for (var k = 0, kLen = question.Answers.length; k<kLen; k++) {
                                 if (question.Answers[k].legend !== null) {
-                                    if (question.Answers[k].sortorder == -1) {
+                                    if (question.Answers[k].sortorder === -1) {
                                         lastAnswers.push({
                                             id: question.Answers[k].sortorder.toString(),
                                             value: question.Answers[k].answer,
