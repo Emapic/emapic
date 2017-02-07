@@ -339,10 +339,13 @@ if (typeof $.fn.validator !== 'undefined' &&
         return $.getJSON('https://nominatim.openstreetmap.org/reverse', params);
     };
 
+    var checkInputUrlIsImageTargetsDeferred = {};
+
     emapic.utils.checkInputUrlIsImage = function(input) {
         var $input = $(input),
             val = $input.val(),
-            $tgt = $('#' + $input.attr('target'));
+            tgt = $input.attr('target'),
+            $tgt = $('#' + tgt);
         $tgt.attr('disabled', true);
         if ($tgt !== null) {
             if (val !== null && val.trim() !== '') {
@@ -350,20 +353,27 @@ if (typeof $.fn.validator !== 'undefined' &&
                 if (val.lastIndexOf('http', 0) !== 0) {
                     val = 'http://' + val;
                 }
-                emapic.utils.checkUrlIsImage(val).done(function(result) {
-                    $tgt.attr('disabled', !result);
+                var dfd = checkInputUrlIsImageTargetsDeferred[tgt] = emapic.utils.checkUrlIsImage(val);
+                checkInputUrlIsImageTargetsDeferred[tgt].promise().done(function(result) {
+                    // If a more recent deferred has been created for the same
+                    // target, then we ignore the result
+                    if (checkInputUrlIsImageTargetsDeferred[tgt] === dfd) {
+                        $tgt.attr('disabled', !result);
+                    }
                 }).fail(function(error) {
-                    console.error(error);
-                    $tgt.attr('disabled', true);
+                    if (error !== null) {
+                        console.error(error);
+                    }
                 });
             }
         }
     };
 
     emapic.utils.checkUrlIsImage = function(url, timeout) {
-        var dfd = $.Deferred();
         timeout = timeout || 5000;
-        var timer, img = new Image();
+        var dfd = $.Deferred(),
+            timer,
+            img = new Image();
         img.onerror = img.onabort = function () {
             clearTimeout(timer);
             dfd.resolve(false);
@@ -375,11 +385,11 @@ if (typeof $.fn.validator !== 'undefined' &&
         timer = setTimeout(function () {
             // reset .src to invalid URL so it stops previous
             // loading, but doesn't trigger new load
-            img.src = "//!!!!/!!!!.jpg";
+            img.src = null;
             dfd.resolve(false);
         }, timeout);
         img.src = url;
-        return dfd.promise();
+        return dfd;
     };
 
 })(emapic);
