@@ -282,7 +282,7 @@
 	"question_type_text_answer_description": "The user will simply write a text answering the question.",
 	"question_type_text_answer_legend": "No.",
 	"question_type_explanatory_text_title": "Explanatory text",
-	"question_type_explanatory_text_description": "Not an actual question, but just a text that can serve, for example, as an introduction for the survey. Keep in mind that the survey must have at least one actual question.",
+	"question_type_explanatory_text_description": "Not an actual question, but just a text that can serve, for example, as an introduction for the survey. Keep in mind that the survey must have at least one actual question. URLs and e-mail addresses inside the text will be detected and transformed into links automatically.",
 	"question_type_explanatory_text_legend": "No.",
 	"question_type_image_url_title": "Image URL",
 	"question_type_image_url_description": "The user must answer with the URL of an image that will be displayed when clicking on his/her answer.",

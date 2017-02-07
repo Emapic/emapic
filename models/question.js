@@ -1,6 +1,7 @@
 var fs = require('fs'),
     escape = require('escape-html'),
-    Promise = require('bluebird');
+    Promise = require('bluebird'),
+    linkifyHtml = require('linkifyjs/html');
 
 module.exports = function(sequelize, DataTypes) {
     var Question = sequelize.define('Question', {
@@ -599,7 +600,7 @@ module.exports = function(sequelize, DataTypes) {
                         return '<div class="main-question" id="question-' + parent.question_order + '">\n' +
                             '<div class="col-xs-12 text-center"><div id="q' + parent.question_order + '-other"' +
                             '  class="col-xs-12 col-md-6 col-md-offset-3 survey-answer explanatory-text"><p id="q' + parent.question_order +
-                            '">' + escape(parent.question) + '</p><br/><button id="q' + parent.question_order +
+                            '">' + linkifyHtml(escape(parent.question)) + '</p><br/><button id="q' + parent.question_order +
                             '-ok" class="btn btn-primary" onclick="emapic.modules.survey.advanceSurvey()">OK</button></div></div>\n</div>';
                     default:
                         return new Error("Question type not contemplated.");

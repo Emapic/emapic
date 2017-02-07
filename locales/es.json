@@ -282,7 +282,7 @@
 	"question_type_text_answer_description": "El usuario simplemente escribirá un texto respondiendo a una pregunta.",
 	"question_type_text_answer_legend": "No.",
 	"question_type_explanatory_text_title": "Texto explicativo",
-	"question_type_explanatory_text_description": "No se trata realmente de una pregunta, sino de un simple texto que se puede emplear, por ejemplo, para poner una introducción a la encuesta. Ten en cuenta que la encuesta debe tener al menos una pregunta de verdad.",
+	"question_type_explanatory_text_description": "No se trata realmente de una pregunta, sino de un simple texto que se puede emplear, por ejemplo, para poner una introducción a la encuesta. Ten en cuenta que la encuesta debe tener al menos una pregunta de verdad. URLs y direcciones de correo-e dentro del texto se detectarán y transformarán en enlaces de manera automática.",
 	"question_type_explanatory_text_legend": "No.",
 	"question_type_image_url_title": "URL de imagen",
 	"question_type_image_url_description": "El usuario deberá responder a la pregunta con la URL de una imagen que se mostrará al pinchar en su respuesta.",
