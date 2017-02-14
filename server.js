@@ -128,6 +128,14 @@ var SampleApp = function() {
           // set the cookie name
           cookieName: 'locale'
         });
+        // Redirect from www-urls to non www-urls
+        self.app.use(function(req, res, next) {
+            if (req.headers && req.headers.host && req.headers.host.match(/^www/) !== null ) {
+                res.writeHead(301, { "Location": req.protocol + '://' + req.headers.host.replace(/^www\./, '') + req.url });
+                return res.end();
+            }
+            return next();
+        });
         self.app.use(function(req, res, next) {
             req.i18n.setLocale(req.i18n.preferredLocale());
             req.i18n.setLocaleFromQuery();
