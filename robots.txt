@@ -1,4 +1,0 @@
-# robots.txt example file
-
-User-agent: *
-Disallow: /api/

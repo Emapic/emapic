@@ -16,7 +16,8 @@ var express = require('express'),
     nconf = require('nconf'),
     multiparty = require('connect-multiparty'),
     errorhandler = require('errorhandler'),
-    httpErrorHandler = require('express-error-handler');
+    httpErrorHandler = require('express-error-handler'),
+    Sitemap = require('express-sitemap');
 
 /**
  *  Define the sample application.
@@ -46,6 +47,122 @@ var SampleApp = function() {
         serverConfig = nconf.get('server');
         socialConfig = nconf.get('social');
         geoConfig = nconf.get('geoServices');
+    };
+
+    /**
+     *  Generate the sitemap.xml and robots.txt
+     */
+    self.loadSitemapRobots = function() {
+        var sitemap = Sitemap({
+            url: serverConfig.domain,
+            route: {
+                // Never index the API
+                '/api/': {
+                    disallow: true
+                },
+                // Hide dynamic elements like thumbnails and surveys
+                '/thumbnails/': {
+                    hide: true
+                },
+                '/survey/': {
+                    hide: true
+                },
+                '/answer_img/': {
+                    hide: true
+                },
+                '/avatar/': {
+                    hide: true
+                },
+                // Hide pages that have no actual content
+                '/auth/': {
+                    hide: true
+                },
+                '/logout': {
+                    hide: true
+                },
+                '/activate': {
+                    hide: true
+                },
+                // Hide pages that require login
+                '/dashboard': {
+                    hide: true
+                },
+                '/profile': {
+                    hide: true
+                },
+                '/avatar': {
+                    hide: true
+                },
+                // Hide all survey pages except the gallery
+                '/surveys/': {
+                    hide: true
+                },
+                '/surveys/list': {
+                    hide: false
+                }
+            }
+        });
+
+        sitemap.originalXml = sitemap.xml;
+        sitemap.xml = function() {
+            var route = this.my.route,
+                sitemap = this.map
+                xmlGenerator = {
+                    xml: this.originalXml,
+                    my: {
+                        url: this.my.url,
+                        route: {}
+                    },
+                    map: this.map
+                };
+
+            for (var uri in sitemap) {
+                if (uri in route) {
+                    continue;
+                }
+                for (var r in route) {
+                    xmlGenerator.my.route[r] = route[r];
+                    if (/\/$/.test(r) && uri.lastIndexOf(r, 0) === 0) {
+                        xmlGenerator.my.route[uri] = route[r];
+                        break;
+                    }
+                }
+            }
+
+            return xmlGenerator.xml();
+        };
+        sitemap._XMLwork = sitemap.xml;
+
+        sitemap.originalTxt = sitemap.txt;
+        sitemap.txt = function() {
+            var route = this.my.route,
+                sitemap = this.map
+                txtGenerator = {
+                    txt: this.originalTxt,
+                    my: this.my,
+                    map: {}
+                };
+
+            for (var r in route) {
+                if (route[r].disallow) {
+                    txtGenerator.map[r] = route[r];
+                }
+            }
+
+            return txtGenerator.txt();
+        };
+        sitemap._TXTwork = sitemap.txt;
+
+        sitemap.generate(self.app, null, true);
+
+        self.app.get('/robots.txt', function (req, res) {
+            res.type('text/plain');
+            return res.send(serverConfig.robotsHeader + sitemap.txt());
+        });
+
+        self.app.get('/sitemap.xml', function (req, res) {
+            sitemap.XMLtoWeb(res);
+        });
     };
 
     /**
@@ -284,12 +401,6 @@ var SampleApp = function() {
             }
         }));
 
-        self.app.get('/robots.txt', function (req, res) {
-            var robots = fs.readFileSync('robots.txt');
-            res.type('text/plain');
-            res.send(robots);
-        });
-
         // development only
         if ('development' == self.app.get('env')) {
             self.app.use(errorhandler({log: function (err, str, req) {
@@ -310,6 +421,9 @@ var SampleApp = function() {
 
         // Create the express server and routes.
         self.initializeServer();
+
+        // Create the sitemap and robots routes
+        self.loadSitemapRobots();
     };
 
 
