@@ -285,7 +285,7 @@ var emapic = emapic || {};
                 emapic.utils.getI18n('js_totals_country', 'país') :
                 emapic.utils.getI18n('js_totals_countries', 'países')) +
                 "</div><div class='province-count'>" + Object.keys(emapic.votedProvincesData).length + " " +
-                (emapic.votedCountriesData.length == 1 ?
+                (emapic.votedProvincesData.length == 1 ?
                 emapic.utils.getI18n('js_totals_region', 'región') :
                 emapic.utils.getI18n('js_totals_regions', 'regiones')) + "</div></td>\n" +
                 totalsHtml + "<td><small>" + total + "</small></td>\n</tr>");
