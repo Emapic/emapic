@@ -230,7 +230,7 @@ module.exports = function(app) {
                         var ansId, ans;
                         switch (questions[l].type) {
                             case 'list-radio':
-                                ans = ansId = result['q' + questions[l].question_order + '.id'];
+                                ans = ansId = parseInt(result['q' + questions[l].question_order + '.id'], 10);
                                 for (var m = 0, mLen = questions[l].Answers.length; m < mLen; m++) {
                                     if (ansId === questions[l].Answers[m].sortorder) {
                                         ans = questions[l].Answers[m].answer;
@@ -239,7 +239,7 @@ module.exports = function(app) {
                                 data.push(ans);
                                 break;
                             case 'list-radio-other':
-                                ans = ansId = result['q' + questions[l].question_order + '.id'];
+                                ans = ansId = parseInt(result['q' + questions[l].question_order + '.id'], 10);
                                 for (var n = 0, nLen = questions[l].Answers.length; n < nLen; n++) {
                                     if (ansId === questions[l].Answers[n].sortorder) {
                                         ans = questions[l].Answers[n].answer;
