@@ -346,18 +346,26 @@ var emapic = emapic || {};
         return null;
     };
 
+    emapic.indivVotesLayerOnEachFeature = function(data) {
+        var popupHtml = emapic.getPopupHtml(data.feature.properties);
+        if (popupHtml !== null) {
+            data.layer.bindPopup(
+                popupHtml,
+                {
+                    className: 'popup-responses popup-status-' + data.feature.properties.status
+                }
+            );
+        }
+        return data;
+    };
+
     emapic.loadIndivVotesLayer = function() {
         return L.geoJson(emapic.indivVotesLayerData, {
             onEachFeature : function(feature, layer) {
-                var popupHtml = emapic.getPopupHtml(feature.properties);
-                if (popupHtml !== null) {
-                    layer.bindPopup(
-                        popupHtml,
-                        {
-                            className: 'popup-responses popup-status-' + feature.properties.status
-                        }
-                    );
-                }
+                emapic.indivVotesLayerOnEachFeature({
+                    feature: feature,
+                    layer: layer
+                })
             },
             pointToLayer: function (feature, latlng) {
                 var iccolor = emapic.getIconColor(feature.properties),
@@ -492,6 +500,13 @@ var emapic = emapic || {};
             coords = size * 1.5,
             clickableJs = (clickable) ? 'onmouseover="evt.target.setAttribute(\'r\', \'' + mouseoversize + '\');" onmouseout="evt.target.setAttribute(\'r\', \'' + size + '\');"' : '';
         return '<svg height="' + dims + '" width="' + dims + '" style="margin-left: -' + margins + 'px; margin-top: -' + margins + 'px;"><circle stroke="black" cx="' + coords + '" cy="' + coords + '" r="' + size + '" fill="' + color + '" ' + clickableJs + '/></svg>';
+    };
+
+    emapic.sidebarPanelClose = function () {
+    };
+
+    emapic.getIndivVotesLayerLeafletLayers = function () {
+      return emapic.indivVotesLayer.getLayers();
     };
 
 })(emapic);

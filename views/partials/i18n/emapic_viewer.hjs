@@ -40,4 +40,10 @@
     emapic.utils.registerI18n('js_geolocate_text', '{{#__}}js_geolocate_text{{/__}}');
     emapic.utils.registerI18n('js_error_loading_data', "{{#__}}js_error_loading_data{{/__}}");
     emapic.utils.registerI18n('js_error_saving_vote', "{{#__}}js_error_saving_vote{{/__}}");
+    emapic.utils.registerI18n('js_see_answers', '{{#__}}js_see_answers{{/__}}');
+    emapic.utils.registerI18n('js_close_panel', '{{#__}}js_close_panel{{/__}}');
+    emapic.utils.registerI18n('js_go_first', '{{#__}}js_go_first{{/__}}');
+    emapic.utils.registerI18n('js_go_previous', '{{#__}}js_go_previous{{/__}}');
+    emapic.utils.registerI18n('js_go_next', '{{#__}}js_go_next{{/__}}');
+    emapic.utils.registerI18n('js_go_last', '{{#__}}js_go_last{{/__}}');
 </script>

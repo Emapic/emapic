@@ -2,10 +2,11 @@
 // Locator tools code
 //
 
-$('html body').append("<!-- SIDEBAR ----------------------------------------------------->\n" +
-    "<div id='sidebar'>\n" +
+$('html body').append("<!-- sidebarLocator ----------------------------------------------------->\n" +
+    "<div id='sidebarLocator'>\n" +
     "<div id='all_countries'></div>\n" +
     "<div id='voted_countries'></div>\n" +
+    "<div id='closesidebarLocator'></div>\n" +
     "</div>");
 
 var emapic = emapic || {};
@@ -14,6 +15,7 @@ var emapic = emapic || {};
 
     var allCountries = $('#all_countries'),
         votedCountries = $('#voted_countries'),
+        closesidebarLocator = $('#closesidebarLocator'),
         allCountriesSpinner = null,
         votedCountriesSpinner = null,
         sidebar,
@@ -23,6 +25,7 @@ var emapic = emapic || {};
             "<a id='control-country' title='" + emapic.utils.getI18n('js_see_my_country', 'Ver mi país') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"country\");'><img src='/images/icon-espana.png' /></a>\n" +
             "<a id='control-country-filter' title='" + emapic.utils.getI18n('js_see_per_country', 'Ver por país') + "' href='javascript:void(0)' onclick='emapic.modules.locators.filterCountry();'><span class='glyphicon glyphicon-flag'></span></a>\n" +
             "<a id='control-world' title='" + emapic.utils.getI18n('js_see_whole_world', 'Ver todo el mundo') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"world\");'><span class='glyphicon glyphicon-globe'></span></a>",
+        closesidebarLocatorHtml = "<button type='button' onclick='emapic.modules.locators.closeSidebar();'><span class='glyphicon glyphicon-chevron-right'></span></button>",
         geolocationDependantBtns = ['control-user', 'control-country'],
         allCountriesHtml = "<div><h3>" + emapic.utils.getI18n('js_see_country', 'Ver país') + "</h3>\n" +
             "<div class='row'>\n" +
@@ -64,9 +67,10 @@ var emapic = emapic || {};
     emapic.modules.locators = emapic.modules.locators || {};
 
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
-        sidebar = L.control.sidebar('sidebar', {
+        sidebar = L.control.sidebar('sidebarLocator', {
             position: 'right',
-            autoPan: false
+            autoPan: false,
+            closeButton: false
         });
         sidebar.on('hide', function() {
             resetFixedTableHeader('#voted_countries table');
@@ -148,8 +152,18 @@ var emapic = emapic || {};
     };
 
     emapic.modules.locators.filterCountry = function() {
-        sidebar.toggle();
+        var sidebarWasOpen = $('#sidebarLocator').parent().hasClass('visible');
+        emapic.sidebarPanelClose();
+        if (!sidebarWasOpen) {
+            sidebar.show();
+        }
     };
+
+    emapic.modules.locators.closeSidebar = function() {
+        sidebar.hide();
+    };
+
+    emapic.sidebarPanelClose = emapic.utils.overrideFunction(emapic.sidebarPanelClose, null, emapic.modules.locators.closeSidebar);
 
     emapic.modules.locators.showSidebarAllCountries = function() {
         resetFixedTableHeader('#voted_countries table');
@@ -172,6 +186,7 @@ var emapic = emapic || {};
         $('#voted_countries .table-scroll').perfectScrollbar();
         votedCountriesSpinner = new Spinner().spin($('#voted_countries tbody')[0]);
         emapic.modules.locators.showSidebarVotedCountries();
+        closesidebarLocator.html(closesidebarLocatorHtml);
         populateSidebarData();
     }
 

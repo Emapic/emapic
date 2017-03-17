@@ -547,13 +547,34 @@ input.form-control[type="radio"] {
 .popup-aggregated .leaflet-popup-content > h3 {
     margin-top: 0px;
 }
+.popup-responses ul.user-answers-list {
+    padding-left: 0px;
+}
+.popup-responses ul.user-answers-list li label {
+    color: black;
+    margin-right: 5px;
+    margin-bottom: 0px;
+    display: inline;
+}
+.popup-responses ul.user-answers-list li:not(:first-child) {
+    margin-top: 5px;
+}
+.popup-responses ul.user-answers-list li span {
+    color: black;
+    font-size: 12px;
+}
+.popup-responses ul.user-answers-list li {
+    list-style: disc inside none;
+    color: black;
+}
+.popup-responses img.image-url-answer {
+    max-width: 285px !important;
+    border: 1px solid black;
+    vertical-align: top;
+}
 .leaflet-popup-content hr {
     margin-bottom: 3px;
     margin-top: 3px;
-}
-.leaflet-popup-content img.image-url-answer {
-    max-width: 300px !important;
-    border: 1px solid black;
 }
 #popup-form {
     display: none;
@@ -894,6 +915,108 @@ select#sex-select.mas {
 .leaflet-sidebar .btn-group button {
 	background-color: #A2C73A;
     color: white;
+}
+#closesidebarLocator button {
+    background-color: #A2C73A;
+    border: 1px solid white;
+    border-radius: 10px;
+    color: white;
+    float: left;
+    height: 40px;
+    width: 37px;
+    line-height: normal;
+    margin-left: -40px;
+    padding-bottom: 5px;
+    padding-left: 3px;
+    position: absolute;
+    top: 50%;
+}
+#closesidebarLocator button > .glyphicon {
+    margin-top: 6px;
+       margin-left: 12px;
+}
+#sidebarPanel {
+    overflow:hidden;
+}
+#sidebarPanel #titlesidebarPanel {
+    height: 20px;
+    width: 100%;
+    text-align: left;
+}
+#sidebarPanel #indivData {
+    margin-top: 10px;
+    margin-left: 10px;
+    padding-right: 5px;
+    height: calc(100% - 100px);
+    width: 100%;
+    margin-bottom:  300px;
+    overflow-y: auto;
+}
+#sidebarPanel #indivData ul.user-answers-list {
+    padding-left: 0px;
+}
+#sidebarPanel #indivData ul.user-answers-list li label {
+    color: black;
+    margin-right: 5px;
+    margin-bottom: 0px;
+    display: inline;
+}
+#sidebarPanel #indivData ul.user-answers-list li:not(:first-child) {
+    margin-top: 5px;
+}
+#sidebarPanel #indivData ul.user-answers-list li span {
+    color: black;
+    font-size: 12px;
+}
+#sidebarPanel #indivData ul.user-answers-list li {
+    list-style: disc inside none;
+    color: black;
+}
+#sidebarPanel #indivData img.image-url-answer {
+    max-width: 100% !important;
+    border: 1px solid black;
+    vertical-align: top;
+}
+#closesidebarPanel button {
+    background-color: #A2C73A;
+    border: 1px solid white;
+    border-radius: 10px;
+    color: white;
+    float: left;
+    height: 40px;
+    width: 37px;
+    line-height: normal;
+    margin-left: -40px;
+    padding-bottom: 5px;
+    padding-left: 3px;
+    position: absolute;
+    top: 50%;
+}
+#closesidebarPanel button > .glyphicon {
+    margin-top: 6px;
+    margin-left: 12px;
+}
+#navContainer {
+    bottom: 11px;
+    position: absolute;
+    height: 30px;
+    background-color: white;
+    right: 0;
+    left:0;
+    text-align: center;
+}
+#navContainer button {
+    margin: 3px;
+}
+#navContainer label{
+    color: black;
+    margin-right: 3px;
+}
+#CurrentFeatureNumber {
+    text-align: right;
+    margin-right: 3px;
+    font-weight: bold;
+    width: auto;
 }
 .leaflet-sidebar .search-countries {
     background-color: #DDD;

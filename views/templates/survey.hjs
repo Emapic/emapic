@@ -168,6 +168,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/leaflet.markercluster.js"></script>
     <script src="/javascripts/emapic_modules/clustering.js"></script>
 
+    <!-- Add answers panel -->
+    <script src="/javascripts/emapic_modules/panel.js"></script>
+
     {{#survey.already_opened}}
     {{#addThisId}}
     <!-- Go to www.addthis.com/dashboard to customize your tools -->

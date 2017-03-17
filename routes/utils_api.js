@@ -92,7 +92,7 @@ module.exports = function(app) {
     addIndivVotePopupMessage = function(results, questions, answers) {
         var msg;
         for (var i = 0, iLen = results.length; i<iLen; i++) {
-            msg = "";
+            msg = "<ul class='user-answers-list'>";
             for (var j = 0, jLen = questions.length; j<jLen; j++) {
                 switch (questions[j].type) {
                     case 'list-radio':
@@ -114,14 +114,14 @@ module.exports = function(app) {
                         } else {
                             value = results[i]['q' + questions[j].question_order + '.id'];
                         }
-                        msg += "<b>" + questions[j].question + ':</b> ' + value + '<br/>';
+                        msg += "<li><label>" + questions[j].question + ':</label><span>' + value + '</span></li>';
                         break;
                     case 'text-answer':
-                        msg += "<b>" + questions[j].question + ':</b> ' + results[i]['q' + questions[j].question_order + '.value'] + '<br/>';
+                        msg += "<li><label>" + questions[j].question + ':</label><span>' + results[i]['q' + questions[j].question_order + '.value'] + '</span></li>';
                         break;
                     case 'image-url':
-                        msg += "<b>" + questions[j].question + ':</b><a href="' + results[i]['q' + questions[j].question_order + '.value'] +
-                            '" target="_blank"><img class="image-url-answer" src="' + results[i]['q' + questions[j].question_order + '.value'] + '"><img/></a>';
+                        msg += "<li><label>" + questions[j].question + ':</label><span><a href="' + results[i]['q' + questions[j].question_order + '.value'] +
+                            '" target="_blank"><img class="image-url-answer" src="' + results[i]['q' + questions[j].question_order + '.value'] + '"><img/></a></span></li>';
                         break;
                     case 'explanatory-text':
                         break;
@@ -129,7 +129,7 @@ module.exports = function(app) {
                         return new Error("Question type not contemplated.");
                 }
             }
-            results[i].popup_msg = msg;
+            results[i].popup_msg = msg + '</ul>';
         }
         return results;
     };

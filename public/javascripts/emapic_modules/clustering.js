@@ -14,6 +14,13 @@ var emapic = emapic || {};
     emapic.modules = emapic.modules || {};
     emapic.modules.clustering = emapic.modules.clustering || {};
 
+    emapic.getIndivVotesLayerLeafletLayers = function () {
+        if (clusteringActive) {
+            emapic.modules.clustering.toggleClustering($('#clustering-control-activate'));
+        }
+        return emapic.indivVotesLayer.getLayers();
+    };
+
     emapic.loadIndivVotesLayer = emapic.utils.overrideFunction(emapic.loadIndivVotesLayer, null, function(markers) {
         if (clusteringActive) {
             if (emapic.legend && emapic.legend.color) {
