@@ -124,6 +124,36 @@ var emapic = emapic || {};
     };
 
     emapic.initializeMap = function() {
+        emapic.map = L.map('map', {
+            attributionControl: false,
+            zoomControl: false
+        });
+        emapic.map.addControl(L.control.zoom({
+            zoomInTitle: emapic.utils.getI18n('js_zoom_in', 'Zoom más'),
+            zoomOutTitle: emapic.utils.getI18n('js_zoom_out', 'Zoom menos'),
+        }));
+        emapic.map.addControl(L.control.attribution({
+            prefix: '<a href="/legal/terms" title="' + emapic.utils.getI18n('js_open_legal_terms_another_tab', 'Abrir cláusulas legales en otra pestaña') + '" target="_blank">' + emapic.utils.getI18n('js_emapic_legal_terms', 'Cláusulas legales de emapic') + '</a> | <a title="A JS library for interactive maps" href="http://leafletjs.com">Leaflet</a>'
+        }));
+
+        emapic.map.setMaxBounds(
+            L.latLngBounds(
+                L.latLng(85, -180),
+                L.latLng(-85, 180)
+            )
+        );
+
+        emapic.addBaseLayers();
+
+        emapic.addTooltips();
+        emapic.map.on('popupopen', function(e) {
+            $(e.popup.getContent()).find("img").load(function() {
+                e.popup.update();
+            });
+        });
+    };
+
+    emapic.addBaseLayers = function() {
         var osmAttrib = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>';
         var mapboxAttrib = "<a href='https://www.mapbox.com/about/maps/' target='_blank'>&copy; Mapbox &copy; OpenStreetMap</a> <a class='mapbox-improve-map' href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a>";
 
@@ -151,25 +181,6 @@ var emapic = emapic || {};
             });
             baseMaps[emapic.utils.getI18n('js_satellite_mapbox_baselayer')] = mapboxSatellite;
         }
-
-        emapic.map = L.map('map', {
-            attributionControl: false,
-            zoomControl: false
-        });
-        emapic.map.addControl(L.control.zoom({
-            zoomInTitle: emapic.utils.getI18n('js_zoom_in', 'Zoom más'),
-            zoomOutTitle: emapic.utils.getI18n('js_zoom_out', 'Zoom menos'),
-        }));
-        emapic.map.addControl(L.control.attribution({
-            prefix: '<a href="/legal/terms" title="' + emapic.utils.getI18n('js_open_legal_terms_another_tab', 'Abrir cláusulas legales en otra pestaña') + '" target="_blank">' + emapic.utils.getI18n('js_emapic_legal_terms', 'Cláusulas legales de emapic') + '</a> | <a title="A JS library for interactive maps" href="http://leafletjs.com">Leaflet</a>'
-        }));
-
-        emapic.map.setMaxBounds(
-            L.latLngBounds(
-                L.latLng(85, -180),
-                L.latLng(-85, 180)
-            )
-        );
         emapic.currentBaseLayer = osmMapnikBW;
         emapic.map.addLayer(osmMapnikBW);
 
@@ -185,20 +196,18 @@ var emapic = emapic || {};
                 }
             });
         });
-        L.control.layers(baseMaps, null, {position: 'bottomright'}).addTo(emapic.map);
+        emapic.addLayerSelector(baseMaps, null);
         emapic.map.on('baselayerchange', function(layer) {
-            if (emapic.currentBaseLayer != layer.layer) {
+            if (emapic.currentBaseLayer !== layer.layer) {
                 emapic.baseLayerLoadedPromise = null;
                 emapic.currentBaseLayer = layer;
             }
         });
-        emapic.addTooltips();
-        emapic.map.on('popupopen', function(e) {
-            $(e.popup.getContent()).find("img").load(function() {
-                e.popup.update();
-            });
-        });
     };
+
+    emapic.addLayerSelector = function(baselayers, overlays) {
+        L.control.layers(baselayers, overlays, {position: 'bottomright'}).addTo(emapic.map);
+    }
 
     emapic.startMapLogic = function() {
         // We use this flag in order to prevent a strange problem where
