@@ -113,7 +113,7 @@ module.exports = function(app) {
             logger.info("Registered new user with mail " + user.email + " and id " + user.id);
             res.redirect('/');
         }).catch(function(err) {
-            if (user.id !== null) {
+            if ('id' in user && user.id !== null) {
                 user.destroy().then(function() {
                     req.session.error = 'signup_error_msg';
                     logger.error('Error while creating user: ' + err);
