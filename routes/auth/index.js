@@ -361,7 +361,7 @@ module.exports = function(app) {
                 throw new Error('password_reset_invalid_user');
             }
             var usrid = crypto.createHash('md5').update(user.salt + user.email).digest('hex');
-            sendMail({
+            return sendMail({
                 to: user.email,
                 subject: req.i18n.__("password_reset_confirm_mail_subject"),
                 text: req.i18n.__("password_reset_confirm_mail_text_body",
@@ -369,6 +369,7 @@ module.exports = function(app) {
                 html: req.i18n.__("password_reset_confirm_mail_html_body",
                     user.login, "https://" + req.get('host') + "/pwd_reset/confirm?id=" + usrid)
             });
+        }).then(function() {
             req.session.success = "password_reset_confirm_success_msg";
             logger.info("Reset password confirm mail sent to user with mail " + user.email + " and id " + user.id);
         }).catch(function (err){
@@ -402,7 +403,7 @@ module.exports = function(app) {
             user.password = bcrypt.hashSync(user.salt + password, 8);
             return user.save();
         }).then(function(user){
-            sendMail({
+            return sendMail({
                 to: user.email,
                 subject: req.i18n.__("password_reset_mail_subject"),
                 text: req.i18n.__("password_reset_mail_text_body",
@@ -410,6 +411,7 @@ module.exports = function(app) {
                 html: req.i18n.__("password_reset_mail_html_body",
                     user.login, password, "https://" + req.get('host') + "/profile")
             });
+        }).then(function(){
             req.session.success = 'password_reset_success_msg';
             logger.info("Reset password mail sent to user with mail " + user.email + " and id " + user.id);
         }).catch(function (err){
