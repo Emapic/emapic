@@ -7,7 +7,7 @@ winston.transports.FileSoleLevel = function(options) {
 };
 util.inherits(winston.transports.FileSoleLevel, winston.Transport);
 winston.transports.FileSoleLevel.prototype.log = function(level, msg, meta, callback) {
-    if (level != this.soleLevel) {
+    if (level !== this.soleLevel) {
         callback(null, true);
     } else {
         this.realLogger.log(level, msg, meta, callback);
@@ -77,8 +77,14 @@ var requestsLogger = winston.loggers.requests = new winston.Logger({
 
 module.exports.stream = {
     write: function(message, encoding) {
-        var json = JSON.parse(message);
-        if (json.remote_addr != '127.0.0.1' && json.remote_addr != 'localhost') {
+        var json;
+        try {
+            json = JSON.parse(message);
+        } catch (ex) {
+            winston.loggers.internal.error('Error while parsing HTTP request: ' + ex + ' || Message: ' + message);
+            return;
+        }
+        if (json.remote_addr !== '127.0.0.1' && json.remote_addr !== 'localhost') {
             requestsLogger.verbose('Web request info', json);
         } else {
             requestsLogger.debug('Localhost web request info', json);
