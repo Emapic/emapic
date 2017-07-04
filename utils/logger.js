@@ -1,5 +1,6 @@
 var util = require('util'),
-    winston = require('winston');
+    winston = require('winston'),
+    morgan = require('morgan');
 
 winston.transports.FileSoleLevel = function(options) {
     this.soleLevel = options.level || 'info';
@@ -73,6 +74,10 @@ var requestsLogger = winston.loggers.requests = new winston.Logger({
     ],
     exitOnError: false,
     emitErrs: false
+});
+
+morgan.token('user-agent', function (req, res) {
+    return req.headers['user-agent'] !== null ? req.headers['user-agent'].replace(/"/g, '\\"') : null;
 });
 
 module.exports.stream = {
