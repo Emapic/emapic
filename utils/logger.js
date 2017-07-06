@@ -77,7 +77,7 @@ var requestsLogger = winston.loggers.requests = new winston.Logger({
 });
 
 morgan.token('user-agent', function (req, res) {
-    return req.headers['user-agent'] !== null ? req.headers['user-agent'].replace(/"/g, '\\"') : null;
+    return ('user-agent' in req.headers && req.headers['user-agent'] !== null) ? req.headers['user-agent'].replace(/"/g, '\\"') : null;
 });
 
 module.exports.stream = {
