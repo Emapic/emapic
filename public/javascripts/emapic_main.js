@@ -44,6 +44,10 @@ var emapic = emapic || {};
         return "/api/baselayers/countries?geom=bbox&lang=" + emapic.locale;
     };
 
+    emapic.getCountryProvincesJsonBboxUrl = function(countryIsoCode) {
+        return "/api/baselayers/provinces?geom=bbox&country=" + countryIsoCode + "&lang=" + emapic.locale;
+    };
+
     emapic.getResultsJsonUrl = function() {
         return "/api/survey/" + emapic.surveyId + "/results";
     };
@@ -130,7 +134,7 @@ var emapic = emapic || {};
         });
         emapic.map.addControl(L.control.zoom({
             zoomInTitle: emapic.utils.getI18n('js_zoom_in', 'Zoom más'),
-            zoomOutTitle: emapic.utils.getI18n('js_zoom_out', 'Zoom menos'),
+            zoomOutTitle: emapic.utils.getI18n('js_zoom_out', 'Zoom menos')
         }));
         emapic.map.addControl(L.control.attribution({
             prefix: '<a href="/legal/terms" title="' + emapic.utils.getI18n('js_open_legal_terms_another_tab', 'Abrir cláusulas legales en otra pestaña') + '" target="_blank">' + emapic.utils.getI18n('js_emapic_legal_terms', 'Cláusulas legales de emapic') + '</a> | <a title="A JS library for interactive maps" href="http://leafletjs.com">Leaflet</a>'

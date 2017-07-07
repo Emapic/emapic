@@ -276,7 +276,7 @@ var emapic = emapic || {};
 
     emapic.modules.survey.confirmPosition = function() {
         $('#check-loc, #check-edit-loc').hide();
-        endEditMarkerPos(true);
+        emapic.modules.survey.endEditMarkerPos(true);
         emapic.utils.enableMapInteraction();
         if (($("#popup-form").length === 0) ||
             ($("#popup-form").children().length === 0)) {
@@ -295,7 +295,7 @@ var emapic = emapic || {};
     emapic.modules.survey.cancelPosition = function() {
         $('#check-edit-loc').hide();
         $('#check-loc').show();
-        endEditMarkerPos(false);
+        emapic.modules.survey.endEditMarkerPos(false);
     };
 
     function createMarkerPopupQuestions() {
@@ -394,21 +394,7 @@ var emapic = emapic || {};
     emapic.updateIndivVotesLayerControls = emapic.utils.overrideFunction(emapic.updateIndivVotesLayerControls,
         null, emapic.modules.survey.updateResponsesMarker);
 
-    function centerMarker() {
-        var markerPos = emapic.modules.survey.marker.getLatLng();
-        emapic.map.setView(markerPos);
-    }
-
-    function editMarkerPos() {
-        emapic.utils.enableMapInteraction();
-        emapic.map.setView(emapic.position);
-        emapic.modules.survey.marker.dragging.enable();
-        emapic.map.on('click', function(e) {
-            emapic.modules.survey.marker.setLatLng(e.latlng);
-        });
-    }
-
-    function endEditMarkerPos(change) {
+    emapic.modules.survey.endEditMarkerPos = function(change) {
         emapic.utils.disableMapInteraction();
         if ( change ) {
             markerpos = emapic.modules.survey.marker.getLatLng();
@@ -418,6 +404,22 @@ var emapic = emapic || {};
         }
         emapic.map.off('click');
         centerMarker();
+    }
+
+    function centerMarker() {
+        var markerPos = emapic.modules.survey.marker.getLatLng();
+        emapic.map.setView(markerPos);
+    }
+
+    function editMarkerPos() {
+        emapic.utils.enableMapInteraction();
+        emapic.map.setView(emapic.position);
+        if ('dragging' in emapic.modules.survey.marker) {
+            emapic.modules.survey.marker.dragging.enable();
+        }
+        emapic.map.on('click', function(e) {
+            emapic.modules.survey.marker.setLatLng(e.latlng);
+        });
     }
 
 })(emapic);
