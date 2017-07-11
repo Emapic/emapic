@@ -9,7 +9,7 @@
   font-style: normal;
 }
 .flag-container {
-    display: inline;
+    display: block;
     border: 1px solid black;
 }
 .flag-container .flag-icon {
