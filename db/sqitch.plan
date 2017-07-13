@@ -11,3 +11,4 @@ update_province_names [base_layers] 2016-10-20T11:39:33Z Jorge López Fernández
 update_municipalities_geoms [base_layers] 2016-10-25T17:13:53Z Jorge López Fernández <jlopez@emapic.es> # Update some municipalities' geoms\n\nThere are a few of municipalities with some small\nmistakes which are better corrected.
 add_simplified_geoms [base_layers] 2016-10-27T11:34:16Z Jorge López Fernández <jlopez@emapic.es> # Add simplified geoms to base layers\n\nWe add a new column with the simplified geoms\nfor countries, provinces and municipalities.
 add_image_url_question [emapic_tables] 2017-01-30T12:17:29Z Jorge López Fernández <jlopez@emapic.es> # Add new question type: image URL
+ignore_null_provinces [emapic_tables] 2017-07-13T11:02:17Z Jorge López Fernández <jlopez@emapic.es> # Don't link responses to provinces w/o name
