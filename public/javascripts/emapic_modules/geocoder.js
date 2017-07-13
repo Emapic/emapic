@@ -56,7 +56,9 @@ var emapic = emapic || {};
     }
 
     emapic.modules.geocoder.removeGeocoder = function() {
-        if (emapic.modules.geocoder.control !== null) {
+        if (emapic.modules.geocoder.control !== null &&
+            '_map' in emapic.modules.geocoder.control &&
+            emapic.modules.geocoder.control._map !== null) {
             emapic.modules.geocoder.control.removeFrom(emapic.map);
         }
     }
