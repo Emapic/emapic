@@ -338,7 +338,7 @@ var emapic = emapic || {};
                 $('#thanks-msg').show();
                 setTimeout(function(){
                     $('#thanks-msg').fadeOut();
-                    emapic.startMapLogic();
+                    setTimeout(emapic.startMapLogic, 500);
                 }, emapic.modules.survey.thksMsgTimeOut);
             },
             error : function(data) {

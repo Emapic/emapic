@@ -353,7 +353,7 @@ var emapic = emapic || {};
     };
 
     emapic.getPopupHtml = function(data) {
-        if (data.popup_msg !== null) {
+        if ('popup_msg' in data && data.popup_msg !== null) {
             return data.popup_msg;
         }
         return null;
