@@ -112,8 +112,9 @@ var emapic = emapic || {};
     };
 
     emapic.preinitEmapic = function() {
-        // If we have a legend, we load it. Otherwise, we init the map.
-        if (emapic.getLegendJsonUrl() !== null) {
+        // If we have a legend and we must display results, we load it.
+        // Otherwise, we init the map.
+        if (emapic.getLegendJsonUrl() !== null && (emapic.resultsAfterVote || emapic.surveyResults)) {
             emapic.loadLegend();
         } else {
             emapic.initEmapic();
@@ -220,7 +221,7 @@ var emapic = emapic || {};
             return false;
         }
         emapic.logicAlreadyStarted = true;
-        if (emapic.resultsAfterVote) {
+        if (emapic.resultsAfterVote || emapic.surveyResults) {
             emapic.loadData();
         } else {
             window.location.href = emapic.redirectUrl;
