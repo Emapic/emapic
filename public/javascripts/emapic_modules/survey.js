@@ -349,7 +349,7 @@ var emapic = emapic || {};
                     type: 'danger',
                     z_index: 12000
                 });
-                emapic.startMapLogic();
+                setTimeout(emapic.startMapLogic, 5000);
             }
         });
     };
