@@ -60,6 +60,7 @@ var emapic = emapic || {};
     };
 
     emapic.geoapi.afterGeopos = function() {
+        $('#questions-flex-container').show();
         $('#questions-wrapper').show();
         emapic.modules.survey.startSurvey();
     };
@@ -242,6 +243,7 @@ var emapic = emapic || {};
     emapic.modules.survey.submitSurvey = function() {
         $('#survey-resume').hide();
         $('#questions-wrapper').hide();
+        $('#questions-flex-container').hide();
         // If we use manual geolocation, we don't show the button for using
         // the user's default position, as it's used as the initial position
         // by default
@@ -255,6 +257,7 @@ var emapic = emapic || {};
         $('#end-survey-btn').show();
         $('#check-loc').hide();
         $('#questions-wrapper').show();
+        $('#questions-flex-container').show();
     };
 
     emapic.modules.survey.successGeolocationApi = function(pos) {

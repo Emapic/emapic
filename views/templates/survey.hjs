@@ -81,17 +81,19 @@
 
           <div id="map" class="map"></div>
 
-          <div id="questions-wrapper" class="text-center" hidden>
-            <div class="questions-section">
-            {{{ questions_html }}}
-            </div>
-
-            <div id="survey-nav-btns">
-                <div id="block-nav-btns">
+          <div id="questions-flex-container" style="display: none;">
+              <div id="questions-wrapper" class="text-center" hidden>
+                <div class="questions-section">
+                {{{ questions_html }}}
                 </div>
-                <button id="end-survey-btn" class="btn btn-success" onclick="emapic.modules.survey.surveyFinished()" style="display: none;">{{#__}}finish{{/__}}</button>
-            </div>
 
+                <div id="survey-nav-btns">
+                    <div id="block-nav-btns">
+                    </div>
+                    <button id="end-survey-btn" class="btn btn-success" onclick="emapic.modules.survey.surveyFinished()" style="display: none;">{{#__}}finish{{/__}}</button>
+                </div>
+
+              </div>
           </div>
 
           <div id="thanks-msg" class="text-center" hidden>

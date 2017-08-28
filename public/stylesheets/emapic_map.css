@@ -752,10 +752,32 @@ select#sex-select.mas {
     width: 100%;
     padding: 0em 4em;
     background-color: #004F71;
-    position: absolute;
     z-index: 1001;
+}
+div.row-fluid > div.col {
+    position: relative;
+}
+div.col > #questions-wrapper,
+div.col > #thanks-msg {
+    position: absolute;
     margin-top: -25%;
     margin-top: -70vh;
+}
+#questions-flex-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: absolute;
+    top: 0px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+#questions-flex-container > #questions-wrapper {
+    margin: auto;
+    width: 100%;
+    padding: 0em 4em;
+    background-color: #004F71;
+    z-index: 1001;
 }
 #questions-wrapper h2, #thanks-msg h2 {
     color: white;
@@ -1005,9 +1027,6 @@ select#sex-select.mas {
 }
 .featurette p {
     color: #b3b3b3;
-}
-.leaflet-sidebar {
-    padding-bottom: 20px;
 }
 .leaflet-sidebar .btn-group,
 .leaflet-sidebar input {
