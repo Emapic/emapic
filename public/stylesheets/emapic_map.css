@@ -405,6 +405,10 @@ input.form-control[type="radio"] {
     white-space: normal;
     word-wrap: break-word;
 }
+.question-selector ul.dropdown-menu {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
 .question-selector select {
     max-width: 150px;
 }
