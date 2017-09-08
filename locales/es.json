@@ -14,7 +14,7 @@
 	"cookies_message_body": "Este sitio web utiliza cookies propias y de terceros para recabar información estadística sobre las visitas y poder ofrecerte una mejor experiencia y servicio. Al navegar o utilizar nuestros servicios, aceptas el uso que hacemos de las cookies.",
 	"cookies_dismiss": "Acepto",
 	"cookies_learn_more": "Saber más",
-	"geoposwarning_title": "Aviso de geoposicionamiento",
+	"geoposwarning_title": "Esta encuesta requiere tu posición",
 	"geoposwarning_emapic_geopositioning": "Geoposicionamiento de Emapic",
 	"geoposwarning_emapic_geopositioning_body_1": "Esta encuesta requiere utilizar la posición geográfica ofrecida por el navegador web para poder ofrecer un mapa de ubicaciones de las respuestas.",
 	"geoposwarning_emapic_geopositioning_body_2": "La única finalidad de la encuesta es conocer las opiniones de los usuarios y su localización aproximada, así la posición final puede ser modificada libremente durante el proceso de la encuesta antes de que se guarde la información requerida del usuario.",

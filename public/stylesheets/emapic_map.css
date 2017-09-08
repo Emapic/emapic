@@ -238,6 +238,10 @@ div.alert-danger a {
 #geoposwarn .modal-content, #geoposwarn .panel, #geoposwarn .panel-default > .panel-heading, #geoposresult .modal-content, #stats-modal .modal-content, #survey-resume .modal-content, #survey-info .modal-content {
     background-color: #004F71;
 }
+#geoposwarn .modal-content a:hover, #geoposresult .modal-content a:hover, #stats-modal .modal-content a:hover, #survey-resume .modal-content a:hover, #survey-info .modal-content a:hover,
+#geoposwarn .modal-content a:focus, #geoposresult .modal-content a:focus, #stats-modal .modal-content a:focus, #survey-resume .modal-content a:focus, #survey-info .modal-content a:focus {
+    color: #ADD8E6;
+}
 #geoposwarn .modal-header button, #geoposresult .modal-header button, #stats-modal .modal-header button, #survey-resume .modal-header button {
     color: white;
 }

@@ -8,12 +8,12 @@
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="headingOne">
                     <h4 class="panel-title">
-                        <a role="button"{{#user}} class="collapsed"{{/user}} data-toggle="collapse" href="#collapseGeolocation" aria-expanded="true" aria-controls="collapseOne">
+                        <a role="button" class="collapsed" data-toggle="collapse" href="#collapseGeolocation" aria-expanded="true" aria-controls="collapseOne">
                             {{#__}}geoposwarning_emapic_geopositioning{{/__}}
                         </a>
                     </h4>
                 </div>
-                <div id="collapseGeolocation" class="panel-collapse collapse{{^user}} in{{/user}}" role="tabpanel" aria-labelledby="headingOne">
+                <div id="collapseGeolocation" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                     <div class="panel-body">
                         <p>{{#__}}geoposwarning_emapic_geopositioning_body_1{{/__}}</p>
                         <p>{{#__}}geoposwarning_emapic_geopositioning_body_2{{/__}}</p>
@@ -23,12 +23,12 @@
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="headingOne">
                     <h4 class="panel-title">
-                        <a role="button"{{^user}} class="collapsed"{{/user}} data-toggle="collapse" href="#collapseOptions" aria-expanded="true" aria-controls="collapseOne">
+                        <a role="button" class="collapsed" data-toggle="collapse" href="#collapseOptions" aria-expanded="true" aria-controls="collapseOne">
                             {{#__}}geoposwarning_options{{/__}}
                         </a>
                     </h4>
                 </div>
-                <div id="collapseOptions" class="panel-collapse collapse{{#user}} in{{/user}}" role="tabpanel" aria-labelledby="headingOne">
+                <div id="collapseOptions" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                     <div class="panel-body">
                         {{#user}}
                         <p>{{#__}}geoposwarning_options_header_logged{{/__}}</p>
