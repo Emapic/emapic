@@ -3,6 +3,7 @@
 	background: white;
 	min-width: 26px;
 	min-height: 26px;
+	max-width: 410px;
 }
 
 .leaflet-touch .leaflet-control-geocoder {
@@ -30,7 +31,7 @@
 	color: #000000;
 	margin-right: 10px;
 }
-.leaflet-control-geocoder-selectors-table {
+.leaflet-control-geocoder-selectors-table td:last-child {
 	width: 100%;
 }
 
