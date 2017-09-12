@@ -3,7 +3,7 @@
 	background: white;
 	min-width: 26px;
 	min-height: 26px;
-	max-width: 415px;
+	max-width: 420px;
 }
 
 .leaflet-touch .leaflet-control-geocoder {
@@ -41,12 +41,15 @@
 }
 .leaflet-control-geocoder-expanded .leaflet-control-geocoder-form {
 	display: inline-block;
+	width: 100%;
+	text-align: right;
 }
 .leaflet-control-geocoder-form input {
 	font-size: 120%;
 	border: 0;
 	background-color: transparent;
 	width: 350px;
+	width: calc(100% - 28px);
 }
 
 .leaflet-control-geocoder-icon {
