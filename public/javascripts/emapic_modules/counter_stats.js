@@ -104,16 +104,12 @@ var emapic = emapic || {};
             }
         });
         if ($('#app-total-counter-body').css('display') != 'none') {
-            $('#app-total-counter-list-container').jScrollPane({
-                contentWidth: '0px'
-            });
+            $('#app-total-counter-list-container').jScrollPane();
         } else {
             scrollPanePending = true;
             $('#app-total-counter-body').on('shown.bs.collapse', function() {
                 if (scrollPanePending) {
-                    $('#app-total-counter-list-container').jScrollPane({
-                        contentWidth: '0px'
-                    });
+                    $('#app-total-counter-list-container').jScrollPane();
                     scrollPanePending = false;
                 }
             });
