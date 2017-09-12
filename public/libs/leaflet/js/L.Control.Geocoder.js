@@ -177,7 +177,7 @@ module.exports = {
 				}
 			} else {
 				L.DomEvent.addListener(icon, 'click', function(e) {
-					this._geocode(e);
+					this._geocode();
 				}, this);
 				this._expand();
 			}
