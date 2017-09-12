@@ -49,7 +49,11 @@
 	border: 0;
 	background-color: transparent;
 	width: 350px;
-	width: calc(100% - 28px);
+	width: calc(100% - 30px);
+}
+
+.leaflet-control-geocoder .leaflet-control-geocoder-selectors-table .selectize-input > input[placeholder] {
+  width: 100% !important;
 }
 
 .leaflet-control-geocoder-icon {
