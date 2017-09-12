@@ -30,7 +30,7 @@
 	color: #000000;
 	margin-right: 10px;
 }
-.leaflet-control-geocoder-selectors-table tr td:last-child {
+.leaflet-control-geocoder-selectors-table {
 	width: 100%;
 }
 
