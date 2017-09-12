@@ -642,6 +642,9 @@ input.form-control[type="radio"] {
 .leaflet-bar:not(.time-control) .tooltip-arrow {
     border-right-color: #004F71 !important;
 }
+.leaflet-touch .leaflet-bar.time-control {
+    border: none;
+}
 .time-control .tooltip-arrow {
     border-top-color: #004F71 !important;
 }

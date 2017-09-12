@@ -201,8 +201,11 @@ var emapic = emapic || {};
             slide: sliderFilter,
             change: sliderFilter,
             start: function( event, ui ) {
-                    event.stopPropagation();
+                event.stopPropagation();
             }
+        });
+        $('#time-slider').bind('touchmove', function(e) {
+            e.stopPropagation();
         });
         filterDates = [sliderDates[sliderLevel][0], sliderDates[sliderLevel][sliderDates[sliderLevel][1].length - 1]];
         $('.ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
