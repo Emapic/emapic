@@ -896,13 +896,13 @@ div.col > #thanks-msg {
     font-size: 18px;
     color: #004f71;
 }
-.survey-answer.explanatory-text p > a {
+#questions-wrapper .survey-answer.explanatory-text p > a {
     font-size: 18px;
     color: #800080;
 }
-.survey-answer.explanatory-text p > a:hover,
-.survey-answer.explanatory-text p > a:active,
-.survey-answer.explanatory-text p > a:focus {
+#questions-wrapper .survey-answer.explanatory-text p > a:hover,
+#questions-wrapper .survey-answer.explanatory-text p > a:active,
+#questions-wrapper .survey-answer.explanatory-text p > a:focus {
     color: #ff00ff;
 }
 .listbtns .survey-answer.outlined-text {
