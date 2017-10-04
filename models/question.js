@@ -458,7 +458,7 @@ module.exports = function(sequelize, DataTypes) {
                     case 'explanatory-text':
                         html += '<div class="col-xs-12 text-center"><div id="q' + parent.question_order + '-other"' +
                             '  class="col-xs-12 col-md-6 col-md-offset-3 survey-answer explanatory-text"><p id="q' + parent.question_order +
-                            '">' + linkifyHtml(escape(parent.question)) + '</p><br/><button id="q' + parent.question_order +
+                            '">' + transformNewlinesToHtml(linkifyHtml(escape(parent.question))) + '</p><br/><button id="q' + parent.question_order +
                             '-ok" class="btn btn-primary" onclick="emapic.modules.survey.advanceSurvey()">OK</button></div></div>';
                         break;
                     default:

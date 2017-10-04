@@ -226,4 +226,8 @@ module.exports = function(app) {
         });
         return dfd.promise;
     };
+
+    transformNewlinesToHtml = function(text) {
+        return text.replace(/(?:\r\n|\r|\n)/g, '<br/>');
+    };
 };
