@@ -129,10 +129,6 @@ var emapic = emapic || {};
                 i != 'country_id' && i != 'adm_code' && i != 'adm_type' &&
                 i != 'country_iso_code' && i.split('_')[0] == emapic.legend.color.question) {
                 question = i.split('_')[0];
-                if (isNaN(question.replace('q', '')) ||
-                    isNaN(i.split('_')[1])) {
-                    continue;
-                }
     			if (!orderedVotes[question]) {
     				orderedVotes[question] = [];
     			}
