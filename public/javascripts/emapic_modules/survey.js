@@ -405,7 +405,7 @@ var emapic = emapic || {};
         } else {
             emapic.modules.survey.marker.setLatLng(emapic.position);
         }
-        emapic.map.off('click');
+        emapic.map.off('click', setResponseMarkerPosition);
         centerMarker();
     }
 
@@ -420,9 +420,11 @@ var emapic = emapic || {};
         if ('dragging' in emapic.modules.survey.marker) {
             emapic.modules.survey.marker.dragging.enable();
         }
-        emapic.map.on('click', function(e) {
-            emapic.modules.survey.marker.setLatLng(e.latlng);
-        });
+        emapic.map.on('click', setResponseMarkerPosition);
+    }
+
+    function setResponseMarkerPosition(e) {
+        emapic.modules.survey.marker.setLatLng(e.latlng);
     }
 
 })(emapic);
