@@ -49,7 +49,7 @@
     "passport-google-oauth": "^1.0.0",
     "passport-local": "^1.0.0",
     "passport-remember-me": "^0.0.1",
-    "pg": "*",
+    "pg": ">=6.0.0 <7.0.0",
     "pg-hstore": "^2.3.2",
     "phantomjs-prebuilt": "^2.1.4",
     "randomstring": "^1.0.3",
