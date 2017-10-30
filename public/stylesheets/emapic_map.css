@@ -1467,7 +1467,7 @@ div.col > #thanks-msg {
     .dropdown-menu.share-url input.share-url-box {
         margin-bottom: 20px;
     }
-    #questions-wrapper, #thanks-msg {
+    #questions-flex-container > #questions-wrapper, #questions-wrapper, #thanks-msg {
         padding: 0 1em;
     }
     .question-selector select {
