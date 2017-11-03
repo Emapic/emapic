@@ -293,14 +293,15 @@ var emapic = emapic || {};
                     totalsHtml += "<td><small>" + totals[j] + "</small></td>\n";
                 }
             }
+            var votedProvincesNr = Object.keys(emapic.votedProvincesData).length;
             $('#voted_countries tbody').html("<tr class='stats-country-totals'>\n" +
                 "<td class='stats-country-label'></td>\n" +
                 "<td colspan='3'><div>" + emapic.votedCountriesData.length +
                 " " + (emapic.votedCountriesData.length == 1 ?
                 emapic.utils.getI18n('js_totals_country', 'país') :
                 emapic.utils.getI18n('js_totals_countries', 'países')) +
-                "</div><div class='province-count'>" + Object.keys(emapic.votedProvincesData).length + " " +
-                (emapic.votedProvincesData.length == 1 ?
+                "</div><div class='province-count'>" + votedProvincesNr + " " +
+                (votedProvincesNr == 1 ?
                 emapic.utils.getI18n('js_totals_region', 'región') :
                 emapic.utils.getI18n('js_totals_regions', 'regiones')) + "</div></td>\n" +
                 totalsHtml + "<td><small>" + total + "</small></td>\n</tr>");
