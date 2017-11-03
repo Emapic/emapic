@@ -315,6 +315,18 @@ div#signup-disclaimer input[type="checkbox"] {
 	padding: 6px 12px;
 }
 
+#intro-content {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#intro-content > div {
+    flex: 1 0 auto;
+    display: flex;
+    align-items: center;
+}
+
 #lema {
 	background-color: #004F71;
 }
