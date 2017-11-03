@@ -244,10 +244,27 @@ var EmapicApp = function() {
     self.initializeServer = function() {
 
         self.app = express();
+
+        utils(self.app);
+
         self.app.use(express.cookieParser(serverConfig.secrets.cookie));
+        var localeFiles = fs.readdirSync('locales'),
+            locales = [],
+            localesWithIsos = [];
+        for (var i = 0, len = localeFiles.length; i<len; i++) {
+            var file = localeFiles[i];
+            if (/\.json$/.test(file)) {
+                var lang = file.replace(/\.json$/, "");
+                locales.push(lang);
+                localesWithIsos.push({
+                    locale: lang,
+                    iso: langToWebLocaleIso(lang)
+                });
+            }
+        }
         i18n.expressBind(self.app, {
           // setup some locales - other locales default to en silently
-          locales: ['en', 'es'],
+          locales: locales,
           extension: '.json',
           // set the cookie name
           cookieName: 'locale'
@@ -264,15 +281,9 @@ var EmapicApp = function() {
             req.i18n.setLocale(req.i18n.preferredLocale());
             req.i18n.setLocaleFromQuery();
             req.i18n.setLocaleFromCookie();
+            res.locals.web_all_locales_with_isos = localesWithIsos;
             res.locals.web_locale = req.i18n.getLocale();
-            switch(res.locals.web_locale) {
-                case 'en':
-                    // We use United Kingdom as reference for english
-                    res.locals.web_locale_iso = 'gb';
-                    break;
-                default:
-                    res.locals.web_locale_iso = res.locals.web_locale;
-            }
+            res.locals.web_locale_iso = langToWebLocaleIso(res.locals.web_locale);
             var baseLocals = res.locals;
             // Add the i18n function to all rendering contexts
             res.locals.__ = function() {
@@ -392,7 +403,6 @@ var EmapicApp = function() {
         self.app.use(bodyParser.urlencoded({ extended: false }));
         self.app.use(bodyParser.json());
 
-        utils(self.app);
         routes(self.app);
 
         self.app.use(httpErrorHandler.httpError(404));

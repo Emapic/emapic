@@ -21,8 +21,9 @@
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" onclick="emapic.utils.setLocale('es');"><div class="flag-container"><span class='flag-icon flag-icon-es'></span></div></a></li>
-            <li><a href="#" onclick="emapic.utils.setLocale('en');"><div class="flag-container"><span class='flag-icon flag-icon-gb'></span></div></a></li>
+            {{#web_all_locales_with_isos}}
+            <li><a href="#" onclick="emapic.utils.setLocale('{{locale}}');"><div class="flag-container"><span class='flag-icon flag-icon-{{iso}}'></span></div></a></li>
+            {{/web_all_locales_with_isos}}
           </ul>
         </div>
     </div>

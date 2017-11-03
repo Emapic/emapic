@@ -230,4 +230,14 @@ module.exports = function(app) {
     transformNewlinesToHtml = function(text) {
         return text.replace(/(?:\r\n|\r|\n)/g, '<br/>');
     };
+
+    langToWebLocaleIso = function(lang) {
+        switch(lang) {
+            case 'en':
+                // We use United Kingdom as reference for english
+                return 'gb';
+            default:
+                return lang;
+        }
+    };
 };
