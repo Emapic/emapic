@@ -12,3 +12,4 @@ update_municipalities_geoms [base_layers] 2016-10-25T17:13:53Z Jorge López Fern
 add_simplified_geoms [base_layers] 2016-10-27T11:34:16Z Jorge López Fernández <jlopez@emapic.es> # Add simplified geoms to base layers\n\nWe add a new column with the simplified geoms\nfor countries, provinces and municipalities.
 add_image_url_question [emapic_tables] 2017-01-30T12:17:29Z Jorge López Fernández <jlopez@emapic.es> # Add new question type: image URL
 ignore_null_provinces [emapic_tables] 2017-07-13T11:02:17Z Jorge López Fernández <jlopez@emapic.es> # Don't link responses to provinces w/o name
+ceuta_melilla_spain [base_layers] 2017-11-07T15:35:28Z Jorge López Fernández <jlopez@emapic.es> # Ceuta and Melilla are wrongly assigned to Morocco. Fix this, add their geometries to the Spain's one and remove them from Morocco's.
