@@ -406,6 +406,9 @@ var emapic = emapic || {};
             emapic.modules.survey.marker.setLatLng(emapic.position);
         }
         emapic.map.off('click', setResponseMarkerPosition);
+        if ('dragging' in emapic.modules.survey.marker) {
+            emapic.modules.survey.marker.dragging.disable();
+        }
         centerMarker();
     }
 
