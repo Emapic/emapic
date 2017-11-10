@@ -420,7 +420,7 @@ var emapic = emapic || {};
     function editMarkerPos() {
         emapic.utils.enableMapInteraction();
         emapic.map.setView(emapic.position);
-        if ('dragging' in emapic.modules.survey.marker) {
+        if (emapic.modules.survey.marker !== null && 'dragging' in emapic.modules.survey.marker) {
             emapic.modules.survey.marker.dragging.enable();
         }
         emapic.map.on('click', setResponseMarkerPosition);
