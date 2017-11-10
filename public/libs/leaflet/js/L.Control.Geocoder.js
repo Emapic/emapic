@@ -250,6 +250,7 @@ module.exports = {
 					this._geocodeResult(results, suggest);
 				}
 			}, this);
+			document.activeElement.blur();
 		},
 
 		_geocodeResultSelected: function(result) {
@@ -409,12 +410,14 @@ module.exports = {
 					provinceSelectize.addOption(provinces);
 					provinceSelectize.enable();
 	            });
+				document.activeElement.blur();
 			}
 		},
 
 		_provinceChange: function(val) {
 			if (val in this._context._provincesData) {
 				this._context._map.fitBounds(this._context._provincesData[val].bbox);
+				document.activeElement.blur();
 			}
 		}
 	}),
