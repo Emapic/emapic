@@ -236,6 +236,9 @@ module.exports = function(app) {
             case 'en':
                 // We use United Kingdom as reference for english
                 return 'gb';
+            case 'gl':
+                // Galician language iso code is different from the region iso code
+                return 'es-ga';
             default:
                 return lang;
         }
