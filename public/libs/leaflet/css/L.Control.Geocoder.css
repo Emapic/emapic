@@ -27,9 +27,9 @@
 	display: inline-block;
 }
 
-.leaflet-control-geocoder-selectors-table label {
+.leaflet-control-geocoder-selectors-table td:first-child {
 	color: #000000;
-	margin-right: 10px;
+	padding-right: 10px;
 }
 .leaflet-control-geocoder-selectors-table td:last-child {
 	width: 100%;
