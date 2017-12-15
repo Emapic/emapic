@@ -19,6 +19,7 @@ module.exports = {
 			countryLabel: 'Country',
 			provinceLabel: 'Province',
 			displayFlags: true,
+			displayTitle: true,
 			prependHtml: null,
 			appendHtml: null
 		},
@@ -37,6 +38,9 @@ module.exports = {
 		onAdd: function (map) {
 			var className = 'leaflet-control-geocoder',
 			    container = L.DomUtil.create('div', className + ' leaflet-bar');
+				if (this.options.displayTitle) {
+					$(container).append('<div class="title-container"><h4>' + this.options.title + '</h4><hr/></div>');
+				}
 				if (this.options.prependHtml !== null) {
 					$(container).append(this.options.prependHtml);
 				}

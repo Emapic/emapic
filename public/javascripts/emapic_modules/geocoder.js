@@ -16,6 +16,11 @@ var emapic = emapic || {};
         geocoderParams.email = emapic.utils.nominatimEmail;
     }
 
+    emapic.modules.geocoder.searchLocation = function(location) {
+        $('div.leaflet-control-geocoder .leaflet-control-geocoder-form input').val(location);
+        $('div.leaflet-control-geocoder .leaflet-control-geocoder-form button').click();
+    };
+
     emapic.modules.geocoder.processGeocodingResult = function(result) {
         result = result.geocode || result;
         emapic.map.fitBounds(result.bbox);
@@ -26,7 +31,8 @@ var emapic = emapic || {};
         var baseParams = $.extend({
             collapsed: false,
             defaultMarkGeocode: false,
-            placeholder: emapic.utils.getI18n('js_geocoder_search_current_view'),
+            title: emapic.utils.getI18n('js_geocoder_title'),
+            placeholder: emapic.utils.getI18n('js_geocoder_placeholder'),
             errorMessage: emapic.utils.getI18n('js_geocoder_no_results'),
             selectizePlaceholder: emapic.utils.getI18n('js_geocoder_write_select'),
             countryLabel: emapic.utils.getI18n('js_geocoder_country'),

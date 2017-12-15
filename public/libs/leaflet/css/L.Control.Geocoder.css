@@ -1,7 +1,7 @@
 .leaflet-control-geocoder {
 	border-radius: 4px;
 	background: white;
-	min-width: 26px;
+	min-width: 400px;
 	min-height: 26px;
 	max-width: 420px;
 }
@@ -9,6 +9,20 @@
 .leaflet-touch .leaflet-control-geocoder {
 	min-width: 30px;
 	min-height: 30px;
+}
+
+.leaflet-control-geocoder .title-container {
+	width: 100%;
+	text-align: center;
+}
+
+.leaflet-control-geocoder .title-container h4 {
+	margin-bottom: 0px;
+	font-weight: bold;
+}
+
+.leaflet-control-geocoder .title-container hr {
+	margin: 5px 0px 10px;
 }
 
 .leaflet-control-geocoder a, .leaflet-control-geocoder .leaflet-control-geocoder-icon {

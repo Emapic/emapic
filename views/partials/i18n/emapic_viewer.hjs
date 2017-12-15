@@ -46,7 +46,8 @@
     emapic.utils.registerI18n('js_go_previous', '{{#__}}js_go_previous{{/__}}');
     emapic.utils.registerI18n('js_go_next', '{{#__}}js_go_next{{/__}}');
     emapic.utils.registerI18n('js_go_last', '{{#__}}js_go_last{{/__}}');
-    emapic.utils.registerI18n('js_geocoder_search_current_view', '{{#__}}js_geocoder_search_current_view{{/__}}');
+    emapic.utils.registerI18n('js_geocoder_title', '{{#__}}js_geocoder_title{{/__}}');
+    emapic.utils.registerI18n('js_geocoder_placeholder', '{{#__}}js_geocoder_placeholder{{/__}}');
     emapic.utils.registerI18n('js_geocoder_no_results', '{{#__}}js_geocoder_no_results{{/__}}');
     emapic.utils.registerI18n('js_geocoder_write_select', '{{#__}}js_geocoder_write_select{{/__}}');
     emapic.utils.registerI18n('js_geocoder_country', '{{#__}}js_geocoder_country{{/__}}');
