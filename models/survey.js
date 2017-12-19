@@ -416,7 +416,6 @@ module.exports = function(sequelize, DataTypes) {
                         var usr_id = (req.user) ? parseInt(req.user.id, 10) : null;
                         // If the survey is closed, or it's a draft and the
                         // vote doesn't come from its owner, we reject the vote
-                        console.log((typeof usr_id) + ' VS ' + (typeof owner.id));
                         if (survey.active === false || (survey.active === null && usr_id !== owner.id)) {
                             return Promise.reject({
                                 message: "Survey is no longer open or it's in draft mode.",
