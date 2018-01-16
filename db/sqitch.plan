@@ -15,3 +15,4 @@ ignore_null_provinces [emapic_tables] 2017-07-13T11:02:17Z Jorge López Fernánd
 ceuta_melilla_spain [base_layers] 2017-11-07T15:35:28Z Jorge López Fernández <jlopez@emapic.es> # Ceuta and Melilla are wrongly assigned to Morocco. Fix this, add their geometries to the Spain's one and remove them from Morocco's.
 country_names_gl [base_layers] 2017-11-03T18:08:55Z Jorge López Fernández <jlopez@emapic.es> # Add galician translations of country names\n\nAlso updated some of the spanish names.
 province_names_gl [base_layers] 2017-11-03T18:52:28Z Jorge López Fernández <jlopez@emapic.es> # Add galician translations of province names\n\nOnly the spanish provinces will have an actual translation.
+fix_roles_relationship [emapic_tables] 2018-01-16T13:41:58Z Jorge López Fernández <jlopez@emapic.es> # Add CASCADEs to roles relationship fk constraints.
