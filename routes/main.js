@@ -1,9 +1,10 @@
 var passport = require('passport'),
     Promise = require('bluebird'),
+    nconf = require('nconf'),
     fs = require('fs'),
-    logger = require('../utils/logger');
+    logger = require('../utils/logger'),
 
-var defaultPageSize = 10;
+    defaultPageSize = nconf.get('app').defaultPageSize;
 
 module.exports = function(app) {
 
@@ -58,8 +59,8 @@ module.exports = function(app) {
     });
 
     app.get('/surveys/answered', requireRole(null), function(req, res){
-        var pageNr = isNaN(req.query.page) ? 1 : req.query.page;
-        var pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
+        var pageNr = isNaN(req.query.page) ? 1 : req.query.page,
+            pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
         req.user.getAnsweredSurveysAndCount({
             limit: pageSize,
             offset: (pageNr - 1) * pageSize
@@ -73,23 +74,10 @@ module.exports = function(app) {
     });
 
     app.get('/surveys/list', function(req, res){
-        var query = req.query.q;
-        var pageNr = isNaN(req.query.page) ? 1 : req.query.page;
-        var pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
-        var surveys;
-        if (query && query.trim() !== '') {
-            surveys = models.Survey.scope('includeAuthor', { method: ['publicSearch', query]}).findAndCountAll({
-                limit: pageSize,
-                offset: (pageNr - 1) * pageSize
-            });
-        } else {
-            surveys = models.Survey.scope('includeAuthor', 'public').findAndCountAll({
-                order: [['active', 'DESC'], ['date_opened', 'DESC']],
-                limit: pageSize,
-                offset: (pageNr - 1) * pageSize
-            });
-        }
-        surveys.then(function(results) {
+        var query = req.query.q,
+            pageNr = isNaN(req.query.page) ? 1 : req.query.page,
+            pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
+        models.Survey.findActiveSurveys(null, query && query.trim() !== '' ? query : null, null, pageSize, pageNr).then(function(results) {
             res.render('surveys-list', {
                 surveys: results.rows,
                 pagination: getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
@@ -100,17 +88,10 @@ module.exports = function(app) {
     });
 
     app.get('/surveys/tag/:tag', function(req, res){
-        if (!req.params.tag) {
-            return res.redirect('/');
-        }
-        var tag = req.params.tag.trim();
-        var pageNr = isNaN(req.query.page) ? 1 : req.query.page;
-        var pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
-        models.Survey.scope('includeAuthor', 'public',  {method: ['filterByTag', tag]}).findAndCountAll({
-            order: [['active', 'DESC'], ['date_opened', 'DESC']],
-            limit: pageSize,
-            offset: (pageNr - 1) * pageSize
-        }).then(function(results) {
+        var tag = req.params.tag.trim(),
+            pageNr = isNaN(req.query.page) ? 1 : req.query.page,
+            pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
+        models.Survey.findActiveSurveys(null, null, tag, pageSize, pageNr).then(function(results) {
             res.render('tag-surveys-list', {
                 surveys: results.rows,
                 tag: tag,
@@ -121,30 +102,22 @@ module.exports = function(app) {
     });
 
     app.get('/surveys/user/:login', function(req, res){
-        if (!req.params.login) {
-            return res.redirect('/');
-        }
-        var userLogin = req.params.login.trim();
-        var pageNr = isNaN(req.query.page) ? 1 : req.query.page;
-        var pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
-        var user;
-        models.User.scope({method: ['findByLogin', userLogin]}).findOne().then(function(usr) {
-            if (usr === null) {
-                return res.redirect('/');
-            }
+        var userLogin = req.params.login.trim(),
+            pageNr = isNaN(req.query.page) ? 1 : req.query.page,
+            pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size,
+            user;
+        models.User.findByLogin(userLogin).then(function(usr) {
             user = usr;
-            models.Survey.scope('includeAuthor', 'public',  {method: ['filterByOwner', user.id]}).findAndCountAll({
-                order: [['active', 'DESC'], ['date_opened', 'DESC']],
-                limit: pageSize,
-                offset: (pageNr - 1) * pageSize
-            }).then(function(results) {
-                res.render('user-surveys-list', {
-                    surveys: results.rows,
-                    owner: user,
-                    pagination: getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
-                    layout: 'layouts/main'
-                });
+            return models.Survey.findActiveSurveys(user.id, null, null, pageSize, pageNr);
+        }).then(function(results) {
+            res.render('user-surveys-list', {
+                surveys: results.rows,
+                owner: user,
+                pagination: getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
+                layout: 'layouts/main'
             });
+        }).catch({ message: 'NULL_USER' }, function(err) {
+            return res.redirect('/surveys/list');
         });
     });
 

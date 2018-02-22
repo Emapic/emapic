@@ -39,6 +39,15 @@ module.exports = function(sequelize, DataTypes) {
             associate: function(models) {
                 models.Role.belongsToMany(User, { through: 'rel_users_roles', foreignKey: 'role_id' });
                 User.belongsToMany(models.Role, { through: 'rel_users_roles', foreignKey: 'user_id' });
+            },
+
+            findByLogin: function(login) {
+                return models.User.scope({method: ['findByLogin', login]}).findOne().then(function(usr) {
+                    if (usr === null) {
+                        throw new Error('NULL_USER');
+                    }
+                    return usr;
+                });
             }
         },
         instanceMethods: {

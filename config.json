@@ -1,6 +1,7 @@
 {
     "app": {
         "searchEngineLang": "es",
+        "defaultPageSize": "10",
         "emapicOpinionFreq": "0",
         "surveyIdEncr": {
             "factor": 917000000,

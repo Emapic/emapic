@@ -145,11 +145,14 @@ El fichero _config.json_ contiene la mayoría de los parámetros de configuraci�
 
 #### Configuración propia de Emapic (_app_)
 
-Aquí se incluyen los parámetros de configuración de Emapic que afectan a la experiencia del usuario final. Por ahora sólo hay tres:
+Aquí se incluyen los parámetros de configuración de Emapic que afectan a la experiencia del usuario final. Por ahora sólo hay cuatro:
 
 * ##### Idioma de búsqueda (_searchEngineLang_)
 El idioma que se supone principal para las búsquedas realizadas sobre las encuestas, por defecto en español.  
 La inmensa mayoría funcionarán igualmente en español y en idiomas «cercanos» (francés, inglés, portugués...), por lo que no se recomienda cambiarlo si no se tienen conocimientos sobre los motores de búsqueda en PostgreSQL[¹](#notas).
+
+* ##### Tamaño de página por defecto (_defaultPageSize_)
+El número de encuestas a mostrar por defecto por página en los listados.
 
 * ##### Frecuencia de la encuesta sobre la experiencia de usuario (_emapicOpinionFreq_)
 Emapic incluye una encuesta sobre la experiencia de usuario respecto al proceso de geolocalización que se muestra con cierta probabilidad tras responder a cualquier encuesta.  

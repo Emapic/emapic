@@ -146,11 +146,14 @@ File _config.json_ contains most of the configuration parameters for the applica
 
 #### Emapic's configuration parameters (_app_)
 
-Here we have the config parameters that directly affect the Emapic user experience. As of now there are only three:
+Here we have the config parameters that directly affect the Emapic user experience. As of now there are only four:
 
 * ##### Search language (_searchEngineLang_)
 Main language for the searches done in our surveys gallery, by default in spanish.  
 They will work mostly the same in both spanish and any "similar" language (french, english, portuguese...), thus we don't recommend changing it if you are not familiar with PostgreSQL search engines[¹](#footnotes).
+
+* ##### Default page size (_defaultPageSize_)
+The number of surveys to show per page by default in their listings.
 
 * ##### User experience survey frequency (_emapicOpinionFreq_)
 Emapic has a user experience survey about the geolocation process which is shown with a configured probability after answering any survey.  

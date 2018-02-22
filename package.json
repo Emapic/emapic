@@ -14,7 +14,7 @@
   "dependencies": {
     "bases": "^0.2.1",
     "bcryptjs": "^0.7.12",
-    "bluebird": "^2.9.25",
+    "bluebird": "^3.5.1",
     "body-parser": "^1.9.0",
     "collections": "^3.0.0",
     "connect-multiparty": "^1.2.5",

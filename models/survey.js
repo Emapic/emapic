@@ -1,7 +1,10 @@
 var Promise = require('bluebird'),
-    searchEngineLang = require('nconf').get('app').searchEngineLang,
+    nconf = require('nconf'),
     fsp = require('fs-promise'),
     path = require('path'),
+
+    searchEngineLang = nconf.get('app').searchEngineLang,
+    defaultPageSize = nconf.get('app').defaultPageSize,
     answersRequestType = {
         'normal': 0,
         'full': 1,
@@ -11,7 +14,8 @@ var Promise = require('bluebird'),
         'select': 0,
         'ddl': 1
     },
-    thumbnailsFolder = 'thumbnails' + path.sep + 'survey';
+    thumbnailsFolder = 'thumbnails' + path.sep + 'survey',
+    defaultOrder = [['active', 'DESC'], ['date_opened', 'DESC']];
 
 function trimSubstringField(field, maxLength) {
     if (maxLength !== null) {
@@ -146,6 +150,10 @@ module.exports = function(sequelize, DataTypes) {
         }
     }, {
         scopes: {
+            defaultOrdering: {
+                order: defaultOrder
+            },
+
             alreadyOpened: {
                 where: {
                     active: {
@@ -153,6 +161,7 @@ module.exports = function(sequelize, DataTypes) {
                     }
                 }
             },
+
             public: {
                 where: {
                     active: {
@@ -161,21 +170,52 @@ module.exports = function(sequelize, DataTypes) {
                     dont_list: false
                 }
             },
-            publicSearch: function(query) {
-                return {
-                    where: ['active IS NOT NULL AND dont_list = false AND (' + models.Survey.getSearchVector() + " @@ plainto_tsquery(?, ?))", searchEngineLang, query],
-                    order: [[{raw: ['ts_rank(' + models.Survey.getSearchVector() + ', plainto_tsquery(\'' + searchEngineLang + '\', ' + sequelize.getQueryInterface().escape(query) + '))']}, 'DESC'], ['active', 'DESC'], ['date_opened', 'DESC']]
+
+            search: function(query, defaultOrdering) {
+                var params = {
+                    where: {
+                        // Workaround for a Sequelize bug (https://github.com/sequelize/sequelize/issues/6440)
+                        $and: [
+                            sequelize.where(
+                                sequelize.fn('ts_match',
+                                    sequelize.col(models.Survey.getSearchVector()),
+                                    sequelize.fn('plainto_tsquery', searchEngineLang, query)
+                                ),
+                                true
+                            )
+                        ]
+                    },
+                    order: [[
+                        sequelize.fn('ts_rank',
+                            sequelize.col(models.Survey.getSearchVector()),
+                            sequelize.fn('plainto_tsquery', searchEngineLang, query)
+                        ), 'DESC']]
                 };
+                if (defaultOrdering === true) {
+                    for (var i = 0, len = defaultOrder.length; i<len; i++) {
+                        params.order.push(defaultOrder[i]);
+                    }
+                }
+                return params;
             },
+
             filterByTag: function(tag) {
+                var likes = [],
+                    tagSplit = tag.split(',');
+                for (var i = 0, len = tagSplit.length; i<len; i++) {
+                    likes.push({
+                        $like: '%,' + tagSplit[i].trim() + ',%'
+                    });
+                }
                 return {
                     where: {
                         tags: {
-                            $like: '%,' + tag + ',%'
+                            $and: likes
                         }
                     }
                 };
             },
+
             filterByOwner: function(userId) {
                 return {
                     where: {
@@ -195,6 +235,14 @@ module.exports = function(sequelize, DataTypes) {
                 });
                 Survey.belongsTo(models.User, {as: 'owner', foreignKey: 'owner_id'});
                 models.User.hasMany(Survey, {foreignKey: 'owner_id'});
+            },
+
+            scopeWithDefaultOrder: function(scopes) {
+                if (!scopes) {
+                    scopes = [];
+                }
+                scopes.push('defaultOrdering');
+                return models.Survey.scope(scopes);
             },
 
             createFromPost: function(req) {
@@ -221,6 +269,37 @@ module.exports = function(sequelize, DataTypes) {
                 }).then(function() {
                     // We return the new survey
                     return survey;
+                });
+            },
+
+            findActiveSurveys: function(userId, query, tag, pageSize, pageNr) {
+                var params = {},
+                    scopes = ['includeAuthor', 'public'];
+                pageSize = isNaN(pageSize) ? defaultPageSize : pageSize;
+                if (pageSize !== null) {
+                    params.limit = pageSize;
+                    if (pageNr !== null) {
+                        params.offset = (pageNr - 1) * pageSize;
+                    }
+                }
+                if (userId !== null) {
+                    scopes.push({method: ['filterByOwner', userId]});
+                }
+                if (tag !== null) {
+                    scopes.push({ method: ['filterByTag', tag]});
+                }
+                if (query !== null) {
+                    scopes.push({ method: ['search', query, true]});
+                }
+                return models.Survey.scopeWithDefaultOrder(scopes).findAndCountAll(params);
+            },
+
+            findActiveSurveysByUserLogin: function(login, query, tag, pageSize, pageNr) {
+                if (login === null) {
+                    return models.Survey.findActiveSurveys(null, query, tag, pageSize, pageNr);
+                }
+                return models.User.findByLogin(login).then(function(user) {
+                    return models.Survey.findActiveSurveys(user.id, query, tag, pageSize, pageNr);
                 });
             },
 
