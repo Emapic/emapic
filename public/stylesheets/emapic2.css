@@ -679,7 +679,8 @@ span.user-inline {
     vertical-align: top;
 }
 
-#survey-descrip {
+#survey-descrip p {
+    text-align: justify;
 }
 
 #survey-title {
