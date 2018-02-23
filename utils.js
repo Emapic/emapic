@@ -169,10 +169,11 @@ module.exports = function(app) {
                 dest[i] = origin[i];
             }
         }
+        return dest;
     };
 
     extractProperties = function(object, deleteFields) {
-        var props = object.get();
+        var props = copyAttributes(object.get(), {});
         for (var i = 0, len = deleteFields.length; i<len; i++) {
             delete props[deleteFields[i]];
         }
@@ -242,5 +243,9 @@ module.exports = function(app) {
             default:
                 return lang;
         }
+    };
+
+    getApplicationBaseURL = function() {
+        return 'https://' + nconf.get('server').domain;
     };
 };

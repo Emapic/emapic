@@ -676,7 +676,7 @@ module.exports = function(app) {
     ));
 
     var googleConfig = nconf.get('oAuth').google;
-    googleConfig.callbackURL = 'https://' + nconf.get('server').domain + '/auth/google/callback';
+    googleConfig.callbackURL = getApplicationBaseURL() + '/auth/google/callback';
     googleConfig.passReqToCallback = true;
 
     passport.use('google', new GoogleStrategy(googleConfig,
@@ -698,7 +698,7 @@ module.exports = function(app) {
     ));
 
     var facebookConfig = nconf.get('oAuth').facebook;
-    facebookConfig.callbackURL = 'https://' + nconf.get('server').domain + '/auth/facebook/callback';
+    facebookConfig.callbackURL = getApplicationBaseURL() + '/auth/facebook/callback';
     facebookConfig.passReqToCallback = true;
     facebookConfig.profileFields = ['id', 'name', 'emails', 'displayName', 'profileUrl', 'picture.type(large)'];
 
