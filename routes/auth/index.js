@@ -4,7 +4,6 @@ var passport = require('passport'),
     FacebookStrategy = require('passport-facebook').Strategy,
     RememberMeStrategy = require('passport-remember-me').Strategy,
     nconf = require('nconf'),
-    crypto = require('crypto'),
     bcrypt = require('bcryptjs'),
     Promise = require('bluebird'),
     imgRequest = Promise.promisifyAll(require('request').defaults({ encoding: null }), {multiArgs: true}),
@@ -360,25 +359,15 @@ module.exports = function(app) {
             if (!user) {
                 throw new Error('password_reset_invalid_user');
             }
-            var usrid = crypto.createHash('md5').update(user.salt + user.email).digest('hex');
-            return sendMail({
-                to: user.email,
-                subject: req.i18n.__("password_reset_confirm_mail_subject"),
-                text: req.i18n.__("password_reset_confirm_mail_text_body",
-                    user.login, "https://" + req.get('host') + "/pwd_reset/confirm?id=" + usrid),
-                html: req.i18n.__("password_reset_confirm_mail_html_body",
-                    user.login, "https://" + req.get('host') + "/pwd_reset/confirm?id=" + usrid)
-            });
+            return sendPasswordResetConfirmMail(req, user);
         }).then(function() {
             req.session.success = "password_reset_confirm_success_msg";
-            logger.info("Reset password confirm mail sent to user with mail " + user.email + " and id " + user.id);
+        }).catch({ message: 'password_reset_invalid_user' }, function(err) {
+            req.session.error = 'auth_mail_invalid_user_msg';
+            logger.debug('Requested password reset for invalid user with mail ' + req.body.email);
         }).catch(function (err){
-            if (err.message !== 'password_reset_invalid_user') {
-                req.session.error = 'password_reset_error_msg';
-                logger.error('Error while sending reset password confirm mail to user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
-            } else {
-                logger.debug('Requested password reset to invalid user with mail ' + req.body.email);
-            }
+            req.session.error = 'password_reset_error_msg';
+            logger.error('Error while sending reset password confirm mail to user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
         }).lastly(function() {
             res.redirect('/login');
         });
@@ -396,26 +385,22 @@ module.exports = function(app) {
                 req.query.id
             )
         }).then(function(usr) {
-            if (!usr) {
-                throw new Error('Requested password reset with hash of non existent user: ' + req.query.id);
+            user = usr;
+            if (!user) {
+                throw new Error('password_reset_invalid_user');
             }
             user = usr;
             password = randomstring.generate(10);
             user.salt = randomstring.generate();
             user.password = bcrypt.hashSync(user.salt + password, 8);
             return user.save();
-        }).then(function() {
-            return sendMail({
-                to: user.email,
-                subject: req.i18n.__("password_reset_mail_subject"),
-                text: req.i18n.__("password_reset_mail_text_body",
-                    user.login, password, "https://" + req.get('host') + "/profile"),
-                html: req.i18n.__("password_reset_mail_html_body",
-                    user.login, password, "https://" + req.get('host') + "/profile")
-            });
+        }).then(function(user){
+            return sendPasswordResetMail(req, user, password);
         }).then(function(){
             req.session.success = 'password_reset_success_msg';
-            logger.info("Reset password mail sent to user with mail " + user.email + " and id " + user.id);
+        }).catch({ message: 'password_reset_invalid_user' }, function(err) {
+            req.session.error = 'password_reset_error_msg';
+            logger.debug('Requested confirmed password reset for invalid user with hash id ' + req.query.id);
         }).catch(function (err){
             req.session.error = 'password_reset_error_msg';
             logger.error('Error while reseting password of user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
@@ -429,22 +414,26 @@ module.exports = function(app) {
             return res.redirect('/login');
         }
         var user;
-        models.User.find({ where: {email: req.body.email, activated: false} }).then(function(usr) {
+        models.User.find({ where: {email: req.body.email} }).then(function(usr) {
             user = usr;
             if (!user) {
                 throw new Error('resend_activation_mail_invalid_user');
             }
+            if (user.activated) {
+                throw new Error('resend_activation_mail_activated_user');
+            }
             return sendSignupMail(req, user);
         }).then(function() {
             req.session.success = 'resend_activation_mail_success_msg';
-            logger.info("Activation mail resent to user with mail " + user.email + " and id " + user.id);
+        }).catch({ message: 'resend_activation_mail_invalid_user' }, function(err) {
+            req.session.error = 'auth_mail_invalid_user_msg';
+            logger.debug('Requested activation mail for invalid user with mail ' + req.body.email);
+        }).catch({ message: 'resend_activation_mail_activated_user' }, function(err) {
+            req.session.error = 'resend_activation_mail_activated_user_msg';
+            logger.debug('Requested activation mail for already activated user with mail ' + req.body.email);
         }).catch(function (err) {
-            if (err.message !== 'resend_activation_mail_invalid_user') {
-                req.session.error = 'resend_activation_mail_error_msg';
-                logger.error('Error while resending activation mail to user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
-            } else {
-                logger.debug('Requested activation mail resent to invalid user with mail ' + req.body.email);
-            }
+            req.session.error = 'resend_activation_mail_error_msg';
+            logger.error('Error while resending activation mail to user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
         }).lastly(function() {
             res.redirect('/login');
         });

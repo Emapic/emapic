@@ -4,7 +4,8 @@ var nodemailer = require('nodemailer'),
     crypto = require('crypto'),
     bcrypt = require('bcryptjs'),
     randomstring = require('randomstring'),
-    logger = require('../../utils/logger');
+    logger = require('../../utils/logger'),
+    nconf = require('nconf');
 
 module.exports = function(app) {
     requireRole = function(roles) {
@@ -44,11 +45,38 @@ module.exports = function(app) {
             to: user.email,
             subject: req.i18n.__("signup_notification_mail_subject"),
             text: req.i18n.__("signup_notification_mail_text_body",
-                user.login, "https://" + req.get('host') + "/activate?id=" + usrid),
+                user.login, "https://" + nconf.get('server').domain + "/activate?id=" + usrid),
             html: req.i18n.__("signup_notification_mail_html_body",
-                user.login, "https://" + req.get('host') + "/activate?id=" + usrid)
+                user.login, "https://" + nconf.get('server').domain + "/activate?id=" + usrid)
         }).then(function() {
             logger.info("Activation mail sent to " + user.email);
+		});
+    };
+
+    sendPasswordResetConfirmMail = function(req, user) {
+        var usrid = crypto.createHash('md5').update(user.salt + user.email).digest('hex');
+        return sendMail({
+            to: user.email,
+            subject: req.i18n.__("password_reset_confirm_mail_subject"),
+            text: req.i18n.__("password_reset_confirm_mail_text_body",
+                user.login, "https://" + nconf.get('server').domain + "/pwd_reset/confirm?id=" + usrid),
+            html: req.i18n.__("password_reset_confirm_mail_html_body",
+                user.login, "https://" + nconf.get('server').domain + "/pwd_reset/confirm?id=" + usrid)
+        }).then(function() {
+            logger.info("Reset password confirm mail sent to user with mail " + user.email + " and id " + user.id);
+		});
+    };
+
+    sendPasswordResetMail = function(req, user, password) {
+        return sendMail({
+            to: user.email,
+            subject: req.i18n.__("password_reset_mail_subject"),
+            text: req.i18n.__("password_reset_mail_text_body",
+                user.login, password, "https://" + nconf.get('server').domain + "/profile"),
+            html: req.i18n.__("password_reset_mail_html_body",
+                user.login, password, "https://" + nconf.get('server').domain + "/profile")
+        }).then(function() {
+            logger.info("Reset password mail sent to user with mail " + user.email + " and id " + user.id);
 		});
     };
 
