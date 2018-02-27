@@ -9,204 +9,192 @@ var Promise = require('bluebird'),
 module.exports = function(app) {
 
     app.get('/survey/:id', function(req, res) {
-        models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.redirect('/');
             }
-            survey.getOwner().then(function(owner){
-                // Survey is in draft mode and it's not being tested by its owner
-                if ((survey.active === null) && (!req.user || (owner.id !== req.user.id))) {
-                    return res.redirect('/');
-                }
-                // Survey is closed
-                if (survey.active === false) {
-                    return res.redirect('/survey/' + req.params.id + '/results');
-                }
-                Promise.join(survey.getHtml(), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
+            // Survey is in draft mode and it's not being tested by its owner
+            if ((survey.active === null) && (!req.user || (survey.owner.id !== req.user.id))) {
+                return res.redirect('/');
+            }
+            // Survey is closed
+            if (survey.active === false) {
+                return res.redirect('/survey/' + req.params.id + '/results');
+            }
+            Promise.join(survey.getHtml(), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
+                // If the survey allows multiple answers, then we don't
+                // set an already voted position
+                var position = survey.multiple_answer ? null : responses.geometry.coordinates;
+                res.render('templates/survey', {
+                    title : survey.title,
+                    survey : survey,
+                    subTitle : subTitle,
+                    questions_html : html,
+                    responses : JSON.stringify(responses.properties),
+                    position : JSON.stringify(position),
+                    emapicOpinion : (survey.active === null) ? false : (Math.random() < emapicOpinionFreq),
+                    layout : 'layouts/map'
+                });
+            });
+        });
+    });
+
+    app.get('/survey/:id/results', function(req, res) {
+        models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
+            if (survey === null) {
+                return res.redirect('/');
+            }
+            // Survey is closed
+            if ((survey.active === false) ||
+            // Data required by the owner
+            (req.user && survey.owner.id === req.user.id) ||
+            // Survey is active and results are always public
+            (survey.active === true && survey.public_results) ||
+            // It's a local request from the server itself
+            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+                return Promise.join(survey.getHtml(), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
                     // If the survey allows multiple answers, then we don't
                     // set an already voted position
                     var position = survey.multiple_answer ? null : responses.geometry.coordinates;
                     res.render('templates/survey', {
                         title : survey.title,
                         survey : survey,
+                        results : true,
                         subTitle : subTitle,
                         questions_html : html,
                         responses : JSON.stringify(responses.properties),
                         position : JSON.stringify(position),
-                        emapicOpinion : (survey.active === null) ? false : (Math.random() < emapicOpinionFreq),
+                        emapicOpinion : false,
                         layout : 'layouts/map'
                     });
-                }).done();
-            });
-        });
-    });
-
-    app.get('/survey/:id/results', function(req, res) {
-        models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
-            if (survey === null) {
-                return res.redirect('/');
+                });
             }
-            survey.getOwner().then(function(owner){
-                // Survey is closed
-                if ((survey.active === false) ||
-                // Data required by the owner
-                (req.user && owner.id === req.user.id) ||
-                // Survey is active and results are always public
-                (survey.active === true && survey.public_results) ||
-                // It's a local request from the server itself
-                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                    return Promise.join(survey.getHtml(), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
-                        // If the survey allows multiple answers, then we don't
-                        // set an already voted position
-                        var position = survey.multiple_answer ? null : responses.geometry.coordinates;
-                        res.render('templates/survey', {
-                            title : survey.title,
-                            survey : survey,
-                            results : true,
-                            subTitle : subTitle,
-                            questions_html : html,
-                            responses : JSON.stringify(responses.properties),
-                            position : JSON.stringify(position),
-                            emapicOpinion : (Math.random() < 0.2),
-                            layout : 'layouts/map'
-                        });
-                    }).done();
-                }
-                return res.redirect('/survey/' + req.params.id);
-            });
+            return res.redirect('/survey/' + req.params.id);
         });
     });
 
     app.get('/api/survey/:id/results', function(req, res) {
-        models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
             }
-            survey.getOwner().then(function(owner) {
-                // Survey is closed
-                if ((survey.active === false) ||
-                // Data required by the owner
-                (req.user && owner.id === req.user.id) ||
-                // Survey is active and results are always public or shown after vote
-                (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
-                // It's a local request from the server itself
-                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                    Promise.join(survey.getAnonymizedResponses(), survey.getQuestions({
-                        scope: 'includeAnswers'
-                    }), function(responses, questions) {
-                        var answers = [];
-                        for (var i = 0, iLen = questions.length; i<iLen; i++) {
-                            answers.push(questions[i].Answers);
-                        }
-                        res.json(postGISQueryToFeatureCollection(addIndivVotePopupMessage(responses, questions, answers)));
-                    });
-                } else {
-                    res.status(403).json({ error: 'you don\'t have the required permissions.' });
-                }
-            });
+            // Survey is closed
+            if ((survey.active === false) ||
+            // Data required by the owner
+            (req.user && survey.owner.id === req.user.id) ||
+            // Survey is active and results are always public or shown after vote
+            (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
+            // It's a local request from the server itself
+            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+                Promise.join(survey.getAnonymizedResponses(), survey.getQuestions({
+                    scope: 'includeAnswers'
+                }), function(responses, questions) {
+                    var answers = [];
+                    for (var i = 0, iLen = questions.length; i<iLen; i++) {
+                        answers.push(questions[i].Answers);
+                    }
+                    res.json(postGISQueryToFeatureCollection(addIndivVotePopupMessage(responses, questions, answers)));
+                });
+            } else {
+                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+            }
         });
     });
 
     app.get('/api/survey/:id/totals', function(req, res) {
-        models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
             }
-            survey.getOwner().then(function(owner) {
-                // Survey is closed
-                if ((survey.active === false) ||
-                // Data required by the owner
-                (req.user && owner.id === req.user.id) ||
-                // Survey is active and results are always public or shown after vote
-                (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
-                // It's a local request from the server itself
-                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                    survey.getTotals().then(function(response) {
-                        res.json(response);
-                    });
-                } else {
-                    res.status(403).json({ error: 'you don\'t have the required permissions.' });
-                }
-            });
+            // Survey is closed
+            if ((survey.active === false) ||
+            // Data required by the owner
+            (req.user && survey.owner.id === req.user.id) ||
+            // Survey is active and results are always public or shown after vote
+            (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
+            // It's a local request from the server itself
+            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+                survey.getTotals().then(function(response) {
+                    res.json(response);
+                });
+            } else {
+                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+            }
         });
     });
 
     app.get('/api/survey/:id/totals/:layer', function(req, res) {
-        models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
             }
-            survey.getOwner().then(function(owner) {
-                // Survey is closed
-                if ((survey.active === false) ||
-                // Data required by the owner
-                (req.user && owner.id === req.user.id) ||
-                // Survey is active and results are always public or shown after vote
-                (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
-                // It's a local request from the server itself
-                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                    var layer = req.params.layer,
-                        params = req.query,
-                        promise;
-                    survey.getAggregatedTotals(layer, params).then(function(features) {
-                        var results = [];
-                        if (features && features.length > 0) {
-                            if ('geojson' in features[0]) {
-                                results = postGISQueryToFeatureCollection(features);
-                            } else {
-                                results = features;
-                            }
+            // Survey is closed
+            if ((survey.active === false) ||
+            // Data required by the owner
+            (req.user && survey.owner.id === req.user.id) ||
+            // Survey is active and results are always public or shown after vote
+            (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
+            // It's a local request from the server itself
+            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+                var layer = req.params.layer,
+                    params = req.query,
+                    promise;
+                survey.getAggregatedTotals(layer, params).then(function(features) {
+                    var results = [];
+                    if (features && features.length > 0) {
+                        if ('geojson' in features[0]) {
+                            results = postGISQueryToFeatureCollection(features);
+                        } else {
+                            results = features;
                         }
-                        res.json(results);
-                    }).catch(function(err) {
-                        var errorMsg,
-                            errorCode;
-                        switch (err.message) {
-                            case 'INVALID GEOM TYPE':
-                                errorCode = 400;
-                                errorMsg = 'requested invalid geom type.';
-                                logger.info("Requested invalid aggregation by geom type '" + params.geom + "' for base layer '" + layer + "'.");
-                                break;
-                            case 'INVALID BASE LAYER':
-                                errorCode = 404;
-                                errorMsg = 'requested invalid base layer.';
-                                logger.info("Requested invalid aggregation by base layer '" + layer + "'.");
-                                break;
-                            default:
-                                errorCode = 500;
-                                errorMsg = 'an error happened while aggregating the data.';
-                                logger.info("Requested aggregation by geom type '" + params.geom + "' for base layer '" + layer + "' raised error: " + err.message);
-                        }
-                        return res.status(errorCode).json({ error: errorMsg });
-                    });
-                } else {
-                    res.status(403).json({ error: 'you don\'t have the required permissions.' });
-                }
-            });
+                    }
+                    res.json(results);
+                }).catch(function(err) {
+                    var errorMsg,
+                        errorCode;
+                    switch (err.message) {
+                        case 'INVALID GEOM TYPE':
+                            errorCode = 400;
+                            errorMsg = 'requested invalid geom type.';
+                            logger.info("Requested invalid aggregation by geom type '" + params.geom + "' for base layer '" + layer + "'.");
+                            break;
+                        case 'INVALID BASE LAYER':
+                            errorCode = 404;
+                            errorMsg = 'requested invalid base layer.';
+                            logger.info("Requested invalid aggregation by base layer '" + layer + "'.");
+                            break;
+                        default:
+                            errorCode = 500;
+                            errorMsg = 'an error happened while aggregating the data.';
+                            logger.info("Requested aggregation by geom type '" + params.geom + "' for base layer '" + layer + "' raised error: " + err.message);
+                    }
+                    return res.status(errorCode).json({ error: errorMsg });
+                });
+            } else {
+                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+            }
         });
     });
 
     app.get('/api/survey/:id/legend', function(req, res) {
-        models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
             }
-            survey.getOwner().then(function(owner) {
-                // Survey is closed
-                if ((survey.active === false) ||
-                // Data required by the owner
-                (req.user && owner.id === req.user.id) ||
-                // Survey is active and results are always public or shown after vote
-                (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
-                // It's a local request from the server itself
-                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                    survey.getLegend().then(function(legend) {
-                        res.json(legend);
-                    });
-                } else {
-                    res.status(403).json({ error: 'you don\'t have the required permissions.' });
-                }
-            });
+            // Survey is closed
+            if ((survey.active === false) ||
+            // Data required by the owner
+            (req.user && survey.owner.id === req.user.id) ||
+            // Survey is active and results are always public or shown after vote
+            (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
+            // It's a local request from the server itself
+            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+                survey.getLegend().then(function(legend) {
+                    res.json(legend);
+                });
+            } else {
+                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+            }
         });
     });
 
@@ -233,31 +221,29 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:id/export', function(req, res) {
-        models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
             }
-            survey.getOwner().then(function(owner) {
-                // Survey is closed
-                if ((survey.active === false) ||
-                // Data required by the owner
-                (req.user && owner.id === req.user.id) ||
-                // Survey is active and results are always public or shown after vote
-                (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
-                // It's a local request from the server itself
-                (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                    Promise.join(survey.getFullResponses(), survey.getQuestions({
-                        scope: 'includeAnswers'
-                    }), function(responses, questions) {
-                        res.attachment(survey.title + '.csv');
-                        pgQueryFullResultsToCsv(responses, questions).then(function(csv) {
-                            res.send(csv);
-                        });
+            // Survey is closed
+            if ((survey.active === false) ||
+            // Data required by the owner
+            (req.user && survey.owner.id === req.user.id) ||
+            // Survey is active and results are always public or shown after vote
+            (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
+            // It's a local request from the server itself
+            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+                Promise.join(survey.getFullResponses(), survey.getQuestions({
+                    scope: 'includeAnswers'
+                }), function(responses, questions) {
+                    res.attachment(survey.title + '.csv');
+                    pgQueryFullResultsToCsv(responses, questions).then(function(csv) {
+                        res.send(csv);
                     });
-                } else {
-                    res.status(403).json({ error: 'you don\'t have the required permissions.' });
-                }
-            });
+                });
+            } else {
+                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+            }
         });
     });
 

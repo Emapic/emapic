@@ -228,7 +228,7 @@ module.exports = function(sequelize, DataTypes) {
         language: { type: DataTypes.STRING, allowNull: false, defaultValue: 'es' }
     }, {
         scopes: {
-            ordered: function() {
+            defaultOrdering: function() {
                 return {
                     order: Question.getDefaultOrder()
                 };
@@ -246,11 +246,11 @@ module.exports = function(sequelize, DataTypes) {
                     order: Question.getDefaultOrder().concat(models.Answer.getDefaultOrder())
                 });
                 Question.belongsTo(models.Survey, {foreignKey: 'survey_id'});
-                models.Survey.hasMany(Question.scope('ordered'), {foreignKey: 'survey_id'});
+                models.Survey.hasMany(Question.scope('defaultOrdering'), {foreignKey: 'survey_id'});
             },
 
             createFromPost: function(req, survey) {
-                return models.Question.bulkCreate(parseQuestionsfromPost(req, survey), {individualHooks: true}).then(function(questions) {
+                return Question.bulkCreate(parseQuestionsfromPost(req, survey), {individualHooks: true}).then(function(questions) {
                     return models.Answer.bulkCreate(parseAnswersFromPost(req, questions), {individualHooks: true}).return(questions);
                 });
             },
@@ -270,7 +270,7 @@ module.exports = function(sequelize, DataTypes) {
                         return question.destroy();
                     });
                 }).then(function() {
-                    return models.Question.bulkCreate(parseQuestionsfromPost(req, survey), {individualHooks: true});
+                    return Question.bulkCreate(parseQuestionsfromPost(req, survey), {individualHooks: true});
                 }).then(function(questions) {
                     return models.Answer.bulkCreate(parseAnswersFromPost(req, questions, oldAnswers), {individualHooks: true}).return(questions);
                 });

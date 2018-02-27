@@ -8,7 +8,7 @@ module.exports = function(sequelize, DataTypes) {
         language: { type: DataTypes.STRING, allowNull: false, defaultValue: 'es' }
     }, {
         scopes: {
-            ordered: function() {
+            defaultOrdering: function() {
                 return {
                     order: Answer.getDefaultOrder()
                 };
@@ -21,7 +21,7 @@ module.exports = function(sequelize, DataTypes) {
 
             associate: function(models) {
                 Answer.belongsTo(models.Question, {foreignKey: 'question_id'});
-                models.Question.hasMany(Answer.scope('ordered'), {foreignKey: 'question_id'});
+                models.Question.hasMany(Answer.scope('defaultOrdering'), {foreignKey: 'question_id'});
             }
         },
         instanceMethods: {

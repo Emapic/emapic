@@ -14,8 +14,7 @@ var Promise = require('bluebird'),
         'select': 0,
         'ddl': 1
     },
-    thumbnailsFolder = 'thumbnails' + path.sep + 'survey',
-    defaultOrder = [['active', 'DESC'], ['date_opened', 'DESC']];
+    thumbnailsFolder = 'thumbnails' + path.sep + 'survey';
 
 function trimSubstringField(field, maxLength) {
     if (maxLength !== null) {
@@ -150,8 +149,10 @@ module.exports = function(sequelize, DataTypes) {
         }
     }, {
         scopes: {
-            defaultOrdering: {
-                order: defaultOrder
+            defaultOrdering: function() {
+                return {
+                    order: Survey.getDefaultOrder()
+                };
             },
 
             alreadyOpened: {
@@ -178,7 +179,7 @@ module.exports = function(sequelize, DataTypes) {
                         $and: [
                             sequelize.where(
                                 sequelize.fn('ts_match',
-                                    sequelize.col(models.Survey.getSearchVector()),
+                                    sequelize.col(Survey.getSearchVector()),
                                     sequelize.fn('plainto_tsquery', searchEngineLang, query)
                                 ),
                                 true
@@ -187,11 +188,12 @@ module.exports = function(sequelize, DataTypes) {
                     },
                     order: [[
                         sequelize.fn('ts_rank',
-                            sequelize.col(models.Survey.getSearchVector()),
+                            sequelize.col(Survey.getSearchVector()),
                             sequelize.fn('plainto_tsquery', searchEngineLang, query)
                         ), 'DESC']]
                 };
                 if (defaultOrdering === true) {
+                    var defaultOrder = Survey.getDefaultOrder();
                     for (var i = 0, len = defaultOrder.length; i<len; i++) {
                         params.order.push(defaultOrder[i]);
                     }
@@ -225,6 +227,10 @@ module.exports = function(sequelize, DataTypes) {
             }
         },
         classMethods: {
+            getDefaultOrder: function() {
+                return [['active', 'DESC'], ['date_opened', 'DESC']];
+            },
+
             associate: function(models) {
                 // Scope must be added here because models.Vote must be already defined
                 Survey.addScope('includeVotes', {
@@ -235,14 +241,6 @@ module.exports = function(sequelize, DataTypes) {
                 });
                 Survey.belongsTo(models.User, {as: 'owner', foreignKey: 'owner_id'});
                 models.User.hasMany(Survey, {foreignKey: 'owner_id'});
-            },
-
-            scopeWithDefaultOrder: function(scopes) {
-                if (!scopes) {
-                    scopes = [];
-                }
-                scopes.push('defaultOrdering');
-                return models.Survey.scope(scopes);
             },
 
             createFromPost: function(req) {
@@ -290,16 +288,18 @@ module.exports = function(sequelize, DataTypes) {
                 }
                 if (query !== null) {
                     scopes.push({ method: ['search', query, true]});
+                } else {
+                    scopes.push('defaultOrdering');
                 }
-                return models.Survey.scopeWithDefaultOrder(scopes).findAndCountAll(params);
+                return Survey.scope(scopes).findAndCountAll(params);
             },
 
             findActiveSurveysByUserLogin: function(login, query, tag, pageSize, pageNr) {
                 if (login === null) {
-                    return models.Survey.findActiveSurveys(null, query, tag, pageSize, pageNr);
+                    return Survey.findActiveSurveys(null, query, tag, pageSize, pageNr);
                 }
                 return models.User.findByLogin(login).then(function(user) {
-                    return models.Survey.findActiveSurveys(user.id, query, tag, pageSize, pageNr);
+                    return Survey.findActiveSurveys(user.id, query, tag, pageSize, pageNr);
                 });
             },
 
@@ -359,7 +359,7 @@ module.exports = function(sequelize, DataTypes) {
             },
 
             updateAllThumbnails: function() {
-                return Promise.map(models.Survey.scope('alreadyOpened').findAll(), function(survey) {
+                return Promise.map(Survey.scope('alreadyOpened').findAll(), function(survey) {
                     return survey.updateThumbnails();
                 // If we take snapshots with multiple sizes, we should lower the concurrency
                 }, {concurrency: 3});

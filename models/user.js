@@ -42,7 +42,7 @@ module.exports = function(sequelize, DataTypes) {
             },
 
             findByLogin: function(login) {
-                return models.User.scope({method: ['findByLogin', login]}).findOne().then(function(usr) {
+                return User.scope({method: ['findByLogin', login]}).findOne().then(function(usr) {
                     if (usr === null) {
                         throw new Error('NULL_USER');
                     }
@@ -57,7 +57,7 @@ module.exports = function(sequelize, DataTypes) {
                         include: [
                             {
                                 model: models.Survey,
-                                include: [{model: models.User, as: 'owner'}]
+                                include: [{model: User, as: 'owner'}]
                             }
                         ],
                         order: ['survey_id', ['vote_date', 'DESC']]
