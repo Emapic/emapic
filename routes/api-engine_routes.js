@@ -101,6 +101,58 @@ module.exports = function(app) {
         });
     });
 
+    app.get('/api/surveys', function(req, res) {
+        var login = req.query.login,
+            userId = isNaN(req.query.userId) ? null : req.query.userId,
+            query = req.query.q,
+            tag = req.query.tag,
+            pageNr = isNaN(req.query.page) ? null : req.query.page,
+            pageSize = isNaN(req.query.size) ? null : req.query.size,
+            results = [],
+            surveysPromise = (userId !== null) ?
+                models.Survey.findActiveSurveys(userId,
+                    query && query.trim() !== '' ? query : null,
+                    tag && tag.trim() !== '' ? tag : null,
+                    pageSize, pageNr) :
+                models.Survey.findActiveSurveysByUserLogin(login && login.trim() !== '' ? login : null,
+                    query && query.trim() !== '' ? query : null,
+                    tag && tag.trim() !== '' ? tag : null,
+                    pageSize, pageNr);
+        surveysPromise.then(function(surveys) {
+            for (var i = 0, len = surveys.rows.length; i<len; i++) {
+                results.push(surveys.rows[i].getDescription());
+            }
+            return res.json({
+                count: surveys.count,
+                rows: results
+            });
+        }).catch({ message: 'NULL_USER' }, function(err) {
+            return res.status(404).json({ error: 'requested user doesn\'t exist.' });
+        });
+    });
+
+    app.get('/api/survey/:id/description', function(req, res) {
+        models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
+            if (survey === null) {
+                return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
+            }
+            // Survey is closed
+            if ((survey.active === false) ||
+            // Data required by the owner
+            (req.user && survey.owner.id === req.user.id) ||
+            // Survey is active and results are always public or shown after vote
+            (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
+            // It's a local request from the server itself
+            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+                survey.getFullDescription().then(function(response) {
+                    res.json(response);
+                });
+            } else {
+                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+            }
+        });
+    });
+
     app.get('/api/survey/:id/totals', function(req, res) {
         models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
