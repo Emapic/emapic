@@ -274,6 +274,10 @@ module.exports = function(sequelize, DataTypes) {
                 }).then(function(questions) {
                     return models.Answer.bulkCreate(parseAnswersFromPost(req, questions, oldAnswers), {individualHooks: true}).return(questions);
                 });
+            },
+
+            getFieldsToHideInDescription: function() {
+                return ['title', 'mandatory', 'language', 'Answers'];
             }
         },
         instanceMethods: {
@@ -465,6 +469,23 @@ module.exports = function(sequelize, DataTypes) {
                         return new Error("Question type not contemplated.");
                 }
                 return '<div class="main-question" id="question-' + parent.question_order + '">\n' + html + '\n</div>';
+            },
+
+            getFullDescription: function() {
+                var description = this.getDescription(),
+                    answersPromise = typeof this.Answers !== 'undefined' ?
+                        Promise.resolve(this.Answers) : this.getAnswers();
+                return answersPromise.then(function(answers) {
+                    return Promise.map(answers, function(answer) {
+                        return answer.getFullDescription();
+                    });
+                }).then(function(answersDesc) {
+                    for (var i = 0, iLen = answersDesc.length; i<iLen; i++) {
+                        delete answersDesc[i].question_id;
+                    }
+                    description.answers = answersDesc;
+                    return description;
+                });
             }
         },
         tableName: 'questions',

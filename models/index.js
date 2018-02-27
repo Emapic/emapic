@@ -3,7 +3,22 @@ var Sequelize = require('sequelize'),
     path = require("path"),
     sequelize = new Sequelize(conString, {
         define: {
-            timestamps: false
+            timestamps: false,
+            classMethods: {
+                getFieldsToHideInDescription: function() {
+                    return [];
+                }
+            },
+            instanceMethods: {
+                getDescription: function() {
+                    return this.getCustomFieldsDescription(
+                        extractProperties(this, this.Model.getFieldsToHideInDescription()));
+                },
+
+                getCustomFieldsDescription: function(fields) {
+                    return fields;
+                }
+            }
         }
     }),
     db = {};

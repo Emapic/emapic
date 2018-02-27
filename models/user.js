@@ -48,6 +48,12 @@ module.exports = function(sequelize, DataTypes) {
                     }
                     return usr;
                 });
+            },
+
+            getFieldsToHideInDescription: function() {
+                return ['already_opened', 'display_name', 'email', 'google_id',
+                    'google_token', 'facebook_id', 'facebook_token', 'password', 'join_date',
+                    'url', 'salt', 'avatar', 'activated', 'geom'];
             }
         },
         instanceMethods: {
@@ -124,6 +130,11 @@ module.exports = function(sequelize, DataTypes) {
                         rows: rows.slice(offset, limit)
                     };
                 });
+            },
+
+            getCustomFieldsDescription: function(fields) {
+                fields.avatar_url = getApplicationBaseURL() + '/avatar/' + this.login;
+                return fields;
             }
         },
         hooks: {

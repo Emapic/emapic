@@ -358,6 +358,13 @@ module.exports = function(sequelize, DataTypes) {
                 return 'tsv';
             },
 
+            getFieldsToHideInDescription: function() {
+                return ['already_opened', 'description_or_title', 'tags_string',
+                    'welcome_text', 'end_text', 'active', 'expires', 'start_date',
+                    'dont_list', 'anonymized', 'language', 'public_statistics',
+                    'owner', 'tags'];
+            },
+
             updateAllThumbnails: function() {
                 return Promise.map(Survey.scope('alreadyOpened').findAll(), function(survey) {
                     return survey.updateThumbnails();
@@ -692,6 +699,34 @@ module.exports = function(sequelize, DataTypes) {
                     }
                     query += geom + sql2;
                     return sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+                });
+            },
+
+            getCustomFieldsDescription: function(fields) {
+                if (typeof this.owner !== 'undefined') {
+                    delete fields.owner_id;
+                    fields.owner = this.owner.getDescription();
+                }
+                return fields;
+            },
+
+            getFullDescription: function() {
+                var description = this.getDescription(),
+                    ownerPromise = typeof this.owner !== 'undefined' ?
+                        Promise.resolve(this.owner) : this.getOwner();
+                return Promise.join(ownerPromise, this.getQuestions({
+                    scope: 'includeAnswers'
+                }), function(owner, questions) {
+                    description.owner = owner.getDescription();
+                    return Promise.map(questions, function(question) {
+                        return question.getFullDescription();
+                    });
+                }).then(function(questionsDesc) {
+                    for (var i = 0, iLen = questionsDesc.length; i<iLen; i++) {
+                        delete questionsDesc[i].survey_id;
+                    }
+                    description.questions = questionsDesc;
+                    return description;
                 });
             },
 

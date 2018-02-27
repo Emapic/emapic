@@ -22,6 +22,10 @@ module.exports = function(sequelize, DataTypes) {
             associate: function(models) {
                 Answer.belongsTo(models.Question, {foreignKey: 'question_id'});
                 models.Question.hasMany(Answer.scope('defaultOrdering'), {foreignKey: 'question_id'});
+            },
+
+            getFieldsToHideInDescription: function() {
+                return ['language', 'img'];
             }
         },
         instanceMethods: {
@@ -29,6 +33,17 @@ module.exports = function(sequelize, DataTypes) {
                 var props = extractProperties(this, ['id', 'question_id']);
                 props.question_id = questionId;
                 return Answer.create(props);
+            },
+
+            getCustomFieldsDescription: function(fields) {
+                if (typeof this.img !== 'undefined' && this.img !== null) {
+                    fields.img_url = getApplicationBaseURL() + '/answer_img/' + this.id;
+                }
+                return fields;
+            },
+
+            getFullDescription: function() {
+                return Promise.resolve(this.getDescription());
             }
         },
         tableName: 'answers',
