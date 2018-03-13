@@ -8,6 +8,9 @@
   font-weight: normal;
   font-style: normal;
 }
+.help-tooltip {
+    cursor: help;
+}
 .flag-container {
     display: block;
     border: 1px solid black;
@@ -793,7 +796,7 @@ div.col > #thanks-msg {
 #questions-wrapper h2, #thanks-msg h2 {
     color: white;
 }
-.questions-section div:not(.other-answer) {
+.questions-section div:not(.other-answer):not(.tooltip-arrow) {
     padding: 5px 5px;
 }
 .questions-section p {
