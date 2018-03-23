@@ -91,6 +91,9 @@ li {
 .img {
     border: 0px;
 }
+button > div.img-with-caption > img {
+    width: 100%;
+}
 .btn-primary {
 		background-color: #A2C73A;
 		border: solid 1px #A2C73A;
