@@ -19,3 +19,4 @@ fix_roles_relationship [emapic_tables] 2018-01-16T13:41:58Z Jorge López Fernán
 add_postgres_search_function [emapic_tables] 2018-02-22T19:16:24Z Jorge López Fernández <jlopez@emapic.es> # Add a Postgres function for accessing @@ operator in Sequelize.
 fix_vatican_city_geoms [base_layers] 2018-02-27T13:07:44Z Jorge López Fernández <jlopez@emapic.es> # Fix Vatican City geometries, which are wrong in multiple ways.
 fix_vatican_city_hierarchy [base_layers] 2018-02-27T15:56:26Z Jorge López Fernández <jlopez@emapic.es> # Assign Vatican City province to Vatican City country.
+fix_municipalities_simpl_geoms [add_simplified_geoms] 2018-04-06T17:16:47Z Jorge López Fernández <jlopez@emapic.es> # Fix a huge mistake regarding municipalities' simplified geoms.

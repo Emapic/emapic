@@ -1,8 +1,7 @@
 ﻿/* This file includes an example of how to simplify a layer while retaining
    its topology using the PostGIS topology module (available in PostGIS >= 2.0).
    By simply executing this SQL file as it is you should have a new column in
-   base_layers.country, simp_geom2, with the same simplified geometries as
-   simp_geom.
+   base_layers.country, simp_geom, with the simplified geometries.
 
 	Based mostly on a blo entry by strk https://strk.kbt.io/blog/2012/04/13/simplifying-a-map-layer-using-postgis-topology/ */
 
@@ -58,5 +57,5 @@ UPDATE base_layers.countries SET topogeom = toTopoGeom(geom, 'countries_topo', 1
 	NOTE: 0.02 is the tolerance (in srid units) for the simplification algorithm (Douglas-Peucker).
 	See http://postgis.net/docs/manual-2.0/ST_SimplifyPreserveTopology.html */
 SELECT SimplifyEdgeGeom('countries_topo', edge_id, 0.02) FROM countries_topo.edge;
-ALTER TABLE base_layers.countries ADD COLUMN simp_geom2 geometry(MultiPolygon, 4326);
-UPDATE base_layers.countries SET geomsimp2 = topogeom::geometry;
+ALTER TABLE base_layers.countries ADD COLUMN simp_geom geometry(MultiPolygon, 4326);
+UPDATE base_layers.countries SET simp_geom = topogeom::geometry;
