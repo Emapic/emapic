@@ -176,7 +176,7 @@
 	"js_totals_regions": "regions",
 	"js_%_positive_votes": "% positive votes",
 	"js_full_date_format": "j/n/Y",
-	"js_week_format": "\\\\S\\\\e\\\\m\\\\a\\\\n\\\\a W (\\\\d\\\\e\\\\l j/n/Y)",
+	"js_week_format": "\\\\W\\\\e\\\\e\\\\k W (\\\\s\\\\t\\\\a\\\\r\\\\t\\\\i\\\\n\\\\g \\\\o\\\\n j/n/Y)",
 	"js_day": "Day",
 	"js_week": "Week",
 	"js_month": "Month",
