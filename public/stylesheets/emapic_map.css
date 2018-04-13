@@ -94,18 +94,21 @@ li {
 button > div.img-with-caption > img {
     width: 100%;
 }
+.btn {
+    white-space: normal;
+}
 .btn-primary {
-		background-color: #A2C73A;
-		border: solid 1px #A2C73A;
-		color: white;
+	background-color: #A2C73A;
+	border: solid 1px #A2C73A;
+	color: white;
 }
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active,
 .open > .dropdown-toggle.btn-primary {
-		background-color: white !important;
-		border: solid 1px #EBEBEB !important;
-		color: #A2C73A !important;
+	background-color: white !important;
+	border: solid 1px #EBEBEB !important;
+	color: #A2C73A !important;
 }
 .btn-default, .btn-default:focus {
 	color: #A2C73A;
@@ -560,7 +563,7 @@ input.form-control[type="radio"] {
 .leaflet-control-geocoder-form input,
 .leaflet-control-geocoder .selectize-control.single .selectize-input input,
 .leaflet-control-geocoder .selectize-control.single .selectize-input.input-active input,
-.selectize-input .item {
+.leaflet-control-geocoder .selectize-control.single .selectize-input .item {
     color: #f0f0f0;
 }
 .leaflet-control-geocoder .selectize-control.single .selectize-input.input-active,
