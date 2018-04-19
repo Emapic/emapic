@@ -18,6 +18,7 @@ module.exports = {
 			selectizePlaceholder: 'Write and select',
 			countryLabel: 'Country',
 			provinceLabel: 'Province',
+			displaySelectors: true,
 			displayFlags: true,
 			displayTitle: true,
 			prependHtml: null,
@@ -44,105 +45,112 @@ module.exports = {
 				if (this.options.prependHtml !== null) {
 					$(container).append(this.options.prependHtml);
 				}
-			var selectorsTable = L.DomUtil.create('table', className + '-selectors-table', container),
-			    countryTr = L.DomUtil.create('tr', className + '-country-row', selectorsTable),
-			    provinceTr = L.DomUtil.create('tr', className + '-province-row', selectorsTable),
-			    form = this._form = L.DomUtil.create('div', className + '-form', container),
-			    icon = L.DomUtil.create('button', className + '-icon', form),
-			    input,
-			    countryLabelTd,
-			    countryLabel,
-			    countrySelectTd,
-			    countrySelect,
-				countrySelectize,
-			    provinceLabelTd,
-			    provinceLabel,
-			    provinceSelectTd,
-			    provinceSelect,
-			    provinceSelectize;
 
 			this._map = map;
 			this._container = container;
 
+			if (this.options.displaySelectors) {
+				var selectorsTable = L.DomUtil.create('table', className + '-selectors-table', container),
+					countryTr = L.DomUtil.create('tr', className + '-country-row', selectorsTable),
+					provinceTr = L.DomUtil.create('tr', className + '-province-row', selectorsTable),
+					countryLabelTd,
+					countryLabel,
+					countrySelectTd,
+					countrySelect,
+					countrySelectize,
+					provinceLabelTd,
+					provinceLabel,
+					provinceSelectTd,
+					provinceSelect,
+					provinceSelectize;
+
+				this._provincesData = {};
+
+				countryLabelTd = L.DomUtil.create('td', '', countryTr);
+				countryLabel = L.DomUtil.create('label', '', countryLabelTd);
+				countryLabel.innerHTML = this.options.countryLabel  + ': ';
+				countrySelectTd = L.DomUtil.create('td', '', countryTr);
+				countrySelect = L.DomUtil.create('select', className + '-select ' + className + '-country-select', countrySelectTd);
+
+				var countrySelectizeOptions = {
+		            options: [],
+					dropdownParent: 'body',
+		            placeholder: this.options.selectizePlaceholder,
+		            labelField: 'name',
+					sortField: 'name',
+		            searchField: ['name'],
+		            valueField: 'iso_code',
+					onChange: this._countryChange
+		        };
+				if (this.options.displayFlags) {
+					countrySelectizeOptions.render = {
+						option: function(data, escape) {
+							return "<div data-value='" + data.iso_code + "' data-selectable='' class='flag-item option'>" +
+							"<div class='flag-container'><span title='" +
+	                        data.name + "' class='flag-icon flag-icon-" + data.iso_code +
+							"'></div><div class='selectize-label'>" + data.name + "</div></div>";
+						},
+						item: function(data, escape) {
+							return "<div data-value='" + data.iso_code + "' data-selectable='' class='flag-item item'>" +
+							"<div class='flag-container'><span title='" +
+	                        data.name + "' class='flag-icon flag-icon-" + data.iso_code +
+							"'></div><div class='selectize-label'>" + data.name + "</div></div>";
+						}
+					};
+				}
+		        countrySelectize = this._countrySelectize = $(countrySelect).selectize(countrySelectizeOptions)[0].selectize;
+
+				countrySelectize.on('change', function(value) {
+					if (value === '') {
+						provinceSelectize.clear();
+						provinceSelectize.disable();
+					}
+				});
+
+				countrySelectize.positionDropdown();
+
+				countrySelectize._context = this;
+
+		        emapic.getAllCountriesDataBbox().done(function() {
+					var countries = [];
+					$.each(emapic.allCountriesData, function(isoCode, data) {
+						countries.push(data.properties);
+					});
+					countrySelectize.addOption(countries);
+		        });
+				provinceLabelTd = L.DomUtil.create('td', null, provinceTr);
+				provinceLabel = L.DomUtil.create('label', null, provinceLabelTd);
+				provinceLabel.innerHTML = this.options.provinceLabel  + ': ';
+				provinceSelectTd = L.DomUtil.create('td', null, provinceTr);
+				provinceSelect = this._provinceSelect = L.DomUtil.create('select', className + '-select ' + className + '-province-select', provinceSelectTd);
+
+		        provinceSelectize = this._provinceSelectize = $(provinceSelect).selectize({
+		            options: [],
+					dropdownParent: 'body',
+		            placeholder: this.options.selectizePlaceholder,
+		            labelField: 'name',
+					sortField: 'name',
+		            searchField: ['name'],
+		            valueField: 'adm_code',
+					onChange: this._provinceChange
+		        })[0].selectize;
+
+				provinceSelectize.positionDropdown();
+
+				provinceSelectize.disable();
+
+				provinceSelectize._context = this;
+			}
+
+			var input,
+				form,
+				icon;
+
+			form = this._form = L.DomUtil.create('div', className + '-form', container);
+			icon = L.DomUtil.create('button', className + '-icon', form);
+
 			icon.innerHTML = '&nbsp;';
 			icon.type = 'button';
-
-			this._provincesData = {};
-
-			countryLabelTd = L.DomUtil.create('td', '', countryTr);
-			countryLabel = L.DomUtil.create('label', '', countryLabelTd);
-			countryLabel.innerHTML = this.options.countryLabel  + ': ';
-			countrySelectTd = L.DomUtil.create('td', '', countryTr);
-			countrySelect = L.DomUtil.create('select', className + '-select ' + className + '-country-select', countrySelectTd);
-
-			var countrySelectizeOptions = {
-	            options: [],
-				dropdownParent: 'body',
-	            placeholder: this.options.selectizePlaceholder,
-	            labelField: 'name',
-				sortField: 'name',
-	            searchField: ['name'],
-	            valueField: 'iso_code',
-				onChange: this._countryChange
-	        };
-			if (this.options.displayFlags) {
-				countrySelectizeOptions.render = {
-					option: function(data, escape) {
-						return "<div data-value='" + data.iso_code + "' data-selectable='' class='flag-item option'>" +
-						"<div class='flag-container'><span title='" +
-                        data.name + "' class='flag-icon flag-icon-" + data.iso_code +
-						"'></div><div class='selectize-label'>" + data.name + "</div></div>";
-					},
-					item: function(data, escape) {
-						return "<div data-value='" + data.iso_code + "' data-selectable='' class='flag-item item'>" +
-						"<div class='flag-container'><span title='" +
-                        data.name + "' class='flag-icon flag-icon-" + data.iso_code +
-						"'></div><div class='selectize-label'>" + data.name + "</div></div>";
-					}
-				};
-			}
-	        countrySelectize = this._countrySelectize = $(countrySelect).selectize(countrySelectizeOptions)[0].selectize;
-
-			countrySelectize.on('change', function(value) {
-				if (value === '') {
-					provinceSelectize.clear();
-					provinceSelectize.disable();
-				}
-			});
-
-			countrySelectize.positionDropdown();
-
-			countrySelectize._context = this;
-
-	        emapic.getAllCountriesDataBbox().done(function() {
-				var countries = [];
-				$.each(emapic.allCountriesData, function(isoCode, data) {
-					countries.push(data.properties);
-				});
-				countrySelectize.addOption(countries);
-	        });
-			provinceLabelTd = L.DomUtil.create('td', null, provinceTr);
-			provinceLabel = L.DomUtil.create('label', null, provinceLabelTd);
-			provinceLabel.innerHTML = this.options.provinceLabel  + ': ';
-			provinceSelectTd = L.DomUtil.create('td', null, provinceTr);
-			provinceSelect = this._provinceSelect = L.DomUtil.create('select', className + '-select ' + className + '-province-select', provinceSelectTd);
-
-	        provinceSelectize = this._provinceSelectize = $(provinceSelect).selectize({
-	            options: [],
-				dropdownParent: 'body',
-	            placeholder: this.options.selectizePlaceholder,
-	            labelField: 'name',
-				sortField: 'name',
-	            searchField: ['name'],
-	            valueField: 'adm_code',
-				onChange: this._provinceChange
-	        })[0].selectize;
-
-			provinceSelectize.positionDropdown();
-
-			provinceSelectize.disable();
-
-			provinceSelectize._context = this;
 
 			input = this._input = L.DomUtil.create('input', '', form);
 			input.type = 'text';

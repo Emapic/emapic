@@ -1,9 +1,9 @@
 .leaflet-control-geocoder {
 	border-radius: 4px;
 	background: white;
-	min-width: 400px;
 	min-height: 26px;
-	max-width: 420px;
+	width: 420px;
+	max-width: calc(100vw - 60px);
 }
 
 .leaflet-touch .leaflet-control-geocoder {
@@ -68,6 +68,7 @@
 
 .leaflet-control-geocoder .leaflet-control-geocoder-selectors-table .selectize-input > input[placeholder] {
   width: 100% !important;
+  padding-right: 18px !important;
 }
 
 .leaflet-control-geocoder-icon {
