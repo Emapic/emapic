@@ -388,21 +388,23 @@ module.exports = function(app) {
         if (!req.query.id) {
             return res.redirect('/');
         }
-        var password;
+        var password,
+            user;
         models.User.find({
             where: models.Sequelize.where(
                 models.Sequelize.fn('md5', models.Sequelize.fn('concat', models.Sequelize.col('salt'), models.Sequelize.col('email'))),
                 req.query.id
             )
-        }).then(function(user) {
-            if (!user) {
-                throw new Error('Requested password reset with hash of non existent user: ' + userid);
+        }).then(function(usr) {
+            if (!usr) {
+                throw new Error('Requested password reset with hash of non existent user: ' + req.query.id);
             }
+            user = usr;
             password = randomstring.generate(10);
             user.salt = randomstring.generate();
             user.password = bcrypt.hashSync(user.salt + password, 8);
             return user.save();
-        }).then(function(user){
+        }).then(function() {
             return sendMail({
                 to: user.email,
                 subject: req.i18n.__("password_reset_mail_subject"),
