@@ -1121,6 +1121,11 @@ div.answer-group {
 	margin-bottom: 60px;
 }
 
+#remember-me {
+    margin: 0;
+    vertical-align: middle;
+}
+
 #remember-me-label {
     font-weight: normal;
     margin-left: 5px;

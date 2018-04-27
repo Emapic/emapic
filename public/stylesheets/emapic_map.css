@@ -576,6 +576,10 @@ input.form-control[type="radio"] {
     color: #f0f0f0;
 }
 .selectize-dropdown .flag-item {
+    display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox;      /* TWEENER - IE 10 */
+    display: -webkit-flex;     /* NEW - Chrome */
     display: flex;
 }
 .selectize-dropdown .flag-item .flag-container{
@@ -585,6 +589,10 @@ input.form-control[type="radio"] {
     margin: 0px 10px -2px 0;
 }
 .selectize-dropdown .flag-item .selectize-label {
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    -webkit-flex-grow: 1;
+    -ms-flex: 1;
     flex-grow: 1;
 }
 .selectize-control .flag-item,
@@ -786,18 +794,19 @@ div.col > #thanks-msg {
 #questions-flex-container {
     width: 100%;
     height: 100%;
+    display: block;
     display: flex;
     position: absolute;
     top: 0px;
     padding-top: 50px;
     padding-bottom: 50px;
+    z-index: 1001;
 }
 #questions-flex-container > #questions-wrapper {
     margin: auto;
     width: 100%;
     padding: 0em 4em;
     background-color: #004F71;
-    z-index: 1001;
 }
 #questions-wrapper h2, #thanks-msg h2 {
     color: white;
@@ -877,8 +886,22 @@ div.col > #thanks-msg {
     padding: 6px 16px;
 }
 .survey-answer > div.flex-container {
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
     align-items: center;
+    display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox;      /* TWEENER - IE 10 */
+    display: -webkit-flex;     /* NEW - Chrome */
     display: flex;
+    -webkit-box-direction: normal;
+    -webkit-box-orient: horizontal;
+    -moz-box-direction: normal;
+    -moz-box-orient: horizontal;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
     flex-direction: row;
     padding: 0;
 }
@@ -889,7 +912,11 @@ div.col > #thanks-msg {
 .other-answer input,
 .text-answer input {
     color: black;
-    flex: 1;
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    -webkit-flex-grow: 1;
+    -ms-flex: 1;
+    flex-grow: 1;
     margin-right: 10px;
     min-width: 0px;
     padding: 0 5px;
@@ -1007,8 +1034,12 @@ div.col > #thanks-msg {
 .check-loc .loc-description label {
     margin-right: 5px;
 }
-#edit-question-btn, #block-nav-btns, #survey-nav-btns, #section-nav-btns {
+#edit-question-btn {
     margin: 20px 0;
+}
+#block-nav-btns, #survey-nav-btns, #section-nav-btns {
+    margin: 0;
+    padding: 10px 0;
 }
 #block-nav-btns button {
     opacity: 1;
@@ -1210,13 +1241,27 @@ div.col > #thanks-msg {
 }
 .leaflet-sidebar #voted_countries,
 .leaflet-sidebar #all_countries {
+    display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox;      /* TWEENER - IE 10 */
+    display: -webkit-flex;     /* NEW - Chrome */
     display: flex;
-    flex-flow: column;
+    -webkit-box-direction: normal;
+    -webkit-box-orient: vertical;
+    -moz-box-direction: normal;
+    -moz-box-orient: vertical;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
     height: 100%;
     width: 100%;
 }
 .leaflet-sidebar #voted_countries > div:last-child,
 .leaflet-sidebar #all_countries > div:last-child {
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    -webkit-flex-grow: 1;
+    -ms-flex: 1;
     flex-grow: 1;
 }
 .leaflet-sidebar #voted_countries .floatThead-wrapper {
@@ -1299,6 +1344,10 @@ div.col > #thanks-msg {
 #time-control {
     width: 50vw;
     min-width: 50px;
+    display: -webkit-inline-box;
+    display: -moz-inline-box;
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
     display: inline-flex;
     vertical-align: middle;
 }

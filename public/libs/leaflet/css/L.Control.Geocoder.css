@@ -62,6 +62,7 @@
 	font-size: 120%;
 	border: 0;
 	background-color: transparent;
+	height: 30px;
 	width: 350px;
 	width: calc(100% - 30px);
 }
