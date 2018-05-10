@@ -6,6 +6,11 @@
         "surveyIdEncr": {
             "factor": 917000000,
             "base": 62
+        },
+        "oAuth": {
+            "active": true,
+            "accessTokenLifetime": null,
+            "refreshTokenLifetime": null
         }
     },
     "db": {

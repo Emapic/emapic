@@ -77,7 +77,7 @@ module.exports = function(app) {
         var query = req.query.q,
             pageNr = isNaN(req.query.page) ? 1 : req.query.page,
             pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
-        models.Survey.findActiveSurveys(null, query && query.trim() !== '' ? query : null, null, pageSize, pageNr).then(function(results) {
+        models.Survey.findPublicSurveys(null, null, query && query.trim() !== '' ? query : null, null, pageSize, pageNr).then(function(results) {
             res.render('surveys-list', {
                 surveys: results.rows,
                 pagination: getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
@@ -91,7 +91,7 @@ module.exports = function(app) {
         var tag = req.params.tag.trim(),
             pageNr = isNaN(req.query.page) ? 1 : req.query.page,
             pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
-        models.Survey.findActiveSurveys(null, null, tag, pageSize, pageNr).then(function(results) {
+        models.Survey.findPublicSurveys(null, null, null, tag, pageSize, pageNr).then(function(results) {
             res.render('tag-surveys-list', {
                 surveys: results.rows,
                 tag: tag,
@@ -108,7 +108,7 @@ module.exports = function(app) {
             user;
         models.User.findByLogin(userLogin).then(function(usr) {
             user = usr;
-            return models.Survey.findActiveSurveys(user.id, null, null, pageSize, pageNr);
+            return models.Survey.findPublicSurveys(user.id, null, null, null, pageSize, pageNr);
         }).then(function(results) {
             res.render('user-surveys-list', {
                 surveys: results.rows,
@@ -122,13 +122,9 @@ module.exports = function(app) {
     });
 
     app.get('/surveys/own', requireRole(null), function(req, res) {
-        var pageNr = isNaN(req.query.page) ? 1 : req.query.page;
-        var pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
-        models.Survey.scope({ method: ['filterByOwner', req.user.id]}).findAndCountAll({
-            order: [['active', 'DESC'], ['date_opened', 'DESC'], ['date_created', 'DESC']],
-            limit: pageSize,
-            offset: (pageNr - 1) * pageSize
-        }).then(function(results) {
+        var pageNr = isNaN(req.query.page) ? 1 : req.query.page,
+            pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
+        models.Survey.findSurveys(req.user.id, false, null, null, null, pageSize, pageNr).then(function(results) {
             res.render('own-surveys-list', {
                 surveys: results.rows,
                 pagination: getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),

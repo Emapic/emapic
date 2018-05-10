@@ -162,6 +162,9 @@ Por defecto no se muestra nunca, pudiendo tener este parámetro un valor entre 0
 Éstos son los valores empleados para encriptar el identificador numérico de cada encuesta y traducirlo a una cadena de texto que es cómo la identificaremos en la URL.  
 Sólo deberías cambiarlo si por algún motivo quieres cadenas de texto con otros caracteres o de diferente longitud.
 
+* ##### OAuth de Emapic (_oauth_)
+Los parámetros de configuración del servicio de autenticación OAuth2 proporcionado por el propio Emapic. No debemos confundirlo con los parámetros de configuración de servicios OAuth externos que se detallan más adelante. Incluyen un parámetro de valor booleano para activar/desactivar el servicio (_active_) y los tiempos de validez en segundos de los tokens de acceso y de refresco (_accessTokenLifetime_ y _refreshTokenLifetime_). Los tiempos de validez admiten el valor nulo, en cuyo caso se emplean los valores por defecto de la librería (1 hora para el token de acceso, 2 semanas para el de refresco)
+
 #### Configuración de conexión a la BDD (_db_)
 
 Los parámetros para conectarnos a la base de datos de Emapic: servidor (_host_), puerto (_port_), nombre de la base de datos (_database_), usuario de la base de datos (_user_) y su contraseña (_password_). Se incluyen los parámetros por defecto empleados en el script de creación de la base de datos (BDD «emapic» en local, puerto 5432, usuario «emapic» y contraseña «emapic»).  
@@ -189,7 +192,7 @@ Si no tenemos cuenta y/o no vemos necesario disponer de dicha capa, podemos simp
 Dirección de e-mail de contacto que se pasará en las peticiones hechas a [Nominatim](http://wiki.openstreetmap.org/wiki/Nominatim).  
 Se puede dejar en blanco para entornos de prueba o controlados, pero si se pone la aplicación de manera pública, se recomienda especificar un e-mail con el que puedan contactar en caso de que haya algún problema con las peticiones o su volumen sea muy alto.
 
-#### OAuth (_oAuth_)
+#### OAuth de servicios externos (_oAuth_)
 
 Para autenticarte a través de Google o Facebook es necesario cambiar los parámetros de los grupos _oAuth.google_ y _oAuth.facebook_ respectivamente. Para ello deberemos tener registrada una aplicación en la sección de desarrolladores de sus respectivas webs y poner en el fichero el __id__ y el __secreto__.
 

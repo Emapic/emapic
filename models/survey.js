@@ -172,6 +172,24 @@ module.exports = function(sequelize, DataTypes) {
                 }
             },
 
+            open: {
+                where: {
+                    active: true
+                }
+            },
+
+            closed: {
+                where: {
+                    active: false
+                }
+            },
+
+            draft: {
+                where: {
+                    active: null
+                }
+            },
+
             search: function(query, defaultOrdering) {
                 var params = {
                     where: {
@@ -228,7 +246,7 @@ module.exports = function(sequelize, DataTypes) {
         },
         classMethods: {
             getDefaultOrder: function() {
-                return [['active', 'DESC'], ['date_opened', 'DESC']];
+                return [['active', 'DESC'], ['date_opened', 'DESC'], ['date_created', 'DESC']];
             },
 
             associate: function(models) {
@@ -270,10 +288,16 @@ module.exports = function(sequelize, DataTypes) {
                 });
             },
 
-            findActiveSurveys: function(userId, query, tag, pageSize, pageNr) {
+            findSurveys: function(userId, onlyPublic, status, query, tag, pageSize, pageNr) {
                 var params = {},
-                    scopes = ['includeAuthor', 'public'];
-                pageSize = isNaN(pageSize) ? defaultPageSize : pageSize;
+                    scopes = ['includeAuthor'];
+                if (onlyPublic === true) {
+                    scopes.push('public');
+                }
+                if (status !== null && status in Survey.options.scopes) {
+                    scopes.push(status);
+                }
+                pageSize = pageSize === null || isNaN(pageSize) ? defaultPageSize : pageSize;
                 if (pageSize !== null) {
                     params.limit = pageSize;
                     if (pageNr !== null) {
@@ -281,25 +305,32 @@ module.exports = function(sequelize, DataTypes) {
                     }
                 }
                 if (userId !== null) {
-                    scopes.push({method: ['filterByOwner', userId]});
+                    scopes.push({ method: ['filterByOwner', userId] });
                 }
                 if (tag !== null) {
-                    scopes.push({ method: ['filterByTag', tag]});
+                    scopes.push({ method: ['filterByTag', tag] });
                 }
                 if (query !== null) {
-                    scopes.push({ method: ['search', query, true]});
+                    scopes.push({ method: ['search', query, true] });
                 } else {
                     scopes.push('defaultOrdering');
                 }
                 return Survey.scope(scopes).findAndCountAll(params);
             },
 
-            findActiveSurveysByUserLogin: function(login, query, tag, pageSize, pageNr) {
+            findPublicSurveys: function(userId, status, query, tag, pageSize, pageNr) {
+                if (['open', 'closed'].indexOf(status) === -1) {
+                    status = null;
+                }
+                return Survey.findSurveys(userId, true, status, query, tag, pageSize, pageNr);
+            },
+
+            findPublicSurveysByUserLogin: function(login, status, query, tag, pageSize, pageNr) {
                 if (login === null) {
-                    return Survey.findActiveSurveys(null, query, tag, pageSize, pageNr);
+                    return Survey.findPublicSurveys(null, status, query, tag, pageSize, pageNr);
                 }
                 return models.User.findByLogin(login).then(function(user) {
-                    return Survey.findActiveSurveys(user.id, query, tag, pageSize, pageNr);
+                    return Survey.findPublicSurveys(user.id, status, query, tag, pageSize, pageNr);
                 });
             },
 
@@ -360,7 +391,7 @@ module.exports = function(sequelize, DataTypes) {
 
             getFieldsToHideInDescription: function() {
                 return ['already_opened', 'description_or_title', 'tags_string',
-                    'welcome_text', 'end_text', 'active', 'expires', 'start_date',
+                    'welcome_text', 'end_text', 'expires', 'start_date',
                     'dont_list', 'anonymized', 'language', 'public_statistics',
                     'owner', 'tags'];
             },
@@ -504,8 +535,9 @@ module.exports = function(sequelize, DataTypes) {
                         // vote doesn't come from its owner, we reject the vote
                         if (survey.active === false || (survey.active === null && usr_id !== owner.id)) {
                             return Promise.reject({
-                                message: "Survey is no longer open or it's in draft mode.",
-                                status: 403
+                                message: "survey is no longer open or it's in draft mode.",
+                                status: 403,
+                                code: 'forbidden_access'
                             });
                         }
                         // If the survey is a draft, then its owner's votes are stored as anonymous

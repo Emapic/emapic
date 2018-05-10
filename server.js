@@ -376,6 +376,22 @@ var EmapicApp = function() {
         self.app.use(passport.initialize());
         self.app.use(passport.session());
         self.app.use(passport.authenticate('remember-me'));
+        // Save OAuth user as the logged in user
+        self.app.use(function(req, res, next) {
+            if (self.app.oauth && req.originalUrl !== self.app.oauthUrl && !req.user) {
+                return self.app.oauth.authenticate()(req, res, function(e) {
+                    if (e && e.name !== 'unauthorized_request' ) {
+                        res.status(e.code);
+                        return res.send({ error_code: e.name, error: e.message });
+                    }
+                    if (res.locals.oauth && res.locals.oauth.token) {
+                        req.user = res.locals.oauth.token.user;
+                    }
+                    return next();
+                });
+            }
+            return next();
+        });
         // Add the logged user and web protocol+host to all rendering contexts
         self.app.use(function(req, res, next) {
             res.locals.user = req.user;
@@ -481,6 +497,10 @@ var EmapicApp = function() {
             }).catch(function(err) {
                 logger.error('Some error happened while updating survey thumbnails: ' + err);
             });
+        });
+
+        nodeSchedule.scheduleJob('0 5 * * *', function() {
+            deleteExpiredOauth2Tokens();
         });
     };
 

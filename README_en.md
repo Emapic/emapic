@@ -163,6 +163,9 @@ By default it's never shown, and this parameter can have any value between 0 (ne
 These are the values used for encrypting the numerical id of each survey and translating it to a text string which is how we will identify it in URLs.  
 You should only change it if for any reason you want text strings with other characters or a different length.
 
+* ##### Emapic OAuth (_oauth_)
+The configuration parameters for the OAuth2 authentication service provided by Emapic itself. Do not confuse them with the configuration parameters for external OAuth services that is detailed later on. These include a boolean parameter for activating/deactivating the service (_active_) and the lifetimes for the access token and the refresh token (_accessTokenLifetime_ and _refreshTokenLifetime_). Both lifetimes accept null as value, which will translate into the default values provided by the library (1 hour for the access token, 2 weeks for the refresh one).
+
 #### DB connection parameters (_db_)
 
 The parameters for setting our Emapic DB connection: server (_host_), port (_port_), database name (_database_), database user (_user_) and its password (_password_). The file already has the default parameters used in the DB creation script (DB "emapic" in localhost, port 5432, user "emapic" with password "emapic").  
@@ -190,7 +193,7 @@ If we don't have an account and/or we don't require that layer, we can simply le
 E-mail address which will be passed in the requests made to [Nominatim](http://wiki.openstreetmap.org/wiki/Nominatim).  
 It can be left blank for testing or controlled environments, but if the application goes public, they advise to specify an e-mail for contacting in case some problem arises or if there happens to be a very high number of requests.
 
-#### OAuth (_oAuth_)
+#### External services OAuth (_oAuth_)
 
 In order to log in through Google or Facebook you must change the parameters inside the groups _oAuth.google_ and _oAuth.facebook_ respectively. For doing that, we must have an application registered in the developers section of their websites and set in the config file the __id__ and the __secret__.
 

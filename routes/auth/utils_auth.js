@@ -4,37 +4,38 @@ var nodemailer = require('nodemailer'),
     crypto = require('crypto'),
     bcrypt = require('bcryptjs'),
     randomstring = require('randomstring'),
-    logger = require('../../utils/logger');
+    Promise = require('bluebird'),
+    logger = require('../../utils/logger'),
+    sequelize = models.sequelize;
 
 module.exports = function(app) {
     requireRole = function(roles) {
         return function(req, res, next) {
             delete req.session.lastUnauthPage;
-            if (roles !== null) {
-                if (req.user) {
+            var allowedPromise;
+            if (req.user) {
+                allowedPromise = (roles === null) ? Promise.resolve(true) :
                     req.user.getRoles().then(function(userRoles) {
                         for (var i = 0, iLen = userRoles.length; i < iLen; i++) {
                             for (var j = 0, jLen = roles.length; j < jLen; j++) {
                                 if (userRoles[i].name === roles[j]) {
-                                    return next();
+                                    return true;
                                 }
                             }
                         }
-                        req.session.lastUnauthPage = req.path;
-                        res.redirect('/login');
+                        return false;
                     });
-                } else {
-                    req.session.lastUnauthPage = req.path;
-                    res.redirect('/login');
-                }
             } else {
-                if (req.user) {
+                allowedPromise = Promise.resolve(false);
+            }
+            return allowedPromise.then(function(allowed) {
+                if (allowed) {
                     return next();
                 } else {
                     req.session.lastUnauthPage = req.path;
-                    res.redirect('/login');
+                    return res.redirect('/login');
                 }
-            }
+            });
         };
     };
 
@@ -91,6 +92,34 @@ module.exports = function(app) {
             }
             user.activated = true;
             return user.save();
+        });
+    };
+
+    deleteExpiredOauth2Tokens = function() {
+        logger.info('Deleting expired OAuth2 tokens...');
+        var now = new Date();
+        return Promise.join(sequelize.query('DELETE FROM oauth2.refresh_tokens WHERE expiration_date < ?;', {
+            replacements: [now],
+            type: sequelize.QueryTypes.BULKDELETE
+        }), sequelize.query('DELETE FROM oauth2.access_tokens WHERE expiration_date < ?;', {
+            replacements: [now],
+            type: sequelize.QueryTypes.BULKDELETE
+        }), function(refreshNr, accessNr) {
+            if (refreshNr > 0 || accessNr > 0) {
+                logger.info('Deleted expired OAuth2 tokens: ' + refreshNr + ' refresh ones / ' + accessNr + ' access ones.');
+            } else {
+                logger.info('No expired OAuth2 tokens to delete.');
+            }
+        });
+    };
+
+    generateUniqueOauth2Token = function(isRefresh) {
+        var token = randomstring.generate(40);
+        return sequelize.query('SELECT count(*) AS nr FROM oauth2.' + (isRefresh ? 'refresh' : 'access') + '_tokens WHERE token = ?;', {
+            replacements: [token],
+            type: sequelize.QueryTypes.SELECT
+        }).then(function(results) {
+            return (results[0].nr > 0) ? generateUniqueOauth2Token(isRefresh) : token;
         });
     };
 };

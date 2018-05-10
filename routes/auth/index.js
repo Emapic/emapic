@@ -9,11 +9,140 @@ var passport = require('passport'),
     imgRequest = Promise.promisifyAll(require('request').defaults({ encoding: null }), {multiArgs: true}),
     randomstring = require('randomstring'),
     fs = require('fs'),
+    oauthserver = require('express-oauth-server'),
     logger = require('../../utils/logger'),
-    utils = require('./utils_auth');
+    utils = require('./utils_auth'),
+    sequelize = models.sequelize;
 
 module.exports = function(app) {
     utils(app);
+
+    var oauthConfig = nconf.get('app').oAuth;
+
+    app.oauthUrl = '/oauth/token';
+
+    if (oauthConfig.active === true) {
+        var oauthParams = {
+            useErrorHandler: true,
+            grants: ['password', 'refresh_token'],
+            model: {
+                getAccessToken: function(accessToken) {
+                    return sequelize.query('SELECT * FROM oauth2.access_tokens WHERE token = ?;', {
+                        replacements: [accessToken],
+                        type: sequelize.QueryTypes.SELECT
+                    }).then(function(features) {
+                        if (features.length > 0) {
+                            return models.User.findById(features[0].user_id).then(function(usr) {
+                                return {
+                                    accessToken: features[0].token,
+                                    accessTokenExpiresAt: features[0].expiration_date,
+                                    client: {id: features[0].client_id},
+                                    user: usr
+                                };
+                            });
+                        }
+                        return false;
+                    });
+                },
+                getClient: function (clientId, clientSecret) {
+                    return sequelize.query('SELECT * FROM oauth2.clients WHERE client_id = ? AND client_secret = ?;', {
+                        replacements: [clientId, clientSecret],
+                        type: sequelize.QueryTypes.SELECT
+                    }).then(function(features) {
+                        if (features.length > 0) {
+                            features[0].grants = features[0].grants.split(',');
+                            return features[0];
+                        }
+                        return false;
+                    });
+                },
+                getRefreshToken: function (token) {
+                    return sequelize.query('SELECT * FROM oauth2.refresh_tokens WHERE token = ?;', {
+                        replacements: [token],
+                        type: sequelize.QueryTypes.SELECT
+                    }).then(function(features) {
+                        if (features.length > 0) {
+                            return {
+                                refreshToken: features[0].token,
+                                refreshTokenExpiresAt: features[0].expiration_date,
+                                client: {id: features[0].client_id},
+                                user: {id: features[0].user_id}
+                            };
+                        }
+                        return false;
+                    });
+                },
+                getUser: function(username, password) {
+                    return localAuth(username, password);
+                },
+                saveToken: function(token, client, user) {
+                    return Promise.join(
+                        sequelize.query('INSERT INTO oauth2.access_tokens(token, expiration_date, client_id, user_id) VALUES (?, ?, ?, ?);', {
+                            replacements: [token.accessToken, token.accessTokenExpiresAt, client.id, user.id],
+                            type: sequelize.QueryTypes.INSERT
+                        }),
+                        sequelize.query('INSERT INTO oauth2.refresh_tokens(token, expiration_date, client_id, user_id) VALUES (?, ?, ?, ?);', {
+                            replacements: [token.refreshToken, token.refreshTokenExpiresAt, client.id, user.id],
+                            type: sequelize.QueryTypes.INSERT
+                        }),
+                        function() {
+                            return {
+                                accessToken: token.accessToken,
+                                accessTokenExpiresAt: token.accessTokenExpiresAt,
+                                refreshToken: token.refreshToken,
+                                refreshTokenExpiresAt: token.refreshTokenExpiresAt,
+                                client: {
+                                    id: client.id
+                                },
+                                user: {
+                                    id: user.id
+                                }
+                            };
+                        }
+                    );
+                },
+                revokeToken: function (token) {
+                    return sequelize.query('DELETE FROM oauth2.refresh_tokens WHERE token = ?;', {
+                        replacements: [token.refreshToken],
+                        type: sequelize.QueryTypes.BULKDELETE
+                    }).then(function(features) {
+                        return features > 0;
+                    });
+                },
+                generateAccessToken: function(client, user, scope) {
+                    return generateUniqueOauth2Token(false);
+                },
+                generateRefreshToken: function(client, user, scope) {
+                    return generateUniqueOauth2Token(true);
+                }
+            }
+        };
+
+        if (oauthConfig.accessTokenLifetime !== null && !isNaN(oauthConfig.accessTokenLifetime)) {
+            oauthParams.accessTokenLifetime = oauthConfig.accessTokenLifetime;
+        }
+
+        if (oauthConfig.refreshTokenLifetime !== null && !isNaN(oauthConfig.refreshTokenLifetime)) {
+            oauthParams.refreshTokenLifetime = oauthConfig.refreshTokenLifetime;
+        }
+
+        app.oauth = new oauthserver(oauthParams);
+
+        app.post(app.oauthUrl, function(req, res, next) {
+            return app.oauth.token()(req, res, function(err) {
+                if (err) {
+                    if (err.name === 'server_error') {
+                        logger.error('Internal server error during API request: ' + err.message);
+                        return res.status(500).json({ error_code: 'internal_error', error: 'an internal server error has occured.' });
+                    }
+                    if (err.statusCode !== undefined && err.name !== undefined && err.message !== undefined) {
+                        return res.status(err.statusCode).json({ error_code: err.name, error: err.message });
+                    }
+                }
+                return next(err);
+            });
+        });
+    }
 
     app.get('/pwd_reset', function(req, res){
         if (req.user) {
@@ -31,7 +160,7 @@ module.exports = function(app) {
         }
     });
 
-    //sends the request through our local login/signin strategy, and if successful takes user to homepage, otherwise returns then to signin page
+    //sends the request through our local login/signin strategy, and if successful takes user to homepage, otherwise returns them to signin page
     app.post('/login',
         passport.authenticate('local', {
             failureRedirect: '/login'

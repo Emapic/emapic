@@ -359,13 +359,15 @@ module.exports = function(sequelize, DataTypes) {
                             break;
                         default:
                             return Promise.reject({
-                                message: "Question type not contemplated.",
-                                status: 500
+                                message: "question type not contemplated.",
+                                status: 500,
+                                code: 'internal_error'
                             });
                     }
                     return Promise.reject({
-                        message: "Invalid answer for question nr " + question.question_order + " / id " + question.id + ": " + answer,
-                        status: 400
+                        message: "invalid answer for question nr " + question.question_order + " : " + answer,
+                        status: 400,
+                        code: 'invalid_request'
                     });
                 });
             },

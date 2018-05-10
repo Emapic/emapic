@@ -8,6 +8,13 @@ var Promise = require('bluebird'),
 
 module.exports = function(app) {
 
+    function handleInternalError(req, res) {
+        return function(err) {
+            logger.error('Internal server error during API request: ' + err.message);
+            res.status(500).json({ error_code: 'internal_error', error: 'an internal server error has occured.' });
+        };
+    }
+
     app.get('/survey/:id', function(req, res) {
         models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
@@ -21,7 +28,7 @@ module.exports = function(app) {
             if (survey.active === false) {
                 return res.redirect('/survey/' + req.params.id + '/results');
             }
-            Promise.join(survey.getHtml(), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
+            return Promise.join(survey.getHtml(), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
                 // If the survey allows multiple answers, then we don't
                 // set an already voted position
                 var position = survey.multiple_answer ? null : responses.geometry.coordinates;
@@ -76,7 +83,7 @@ module.exports = function(app) {
     app.get('/api/survey/:id/results', function(req, res) {
         models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
-                return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
+                return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
             // Survey is closed
             if ((survey.active === false) ||
@@ -86,7 +93,7 @@ module.exports = function(app) {
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
             (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                Promise.join(survey.getAnonymizedResponses(), survey.getQuestions({
+                return Promise.join(survey.getAnonymizedResponses(), survey.getQuestions({
                     scope: 'includeAnswers'
                 }), function(responses, questions) {
                     var answers = [];
@@ -96,29 +103,28 @@ module.exports = function(app) {
                     res.json(postGISQueryToFeatureCollection(addIndivVotePopupMessage(responses, questions, answers)));
                 });
             } else {
-                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+                return res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
             }
-        });
+        }).catch(handleInternalError(req, res));
     });
 
     app.get('/api/surveys', function(req, res) {
-        var login = req.query.login,
+        var login = req.query.login && req.query.login.trim() !== '' ? req.query.login : null,
             userId = isNaN(req.query.userId) ? null : req.query.userId,
-            query = req.query.q,
-            tag = req.query.tag,
+            query = req.query.q && req.query.q.trim() !== '' ? req.query.q : null,
+            tag = req.query.tag && req.query.tag.trim() !== '' ? req.query.tag : null,
+            status = req.query.status && req.query.status.trim() !== '' ? req.query.status : null,
             pageNr = isNaN(req.query.page) ? null : req.query.page,
             pageSize = isNaN(req.query.size) ? null : req.query.size,
-            results = [],
             surveysPromise = (userId !== null) ?
-                models.Survey.findActiveSurveys(userId,
-                    query && query.trim() !== '' ? query : null,
-                    tag && tag.trim() !== '' ? tag : null,
+                models.Survey.findPublicSurveys(userId,
+                    status, query, tag,
                     pageSize, pageNr) :
-                models.Survey.findActiveSurveysByUserLogin(login && login.trim() !== '' ? login : null,
-                    query && query.trim() !== '' ? query : null,
-                    tag && tag.trim() !== '' ? tag : null,
+                models.Survey.findPublicSurveysByUserLogin(login,
+                    status, query, tag,
                     pageSize, pageNr);
         surveysPromise.then(function(surveys) {
+            var results = [];
             for (var i = 0, len = surveys.rows.length; i<len; i++) {
                 results.push(surveys.rows[i].getDescription());
             }
@@ -127,14 +133,32 @@ module.exports = function(app) {
                 rows: results
             });
         }).catch({ message: 'NULL_USER' }, function(err) {
-            return res.status(404).json({ error: 'requested user doesn\'t exist.' });
-        });
+            return res.status(404).json({ error_code: 'invalid_resource', error: 'requested user doesn\'t exist.' });
+        }).catch(handleInternalError(req, res));
+    });
+
+    app.get('/api/surveys/own', function(req, res) {
+        var query = req.query.q && req.query.q.trim() !== '' ? req.query.q : null,
+            tag = req.query.tag && req.query.tag.trim() !== '' ? req.query.tag : null,
+            status = req.query.status && req.query.status.trim() !== '' ? req.query.status : null,
+            pageNr = isNaN(req.query.page) ? null : req.query.page,
+            pageSize = isNaN(req.query.size) ? null : req.query.size;
+        models.Survey.findSurveys(req.user.id, false, status, query, tag, pageSize, pageNr).then(function(surveys) {
+            var results = [];
+            for (var i = 0, len = surveys.rows.length; i<len; i++) {
+                results.push(surveys.rows[i].getDescription());
+            }
+            return res.json({
+                count: surveys.count,
+                rows: results
+            });
+        }).catch(handleInternalError(req, res));
     });
 
     app.get('/api/survey/:id/description', function(req, res) {
         models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
-                return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
+                return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
             // Survey is closed
             if ((survey.active === false) ||
@@ -144,19 +168,19 @@ module.exports = function(app) {
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
             (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                survey.getFullDescription().then(function(response) {
+                return survey.getFullDescription().then(function(response) {
                     res.json(response);
                 });
             } else {
-                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+                res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
             }
-        });
+        }).catch(handleInternalError(req, res));
     });
 
     app.get('/api/survey/:id/totals', function(req, res) {
         models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
-                return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
+                return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
             // Survey is closed
             if ((survey.active === false) ||
@@ -166,19 +190,19 @@ module.exports = function(app) {
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
             (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                survey.getTotals().then(function(response) {
+                return survey.getTotals().then(function(response) {
                     res.json(response);
                 });
             } else {
-                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+                res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
             }
-        });
+        }).catch(handleInternalError(req, res));
     });
 
     app.get('/api/survey/:id/totals/:layer', function(req, res) {
         models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
-                return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
+                return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
             // Survey is closed
             if ((survey.active === false) ||
@@ -191,7 +215,7 @@ module.exports = function(app) {
                 var layer = req.params.layer,
                     params = req.query,
                     promise;
-                survey.getAggregatedTotals(layer, params).then(function(features) {
+                return survey.getAggregatedTotals(layer, params).then(function(features) {
                     var results = [];
                     if (features && features.length > 0) {
                         if ('geojson' in features[0]) {
@@ -203,35 +227,39 @@ module.exports = function(app) {
                     res.json(results);
                 }).catch(function(err) {
                     var errorMsg,
+                        errorHttpCode,
                         errorCode;
                     switch (err.message) {
                         case 'INVALID GEOM TYPE':
-                            errorCode = 400;
+                            errorHttpCode = 422;
+                            errorCode = 'invalid_geom';
                             errorMsg = 'requested invalid geom type.';
                             logger.info("Requested invalid aggregation by geom type '" + params.geom + "' for base layer '" + layer + "'.");
                             break;
                         case 'INVALID BASE LAYER':
-                            errorCode = 404;
+                            errorHttpCode = 404;
+                            errorCode = 'invalid_resource';
                             errorMsg = 'requested invalid base layer.';
                             logger.info("Requested invalid aggregation by base layer '" + layer + "'.");
                             break;
                         default:
-                            errorCode = 500;
+                            errorHttpCode = 500;
+                            errorCode = 'internal_error';
                             errorMsg = 'an error happened while aggregating the data.';
                             logger.info("Requested aggregation by geom type '" + params.geom + "' for base layer '" + layer + "' raised error: " + err.message);
                     }
-                    return res.status(errorCode).json({ error: errorMsg });
+                    return res.status(errorHttpCode).json({ error_code: errorCode, error: errorMsg });
                 });
             } else {
-                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+                res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
             }
-        });
+        }).catch(handleInternalError(req, res));
     });
 
     app.get('/api/survey/:id/legend', function(req, res) {
         models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
-                return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
+                return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
             // Survey is closed
             if ((survey.active === false) ||
@@ -241,41 +269,44 @@ module.exports = function(app) {
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
             (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                survey.getLegend().then(function(legend) {
+                return survey.getLegend().then(function(legend) {
                     res.json(legend);
                 });
             } else {
-                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+                res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
             }
-        });
+        }).catch(handleInternalError(req, res));
     });
 
     app.post('/api/survey/:id/results', function(req, res) {
         models.Survey.findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
-                return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
+                return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
             if (typeof req.body.responses === undefined) {
-                return res.status(400).json({ error: 'you must provide a response to save.' });
+                return res.status(400).json({ error_code: 'invalid_request',  error: 'you must provide a response to save.' });
             }
             survey.saveResponse(req).catch(function(err) {
                 logger.error('Error while saving response for survey with id ' + survey.id + ' : ' + err.message);
+                var error;
                 if ('status' in err) {
                     res.status(err.status);
+                    error = { error_code: err.code, error: err.message };
                 } else {
                     res.status(500);
+                    error = { error_code: 'internal_error', error: 'response couldn\'t be saved.' };
                 }
-                res.json({ error: 'response couldn\'t be saved.' });
+                res.json(error);
             }).lastly(function(response) {
                 res.end();
             });
-        });
+        }).catch(handleInternalError(req, res));
     });
 
     app.get('/api/survey/:id/export', function(req, res) {
         models.Survey.scope('includeAuthor').findById(decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
-                return res.status(404).json({ error: 'requested survey doesn\'t exist.' });
+                return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
             // Survey is closed
             if ((survey.active === false) ||
@@ -285,7 +316,7 @@ module.exports = function(app) {
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
             (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                Promise.join(survey.getFullResponses(), survey.getQuestions({
+                return Promise.join(survey.getFullResponses(), survey.getQuestions({
                     scope: 'includeAnswers'
                 }), function(responses, questions) {
                     res.attachment(survey.title + '.csv');
@@ -294,9 +325,9 @@ module.exports = function(app) {
                     });
                 });
             } else {
-                res.status(403).json({ error: 'you don\'t have the required permissions.' });
+                res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
             }
-        });
+        }).catch(handleInternalError(req, res));
     });
 
     // One request per minute limit for full/simple geom requests as data can be
@@ -306,7 +337,7 @@ module.exports = function(app) {
         max: 1,
         delayMs: 0,
         handler: function (req, res, next) {
-            return res.status(429).json({ warning: "base layer API full/simple geom requests limited to 1 per minute." });
+            return res.status(429).json({ error_code: 'base_layer_limit_exceeded', error: 'base layer API full/simple geom requests limited to 1 per minute.' });
         }
     });
 
@@ -349,7 +380,7 @@ module.exports = function(app) {
                     break;
                 default:
                     logger.info("Requested invalid geom type '" + params.geom + "' for base layer '" + layer + "'.");
-                    return res.status(400).json({ error: "requested invalid geom type." });
+                    return res.status(422).json({ error_code: 'invalid_geom', error: "requested invalid geom type." });
             }
         }
         if ('lang' in params) {
@@ -391,9 +422,9 @@ module.exports = function(app) {
                     break;
                 default:
                     logger.info("Requested base layer '" + layer + "' doesn't exist.");
-                    return res.status(404).json({ error: "requested layer doesn't exist." });
+                    return res.status(404).json({ error_code: 'invalid_resource', error: "requested layer doesn't exist." });
             }
-            sequelize.query(sql, {
+            return sequelize.query(sql, {
                 replacements: replacements,
                 type: sequelize.QueryTypes.SELECT
             }).then(function(features) {
@@ -408,11 +439,11 @@ module.exports = function(app) {
                 var size = Buffer.byteLength(JSON.stringify(results)) / 1000000;
                 if (size > 25) {
                     logger.warn("Requested layer '" + layer + "' with " + (('geom' in params) ? params.geom : 'simple') + " geom, which is too big for being served as geojson (" + size + " MB).");
-                    return res.status(400).json({ error: "requested layer is too big for being served as geojson (25 MB max)." });
+                    return res.status(403).json({ error_code: 'layer_too_big', error: "requested layer is too big for being served as geojson (25 MB max)." });
                 }
                 res.json(results);
             });
-        });
+        }).catch(handleInternalError(req, res));
     });
 
 };
