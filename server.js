@@ -1,4 +1,5 @@
-//  OpenShift sample Node application
+require('exit-on-epipe');
+
 var express = require('express'),
     FileStore = require('session-file-store')(express.session),
     fs = require('fs'),
@@ -445,7 +446,7 @@ var EmapicApp = function() {
 
 
     /**
-     *  Initializes the sample application.
+     *  Initializes the application.
      */
     self.initialize = function() {
         self.loadConfig();
@@ -462,7 +463,7 @@ var EmapicApp = function() {
 
 
     /**
-     *  Start the server (starts up the sample application).
+     *  Start the server (starts up the application).
      */
     self.start = function() {
         var options = {};
