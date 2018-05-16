@@ -57,7 +57,9 @@ label {
 .leaflet-container {
     font-family: hero,sans-serif !important;
 }
-.force-disable, .leaflet-control-container.force-disable a {
+.force-disable, .leaflet-control-container.force-disable a,
+.leaflet-control-container.force-disable button,
+.leaflet-control-container.force-disable input {
     cursor: default !important;
     pointer-events: none;
 }
@@ -811,7 +813,7 @@ div.col > #thanks-msg {
 #questions-wrapper h2, #thanks-msg h2 {
     color: white;
 }
-.questions-section div:not(.other-answer):not(.tooltip-arrow) {
+.questions-section div:not(.other-answer):not(.tooltip-arrow):not(.selectize-input) {
     padding: 5px 5px;
 }
 .questions-section p {
