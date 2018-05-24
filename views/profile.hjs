@@ -16,6 +16,7 @@
         <button id="btn-password" onclick="changeProfileSection(this, '#profile-password')" type="button" class="btn btn-default">{{#__}}password_cap{{/__}}</button>
         <button id="btn-avatar" onclick="changeProfileSection(this, '#profile-avatar')" type="button" class="btn btn-default">{{#__}}image{{/__}}</button>
         <button id="btn-localization" onclick="changeProfileSection(this, '#profile-localization')" type="button" class="btn btn-default">{{#__}}localization{{/__}}</button>
+        <button id="btn-preferences" onclick="changeProfileSection(this, '#profile-preferences')" type="button" class="btn btn-default">{{#__}}preferences{{/__}}</button>
         <button id="btn-delete" onclick="changeProfileSection(this, '#profile-delete')" type="button" class="btn btn-default">{{#__}}account{{/__}}</button>
     </div>
 
@@ -151,6 +152,25 @@
                 <button id="delete-position-btn" type="button" autocomplete="off" class="btn btn-default btn-close btn-md" {{^userFormData.geom}} disabled="true" {{/userFormData.geom}} onclick="deletePosition();">{{#__}}delete_stored_position{{/__}}</button>
                 <button id="update-position-btn" type="submit" autocomplete="off" class="pull-right btn btn-primary btn-md" disabled="true">{{#__}}update_position{{/__}}</button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-xs-12 col-sm-9 panel panel-default" id="profile-preferences" style="display: none;">
+        <div class="panel-body">
+            <form data-toggle="validator" role="form" action="/profile" method="post">
+			    <div class="form-group">
+					<div class="col-xs-12 access preferences-block">
+						<p><input type="checkbox" name="accept_info_email" {{#userFormData.accept_info_email}} checked="true" {{/userFormData.accept_info_email}}>
+                            {{#__}}accept_info_email{{/__}}
+                        </p>
+					</div>
+			    </div>
+                <input class="form-control" type="hidden" name="preferences" value="true">
+                <input class="form-control" type="hidden" name="email" value="{{ userFormData.email }}">
+                <button type="submit" class="btn btn-primary btn-md col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-5 col-lg-offset-4">
+                    {{#__}}update_preferences{{/__}}
+                </button>
             </form>
         </div>
     </div>

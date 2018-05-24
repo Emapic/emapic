@@ -210,7 +210,8 @@ module.exports = function(app) {
             login : req.body.login.substring(0, 25).trim(),
             name : (req.body.name !== null) ? req.body.name.substring(0, 100).trim() : null,
             password : req.body.password.substring(0, 50).trim(),
-            url : (req.body.url ? req.body.url.substring(0, 300).trim() : null)
+            url : (req.body.url ? req.body.url.substring(0, 300).trim() : null),
+            accept_info_email : ('accept_info_email' in req.body)
         };
 
         if (req.files.avatar) {
@@ -376,7 +377,7 @@ module.exports = function(app) {
                     copyAttributes({
                         userFormData: req.body
                     }, res.locals);
-                return res.render('profile', {layout: 'layouts/main'});
+                    return res.render('profile', {layout: 'layouts/main'});
                 });
             });
         } else if (req.files && req.files.avatar) {
@@ -466,6 +467,23 @@ module.exports = function(app) {
                     req.session.error = 'update_user_error_msg';
                     logger.error('Error while updating user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
                 }
+                req.user.reload().then(function() {
+                    copyAttributes({
+                        userFormData: req.body
+                    }, res.locals);
+                    return res.render('profile', {layout: 'layouts/main'});
+                });
+            });
+        } else if (req.body.preferences) {
+            // Other preferences update
+            req.user.accept_info_email = req.body.accept_info_email = 'accept_info_email' in req.body
+            req.user.save().then(function(user) {
+                req.session.success = 'update_preferences_success_msg';
+                logger.info("Sucessfully updated preferences for user with mail " + user.email + " and id " + user.id);
+                return res.redirect('/profile');
+            }).catch(function(err) {
+                req.session.error = 'update_preferences_error_msg';
+                logger.error('Error while updating preferences for user with mail ' + user.email + ' and id ' + user.id + ': ', err);
                 req.user.reload().then(function() {
                     copyAttributes({
                         userFormData: req.body

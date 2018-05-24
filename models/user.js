@@ -18,6 +18,7 @@ module.exports = function(sequelize, DataTypes) {
         salt: { type: DataTypes.STRING },
         avatar: { type: DataTypes.BLOB },
         activated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
+        accept_info_email: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
         geom: { type: DataTypes.GEOMETRY('POINT', 4326) },
         display_name: {
             type: DataTypes.VIRTUAL,

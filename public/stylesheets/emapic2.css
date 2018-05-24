@@ -261,7 +261,8 @@ textarea {
 	height: 100px !important;
 }
 
-div#signup-disclaimer input[type="checkbox"] {
+div#signup-disclaimer input[type="checkbox"],
+div.preferences-block input[type="checkbox"] {
 	margin: 0px 10px 0px 0px;
 	height: initial !important;
 	vertical-align: middle;

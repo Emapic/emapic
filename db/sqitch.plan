@@ -22,3 +22,4 @@ fix_vatican_city_hierarchy [base_layers] 2018-02-27T15:56:26Z Jorge López Fern�
 fix_municipalities_simpl_geoms [add_simplified_geoms] 2018-04-06T17:16:47Z Jorge López Fernández <jlopez@emapic.es> # Fix a huge mistake regarding municipalities' simplified geoms.
 fix_vigo_municipality_geoms [add_simplified_geoms] 2018-04-27T15:43:21Z Jorge López Fernández <jlopez@emapic.es> # Vigo geoms are lacking the Cies.
 oauth2_tables [emapic_db_user emapic_tables] 2018-03-07T18:05:12Z Jorge López Fernández <jlopez@emapic.es> # Create tables needed for oAuth2 support.
+add_accept_info_email [emapic_tables] 2018-05-23T20:34:03Z Jorge López Fernández <jlopez@emapic.es> # Add field to users for accepting emails with additional info
