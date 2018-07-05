@@ -248,4 +248,5 @@ module.exports = function(app) {
     getApplicationBaseURL = function() {
         return 'https://' + nconf.get('server').domain;
     };
+
 };

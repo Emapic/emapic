@@ -4,8 +4,10 @@
   "private": false,
   "license": "AGPLV3",
   "author": "Jorge López",
-  "author": "Adrián Eirís",
-  "author": "Francisco Puga",
+  "contributors": [
+    "Adrián Eirís",
+    "Francisco Puga"
+  ],
   "scripts": {
     "debug": "./node_modules/.bin/supervisor server.js",
     "test": "./node_modules/.bin/mocha -u tdd -w",

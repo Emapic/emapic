@@ -30,7 +30,7 @@ Puedes ver un listado más detallado de las tecnologías, librerías y fuentes d
 Para poder ejecutar Emapic en local en un entorno Unix necesitas antes de empezar:
 
 * [git](https://git-scm.com/)
-* [Node.js](https://nodejs.org/) (>=0.10.25)
+* [Node.js](https://nodejs.org/) (>=0.10.25 <4.0.0)
 * [npm](https://www.npmjs.com/) (normalmente ya instalado con Node.js)
 * [PostgreSQL](https://www.postgresql.org/) (>=9.2)
 * [PostGIS](http://postgis.net/) (>=2.0)
