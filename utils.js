@@ -16,7 +16,8 @@ var nodemailer = require('nodemailer'),
     optipng = require('optipng-bin'),
     phantomjs = require('phantomjs-prebuilt'),
     surveyIdEncr = nconf.get('app').surveyIdEncr,
-    smtpConfig = nconf.get('smtp');
+    smtpConfig = nconf.get('smtp'),
+    fileType = require('file-type');
 
 function takeSnapshotRaw(url, imgPath, width, height, wait, minSize, tries) {
     tries = (tries) ? tries : 0;
@@ -247,6 +248,12 @@ module.exports = function(app) {
 
     getApplicationBaseURL = function() {
         return 'https://' + nconf.get('server').domain;
+    };
+
+    getMimeTypeFromBuffer = function(buffer, defaultMime) {
+        var metadata = fileType(buffer);
+        return metadata === null ?
+            (defaultMime ? defaultMime : 'application/octet-stream') : metadata.mime;
     };
 
 };

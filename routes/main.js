@@ -294,11 +294,13 @@ module.exports = function(app) {
 
     app.get('/avatar', requireRole(null), function(req, res){
         img_data = req.user.avatar;
-        res.contentType("image/png");
         if (img_data === null || img_data.length === 0) {
+            res.contentType("image/png");
             res.send(fs.readFileSync("public/images/default-avatar.png"));
         } else {
-            res.send(new Buffer(img_data));
+            var buffer = new Buffer(img_data);
+            res.contentType(getMimeTypeFromBuffer(buffer, 'image/png'));
+            res.send(buffer);
         }
     });
 
@@ -307,11 +309,13 @@ module.exports = function(app) {
             if (user === null) {
                 return res.send(404);   // HTTP status 404: NotFound
             }
-            res.contentType("image/png");
             if (user.avatar === null || user.avatar.length === 0) {
+                res.contentType("image/png");
                 res.send(fs.readFileSync("public/images/default-avatar.png"));
             } else {
-                res.send(new Buffer(user.avatar));
+                var buffer = new Buffer(user.avatar);
+                res.contentType(getMimeTypeFromBuffer(buffer, 'image/png'));
+                res.send(buffer);
             }
         });
     });
@@ -321,8 +325,9 @@ module.exports = function(app) {
             if (answer === null || answer.img === null || answer.img.length === 0) {
                 return res.send(404);   // HTTP status 404: NotFound
             }
-            res.contentType("image/png");
-            res.send(new Buffer(answer.img));
+            var buffer = new Buffer(answer.img);
+            res.contentType(getMimeTypeFromBuffer(buffer, 'image/png'));
+            res.send(buffer);
         });
     });
 
