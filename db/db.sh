@@ -63,6 +63,19 @@ psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/country_names_e
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/update_province_names.sql 1> /dev/null
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/update_municipalities_geoms.sql 1> /dev/null
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_simplified_geoms.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_image_url_question.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/ignore_null_provinces.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/ceuta_melilla_spain.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/country_names_gl.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/province_names_gl.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/fix_roles_relationship.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_postgres_search_function.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/fix_vatican_city_geoms.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/fix_vatican_city_hierarchy.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/fix_municipalities_simpl_geoms.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/fix_vigo_municipality_geoms.sql 1> /dev/null
+sed 's/:"emapic_db_user"/emapic/g' deploy/oauth2_tables.sql | psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_accept_info_email.sql 1> /dev/null
 
 echo "6- Creating test user..."
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f emapic_test_user.sql 1> /dev/null

@@ -65,7 +65,7 @@ Entramos en la carpeta _db_ dentro del repositorio:
 cd db
 ```
 
-El fichero _db.sh_ dentro de esta carpeta es el empleado para construir la BDD. Por defecto creará una BDD de nombre «emapic» y un usuario de BDD «emapic» con contraseña «emapic» para acceder a ella desde la aplicación.  Finalmente introducirá un usuario de prueba también de nombre «emapic» y contraseña «emapic» para acceder a la propia aplicación web. Para ello accederá con el usuario «postgres», contraseña «postgres» al servidor local en el puerto por defecto (5432).  
+El fichero _db.sh_ dentro de esta carpeta es el empleado para construir la BDD. Por defecto creará una BDD de nombre «emapic» y un usuario de BDD «emapic» con contraseña «emapic» para acceder a ella desde la aplicación.  Finalmente introducirá un usuario de prueba también de nombre «emapic» y contraseña «emapic» para acceder a la propia aplicación web. Para ello accederá con el usuario «postgres», contraseña «postgres» al servidor local en el puerto por defecto (5432). Este script require que _sed_ esté instalado y accesible para poder realizar una serie de sustituciones en varios ficheros.
 Si alguno de estos datos no es correcto, especialmente los relativos al usuario administrador o al servidor, edita el documento y cámbialos en las primeras líneas. A continuación:
 ```
 ./db.sh

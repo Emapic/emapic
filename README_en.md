@@ -65,7 +65,7 @@ We browse into the _db_ folder in the repository:
 cd db
 ```
 
-File _db.sh_ inside that folder is the one used for creating the database. By default it will create a DB named "emapic" and a DB user "emapic" with password "emapic" for accessing it from our application. Lastly, it will insert a test user named "emapic" and with password "emapic" as well for the web application itself. For doing all this, it will access with admin user "postgres", password "postgres" the local PostgreSQL server through default port (5432).  
+File _db.sh_ inside that folder is the one used for creating the database. By default it will create a DB named "emapic" and a DB user "emapic" with password "emapic" for accessing it from our application. Lastly, it will insert a test user named "emapic" and with password "emapic" as well for the web application itself. For doing all this, it will access with admin user "postgres", password "postgres" the local PostgreSQL server through default port (5432).  This script requires _sed_ to be installed and accessible for making a few replacements in some files.
 If any of these data is not correct, particularly the ones related to the DB server or the admin user, you must edit the file and change them in its first lines. Next:
 
 ```

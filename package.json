@@ -56,7 +56,7 @@
     "passport-remember-me": "0.0.1",
     "pg": ">=6.0.0 <7.0.0",
     "pg-hstore": "2.3.2",
-    "phantomjs-prebuilt": "2.1.4",
+    "phantomjs-prebuilt": "2.1.16",
     "randomstring": "1.0.3",
     "request": "2.72.0",
     "sequelize": "3.14.0",
