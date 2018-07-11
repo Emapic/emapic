@@ -873,7 +873,7 @@ module.exports = function(app) {
     ));
 
     function issueToken(user, done) {
-        var token = randomString(64);
+        var token = randomstring.generate(64);
         saveRememberMeToken(token, user.id, function(err) {
             if (err) { return done(err); }
             return done(null, token);
