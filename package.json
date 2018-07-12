@@ -58,6 +58,7 @@
     "pg-hstore": "2.3.2",
     "phantomjs-prebuilt": "2.1.16",
     "randomstring": "1.0.3",
+    "read-chunk": "1.0.1",
     "request": "2.72.0",
     "sequelize": "3.14.0",
     "session-file-store": "0.0.24",

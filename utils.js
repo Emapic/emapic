@@ -17,7 +17,8 @@ var nodemailer = require('nodemailer'),
     phantomjs = require('phantomjs-prebuilt'),
     surveyIdEncr = nconf.get('app').surveyIdEncr,
     smtpConfig = nconf.get('smtp'),
-    fileType = require('file-type');
+    fileType = require('file-type'),
+    readChunk = require('read-chunk');
 
 function takeSnapshotRaw(url, imgPath, width, height, wait, minSize, tries) {
     tries = (tries) ? tries : 0;
@@ -238,10 +239,27 @@ module.exports = function(app) {
         return 'https://' + nconf.get('server').domain;
     };
 
-    getMimeTypeFromBuffer = function(buffer, defaultMime) {
-        var metadata = fileType(buffer);
+    getFileMetadata = function(input) {
+        return fileType(Buffer.isBuffer(input) ? input : readChunk.sync(input, 0, 4100));
+    }
+
+    getFileMimeType = function(input, defaultMime) {
+        var metadata = getFileMetadata(input);
         return metadata === null ?
             (defaultMime ? defaultMime : 'application/octet-stream') : metadata.mime;
+    };
+
+    getFileType = function(input) {
+        var metadata = getFileMetadata(input);
+        return metadata === null ? null : metadata.mime.split('/')[0];
+    };
+
+    isImage = function(input) {
+        return getFileType(input) === 'image';
+    };
+
+    isVideo = function(input) {
+        return getFileType(input) === 'video';
     };
 
 };
