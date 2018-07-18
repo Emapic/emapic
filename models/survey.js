@@ -110,7 +110,7 @@ module.exports = function(sequelize, DataTypes) {
             // Survey id "encrypted" in a different number base.
             type: DataTypes.VIRTUAL,
             get: function() {
-                return encryptSurveyId(this.id);
+                return Utils.encryptSurveyId(this.id);
             }
         },
         description_or_title: {
@@ -407,7 +407,7 @@ module.exports = function(sequelize, DataTypes) {
             clone: function(userid) {
                 var originalSurvey = this,
                     newSurvey,
-                    props = extractProperties(originalSurvey, ['id', 'nr_votes', 'date_created', 'date_opened', 'date_closed', 'active']);
+                    props = Utils.extractProperties(originalSurvey, ['id', 'nr_votes', 'date_created', 'date_opened', 'date_closed', 'active']);
                     props.owner_id = userid;
                     props.title = props.title + ' (copy)';
                 return Promise.join(Survey.create(props), originalSurvey.getQuestions({
@@ -470,8 +470,8 @@ module.exports = function(sequelize, DataTypes) {
                     url = 'http://localhost:3001/survey/' + encrId + '/results';
                 // TODO resize the snapshots from the optimal size (512x288 / 512x512) to the smaller possible sizes (256x144 / 400x400)
                 return Promise.all([
-                    takeSnapshot(url, thumbnailsFolder + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 3000, 20000),
-                    takeSnapshot(url, thumbnailsFolder + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 3000, 30000)
+                    Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 3000, 20000),
+                    Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 3000, 30000)
                 ]);
             },
 

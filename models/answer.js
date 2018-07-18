@@ -30,14 +30,14 @@ module.exports = function(sequelize, DataTypes) {
         },
         instanceMethods: {
             clone: function(questionId) {
-                var props = extractProperties(this, ['id', 'question_id']);
+                var props = Utils.extractProperties(this, ['id', 'question_id']);
                 props.question_id = questionId;
                 return Answer.create(props);
             },
 
             getCustomFieldsDescription: function(fields) {
                 if (typeof this.img !== 'undefined' && this.img !== null) {
-                    fields.img_url = getApplicationBaseURL() + '/answer_img/' + this.id;
+                    fields.img_url = Utils.getApplicationBaseURL() + '/answer_img/' + this.id;
                 }
                 return fields;
             },

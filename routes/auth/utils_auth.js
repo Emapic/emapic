@@ -41,13 +41,13 @@ module.exports = function(app) {
 
     sendSignupMail = function(req, user) {
         var usrid = crypto.createHash('md5').update(user.salt + user.email).digest('hex');
-        return sendMail({
+        return Utils.sendMail({
             to: user.email,
             subject: req.i18n.__("signup_notification_mail_subject"),
             text: req.i18n.__("signup_notification_mail_text_body",
-                user.login, getApplicationBaseURL() + "/activate?id=" + usrid),
+                user.login, Utils.getApplicationBaseURL() + "/activate?id=" + usrid),
             html: req.i18n.__("signup_notification_mail_html_body",
-                user.login, getApplicationBaseURL() + "/activate?id=" + usrid)
+                user.login, Utils.getApplicationBaseURL() + "/activate?id=" + usrid)
         }).then(function() {
             logger.info("Activation mail sent to " + user.email);
 		});
@@ -55,26 +55,26 @@ module.exports = function(app) {
 
     sendPasswordResetConfirmMail = function(req, user) {
         var usrid = crypto.createHash('md5').update(user.salt + user.email).digest('hex');
-        return sendMail({
+        return Utils.sendMail({
             to: user.email,
             subject: req.i18n.__("password_reset_confirm_mail_subject"),
             text: req.i18n.__("password_reset_confirm_mail_text_body",
-                user.login, getApplicationBaseURL() + "/pwd_reset/confirm?id=" + usrid),
+                user.login, Utils.getApplicationBaseURL() + "/pwd_reset/confirm?id=" + usrid),
             html: req.i18n.__("password_reset_confirm_mail_html_body",
-                user.login, getApplicationBaseURL() + "/pwd_reset/confirm?id=" + usrid)
+                user.login, Utils.getApplicationBaseURL() + "/pwd_reset/confirm?id=" + usrid)
         }).then(function() {
             logger.info("Reset password confirm mail sent to user with mail " + user.email + " and id " + user.id);
 		});
     };
 
     sendPasswordResetMail = function(req, user, password) {
-        return sendMail({
+        return Utils.sendMail({
             to: user.email,
             subject: req.i18n.__("password_reset_mail_subject"),
             text: req.i18n.__("password_reset_mail_text_body",
-                user.login, password, getApplicationBaseURL() + "/profile"),
+                user.login, password, Utils.getApplicationBaseURL() + "/profile"),
             html: req.i18n.__("password_reset_mail_html_body",
-                user.login, password, getApplicationBaseURL() + "/profile")
+                user.login, password, Utils.getApplicationBaseURL() + "/profile")
         }).then(function() {
             logger.info("Reset password mail sent to user with mail " + user.email + " and id " + user.id);
 		});

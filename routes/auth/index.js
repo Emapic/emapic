@@ -194,13 +194,13 @@ module.exports = function(app) {
         if (!req.body.email ||
             !req.body.login ||
             !req.body.password) {
-            copyBodyToLocals(req, res);
+            Utils.copyBodyToLocals(req, res);
             return res.render('signup', {layout: 'layouts/main'});
         }
 
         if (!/^[A-Za-z0-9_.\-~]+$/.test(req.body.login)) {
             req.session.error = 'username_invalid_error_msg';
-            copyBodyToLocals(req, res);
+            Utils.copyBodyToLocals(req, res);
             return res.render('signup', {layout: 'layouts/main'});
         }
 
@@ -246,7 +246,7 @@ module.exports = function(app) {
                 user.destroy().then(function() {
                     req.session.error = 'signup_error_msg';
                     logger.error('Error while creating user: ' + err);
-                    copyBodyToLocals(req, res);
+                    Utils.copyBodyToLocals(req, res);
                     return res.render('signup', {layout: 'layouts/main'});
                 });
             } else {
@@ -264,7 +264,7 @@ module.exports = function(app) {
                     req.session.error = 'signup_error_msg';
                     logger.error('Error while creating user: ' + err);
                 }
-                copyBodyToLocals(req, res);
+                Utils.copyBodyToLocals(req, res);
                 return res.render('signup', {layout: 'layouts/main'});
             }
         });
@@ -338,7 +338,7 @@ module.exports = function(app) {
         if (req.user.email !== req.body.email) {
             logger.warn("Trying to update an user profile different from the one logged in.");
             req.session.error = 'update_user_error_msg';
-            copyAttributes({
+            Utils.copyAttributes({
                 userFormData: req.body
             }, res.locals);
             return res.render('profile', {layout: 'layouts/main'});
@@ -374,7 +374,7 @@ module.exports = function(app) {
                 logger.error('Error while updating password: ' + err);
                 req.session.error = 'update_password_error_msg';
                 req.user.reload().then(function() {
-                    copyAttributes({
+                    Utils.copyAttributes({
                         userFormData: req.body
                     }, res.locals);
                     return res.render('profile', {layout: 'layouts/main'});
@@ -397,7 +397,7 @@ module.exports = function(app) {
                 req.session.error = 'update_avatar_error_msg';
                 logger.error('Error while updating avatar for user with mail ' + user.email + ' and id ' + user.id + ': ', err);
                 req.user.reload().then(function() {
-                    copyAttributes({
+                    Utils.copyAttributes({
                         userFormData: req.body
                     }, res.locals);
                     return res.render('profile', {layout: 'layouts/main'});
@@ -434,7 +434,7 @@ module.exports = function(app) {
                     logger.error('Error while updating user position for user with mail ' + user.email + ' and id ' + user.id + ': ', err);
                 }
                 req.user.reload().then(function() {
-                    copyAttributes({
+                    Utils.copyAttributes({
                         userFormData: req.body
                     }, res.locals);
                     return res.render('profile', {layout: 'layouts/main'});
@@ -444,7 +444,7 @@ module.exports = function(app) {
             // General profile update
             if (!/^[A-Za-z0-9_.\-~]+$/.test(req.body.login)) {
                 req.session.error = 'username_invalid_error_msg';
-                copyAttributes({
+                Utils.copyAttributes({
                     userFormData: req.body
                 }, res.locals);
                 return res.render('profile', {layout: 'layouts/main'});
@@ -468,7 +468,7 @@ module.exports = function(app) {
                     logger.error('Error while updating user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
                 }
                 req.user.reload().then(function() {
-                    copyAttributes({
+                    Utils.copyAttributes({
                         userFormData: req.body
                     }, res.locals);
                     return res.render('profile', {layout: 'layouts/main'});
@@ -485,7 +485,7 @@ module.exports = function(app) {
                 req.session.error = 'update_preferences_error_msg';
                 logger.error('Error while updating preferences for user with mail ' + user.email + ' and id ' + user.id + ': ', err);
                 req.user.reload().then(function() {
-                    copyAttributes({
+                    Utils.copyAttributes({
                         userFormData: req.body
                     }, res.locals);
                     return res.render('profile', {layout: 'layouts/main'});
@@ -823,7 +823,7 @@ module.exports = function(app) {
     ));
 
     var googleConfig = nconf.get('oAuth').google;
-    googleConfig.callbackURL = getApplicationBaseURL() + '/auth/google/callback';
+    googleConfig.callbackURL = Utils.getApplicationBaseURL() + '/auth/google/callback';
     googleConfig.passReqToCallback = true;
 
     passport.use('google', new GoogleStrategy(googleConfig,
@@ -845,7 +845,7 @@ module.exports = function(app) {
     ));
 
     var facebookConfig = nconf.get('oAuth').facebook;
-    facebookConfig.callbackURL = getApplicationBaseURL() + '/auth/facebook/callback';
+    facebookConfig.callbackURL = Utils.getApplicationBaseURL() + '/auth/facebook/callback';
     facebookConfig.passReqToCallback = true;
     facebookConfig.profileFields = ['id', 'name', 'emails', 'displayName', 'profileUrl', 'picture.type(large)'];
 

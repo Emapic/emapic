@@ -47,7 +47,7 @@ module.exports = function(app) {
     });
 
     app.get('/profile', requireRole(null), function(req, res){
-        copyAttributes({
+        Utils.copyAttributes({
             userFormData: req.user.get()
         }, res.locals);
         res.render('profile', {
@@ -67,7 +67,7 @@ module.exports = function(app) {
         }).then(function(results) {
             res.render('answered-surveys-list', {
                 answered: results.rows,
-                pagination: getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
+                pagination: Utils.getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
                 layout: 'layouts/main'
             });
         });
@@ -80,7 +80,7 @@ module.exports = function(app) {
         models.Survey.findPublicSurveys(null, null, query && query.trim() !== '' ? query : null, null, pageSize, pageNr).then(function(results) {
             res.render('surveys-list', {
                 surveys: results.rows,
-                pagination: getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
+                pagination: Utils.getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
                 query: query,
                 layout: 'layouts/main'
             });
@@ -95,7 +95,7 @@ module.exports = function(app) {
             res.render('tag-surveys-list', {
                 surveys: results.rows,
                 tag: tag,
-                pagination: getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
+                pagination: Utils.getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
                 layout: 'layouts/main'
             });
         });
@@ -113,7 +113,7 @@ module.exports = function(app) {
             res.render('user-surveys-list', {
                 surveys: results.rows,
                 owner: user,
-                pagination: getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
+                pagination: Utils.getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
                 layout: 'layouts/main'
             });
         }).catch({ message: 'NULL_USER' }, function(err) {
@@ -127,7 +127,7 @@ module.exports = function(app) {
         models.Survey.findSurveys(req.user.id, false, null, null, null, pageSize, pageNr).then(function(results) {
             res.render('own-surveys-list', {
                 surveys: results.rows,
-                pagination: getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
+                pagination: Utils.getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
                 layout: 'layouts/main'
             });
         });
@@ -148,7 +148,7 @@ module.exports = function(app) {
             for (var file in req.files) {
                 if (req.files[file].size > 1000000) {
                     req.session.error = 'survey_answer_image_file_too_big_msg';
-                    copyBodyToLocals(req, res);
+                    Utils.copyBodyToLocals(req, res);
                     questionsMap = JSON.stringify(extractQuestionsMapFromRequest(req));
                     return res.render('new-survey', {
                         is_admin: isAdmin,
@@ -235,24 +235,24 @@ module.exports = function(app) {
     });
 
     app.get('/survey/:id/delete', function(req, res) {
-        req.user.getSurveys({ where: ['id = ?', decryptSurveyId(req.params.id)] }).then(function(surveys) {
+        req.user.getSurveys({ where: ['id = ?', Utils.decryptSurveyId(req.params.id)] }).then(function(surveys) {
             if (surveys.length === 0) {
                 return Promise.reject();
             }
             return surveys[0].destroy();
         }).then(function() {
             req.session.success = 'survey_deleted_success_msg';
-            logger.info('Survey with id ' + decryptSurveyId(req.params.id) + ' has been deleted successfully.');
+            logger.info('Survey with id ' + Utils.decryptSurveyId(req.params.id) + ' has been deleted successfully.');
         }).catch(function(err) {
             req.session.error = 'survey_deleted_error_msg';
-            logger.error('Error while deleting survey with id ' + decryptSurveyId(req.params.id) + ' : ' + err);
+            logger.error('Error while deleting survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err);
         }).lastly(function() {
             res.redirect('/surveys/own');
         });
     });
 
     app.get('/survey/:id/open', function(req, res) {
-        req.user.getSurveys({ where: ['id = ?', decryptSurveyId(req.params.id)] }).then(function(surveys) {
+        req.user.getSurveys({ where: ['id = ?', Utils.decryptSurveyId(req.params.id)] }).then(function(surveys) {
             if ((surveys.length === 0) || (surveys[0].active === false)) {
                 return Promise.reject();
             }
@@ -264,17 +264,17 @@ module.exports = function(app) {
             });
         }).then(function() {
             req.session.success = 'survey_open_success_msg';
-            logger.info('Survey with id ' + decryptSurveyId(req.params.id) + ' has been opened successfully.');
+            logger.info('Survey with id ' + Utils.decryptSurveyId(req.params.id) + ' has been opened successfully.');
         }).catch(function(err) {
             req.session.error = 'survey_open_error_msg';
-            logger.error('Error while opening survey with id ' + decryptSurveyId(req.params.id) + ' : ' + err);
+            logger.error('Error while opening survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err);
         }).lastly(function() {
             res.redirect('/surveys/own');
         });
     });
 
     app.get('/survey/:id/close', function(req, res) {
-        req.user.getSurveys({ where: ['id = ?', decryptSurveyId(req.params.id)] }).then(function(surveys) {
+        req.user.getSurveys({ where: ['id = ?', Utils.decryptSurveyId(req.params.id)] }).then(function(surveys) {
             if ((surveys.length === 0) || (surveys[0].active === null)) {
                 return Promise.reject();
             }
@@ -283,10 +283,10 @@ module.exports = function(app) {
             return surveys[0].save();
         }).then(function() {
             req.session.success = 'survey_close_success_msg';
-            logger.info('Survey with id ' + decryptSurveyId(req.params.id) + ' has been closed successfully.');
+            logger.info('Survey with id ' + Utils.decryptSurveyId(req.params.id) + ' has been closed successfully.');
         }).catch(function(err) {
             req.session.error = 'survey_close_error_msg';
-            logger.error('Error while closing survey with id ' + decryptSurveyId(req.params.id) + ' : ' + err);
+            logger.error('Error while closing survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err);
         }).lastly(function() {
             res.redirect('/surveys/own');
         });
@@ -299,7 +299,7 @@ module.exports = function(app) {
             res.send(fs.readFileSync("public/images/default-avatar.png"));
         } else {
             var buffer = new Buffer(img_data);
-            res.contentType(getFileMimeType(buffer, 'image/png'));
+            res.contentType(Utils.getFileMimeType(buffer, 'image/png'));
             res.send(buffer);
         }
     });
@@ -314,7 +314,7 @@ module.exports = function(app) {
                 res.send(fs.readFileSync("public/images/default-avatar.png"));
             } else {
                 var buffer = new Buffer(user.avatar);
-                res.contentType(getFileMimeType(buffer, 'image/png'));
+                res.contentType(Utils.getFileMimeType(buffer, 'image/png'));
                 res.send(buffer);
             }
         });
@@ -326,7 +326,7 @@ module.exports = function(app) {
                 return res.send(404);   // HTTP status 404: NotFound
             }
             var buffer = new Buffer(answer.img);
-            res.contentType(getFileMimeType(buffer, 'image/png'));
+            res.contentType(Utils.getFileMimeType(buffer, 'image/png'));
             res.send(buffer);
         });
     });

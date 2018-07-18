@@ -134,7 +134,7 @@ module.exports = function(sequelize, DataTypes) {
             },
 
             getCustomFieldsDescription: function(fields) {
-                fields.avatar_url = getApplicationBaseURL() + '/avatar/' + this.login;
+                fields.avatar_url = Utils.getApplicationBaseURL() + '/avatar/' + this.login;
                 return fields;
             }
         },

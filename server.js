@@ -259,7 +259,7 @@ var EmapicApp = function() {
                 locales.push(lang);
                 localesWithIsos.push({
                     locale: lang,
-                    iso: langToWebLocaleIso(lang)
+                    iso: Utils.langToWebLocaleIso(lang)
                 });
             }
         }
@@ -284,7 +284,7 @@ var EmapicApp = function() {
             req.i18n.setLocaleFromCookie();
             res.locals.web_all_locales_with_isos = localesWithIsos;
             res.locals.web_locale = req.i18n.getLocale();
-            res.locals.web_locale_iso = langToWebLocaleIso(res.locals.web_locale);
+            res.locals.web_locale_iso = Utils.langToWebLocaleIso(res.locals.web_locale);
             var baseLocals = res.locals;
             // Add the i18n function to all rendering contexts
             res.locals.__ = function() {
@@ -296,7 +296,7 @@ var EmapicApp = function() {
             // Add an utility function for url escaping
             res.locals.encodeURIComponent = function() {
                 return function(text) {
-                    copyAttributes(baseLocals, this);
+                    Utils.copyAttributes(baseLocals, this);
                     return encodeURIComponent(Hogan.compile(text).render(this));
                 };
             };

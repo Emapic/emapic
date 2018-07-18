@@ -12,7 +12,7 @@ var Sequelize = require('sequelize'),
             instanceMethods: {
                 getDescription: function() {
                     return this.getCustomFieldsDescription(
-                        extractProperties(this, this.Model.getFieldsToHideInDescription()));
+                        Utils.extractProperties(this, this.Model.getFieldsToHideInDescription()));
                 },
 
                 getCustomFieldsDescription: function(fields) {
