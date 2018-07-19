@@ -7,7 +7,7 @@
 
 __Motor de encuestas geolocalizadas.__
 
-[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0) [![Dependency Status](https://gemnasium.com/badges/github.com/Emapic/emapic.svg)](https://gemnasium.com/github.com/Emapic/emapic) [![Code Climate](https://codeclimate.com/github/Emapic/emapic/badges/gpa.svg)](https://codeclimate.com/github/Emapic/emapic)
+[![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.png?v=103)](https://github.com/ellerbrock/open-source-badges/) [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](http://www.gnu.org/licenses/agpl-3.0) [![Code Climate](https://codeclimate.com/github/Emapic/emapic/badges/gpa.svg)](https://codeclimate.com/github/Emapic/emapic)
 
 Repositorio abierto del código fuente del motor de encuestas con componente geográfico Emapic, desarrollado por el laboratorio [CartoLAB](http://cartolab.udc.es/cartoweb/) de la [Universidade da Coruña](http://www.udc.es/). En producción en el sitio web [emapic.es](https://emapic.es).
 
