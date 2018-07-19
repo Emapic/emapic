@@ -4,7 +4,6 @@
 
     <!-- Emapic Styles -->
     <link rel="stylesheet" type="text/css" href="/stylesheets/emapic.css">
-    <link rel="stylesheet" type="text/css" href="/stylesheets/emapic2.css">
 
 {{{yield-styles}}}
 

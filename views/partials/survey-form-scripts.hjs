@@ -254,34 +254,36 @@
                             \
                             <div id="answers">\
                             \
-                                <div id="answers-title" class="form-group form-group-sm">\
+                                <div class="form-group form-group-sm">\
                                     <div class="col-xs-12">\
                                         <h4><label>{{#__}}answers{{/__}}</label>\
                                             <span class="glyphicon glyphicon-question-sign help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_answers{{/__}}"></span>\
                                         </h4>\
                                     </div>\
                                 </div>\
-                                <div class="col-xs-12 form-group form-group-sm form-checkbox-line">\
-                                    <div class="col-xs-2 col-md-1 col-sm-offset-2 col-md-offset-3">\
-                                        <input id="responses_img_' + qstn + '" class="form-control" type="checkbox" onchange="responsesImgChanged(this)" name="responses_img_' + qstn + '" {{#responses_img}}checked{{/responses_img}}>\
+                                <div class="form-group form-group-sm form-checkbox-line">\
+                                    <div class="col-xs-2 col-md-1 col-sm-offset-1 col-md-offset-3">\
+                                        <input id="responses_img_' + qstn + '" class="form-control pull-right" type="checkbox" onchange="responsesImgChanged(this)" name="responses_img_' + qstn + '" {{#responses_img}}checked{{/responses_img}}>\
                                     </div>\
-                                    <div class="col-xs-8 col-sm-4 col-md-4">\
-                                        <label class="control-label" for="responses_img_' + qstn + '">{{#__}}responses_image{{/__}}:</label>\
+                                    <div class="col-xs-8 col-sm-5 col-md-4 col-lg-3">\
+                                        <label class="control-label" for="responses_img_' + qstn + '">{{#__}}responses_image{{/__}}</label>\
                                     </div>\
                                     <div class="col-xs-2 col-md-1">\
-                                        <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_responses_image{{/__}}"></span>\
+                                        <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="{{#__}}help_tooltip_new_survey_responses_image{{/__}}"></span>\
                                     </div>\
                                 </div>\
                                 <div id="answer_groups">\
                                     <div class="answer-group col-xs-12 form-horizontal" id="answer_' + qstn + '_1">\
                                         <div class="form-group">\
                                             <input type="hidden" name="id_' + qstn + '_1"/>\
-                                            <label class="col-xs-12 col-sm-3 text-right control-label">\
-                                                <button class="btn btn-danger delete-survey-answer" disabled onclick="deleteOption(this)" data-placement="top" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_answer{{/__}}">\
-                                                    <span class="glyphicon glyphicon-trash"></span>\
-                                                </button>\
-                                                <div class="answer-handle glyphicon glyphicon-move"></div>\
-                                                <span>{{#__}}option{{/__}} 1:</span>\
+                                            <label class="col-xs-12 col-sm-3 control-label">\
+                                                <div class="col-xs-12 col-md-10 col-md-offset-2 col-lg-8 col-lg-offset-4 control-sublabel">\
+                                                    <button class="btn btn-danger delete-survey-answer" disabled onclick="deleteOption(this)" data-placement="top" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_answer{{/__}}">\
+                                                        <span class="glyphicon glyphicon-trash"></span>\
+                                                    </button>\
+                                                    <div class="answer-handle glyphicon glyphicon-move"></div>\
+                                                    <span>{{#__}}option{{/__}} 1:</span>\
+                                                </div>\
                                             </label>\
                                             <div class="col-xs-12 col-sm-6 form-group-sm">\
                                                 <input spellcheck="true" class="form-control" required type="text" required maxlength="150" name="option_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" >\
@@ -293,8 +295,8 @@
                                         </div>\
                                         <div class="form-group answer-img-group" style="display: none;">\
                                             <div class="col-xs-12 col-md-2 col-md-offset-1"><div class="answer-img-container" style="display:none;"><div class="answer-img pull-left"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
-                                            <label class="col-xs-12 col-md-2 text-right control-label">{{#__}}image{{/__}}:</label>\
-                                            <div class="col-xs-12 col-md-7">\
+                                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
+                                            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
                                                 <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" />\
                                                 <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
                                             </div>\
@@ -303,12 +305,14 @@
                                     <div class="answer-group col-xs-12 form-horizontal" id="answer_' + qstn + '_2">\
                                         <div class="form-group">\
                                             <input type="hidden" name="id_' + qstn + '_2"/>\
-                                            <label class="col-xs-12 col-sm-3 text-right control-label">\
-                                                <button class="btn btn-danger delete-survey-answer" disabled onclick="deleteOption(this)" data-placement="top" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_answer{{/__}}">\
-                                                    <span class="glyphicon glyphicon-trash"></span>\
-                                                </button>\
-                                                <div class="answer-handle glyphicon glyphicon-move"></div>\
-                                                <span>{{#__}}option{{/__}} 2:</span>\
+                                            <label class="col-xs-12 col-sm-3 control-label">\
+                                                <div class="col-xs-12 col-md-10 col-md-offset-2 col-lg-8 col-lg-offset-4 control-sublabel">\
+                                                    <button class="btn btn-danger delete-survey-answer" disabled onclick="deleteOption(this)" data-placement="top" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_answer{{/__}}">\
+                                                        <span class="glyphicon glyphicon-trash"></span>\
+                                                    </button>\
+                                                    <div class="answer-handle glyphicon glyphicon-move"></div>\
+                                                    <span>{{#__}}option{{/__}} 2:</span>\
+                                                </div>\
                                             </label>\
                                             <div class="col-xs-12 col-sm-6 form-group-sm">\
                                                 <input spellcheck="true" class="form-control" required type="text" required maxlength="150" name="option_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" >\
@@ -320,8 +324,8 @@
                                         </div>\
                                         <div class="form-group answer-img-group" style="display: none;">\
                                             <div class="col-xs-12 col-md-2 col-md-offset-1"><div class="answer-img-container" style="display:none;"><div class="answer-img pull-left"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
-                                            <label class="col-xs-12 col-md-2 text-right control-label">{{#__}}image{{/__}}:</label>\
-                                            <div class="col-xs-12 col-md-7">\
+                                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
+                                            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
                                                 <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" />\
                                                 <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
                                             </div>\
@@ -339,7 +343,7 @@
                                 <div id="answer_' + qstn + '_other" class="answer-group col-xs-12 form-horizontal">\
                                     <div class="form-group">\
                                         <input disabled type="hidden" name="id_' + qstn + '_other"/>\
-                                        <label class="col-xs-12 col-sm-3 control-label">\
+                                        <label class="col-xs-12 col-sm-3 text-right">\
                                             <span class="glyphicon glyphicon-question-sign help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title=\'{{#__}}help_tooltip_option_other_answer{{/__}}\'></span>\
                                             <input type="checkbox" name="responses_' + qstn + '_other" onchange="responsesOtherChanged(this)">\
                                             <span>{{#__}}option_other{{/__}}:</span>\
@@ -354,8 +358,8 @@
                                     </div>\
                                     <div class="form-group answer-img-group" style="display: none;">\
                                         <div class="col-xs-12 col-sm-2 col-sm-offset-1"><div class="answer-img-container" style="display:none;"><div class="answer-img pull-left"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
-                                        <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
-                                        <div class="col-xs-12 col-sm-7">\
+                                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
+                                        <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
                                             <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}" />\
                                             <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
                                         </div>\
@@ -461,12 +465,14 @@
             <div class="answer-group col-xs-12 form-horizontal" id="answer_' + qstn + '_' + answ + '">\
                 <div class="form-group">\
                     <input type="hidden" name="id_' + qstn + '_' + answ + '" ' + (id != null ? 'value="' + id + '"' : '') + '/>\
-                    <label class="col-xs-12 col-sm-3 text-right control-label">\
-                        <button class="btn btn-danger delete-survey-answer" onclick="deleteOption(this)" data-placement="top" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_answer{{/__}}">\
-                            <span class="glyphicon glyphicon-trash"></span>\
-                        </button>\
-                        <div class="answer-handle glyphicon glyphicon-move"></div>\
-                        <span>{{#__}}option{{/__}} ' + answ + ':</span>\
+                    <label class="col-xs-12 col-sm-3 control-label">\
+                        <div class="col-xs-12 col-md-10 col-md-offset-2 col-lg-8 col-lg-offset-4 control-sublabel">\
+                            <button class="btn btn-danger delete-survey-answer" onclick="deleteOption(this)" data-placement="top" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_answer{{/__}}">\
+                                <span class="glyphicon glyphicon-trash"></span>\
+                            </button>\
+                            <div class="answer-handle glyphicon glyphicon-move"></div>\
+                            <span>{{#__}}option{{/__}} ' + answ + ':</span>\
+                        </div>\
                     </label>\
                     <div class="col-xs-12 col-sm-6 form-group-sm">\
                         <input spellcheck="true" class="form-control" type="text" required maxlength="150" name="option_' + qstn + '_' + answ + '" data-error="{{#__}}type_an_option{{/__}}" value="' + value + '">\
@@ -480,8 +486,8 @@
                     <div class="col-xs-12 col-md-2 col-md-offset-1">' +
                     (imageUrl != null ? '<div class="answer-img-container"><div class="answer-img pull-left" style="background-image: url(\'' + imageUrl + '\');"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div>' : '') +
                     '</div>\
-                    <label class="col-xs-12 col-md-2 text-right control-label">{{#__}}image{{/__}}:</label>\
-                    <div class="col-xs-12 col-md-7">\
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
+                    <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
                         <input class="form-control" ' + (imageUrl ? '' : 'required ' ) + (responses_img ? '' : 'disabled ' ) + 'type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_' + answ + '" />\
                         <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
                     </div>\
@@ -548,7 +554,7 @@
             var $answ = $($answs[i]);
             var newNr = $answ.index() + 1;
             updateOptionComponentAttr($answ, 'id', newNr);
-            var $heading = $answ.find('div.form-group > label > span');
+            var $heading = $answ.find('div.form-group > label > div > span');
             $heading.text('{{#__}}option{{/__}} ' + newNr + ':');
             $answ.find('input, textarea').each(function(idx, el) {
                 updateOptionComponentAttr($(el), 'name', newNr);
