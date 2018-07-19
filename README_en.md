@@ -275,6 +275,7 @@ When reporting an issue:
 If you have any doubt or problem regarding the application, you can contact directly with us:
 
 * Jorge López Fernández [github](https://github.com/jorgelf)
+* Aida Vidal Balea [github](https://github.com/aidav25)
 * Adrián Eirís Torres [github](https://github.com/aeiris)
 * Alberto Varela García [github](https://github.com/avarela) | [twitter](https://twitter.com/albertouve)
 

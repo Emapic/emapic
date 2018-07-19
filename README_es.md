@@ -274,6 +274,7 @@ A la hora de reportar un error:
 Ante cualquier duda o problema con la aplicación, puedes contactar directamente con nosotros:
 
 * Jorge López Fernández [github](https://github.com/jorgelf)
+* Aida Vidal Balea [github](https://github.com/aidav25)
 * Adrián Eirís Torres [github](https://github.com/aeiris)
 * Alberto Varela García [github](https://github.com/avarela) | [twitter](https://twitter.com/albertouve)
 
