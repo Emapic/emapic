@@ -280,8 +280,8 @@ var EmapicApp = function() {
         });
         self.app.use(function(req, res, next) {
             req.i18n.setLocale(req.i18n.preferredLocale());
-            req.i18n.setLocaleFromQuery();
             req.i18n.setLocaleFromCookie();
+            // req.i18n.setLocaleFromQuery();
             res.locals.web_all_locales_with_isos = localesWithIsos;
             res.locals.web_locale = req.i18n.getLocale();
             res.locals.web_locale_iso = Utils.langToWebLocaleIso(res.locals.web_locale);
