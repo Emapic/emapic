@@ -261,6 +261,26 @@ module.exports = function(app) {
 
         isVideo: function(input) {
             return Utils.getFileType(input) === 'video';
+        },
+
+        deleteTmpFilesFromRequest: function(req) {
+            var paths = [];
+            for (var name in req.files) {
+                if ({}.hasOwnProperty.call(req.files, name)) {
+                    paths.push(req.files[name].path);
+                }
+            }
+            if (paths.length > 0) {
+                paths.map(fs.unlink);
+                logger.debug('Successfully deleted the following tmp files: ' + paths.join(' | '));
+            }
+        },
+
+        dontDeleteTmpFiles: function() {
+            return function(req, res, next) {
+                res.__deleteFilesOnFinished = false;
+                return next();
+            }
         }
     };
 };

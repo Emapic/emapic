@@ -1,12 +1,13 @@
 {
   "name": "emapic",
-  "version": "0.5.0-alpha",
+  "version": "0.5.5-alpha",
   "private": false,
   "license": "AGPLV3",
   "author": "Jorge López",
   "contributors": [
     "Adrián Eirís",
-    "Francisco Puga"
+    "Francisco Puga",
+    "Aida Vidal"
   ],
   "scripts": {
     "debug": "./node_modules/.bin/supervisor server.js",
@@ -18,6 +19,7 @@
     "bcryptjs": "0.7.12",
     "bluebird": "3.5.1",
     "body-parser": "1.9.0",
+    "clamscan": "0.8.4",
     "collections": "3.0.0",
     "connect-multiparty": "1.2.5",
     "connect-slashes": "1.3.1",
@@ -47,6 +49,7 @@
     "nodemailer-smtp-transport": "1.0.3",
     "nodemailer-wellknown": "0.1.5",
     "node-schedule": "1.0.0",
+    "on-finished": "2.3.0",
     "optipng-bin": "3.1.2",
     "pagination": "0.4.4",
     "passport": "0.2.1",
@@ -57,13 +60,13 @@
     "pg": ">=6.0.0 <7.0.0",
     "pg-hstore": "2.3.2",
     "phantomjs-prebuilt": "2.1.16",
-    "randomstring": "1.0.3",
+    "randomstring": "1.1.5",
     "read-chunk": "1.0.1",
     "request": "2.72.0",
     "sequelize": "3.14.0",
     "session-file-store": "0.0.24",
     "url": "0.11.0",
-    "winston": "1.0.0"
+    "winston": "2.4.3"
   },
   "description": "Spatial enabled surveys",
   "main": "server.js",

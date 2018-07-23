@@ -38,6 +38,8 @@ For launching Emapic locally you need before starting:
 You also need the PostgreSQL module _unaccent_ in order to search through texts with accents and similar signs. This can be easily installed in Debian and derived systems via the __postgresql-contrib__ package.  
 We strongly encourage to install it, but in case you consider it's not actually required for any reason (e.g. it's a private installation and the user's main language doesn't use accents), you can prevent its use by removing the SQL commands that create and delete it from files _db/deploy/extensions.sql_ and _db/revert/extensions.sql_, delete its SELECT in _db/verify/extensions.sql_ and remove its reference when creating the text search configuration in _db/deploy/extensions.sql_.
 
+Although it's disabled by default, if we want the server to automatically scan every uploaded file for virus, we must install [ClamAV](https://www.clamav.net/) antivirus. In Debian and derived systems it can be easily installed via the __clamav__ package. We strongly encourage to install its _daemon_ as well, in Debian and derived systems via the __clamav-daemon__ package. Though the application can scan files without the _daemon_, scanning time sees a big increase, going from what's usually not more than a mere hundredths of a second to more than ten seconds, resulting in laggy responses from the server. The application will automatically use the _daemon_ command instead of the manual one when available. Once we have installed the antivirus, we must remember to download the virus database with the command _freshclam_ and to repeat this process periodically in order to keep it updated. If we have any problems after installing these two packges and updating the virus database, we recommend to check [ClamAV installation guide](https://www.clamav.net/documents/installing-clamav).
+
 We also recommend for developers who wish to work with our code:
 
 * [Sqitch](http://sqitch.org/) >= 0.9994  
@@ -215,10 +217,18 @@ Port used for listening to HTTPS requests.
 Normally it would be port 443, but by default we set an unreserved port for testing purposes in a localhost server.  
 It can also be configured through the environment variable _NODEJS_HTTPS_PORT_.
 
-* ##### Puerto en que servirá peticiones HTTP (_httpport_)
+* ##### HTTP port (_httpport_)
 Port used for listening to HTTP requests, which will be redirected to HTTPS in most cases.  
 Normally it would be port 80, but by default we set an unreserved port for testing purposes in a localhost server.  
 It can also be configured through the environment variable _NODEJS_HTTP_PORT_.
+
+* ##### «robots.txt» file header (_robotsHeader_)
+It's simply a text that precedes the body of the "robots.txt" file, which is dynamically generated.
+It doesn't have any actual effect onto the application and we can leave its default value or replace it by any introductory text that we want.
+
+* ##### Automatic scanning for virus with ClamAV of every file uploaded to the server (_autoScanFiles_)
+Indicates whether the application will scan every uploaded file for virus with ClamAV before actually processing the request. If it finds any suspicious file, request will be terminated and everyfile it uploaded will be deleted.
+This comes disabled by default. If we want this scan to be automatically performed, we must first install ClamAV onto the local machine (more information onto this in [the prerequisites section](#prerequisites)) and make sure that commands _clamscan_ and/or _clamdscan_ are executable by the user that will launch the Node.js server application. Once the antivirus is configured, we would set this parameter to "true" in order to activate the scanning.
 
 * ##### Encryption secrets (_secrets_)
 The text strings used for encrypting the elements used for keeping and unequivocally communication between Emapic and each web user.  

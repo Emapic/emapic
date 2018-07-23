@@ -26,7 +26,15 @@ var express = require('express'),
     Sitemap = require('express-sitemap'),
     nodeSchedule = require('node-schedule'),
     utils = require('./utils'),
-    routes = require('./routes');
+    routes = require('./routes'),
+    onFinished = require('on-finished'),
+    clamscan = require('clamscan'),
+    clamscanConfig = {
+        // debug_mode: true,
+        clamdscan: {
+            config_file: null // Use default config file
+        }
+    };
 
 require('pg').defaults.parseInt8 = true;
 
@@ -39,7 +47,8 @@ var EmapicApp = function() {
     var self = this,
         serverConfig,
         socialConfig,
-        geoConfig;
+        geoConfig,
+        avScanner;
 
 
     /*  ================================================================  */
@@ -393,6 +402,67 @@ var EmapicApp = function() {
             }
             return next();
         });
+        // Delete uploaded files from local temp folder
+        self.app.use(function(req, res, next) {
+            res.__deleteFilesOnFinished = true;
+            onFinished(res, function(err) {
+                if (err || res.__deleteFilesOnFinished === true) {
+                    Utils.deleteTmpFilesFromRequest(req);
+                } else {
+                    logger.debug('Don\'t delete tmp files automatically.');
+                }
+            })
+            return next();
+        });
+        // Scan uploaded files
+        if (serverConfig.autoScanFiles === true) {
+            avScanner = clamscan(clamscanConfig);
+            self.app.use(function(req, res, next) {
+                var paths = [],
+                    originalFilenames = {};
+                for (var name in req.files) {
+                    if ({}.hasOwnProperty.call(req.files, name)) {
+                        paths.push(req.files[name].path);
+                        originalFilenames[req.files[name].path] = req.files[name].originalFilename;
+                    }
+                }
+                if (paths.length === 0) {
+                    return next();
+                }
+                avScanner.scan_files(paths, function(err, goodFiles, badFiles) {
+                    // There seems to be some weird bug that might raise an error when
+                    // scanning and finding suspicious files, so we must check the
+                    // error code for the actual ones
+                    if (err && err.code === 2) {
+                        logger.error('Error while scanning files: ' + err);
+                        return res.send(500);
+                    }
+                    if (goodFiles.length > 0) {
+                        var goodOnes = [];
+                        for (var i = 0, iLen = goodFiles.length; i<iLen; i++) {
+                            goodOnes.push('"' + goodFiles[i] + '" ("' + originalFilenames[goodFiles[i]] + '")');
+                        }
+                        logger.debug('The following files have been scanned and deemed innofensive: ' + goodOnes.join(' | '));
+                    }
+                    if (badFiles.length === 0) {
+                        return next();
+                    } else {
+                        var badOnes = [],
+                            metadata = {
+                                ip: req.ip,
+                                url: req.url,
+                                userAgent: req.headers['user-agent'],
+                                userId: req.user ? req.user.id : null
+                            };
+                        for (var j = 0, jLen = badFiles.length; j<jLen; j++) {
+                            badOnes.push('"' + badFiles[j] + '" ("' + originalFilenames[badFiles[j]] + '")');
+                        }
+                        logger.alert('VIRUS WARNING: the following suspicious files have been detected: ' + badOnes.join(' | '), metadata);
+                        return res.send(400);
+                    }
+                });
+            });
+        }
         // Add the logged user and web protocol+host to all rendering contexts
         self.app.use(function(req, res, next) {
             res.locals.user = req.user;

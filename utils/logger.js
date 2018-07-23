@@ -1,7 +1,29 @@
 var util = require('util'),
     winston = require('winston'),
-    morgan = require('morgan');
-
+    morgan = require('morgan'),
+    loggingLevels = {
+        levels: {
+            emerg: 0,
+            alert: 1,
+            crit: 2,
+            error: 3,
+            warn: 4,
+            notice: 5,
+            info: 6,
+            debug: 7
+        },
+        colors: {
+            emerg: 'grey',
+            alert: 'magenta',
+            crit: 'magenta',
+            error: 'red',
+            warn: 'yellow',
+            notice: 'blue',
+            info: 'green',
+            debug: 'white'
+        }
+    };
+winston.addColors(loggingLevels.colors);
 winston.transports.FileSoleLevel = function(options) {
     this.soleLevel = options.level || 'info';
     this.realLogger = new winston.transports.File(options);
@@ -9,7 +31,7 @@ winston.transports.FileSoleLevel = function(options) {
 util.inherits(winston.transports.FileSoleLevel, winston.Transport);
 winston.transports.FileSoleLevel.prototype.log = function(level, msg, meta, callback) {
     if (level !== this.soleLevel) {
-        callback(null, true);
+        return callback(null, true);
     } else {
         this.realLogger.log(level, msg, meta, callback);
     }
@@ -39,7 +61,7 @@ var transports = {
     }),
     'file-requests': new winston.transports.File({
         name: 'file-requests',
-        level: 'verbose',
+        level: 'info',
         filename: './logs/emapic-requests.log',
         handleExceptions: false,
         json: true,
@@ -57,7 +79,8 @@ var transports = {
     })
 };
 
-module.exports = winston.loggers.internal = new winston.Logger({
+module.exports = winston.loggers.internal = new (winston.Logger)({
+    levels: loggingLevels.levels,
     transports: [
         transports['file-problems'],
         transports['file-info'],
@@ -67,7 +90,8 @@ module.exports = winston.loggers.internal = new winston.Logger({
     emitErrs: false
 });
 
-var requestsLogger = winston.loggers.requests = new winston.Logger({
+var requestsLogger = winston.loggers.requests = new (winston.Logger)({
+    levels: loggingLevels.levels,
     transports: [
         transports['file-requests'],
         transports.console
@@ -90,7 +114,7 @@ module.exports.stream = {
             return;
         }
         if (json.remote_addr !== '127.0.0.1' && json.remote_addr !== 'localhost') {
-            requestsLogger.verbose('Web request info', json);
+            requestsLogger.info('Web request info', json);
         } else {
             requestsLogger.debug('Localhost web request info', json);
         }

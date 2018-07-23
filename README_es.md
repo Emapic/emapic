@@ -38,6 +38,8 @@ Para poder ejecutar Emapic en local en un entorno Unix necesitas antes de empeza
 Además se necesita el módulo _unaccent_ de PostgreSQL con el fin de poder ejecutar búsquedas sobre textos con tildes y similares. Éste se puede instalar fácilmente en sistemas Debian y derivados mediante el paquete __postgresql-contrib__.  
 Recomendamos encarecidamente su instalación, pero en caso de considerar que no necesitas la extensión por algún motivo (e.g. se va a instalar de manera privada y el idioma del usuario no emplea acentos), puedes eliminar su uso borrando los comandos SQL que la crean y la borran en los archivos _db/deploy/extensions.sql_ y _db/revert/extensions.sql_, eliminando su SELECT en _db/verify/extensions.sql_, y quitando su referencia al crear la configuración de búsqueda en _db/deploy/extensions.sql_.
 
+Aunque por defecto esta opción viene desactivada, si queremos que el servidor escanee los ficheros subidos de manera automática en busca de virus, deberemos tener instalado el antivirus [ClamAV](https://www.clamav.net/). En sistemas Debian y derivados podemos instalarlo fácilmente mediante el paquete __clamav__. Recomendamos encarecidamente instalar también el _daemon_ correspondiente, en Debian y derivados mediante el paquete __clamav-daemon__. Aunque la aplicación puede escanear archivos manualmente sin el _daemon_, el tiempo de los escaneos sufre un retraso muy importante, pasando habitualmente de unas centésimas de segundo a más de diez segundos, resultando en respuestas muy tardías por parte del servidor. La aplicación usará automáticamente el comando del _daemon_ en lugar del manual siempre que esté disponible. Una vez que tenemos instalado el antivirus, debemos acordarnos de descargar la base de datos de virus con el comando _freshclam_ y de repetir el proceso de manea periódica para mantenerla actualizada. Si tras instalar esos dos paquetes y actualizar la base de datos de virus hay cualquier problema, recomendamos consultar directamente [la documentación de instalación de ClamAV](https://www.clamav.net/documents/installing-clamav).
+
 También recomendamos para desarrolladores que quieran trabajar sobre nuestro código:
 
 * [Sqitch](http://sqitch.org/) >= 0.9994  
@@ -198,7 +200,7 @@ Para autenticarte a través de Google o Facebook es necesario cambiar los parám
 
 #### Configuración interna del servidor (_server_)
 
-Aquí se incluyen los parámetros empleados para configurar el servidor de Node.js:
+Aquí se incluyen los parámetros empleados para configurar el servidor de Node.js y otros paquetes de bajo nivel:
 
 * ##### Nombre del dominio (_domain_)
 Dominio en el cual se servirá la aplicación. Necesario para configurar los callbacks de los servicios oAuth.  
@@ -218,6 +220,14 @@ También se puede configurar con la variable de entorno _NODEJS_HTTPS_PORT_.
 Puerto usado para escuchar las peticiones HTTP, que serán redirigidas a HTTPS en la mayoría de los casos.  
 Normalmente sería el puerto 80, pero por defecto viene con un puerto no reservado para un servidor local de pruebas.  
 También se puede configurar con la variable de entorno _NODEJS_HTTP_PORT_.
+
+* ##### Cabecera del fichero «robots.txt» (_robotsHeader_)
+Simplemente se trata de una cadena de texto que se antepone al cuerpo del fichero «robots.txt», generado dinámicamente en memoria.
+No tiene efecto sobre la aplicación y podemos dejar el valor por defecto o sustituir por otra cadena introductoria que queramos.
+
+* ##### Escaneo automático mediante ClamAV de ficheros subidos al servidor (_autoScanFiles_)
+Indica si la aplicación escaneará los archivos subidos en busca de virus mediante ClamAV antes de procesar las peticiones. En caso de encontrar un archivo sospechoso, terminará la petición y borrará todos los archivos subidos por la misma.
+Por defecto está desactivado. Si queremos que se realicen estos escaneos de manera automática, antes deberemos instalar en local ClamAV (más información en el [apartado de prerrequisitos](#prerrequisitos)) y asegurarnos de que los comandos _clamscan_ y/o _clamdscan_ son ejecutables por el usuario que lance la aplicación del servidor Node.js. Una vez que el antivirus esté configurado, le daríamos el valor «true» a este parámetro de configuración para activar el escaneo.
 
 * ##### Secretos de encriptación (_secrets_)
 Las cadenas empleadas para encriptar los elementos que nos permiten mantener una comunicación inequívoca entre Emapic y cada usuario web.  
