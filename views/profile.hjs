@@ -130,7 +130,7 @@
                     <input class="form-control" type="hidden" name="email" value="{{ userFormData.email }}">
                     <div class="form-group col-md-8">
                         <div class="avatar-wrapper">
-                            <img id="avatarimg" class="img-responsive user-avatar" src="/avatar">
+                            <img id="avatarimg" class="img-responsive img-thumbnail user-avatar" src="/avatar">
                         </div>
                         <input id="avatarinput" class="form-control" type="file" accept="image/*" data-maxfilesize="250000" data-error="{{#__}}maximum_avatar_size{{/__}}" name="avatar" />
                         <div class="help-block">{{#__}}maximum_avatar_size{{/__}}</div>
