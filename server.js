@@ -277,7 +277,9 @@ var EmapicApp = function() {
           locales: locales,
           extension: '.json',
           // set the cookie name
-          cookieName: 'locale'
+          cookieName: 'locale',
+          // i18n-2 debug messages can clutter the output. Disable them explicitly even in development mode.
+          devMode: false
         });
         // Redirect from www-urls to non www-urls
         self.app.use(function(req, res, next) {
@@ -378,7 +380,13 @@ var EmapicApp = function() {
         self.app.use(express.session({
             store: new FileStore({
                 path: './.sessions',
-                ttl: 18000
+                ttl: 18000,
+                logFn: logger.info,
+                fallbackSessionFn: function(sessionId) {
+                    logger.warn('Error while reading session with id "' + sessionId + '". Session will be considered expired.');
+                    // Workaround for expiring the session
+                    return {cookie: {originalMaxAge: 0 }};
+                }
             }),
             secret: serverConfig.secrets.session
         }));
