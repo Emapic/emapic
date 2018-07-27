@@ -286,7 +286,9 @@ module.exports = function(app) {
             if (typeof req.body.responses === undefined) {
                 return res.status(400).json({ error_code: 'invalid_request',  error: 'you must provide a response to save.' });
             }
-            survey.saveResponse(req).catch(function(err) {
+            survey.saveResponse(req).then(function(response) {
+                res.end();
+            }).catch(function(err) {
                 logger.error('Error while saving response for survey with id ' + survey.id + ' : ' + err.message);
                 var error;
                 if ('status' in err) {
@@ -297,8 +299,6 @@ module.exports = function(app) {
                     error = { error_code: 'internal_error', error: 'response couldn\'t be saved.' };
                 }
                 res.json(error);
-            }).lastly(function(response) {
-                res.end();
             });
         }).catch(handleInternalError(req, res));
     });
