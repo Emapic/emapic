@@ -10,8 +10,7 @@ var nodemailer = require('nodemailer'),
     bases = require('bases'),
     path = require('path'),
     imageType = require('image-type'),
-    http = require('http'),
-    https = require('https'),
+    request = require('request'),
     childProcess = Promise.promisifyAll(require('child_process')),
     optipng = require('optipng-bin'),
     phantomjs = require('phantomjs-prebuilt'),
@@ -202,21 +201,27 @@ module.exports = function(app) {
             if (url.lastIndexOf('http', 0) !== 0) {
                 url = 'http://' + url;
             }
-            var dfd = Promise.defer(),
-                protocol = (url.lastIndexOf('https:', 0) === 0) ? https : http;
-            protocol.get(url, function(res) {
-                res.on('data', function(chunk) {
-                    res.destroy();
-                    if (imageType(chunk) !== null) {
-                        dfd.resolve();
-                    } else {
-                        dfd.reject();
+            return new Promise(function(resolve, reject) {
+                request({
+                    url: url,
+                    timeout: 4000
+                }).on('response', function(res) {
+                    res.on('data', function(chunk) {
+                        res.destroy();
+                        if (imageType(chunk) !== null) {
+                            resolve();
+                        } else {
+                            reject();
+                        }
+                    });
+                }).on('error', function(err) {
+                    if (err.code === 'ETIMEDOUT') {
+                        logger.warn('Couldn\'t check whether the URL "' + url + '" is actually an image due to connection timeout. Will accept it as one.');
+                        return resolve()
                     }
+                    reject(err);
                 });
-            }).on('error', function(err) {
-                dfd.reject(err);
             });
-            return dfd.promise;
         },
 
         transformNewlinesToHtml: function(text) {
