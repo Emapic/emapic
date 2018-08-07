@@ -113,7 +113,9 @@ var emapic = emapic || {};
     }
 
     emapic.modules.survey.addAnswer = function(question, htmlId, id) {
-        var value = $('#' + htmlId).val();
+        var $el = $('#' + htmlId),
+            value = ($el[0] && $el[0].files) ? ($el[0].files[0] ? $el[0].files[0] : '') : $el.val();
+
         if (id) {
             emapic.modules.survey.responses[question + '.id'] = id;
         }
@@ -283,7 +285,7 @@ var emapic = emapic || {};
         emapic.utils.enableMapInteraction();
         if (($("#popup-form").length === 0) ||
             ($("#popup-form").children().length === 0)) {
-            emapic.modules.survey.postMood();
+            emapic.modules.survey.postMood('multipart');
         } else {
             createMarkerPopupQuestions();
         }
@@ -320,7 +322,7 @@ var emapic = emapic || {};
 
     emapic.modules.survey.submitMarkerPopupData = function() {
         emapic.modules.survey.preparePopupData();
-        emapic.modules.survey.postMood();
+        emapic.modules.survey.postMood('multipart');
 
         emapic.modules.survey.marker.closePopup();
         emapic.modules.survey.marker.unbindPopup();
@@ -329,32 +331,63 @@ var emapic = emapic || {};
     emapic.modules.survey.prepareSurveyData = function() {
     };
 
-    emapic.modules.survey.postMood = function() {
+    emapic.modules.survey.postMood = function(enctype) {
         emapic.modules.survey.prepareSurveyData();
 
-        $.ajax({
-            type : 'POST',
-            data : JSON.stringify(emapic.modules.survey.data),
-            contentType : 'application/json',
-            url : emapic.modules.survey.getPostVoteUrl(),
-            success : function(data) {
-                $('#thanks-msg').show();
-                setTimeout(function(){
-                    $('#thanks-msg').fadeOut();
-                    setTimeout(emapic.startMapLogic, 500);
-                }, emapic.modules.survey.thksMsgTimeOut);
-            },
-            error : function(data) {
-                $.notify({
-                    message: emapic.utils.getI18n('js_error_saving_vote', "Ha ocurrido un error al guardar tu voto. Prueba a recargar la página y si el problema persiste, puedes contactar con nosotros en <a href='mailto:info@emapic.es'>info@emapic.es</a>.")
-                }, {
-                    delay: 0,
-                    type: 'danger',
-                    z_index: 12000
+        enctype = enctype || 'json';
+        switch (enctype) {
+            case 'multipart':
+                $.ajax({
+                    type : 'POST',
+                    data : emapic.modules.survey.data,
+                    contentType : false,
+                    processData : false,
+                    url : emapic.modules.survey.getPostVoteUrl(),
+                    success : function(data) {
+                        $('#thanks-msg').show();
+                        setTimeout(function(){
+                            $('#thanks-msg').fadeOut();
+                            setTimeout(emapic.startMapLogic, 500);
+                        }, emapic.modules.survey.thksMsgTimeOut);
+                    },
+                    error : function(data) {
+                        $.notify({
+                            message: emapic.utils.getI18n('js_error_saving_vote', "Ha ocurrido un error al guardar tu voto. Prueba a recargar la página y si el problema persiste, puedes contactar con nosotros en <a href='mailto:info@emapic.es'>info@emapic.es</a>.")
+                        }, {
+                            delay: 0,
+                            type: 'danger',
+                            z_index: 12000
+                        });
+                        setTimeout(emapic.startMapLogic, 5000);
+                    }
                 });
-                setTimeout(emapic.startMapLogic, 5000);
-            }
-        });
+                break;
+            case 'json':
+                $.ajax({
+                    type : 'POST',
+                    data : JSON.stringify(emapic.modules.survey.data),
+                    contentType : 'application/json',
+                    url : emapic.modules.survey.getPostVoteUrl(),
+                    success : function(data) {
+                        $('#thanks-msg').show();
+                        setTimeout(function(){
+                            $('#thanks-msg').fadeOut();
+                            setTimeout(emapic.startMapLogic, 500);
+                        }, emapic.modules.survey.thksMsgTimeOut);
+                    },
+                    error : function(data) {
+                        $.notify({
+                            message: emapic.utils.getI18n('js_error_saving_vote', "Ha ocurrido un error al guardar tu voto. Prueba a recargar la página y si el problema persiste, puedes contactar con nosotros en <a href='mailto:info@emapic.es'>info@emapic.es</a>.")
+                        }, {
+                            delay: 0,
+                            type: 'danger',
+                            z_index: 12000
+                        });
+                        setTimeout(emapic.startMapLogic, 5000);
+                    }
+                });
+                break;
+        }
     };
 
     function getStatusIcon(responses) {

@@ -89,7 +89,7 @@ module.exports = function(app) {
         return geojson;
     };
 
-    addIndivVotePopupMessage = function(results, questions, answers) {
+    addIndivVotePopupMessage = function(results, questions, answers, req) {
         var msg;
         for (var i = 0, iLen = results.length; i<iLen; i++) {
             msg = "<ul class='user-answers-list'>";
@@ -119,6 +119,14 @@ module.exports = function(app) {
                     case 'text-answer':
                         if (results[i]['q' + questions[j].question_order + '.value'] && results[i]['q' + questions[j].question_order + '.value'].trim()){
                             msg += "<li><label>" + questions[j].question + ':</label><span>' + results[i]['q' + questions[j].question_order + '.value'].trim() + '</span></li>';
+                        }
+                        break;
+                    case 'image-upload':
+                        if (results[i]['q' + questions[j].question_order + '.value'] && results[i]['q' + questions[j].question_order + '.value'].trim()){
+                            msg += "<li><label>" + questions[j].question + ':</label><div class="survey-answer-img"><a href="' +
+                                results[i]['q' + questions[j].question_order + '.value'] + '" target="_blank"><img title="' +
+                                req.i18n.__('click_image_full_size') + '"  class="image-upload" src="' +
+                                results[i]['q' + questions[j].question_order + '.value'] + '"></img></a></div></li>';
                         }
                         break;
                     case 'image-url':
@@ -206,6 +214,7 @@ module.exports = function(app) {
                     headers.push(questions[i].question, questions[i].question + ' - ' + otherName);
                     break;
                 case 'text-answer':
+                case 'image-upload':
                 case 'image-url':
                     headers.push(questions[i].question);
                     break;
@@ -252,6 +261,7 @@ module.exports = function(app) {
                                 data.push(ans, (ansId === -1) ? result['q' + questions[l].question_order + '.value'] : null);
                                 break;
                             case 'text-answer':
+                            case 'image-upload':
                             case 'image-url':
                                 data.push(result['q' + questions[l].question_order + '.value']);
                                 break;
@@ -319,6 +329,7 @@ module.exports = function(app) {
                     break;
                 case 'text-answer':
                 case 'explanatory-text':
+                case 'image-upload':
                 case 'image-url':
                     if (req.body['question_' + i].trim() === '') {
                         break;
@@ -374,6 +385,7 @@ module.exports = function(app) {
                     };
                 case 'text-answer':
                 case 'image-url':
+                case 'image-upload':
                     return {
                         question: question.question,
                         type: question.type,

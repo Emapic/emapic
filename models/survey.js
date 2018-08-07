@@ -2,6 +2,8 @@ var Promise = require('bluebird'),
     nconf = require('nconf'),
     fsp = require('fs-promise'),
     path = require('path'),
+    fs = require('fs'),
+    logger = require('../utils/logger'),
 
     searchEngineLang = nconf.get('app').searchEngineLang,
     defaultPageSize = nconf.get('app').defaultPageSize,
@@ -58,7 +60,7 @@ function getAllFieldsSQL(qstns, type) {
 
 function getSurveyResponsesSql(survey, type) {
     var id = survey.id;
-    return survey.getQuestions().then(function(questions) {
+    return survey.getQuestions({ scope: 'includeSurvey' }).then(function(questions) {
         var fieldsSql = getAllFieldsSQL(questions, sqlType.select),
             sql;
         switch (type) {
@@ -363,7 +365,11 @@ module.exports = function(sequelize, DataTypes) {
                 (body.emapic_experience_geolocation_result && body.emapic_experience_geolocation_result !== 'null')) {
                     var strquery = 'INSERT INTO metadata.emapic_opinions (browser_os, geolocation_result, final_position_reason, comments, geom, "timestamp", accuracy) VALUES (?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326), now(), ?)';
                     return sequelize.query(strquery, {
-                        replacements: [body.browser_os, body.emapic_experience_geolocation_result, body.emapic_experience_final_position_reason, body.emapic_experience_comments, body.lng, body.lat, body.precision],
+                        replacements: [body.browser_os,
+                            body.emapic_experience_geolocation_result && body.emapic_experience_geolocation_result !== 'null' ? body.emapic_experience_geolocation_result : null,
+                            body.emapic_experience_final_position_reason && body.emapic_experience_final_position_reason !== 'null' ? body.emapic_experience_final_position_reason : null,
+                            body.emapic_experience_comments && body.emapic_experience_comments !== 'null' ? body.emapic_experience_comments : null,
+                            body.lng, body.lat, body.precision],
                         type: sequelize.QueryTypes.INSERT
                     });
                 } else {
@@ -437,7 +443,14 @@ module.exports = function(sequelize, DataTypes) {
             },
 
             dropTable: function() {
-                return sequelize.query('DROP TABLE IF EXISTS opinions.survey_' + this.id + ';');
+                var survey = this;
+                return this.dropAllSurveyFiles().then(function() {
+                    return sequelize.query('DROP TABLE IF EXISTS opinions.survey_' + survey.id + ';');
+                });
+            },
+
+            dropAllSurveyFiles: function() {
+                return FileHelper.deleteAllFilesFromFolder('images/survey/' + this.id);
             },
 
             recreateTable: function() {
@@ -521,13 +534,18 @@ module.exports = function(sequelize, DataTypes) {
                     date = new Date(),
                     dateUtc = date.toISOString().replace(/T/, ' ').replace(/Z/, ''),
                     body = req.body;
+
+                for (var i = 0; i < Object.keys(req.files).length; i++) {
+                    body[Object.values(req.files)[i].fieldName] = Object.values(req.files)[i];
+                }
+
                 return Promise.join(this.getOwner(), this.getQuestions({
-                    scope: 'includeAnswers'
+                    scope: ['includeAnswers', 'includeSurvey']
                 }), function(owner, questions) {
                     var validAnswers = [];
                     for (var j = 0, jLen = questions.length; j<jLen; j++) {
                         // We first check that the answers are valid for its questions
-                        validAnswers.push(questions[j].checkValidResponse(body.responses));
+                        validAnswers.push(questions[j].checkValidResponse(body));
                     }
                     return Promise.all(validAnswers).then(function() {
                         var usr_id = (req.user) ? parseInt(req.user.id, 10) : null;
@@ -556,16 +574,33 @@ module.exports = function(sequelize, DataTypes) {
                         insert_query2 = ') VALUES (?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326)',
                         insert_params = [usr_id, body.precision, dateUtc, body.lng, body.lat];
                         for (var i = 0, iLen = questions.length; i<iLen; i++) {
-                            var vars = questions[i].getInsertSql(body.responses);
+                            var vars = questions[i].getInsertSql(body);
                             insert_query1 += (vars[0] !== '' ? ', ' : '') + vars[0];
                             insert_query2 += (vars[1] !== '' ? ', ' : '') + vars[1];
                             insert_params = insert_params.concat(vars[2]);
                         }
-                        insert_query1 += insert_query2 + ');';
+                        insert_query1 += insert_query2 + ') RETURNING gid;';
 
                         return sequelize.query(insert_query1,
                             { replacements: insert_params, type: sequelize.QueryTypes.INSERT }
-                        ).then(function() {
+                        ).then(function(data) {
+                            return Promise.try(function() {
+                                var postInserts = [];
+                                for (var j = 0, jLen = questions.length; j<jLen; j++) {
+                                    postInserts.push(questions[j].getPostInsertOperations(body, data[0].gid));
+                                }
+                                return Promise.all(postInserts);
+                            }).catch(function(err) {
+                                // If an error happens during post-insert operations,
+                                // we must delete the previously saved answer
+                                logger.debug('An error happened during post-insert operations. Deleting previously saved answer with gid ' + data[0].gid + ' for survey ' + survey.id);
+                                return sequelize.query('DELETE FROM opinions.survey_' + survey.id + ' WHERE gid = ?;',
+                                    { replacements: [data[0].gid], type: sequelize.QueryTypes.DELETE }
+                                ).then(function() {
+                                    throw err;
+                                });
+                            });
+                        }).then(function() {
                             return models.Vote.create({
                                 user_id : usr_id,
                                 survey_id : survey.id,
@@ -603,7 +638,7 @@ module.exports = function(sequelize, DataTypes) {
                 var surv = this,
                     id = this.id,
                     questions;
-                return this.getQuestions().then(function(qstns) {
+                return this.getQuestions({ scope: 'includeSurvey' }).then(function(qstns) {
                     questions = qstns;
                     return sequelize.query("SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + getAllFieldsSQL(questions, sqlType.select) + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id WHERE usr_id = ? LIMIT 1;", {
                         replacements: [userId],
@@ -628,6 +663,15 @@ module.exports = function(sequelize, DataTypes) {
                             properties: structure
                         };
                     }
+                });
+            },
+
+            getAnswerImagePath: function(questionId, answerId) {
+                return sequelize.query('SELECT b.path, b.mime_type FROM opinions.survey_' + this.id + ' a JOIN metadata.files b ON a.q' + questionId + ' = b.id WHERE a.gid = ?;', {
+                    replacements: [answerId],
+                    type: sequelize.QueryTypes.SELECT
+                }).then(function(data) {
+                    return (data.length === 0) ? null : data[0].path;
                 });
             },
 

@@ -1120,16 +1120,24 @@ span.user-inline {
     text-transform: capitalize
 }
 
+.user-avatar {
+	border: 1px solid #000000;
+	margin-bottom: 10px;
+	padding: 8px;
+}
+
+.avatar-wrapper {
+    margin-bottom: 10px;
+}
+
 .avatar-wrapper,
 .avatar-wrapper .user-avatar {
 	max-width: 250px;
 	max-height: 250px;
 }
 
-.user-avatar {
-	border: 1px solid #000000;
-	margin-bottom: 10px;
-	padding: 8px;
+.avatar-wrapper .user-avatar {
+    margin-bottom: 0;
 }
 
 #linked-accounts > div.col-xs-12,
@@ -1155,14 +1163,6 @@ span.user-inline {
 /* --- Dashboard --- */
 .dashboard-content {
 	margin-top: 40px;
-}
-
-.dashboard-content .avatar-wrapper {
-    margin-bottom: 10px;
-}
-
-.dashboard-content .avatar-wrapper .user-avatar {
-    margin-bottom: 0px;
 }
 
 #dashboard-user-desc {

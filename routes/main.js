@@ -234,7 +234,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/survey/:id/delete', function(req, res) {
+    app.get('/survey/:id/delete', requireRole(null), function(req, res) {
         req.user.getSurveys({ where: ['id = ?', Utils.decryptSurveyId(req.params.id)] }).then(function(surveys) {
             if (surveys.length === 0) {
                 return Promise.reject();
@@ -251,7 +251,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/survey/:id/open', function(req, res) {
+    app.get('/survey/:id/open', requireRole(null), function(req, res) {
         req.user.getSurveys({ where: ['id = ?', Utils.decryptSurveyId(req.params.id)] }).then(function(surveys) {
             if ((surveys.length === 0) || (surveys[0].active === false)) {
                 return Promise.reject();
@@ -273,7 +273,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/survey/:id/close', function(req, res) {
+    app.get('/survey/:id/close', requireRole(null), function(req, res) {
         req.user.getSurveys({ where: ['id = ?', Utils.decryptSurveyId(req.params.id)] }).then(function(surveys) {
             if ((surveys.length === 0) || (surveys[0].active === null)) {
                 return Promise.reject();

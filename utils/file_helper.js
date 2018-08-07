@@ -168,15 +168,23 @@ module.exports = function(app) {
         },
 
         deleteAllFilesFromFolder: function(folderPath) {
-            return rimraf(folderPath).then(function() {
-                return sequelize.query("DELETE FROM metadata.files WHERE path LIKE ? | '/%';", {
+            var cleanFolderPath = folderPath;
+            while(cleanFolderPath.charAt(0) === '/') {
+                cleanFolderPath = cleanFolderPath.substr(1);
+            }
+            if (cleanFolderPath.charAt(cleanFolderPath.length - 1) !== '/') {
+                cleanFolderPath += '/';
+            }
+            var fullFolderPath = uploadedFilesFolder + cleanFolderPath;
+            return rimraf(fullFolderPath).then(function() {
+                return sequelize.query("DELETE FROM metadata.files WHERE path LIKE ? || '%';", {
                     type: sequelize.QueryTypes.DELETE,
-                    replacements: [filePath]
+                    replacements: [fullFolderPath]
                 });
             }).tap(function(id) {
-                logger.debug('Deleted all files from folder "' + folderPath + '"');
+                logger.debug('Deleted folder "' + fullFolderPath + '" and all of its files.');
             }).catch(function(err) {
-                logger.error('Error while deleting all files from folder "' + folderPath + '": ' + err.message);
+                logger.error('Error while deleting folder "' + fullFolderPath + '": ' + err.message);
                 throw err;
             });
         }

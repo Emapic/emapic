@@ -1,4 +1,5 @@
 var fs = require('fs'),
+    path = require('path'),
     escape = require('escape-html'),
     Promise = require('bluebird'),
     linkifyHtml = require('linkifyjs/html'),
@@ -35,6 +36,7 @@ function parseQuestionsfromPost(req, survey) {
                 }
                 break;
             case 'text-answer':
+            case 'image-upload':
             case 'image-url':
                 if (req.body['question_' + i].trim() === '') {
                     type = null;
@@ -118,6 +120,7 @@ function parseAnswersFromPost(req, questions, oldAnswers) {
                 break;
             case 'text-answer':
             case 'explanatory-text':
+            case 'image-upload':
             case 'image-url':
                 // These question types have no predefined answers
                 break;
@@ -211,17 +214,40 @@ function generateExclusiveBtnAnswerHtml(answer, layout, question) {
 }
 
 function generateTextInputQuestionHtml(question, validator, req) {
-    validator = validator || null;
     var opt = req.i18n.__('optional_note'),
-        html,
+        validator = validator || null,
         mandatory = question.mandatory;
+
     return '<h2>' + escape(question.question) + (mandatory ? '' : '<small><i> (' + opt + ') </i></small>') + '</h2>\n' +
         '<div class="col-xs-12 text-left"><div id="q' + question.question_order + '-other"' +
-        ' class="col-xs-12 btn btn-lg survey-answer text-answer"><div class="flex-container"><input autocomplete="off" id="q' +
+        ' class="col-xs-12 survey-answer text-answer"><div class="flex-container"><input autocomplete="off" id="q' +
         question.question_order + '-input" type="text" target="q' + question.question_order +
         '-ok" onkeydown="emapic.utils.inputEnterToClick(event)" ' + (validator !== null ?
         ' onkeyup="' + validator + '(this, ' + mandatory + ')" onchange="' + validator + '(this, ' + mandatory + ')"' : '') + '/><button id="q' + question.question_order +
         '-ok"'  + (mandatory ? ' disabled' : '') + ' autocomplete="off" class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + question.question_order +
+        '\', \'q' + question.question_order + '-input\')">OK</button></div></div></div>';
+}
+
+function generateImageInputQuestionHtml(question, validator, req) {
+    var fileSizeText = req.i18n.__('maximum_image_upload_size'),
+        opt = req.i18n.__('optional_note'),
+        validator = validator || null,
+        mandatory = question.mandatory;
+
+    return '<h2>' + escape(question.question) + (mandatory ? '' : '<small><i> (' + opt + ') </i></small>') + '</h2>\n' +
+        '<div class="col-xs-12"><div id="q' + question.question_order + '-other"' +
+        ' class="col-xs-12 survey-answer upload-file-answer">' +
+        '<div><img class="img-responsive img-thumbnail" id="inputfileimg_' + question.question_order +
+        '" src=\'data:image/svg+xml;utf8,' + encodeURIComponent(Utils.getLocalizedSelectAnImageSVG(req)) + '\' style="max-width:50%"></div>' +
+        '<div class="flex-container"><div><input autocomplete="off"' +
+        ' required type="file" accept="image/*" name="img_upload_"' + question.question_order +
+        ' id="q' + question.question_order + '-input" target="q' + question.question_order + '-ok"' +
+        ' target2="help-block_'+ question.question_order +'" data-maxfilesize="4000000"' +
+        (validator !== null ? ' onchange="emapic.utils.loadInputImage(this,\'inputfileimg_' + question.question_order + '\'); ' +
+        validator + '(this, ' + mandatory + ')"' : '') +
+        ' /><div id="help-block_'+ question.question_order +'" class="help-block">' + fileSizeText + '</div></div>' +
+        '<button id="q' + question.question_order + '-ok" autocomplete="off" ' + (mandatory ? ' disabled="true"' : '') +
+        ' class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + question.question_order +
         '\', \'q' + question.question_order + '-input\')">OK</button></div></div></div>';
 }
 
@@ -253,6 +279,9 @@ module.exports = function(sequelize, DataTypes) {
                 Question.addScope('includeAnswers', {
                     include: [models.Answer],
                     order: Question.getDefaultOrder().concat(models.Answer.getDefaultOrder())
+                });
+                Question.addScope('includeSurvey', {
+                    include: [models.Survey]
                 });
                 Question.belongsTo(models.Survey, {foreignKey: 'survey_id'});
                 models.Survey.hasMany(Question.scope('defaultOrdering'), {foreignKey: 'survey_id'});
@@ -302,6 +331,8 @@ module.exports = function(sequelize, DataTypes) {
                     case 'text-answer':
                     case 'image-url':
                         return "q" + this.question_order + " text" + (this.mandatory ? " NOT NULL" : "");
+                    case 'image-upload':
+                        return "q" + this.question_order + " int REFERENCES metadata.files ON UPDATE CASCADE ON DELETE SET NULL";
                     case 'explanatory-text':
                         return "";
                     default:
@@ -318,6 +349,12 @@ module.exports = function(sequelize, DataTypes) {
                     case 'text-answer':
                     case 'image-url':
                         return 'a.q' + this.question_order + ' AS "q' + this.question_order + '.value"';
+                    case 'image-upload':
+                        if (!this.mandatory) {
+                            return 'CASE WHEN a.q' + this.question_order + ' IS NULL THEN NULL ELSE \'/api/survey/' + Utils.encryptSurveyId(this.Survey.id) + '/result/\' || a.gid || \'/image/' + this.question_order + '\' END AS "q' + this.question_order + '.value"';
+                        } else {
+                            return '\'/api/survey/' + Utils.encryptSurveyId(this.Survey.id) + '/result/\' || a.gid || \'/image/' + this.question_order + '\' AS "q' + this.question_order + '.value"';
+                        }
                     case 'explanatory-text':
                         return '';
                     default:
@@ -374,6 +411,31 @@ module.exports = function(sequelize, DataTypes) {
                             break;
                         case 'explanatory-text':
                             return Promise.resolve();
+                        case 'image-upload':
+                            if (!question.mandatory && responses['q' + question.question_order + '.value'] === "") {
+                                return Promise.resolve();
+                            } else {
+                                if (('q' + question.question_order + '.value') in responses &&
+                                  'path' in responses['q' + question.question_order + '.value']) {
+                                    answer = responses['q' + question.question_order + '.value'];
+                                    if (!(Utils.isImage(fs.readFileSync(responses['q' + question.question_order + '.value'].path)))) {
+                                        return Promise.reject({
+                                            message: "invalid answer for question nr " + question.question_order + " : selected file is not an image.",
+                                            status: 400,
+                                            code: 'invalid_request'
+                                        });
+                                    }
+                                    if (responses['q' + question.question_order + '.value'].size > 4000000) {
+                                        return Promise.reject({
+                                            message: "invalid answer for question nr " + question.question_order + " : image file exceeds the 4MB max size.",
+                                            status: 400,
+                                            code: 'invalid_request'
+                                        });
+                                    }
+                                    return Promise.resolve();
+                                }
+                            }
+                            break;
                         case 'image-url':
                             answer = responses['q' + question.question_order + '.value'];
                             if (answer) {
@@ -407,12 +469,10 @@ module.exports = function(sequelize, DataTypes) {
                 var respField = 'q' + this.question_order + '.id';
                 switch (this.type) {
                     case 'list-radio-other':
-                        if ('q' + this.question_order + '.id' in responses) {
-                            if (parseInt(responses['q' + this.question_order + '.id'], 10) === -1) {
-                                if ('q' + this.question_order + '.value' in responses) {
-                                    return ['q' + this.question_order + ', q' + this.question_order + '_other', '?, ?', [responses['q' + this.question_order + '.id'], responses['q' + this.question_order + '.value']]];
-                                }
-                            }
+                        if (respField in responses &&
+                            parseInt(responses[respField], 10) === -1 &&
+                            'q' + this.question_order + '.value' in responses) {
+                                return ['q' + this.question_order + ', q' + this.question_order + '_other', '?, ?', [responses[respField], responses['q' + this.question_order + '.value']]];
                         }
                         break;
                     case 'list-radio':
@@ -421,6 +481,9 @@ module.exports = function(sequelize, DataTypes) {
                     case 'image-url':
                         respField = 'q' + this.question_order + '.value';
                         break;
+                    case 'image-upload':
+                        // File is actually stored in a post-insert operation
+                        return ['q' + this.question_order, '?', [null]];
                     case 'explanatory-text':
                         return ['', '', []];
                     default:
@@ -430,6 +493,39 @@ module.exports = function(sequelize, DataTypes) {
                     return ['q' + this.question_order, '?', [responses[respField]]];
                 }
                 return new Error("Question fields have not been sent: q" + this.question_order);
+            },
+
+            getPostInsertOperations: function(responses, answerId) {
+                var respField = 'q' + this.question_order + '.id',
+                    question = this,
+                    survey = this.Survey;
+                switch (this.type) {
+                    case 'image-upload':
+                        // Store the image in the local filesystem, save its
+                        // metadata inside database and set a reference to it
+                        // in the saved answer.
+                        respField = 'q' + question.question_order + '.value';
+                        if (respField in responses && responses[respField] !== '') {
+                            if ('path' in responses[respField]) {
+                                return FileHelper.saveFileFromPath(responses[respField].path, 'images/survey/' + survey.id + '/answer/' + answerId +
+                                '/answer_q' + question.question_order + path.extname(responses[respField].name), responses[respField].name).then(function(fileId) {
+                                    return sequelize.query('UPDATE opinions.survey_' + survey.id + ' SET q' + question.question_order + ' = ? WHERE gid = ?;',
+                                        { replacements: [fileId, answerId], type: sequelize.QueryTypes.UPDATE }
+                                    );
+                                });
+                            }
+                        }
+                        // Fall-through
+                    case 'list-radio-other':
+                    case 'list-radio':
+                    case 'text-answer':
+                    case 'image-url':
+                    case 'explanatory-text':
+                        // Nothing to do
+                        return Promise.resolve();
+                    default:
+                        return new Error("Question type not contemplated.");
+                }
             },
 
             clone: function(surveyId) {
@@ -488,6 +584,9 @@ module.exports = function(sequelize, DataTypes) {
                         );
                     case 'text-answer':
                         html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputNotVoid', req);
+                        break;
+                    case 'image-upload':
+                        html += generateImageInputQuestionHtml(parent, 'emapic.utils.checkImageNotVoid', req);
                         break;
                     case 'image-url':
                         html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputUrlIsImage', req);

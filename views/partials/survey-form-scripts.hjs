@@ -150,6 +150,13 @@
                 }
                 $('textarea[name="question_' + qstn + '"]').val(questionMap.question);
                 break;
+            case 'image-upload':
+                if (!$('#qstn_' + qstn).length) {
+                    addNewQuestion(questionMap.type);
+                }
+                $('input[name="question_' + qstn + '"]').val(questionMap.question);
+                $('input[type="checkbox"][name="optional_question_' + qstn + '"]').prop("checked", !questionMap.mandatory);
+                break;
             case 'image-url':
                 if (!$('#qstn_' + qstn).length) {
                     addNewQuestion(questionMap.type);
@@ -197,6 +204,7 @@
                 break;
             case 'text-answer':
             case 'explanatory-text':
+            case 'image-upload':
             case 'image-url':
                 break;
         }
@@ -440,6 +448,42 @@
                                 <div class="col-xs-12 col-md-8 col-md-offset-2">\
                                     <textarea spellcheck="true" class="form-control" type="text" required maxlength="1000" name="question_' + qstn + '" data-error="{{#__}}type_a_text{{/__}}"></textarea>\
                                     <div class="help-block with-errors"></div>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </div>');
+                break;
+            case 'image-upload':
+                $('#questions').append('\
+                    <div class="panel panel-default question-group" id="qstn_' + qstn + '">\
+                        <input type="hidden" name="question_type_' + qstn + '" value="' + type + '"/>\
+                        <div class="panel-heading" data-toggle="collapse">\
+                            <div class="question-handle glyphicon glyphicon-move"></div><a>{{#__}}question{{/__}} ' + qstn + ' - {{#__}}question_type_image_upload_title{{/__}}<span class="glyphicon glyphicon-chevron-up pull-right"></span></a>\
+                        </div>\
+                        <div class="panel-body collapse">\
+                            <div class="form-group form-group-sm">\
+                                <div class="col-xs-12">\
+                                    <h4><label>{{#__}}question{{/__}}</label>\
+                                        <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_question{{/__}}"></span>\
+                                        <button class="btn btn-danger pull-right delete-survey-question" onclick="deleteQuestion(this)" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_question{{/__}}">\
+                                            <span class="glyphicon glyphicon-trash"></span>\
+                                        </button>\
+                                    </h4>\
+                                </div>\
+                                <div class="col-xs-12 col-md-4 col-md-offset-4">\
+                                    <input spellcheck="true" class="form-control" type="text" required maxlength="150" name="question_' + qstn + '" data-error="{{#__}}type_a_question{{/__}}" >\
+                                    <div class="help-block with-errors"></div>\
+                                    <div class="form-checkbox-line">\
+                                        <div class="col-xs-2">\
+                                            <input id="optional_question_' + qstn + '" class="form-control pull-right" type="checkbox" name="optional_question_' + qstn + '">\
+                                        </div>\
+                                        <div class="col-xs-8">\
+                                            <label class="control-label adi-opts-label text-left" for="optional_question_' + qstn + '">{{#__}}optional_question{{/__}}</label>\
+                                        </div>\
+                                        <div class="col-xs-2">\
+                                            <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="{{#__}}help_tooltip_new_survey_optional_question{{/__}}"></span>\
+                                        </div>\
+                                    </div>\
                                 </div>\
                             </div>\
                         </div>\

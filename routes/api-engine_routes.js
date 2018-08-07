@@ -1,4 +1,5 @@
-var Promise = require('bluebird'),
+var fs = require('fs'),
+    Promise = require('bluebird'),
     bases = require('bases'),
     RateLimit = require('express-rate-limit'),
     logger = require('../utils/logger'),
@@ -100,7 +101,7 @@ module.exports = function(app) {
                     for (var i = 0, iLen = questions.length; i<iLen; i++) {
                         answers.push(questions[i].Answers);
                     }
-                    res.json(postGISQueryToFeatureCollection(addIndivVotePopupMessage(responses, questions, answers)));
+                    res.json(postGISQueryToFeatureCollection(addIndivVotePopupMessage(responses, questions, answers, req)));
                 });
             } else {
                 return res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
@@ -178,6 +179,23 @@ module.exports = function(app) {
             } else {
                 res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
             }
+        }).catch(handleInternalError(req, res));
+    });
+
+    app.get('/api/survey/:surveyId/result/:answrId/image/:qstnId', function(req, res) {
+        var answrId = parseInt(req.params.answrId, 10),
+            qstnId = parseInt(req.params.qstnId, 10);
+        if (isNaN(qstnId) || isNaN(answrId)) {
+            return res.send(404);   // HTTP status 404: NotFound
+        }
+        models.Survey.scope('includeAuthor').findById(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
+            return survey.getAnswerImagePath(qstnId, answrId);
+        }).then(function(path) {
+            if (path === null) {
+                return res.send(404);   // HTTP status 404: NotFound
+            }
+            res.contentType(Utils.getFileMimeType(path, 'image/png'));
+            fs.createReadStream(path).pipe(res);
         }).catch(handleInternalError(req, res));
     });
 

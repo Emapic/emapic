@@ -40,6 +40,18 @@ if (typeof $.fn.validator !== 'undefined' &&
         return null;
     };
 
+    emapic.utils.loadInputImage = function(input, id) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#' + id).attr('src', e.target.result);
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    };
+
     emapic.utils.disableDefaultClickEvents = function(element) {
         var stop = L.DomEvent.stopPropagation;
         L.DomEvent
@@ -230,6 +242,29 @@ if (typeof $.fn.validator !== 'undefined' &&
         }, timeout);
         img.src = url;
         return dfd;
+    };
+
+    emapic.utils.checkImageNotVoid = function(input, mandatory) {
+        var $input = $(input),
+            val = $input.val(),
+            $tgt = $('#' + $input.attr('target')),
+            $helpBlock = $('#' + $input.attr('target2')),
+            maxFileSize = $('#' + $input.attr('data-maxfilesize')).selector;
+
+        maxFileSize = maxFileSize.replace('#', '');
+        if ($tgt != null) {
+            if (input.files[0].size > maxFileSize) {
+                $tgt.attr('disabled', 'true');
+                if ($helpBlock != null) {
+                    $helpBlock.parent().addClass('has-error');
+                }
+            } else {
+                $tgt.attr('disabled', !(val != null && val.trim() != ''));
+                if ($helpBlock != null) {
+                    $helpBlock.parent().removeClass('has-error');
+                }
+            }
+        }
     };
 
     emapic.utils.inputEnterToClick = function(event) {

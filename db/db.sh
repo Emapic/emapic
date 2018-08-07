@@ -76,6 +76,9 @@ psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/fix_municipalit
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/fix_vigo_municipality_geoms.sql 1> /dev/null
 sed 's/:"emapic_db_user"/emapic/g' deploy/oauth2_tables.sql | psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE 1> /dev/null
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_accept_info_email.sql 1> /dev/null
+sed 's/:"emapic_db_user"/emapic/g' deploy/create_files_table.sql | psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_image_upload_question.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/files_table_add_time.sql 1> /dev/null
 
 echo "6- Creating test user..."
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f emapic_test_user.sql 1> /dev/null

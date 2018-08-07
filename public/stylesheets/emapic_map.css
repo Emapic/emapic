@@ -410,6 +410,24 @@ div.alert-danger a {
 .leaflet-control-container .leaflet-top.leaflet-right .leaflet-control {
 	clear: left;
 }
+div.upload-file-answer > div.flex-container {
+    max-width: 600px;
+    margin: auto;
+}
+div.upload-file-answer input[type="file"] {
+    font-size: 15px;
+    color: #A2C73A;
+    width: 100%;
+    text-align: center;
+}
+div.upload-file-answer .help-block {
+    color: #D3D3D3;
+}
+div.upload-file-answer .has-error .help-block {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #FF1A1A;
+}
 .form-control {
     font-size: 15px;
 }
@@ -718,10 +736,15 @@ input.form-control[type="radio"] {
     list-style: disc inside none;
     color: black;
 }
-.popup-responses img.image-url-answer {
+.popup-responses div.survey-answer-img {
+    text-align: center;
+    display: block;
+    width: 100%;
+    margin: 5px 0;
+}
+.popup-responses div.survey-answer-img img {
     max-width: 285px !important;
-    border: 1px solid black;
-    vertical-align: top;
+    border: 3px double black;
 }
 .leaflet-popup-content hr {
     margin-bottom: 3px;
@@ -929,7 +952,8 @@ div.col > #thanks-msg {
     cursor: default;
 }
 .other-answer input,
-.text-answer input {
+.text-answer input,
+.upload-file-answer div.flex-container > div {
     color: black;
     -webkit-box-flex: 1;
     -moz-box-flex: 1;
@@ -939,6 +963,9 @@ div.col > #thanks-msg {
     margin-right: 10px;
     min-width: 0px;
     padding: 0 5px;
+}
+.upload-file-answer div.flex-container > div input[type="file"] {
+    margin: auto;
 }
 .other-answer .answer-img {
     align-self: center;
@@ -1164,10 +1191,15 @@ div.col > #thanks-msg {
     list-style: disc inside none;
     color: black;
 }
-#sidebarPanel #indivData img.image-url-answer {
+#sidebarPanel #indivData div.survey-answer-img {
+    text-align: center;
+    display: block;
+    width: 100%;
+    margin: 5px 0;
+}
+#sidebarPanel #indivData div.survey-answer-img img {
     max-width: 100% !important;
-    border: 1px solid black;
-    vertical-align: top;
+    border: 3px double black;
 }
 #sidebarPanel #navContainer {
     flex: 0 0;
@@ -1197,7 +1229,7 @@ div.col > #thanks-msg {
     top: 50%;
 }
 #sidebarPanel #closesidebarPanel button > .glyphicon {
-    margin-top: 6px;
+    margin-top: 5px;
     margin-left: 12px;
 }
 #sidebarPanel #CurrentFeatureNumber {

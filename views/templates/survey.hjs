@@ -259,20 +259,27 @@
         {{^results}}
         {{#emapicOpinion}}
         emapic.modules.survey.preparePopupData = function() {
-            emapic.modules.survey.data.emapic_experience_comments = ($('.leaflet-popup-content #emapic_experience_comments').val().trim() != "") ? $('.leaflet-popup-content #emapic_experience_comments').val().trim() : null;
-            emapic.modules.survey.data.emapic_experience_final_position_reason = $('.leaflet-popup-content #emapic_experience_final_position_reason').val();
-            emapic.modules.survey.data.emapic_experience_geolocation_result = $('.leaflet-popup-content #emapic_experience_geolocation_result').val();
+            emapic.modules.survey.data = (!(emapic.modules.survey.data instanceof FormData)) ? new FormData() : emapic.modules.survey.data;
+
+            ($('.leaflet-popup-content #emapic_experience_comments').val().trim() != "") ? emapic.modules.survey.data.append('emapic_experience_comments', $('.leaflet-popup-content #emapic_experience_comments').val().trim()) : emapic.modules.survey.data.append('emapic_experience_comments', null);
+            emapic.modules.survey.data.append('emapic_experience_final_position_reason', $('.leaflet-popup-content #emapic_experience_final_position_reason').val());
+            emapic.modules.survey.data.append('emapic_experience_geolocation_result', $('.leaflet-popup-content #emapic_experience_geolocation_result').val());
         };
 
         {{/emapicOpinion}}
         emapic.modules.survey.prepareSurveyData = function() {
-            emapic.modules.survey.data.browser_os = navigator.userAgent;
-            emapic.modules.survey.data.precision = emapic.precision;
-            emapic.modules.survey.data.lat0 = emapic.geoapi.geoapiLat;
-            emapic.modules.survey.data.lng0 = emapic.geoapi.geoapiLon;
-            emapic.modules.survey.data.lat = emapic.position[0];
-            emapic.modules.survey.data.lng = emapic.position[1];
-            emapic.modules.survey.data.responses = emapic.modules.survey.responses;
+            emapic.modules.survey.data = (!(emapic.modules.survey.data instanceof FormData)) ? new FormData() : emapic.modules.survey.data;
+
+            emapic.modules.survey.data.append('browser_os', navigator.userAgent);
+            emapic.modules.survey.data.append('precision', emapic.precision);
+            emapic.modules.survey.data.append('lat0', emapic.geoapi.geoapiLat);
+            emapic.modules.survey.data.append('lng0', emapic.geoapi.geoapiLon);
+            emapic.modules.survey.data.append('lat', emapic.position[0]);
+            emapic.modules.survey.data.append('lng', emapic.position[1]);
+
+            for (var i in emapic.modules.survey.responses) {
+                emapic.modules.survey.data.append(i, emapic.modules.survey.responses[i]);
+            }
         };
 
         {{/results}}

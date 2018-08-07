@@ -17,7 +17,11 @@ var nodemailer = require('nodemailer'),
     surveyIdEncr = nconf.get('app').surveyIdEncr,
     smtpConfig = nconf.get('smtp'),
     fileType = require('file-type'),
-    readChunk = require('read-chunk');
+    readChunk = require('read-chunk'),
+
+    selectAnImageSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="150px" width="150px" version="1.0" viewBox="-300 -300 600 600" xml:space="preserve"><circle stroke="#AAA" stroke-width="10" r="280" fill="#FFF"/><text style="letter-spacing:1;text-anchor:middle;text-align:center;stroke-opacity:.5;stroke:#000;stroke-width:2;fill:#444;font-size:360px;font-family:Bitstream Vera Sans,Liberation Sans, Arial, sans-serif;line-height:125%;writing-mode:lr-tb;" transform="scale(.2)">{INNER_TEXT}</text></svg>',
+    selectAnImageSVGInnerTextOneLine = '<tspan y="180" x="8">{LINE_1}</tspan>',
+    selectAnImageSVGInnerTextTwoLines = '<tspan y="-40" x="8">{LINE_1}</tspan><tspan y="400" x="8">{LINE_2}</tspan>';
 
 function takeSnapshotRaw(url, imgPath, width, height, wait, minSize, tries) {
     tries = (tries) ? tries : 0;
@@ -195,6 +199,13 @@ module.exports = function(app) {
 
         getRandomInt: function(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
+        },
+
+        getLocalizedSelectAnImageSVG: function(req) {
+            var innerTexts = req.i18n.__('select_an_image_svg_text').split('\\n');
+            return selectAnImageSVG.replace('{INNER_TEXT}', (innerTexts.length === 1) ?
+                selectAnImageSVGInnerTextOneLine.replace('{LINE_1}', innerTexts[0]) :
+                selectAnImageSVGInnerTextTwoLines.replace('{LINE_1}', innerTexts[0]).replace('{LINE_2}', innerTexts[1]));
         },
 
         checkUrlIsImage: function(url) {

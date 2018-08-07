@@ -78,6 +78,28 @@
                       </div>
                   </div>
                 </div>
+                <div id="question-type-image-upload-group" role="tab" class="input-group">
+                  <span class="input-group-addon">
+                    <input autocomplete="off" id="question-type-image-upload" type="radio" name="question-type" value="image-upload">
+                  </span>
+                  <div class="form-control question-type-item">
+                      <div>
+                          <label for="question-type-image-upload">
+                            <h3>{{#__}}question_type_image_upload_title{{/__}}</h3>
+                          </label>
+                          <a data-toggle="collapse" data-target="#question-type-image-upload-body" data-parent="#question-type-list" aria-expanded="false" aria-controls="question-type-image-upload-body"><span class="glyphicon glyphicon-chevron-down pull-right"></span></a>
+                      </div>
+                      <div id="question-type-image-upload-body" class="question-type-body collapse">
+                          <label for="question-type-image-upload">
+                            <p class="question-type-description">{{#__}}question_type_image_upload_description{{/__}}</p>
+                            <h4>{{#__}}question_type_legend_title{{/__}}</h4>
+                            <p class="question-type-legend">{{#__}}question_type_image_upload_legend{{/__}}</p>
+                            <h4>{{#__}}question_type_optional_question_title{{/__}}</h4>
+                            <p class="question-type-legend">{{#__}}question_type_image_upload_optional_question{{/__}}</p>
+                          </label>
+                      </div>
+                  </div>
+                </div>
                 <div id="question-type-image-url-group" role="tab" class="input-group">
                   <span class="input-group-addon">
                     <input autocomplete="off" id="question-type-image-url" type="radio" name="question-type" value="image-url">

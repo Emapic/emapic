@@ -208,18 +208,6 @@
     };
     {{/userFormData.geom}}
 
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-                $('#avatarimg').attr('src', e.target.result);
-            };
-
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
     emapic.geoapi.afterGeopos = function() {
         var position = [emapic.geoapi.geoapiLat, emapic.geoapi.geoapiLon];
         setMarker(position);
@@ -318,7 +306,7 @@
     $(function() {
         <!-- Preview the avatar img -->
         $("#avatarinput").change(function(){
-            readURL(this);
+            emapic.utils.loadInputImage(this, 'avatarimg');
         });
         $('.help-tooltip').tooltip({placement: 'left', html: true});
     });
