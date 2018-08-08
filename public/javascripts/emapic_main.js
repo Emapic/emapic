@@ -381,17 +381,7 @@ var emapic = emapic || {};
                     layer: layer
                 })
             },
-            pointToLayer: function (feature, latlng) {
-                var iccolor = emapic.getIconColor(feature.properties),
-                    clickable = emapic.getPopupHtml(feature.properties) !== null;
-                return L.marker(latlng, {
-                    icon: L.divIcon({
-                        className: 'circle-icon',
-                        html: emapic.getIconHtml(feature.properties, clickable)
-                    }),
-                    clickable: clickable
-                });
-            },
+            pointToLayer: emapic.getIconMarker,
             filter: emapic.filterFeature
         });
     };
@@ -482,15 +472,22 @@ var emapic = emapic || {};
     emapic.enableIndivLayerExclusiveComponents = function() {
     };
 
-    emapic.getIconColor = function(properties) {
-        if (emapic.legend && emapic.legend.color) {
-            var question = emapic.legend.color.question;
-            if (question && (question + '.id') in properties &&
-                properties[(question + '.id')] in emapic.legend.color.responses) {
-                return emapic.legend.color.responses[properties[(question + '.id')]].legend;
-            }
+    emapic.getCurrentIconColorForAnswer = function(answer) {
+        if (answer !== null && emapic.legend && emapic.legend.color && answer in emapic.legend.color.responses) {
+            return emapic.legend.color.responses[answer].legend;
         }
         return emapic.fallbackColor;
+    };
+
+    emapic.getIconColor = function(properties) {
+        var answer = null;
+        if (emapic.legend && emapic.legend.color) {
+            var question = emapic.legend.color.question;
+            if (question && (question + '.id') in properties) {
+                answer = properties[(question + '.id')];
+            }
+        }
+        return emapic.getCurrentIconColorForAnswer(answer);
     };
 
     emapic.getIconSize = function(properties) {
@@ -502,6 +499,17 @@ var emapic = emapic || {};
             }
         }
         return 6;
+    };
+
+    emapic.getIconMarker = function (feature, latlng) {
+        var clickable = emapic.getPopupHtml(feature.properties) !== null;
+        return L.marker(latlng, {
+            icon: L.divIcon({
+                className: 'circle-icon',
+                html: emapic.getIconHtml(feature.properties, clickable)
+            }),
+            clickable: clickable
+        });
     };
 
     emapic.getIconHtml = function(properties, clickable) {

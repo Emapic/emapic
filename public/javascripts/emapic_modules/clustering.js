@@ -103,13 +103,8 @@ var emapic = emapic || {};
             previousPoint = resolveToPoint(previousAngle);
         html += '<circle cx="' + pieCenter.x + '" cy="' + pieCenter.y + '" r="' + (pieRadius + 1) + '" stroke="black" stroke-width="1"/>';
         for (var i=0, len=votes.length; i<len; i++) {
-            if (votes[i].votes == total) {
-                var color;
-                if (emapic.legend && emapic.legend.color && emapic.legend.color.responses && emapic.legend.color.responses[votes[i].value]) {
-                    color = emapic.legend.color.responses[votes[i].value].legend;
-                } else {
-                    color = emapic.fallbackColor;
-                }
+            var color = emapic.getCurrentIconColorForAnswer(votes[i].value);
+            if (votes[i].votes === total) {
                 html += '<circle cx="' + pieCenter.x + '" cy="' + pieCenter.y + '" r="' + pieRadius + '" fill="' + color + '" stroke="black" stroke-width="0"/>';
                 break;
             }
@@ -117,7 +112,7 @@ var emapic = emapic || {};
                 angle_dif = (360 * votes[i].votes / total);
                 angle = previousAngle + angle_dif;
                 next_point = resolveToPoint(angle);
-                html += '<path d="M' + pieCenter.x + ',' + pieCenter.y + ' L' + previousPoint.x + ',' + previousPoint.y + ' A' + pieRadius + ',' + pieRadius + ' 0 ' + (angle_dif > 180 ? '1' : '0') + ',1 ' + next_point.x + ',' + next_point.y + ' z" fill="' + emapic.legend.color.responses[votes[i].value].legend + '" />';
+                html += '<path d="M' + pieCenter.x + ',' + pieCenter.y + ' L' + previousPoint.x + ',' + previousPoint.y + ' A' + pieRadius + ',' + pieRadius + ' 0 ' + (angle_dif > 180 ? '1' : '0') + ',1 ' + next_point.x + ',' + next_point.y + ' z" fill="' + color + '" />';
                 previousPoint = next_point;
                 previousAngle = angle;
             }

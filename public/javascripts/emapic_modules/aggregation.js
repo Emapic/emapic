@@ -186,30 +186,28 @@ var emapic = emapic || {};
     }
 
     function getAreaStyle(feature) {
-        var color = emapic.fallbackColor;
-        if (emapic.legend && emapic.legend.color) {
-            var biggestNr = 0,
-                biggestOpt = null,
-                tie = false;
-            for (var i in feature.properties) {
-                if (i != 'name' && i != 'total_responses' && i != 'iso_code' && i.split('_')[0] == emapic.legend.color.question) {
-                    var nr = parseInt(feature.properties[i]);
-                    if (nr == biggestNr) {
-                        tie = true;
-                    }
-                    if (nr > biggestNr) {
-                        tie = false;
-                        biggestNr = nr;
-                        biggestOpt = i.split('_')[1];
-                    }
+        var color,
+            biggestNr = 0,
+            biggestOpt = null,
+            tie = false;
+        for (var i in feature.properties) {
+            if (i != 'name' && i != 'total_responses' && i != 'iso_code' && i.split('_')[0] == emapic.legend.color.question) {
+                var nr = parseInt(feature.properties[i]);
+                if (nr == biggestNr) {
+                    tie = true;
+                }
+                if (nr > biggestNr) {
+                    tie = false;
+                    biggestNr = nr;
+                    biggestOpt = i.split('_')[1];
                 }
             }
+        }
 
-            if (tie || biggestOpt === null || !(biggestOpt in emapic.legend.color.responses)) {
-                color = emapic.neutralColor;
-            } else {
-                color = emapic.legend.color.responses[biggestOpt].legend;
-            }
+        if (tie) {
+            color = emapic.neutralColor;
+        } else {
+            color = emapic.getCurrentIconColorForAnswer(biggestOpt);
         }
 
         return {
