@@ -118,19 +118,19 @@
 								{{^addThisId}}
                                 <div class="social-btns">
                                     <a href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u={{#encodeURIComponent}}{{web_host}}/survey/{{encr_id}}{{/encodeURIComponent}}&display=popup&src=share_button" target="_blank">
-                                        <span class="share-sq fa fa-facebook-official">
+                                        <span class="share-sq fab fa-facebook-">
                                         </span>
                                     </a>
                                     <a href="https://twitter.com/intent/tweet?text={{#encodeURIComponent}}{{title}}{{/encodeURIComponent}}&tw_p=tweetbutton&url={{#encodeURIComponent}}{{web_host}}/survey/{{encr_id}}{{/encodeURIComponent}}{{#twitterVia}}&via={{twitterVia}}{{/twitterVia}}" target="_blank">
-                                        <span class="share-sq fa fa-twitter">
+                                        <span class="share-sq fab fa-twitter">
                                         </span>
                                     </a>
                                     <a href="https://plus.google.com/share?url={{#encodeURIComponent}}{{web_host}}/survey/{{encr_id}}{{/encodeURIComponent}}" target="_blank">
-                                        <span class="share-sq fa fa-google-plus">
+                                        <span class="share-sq fab fa-google-plus-g">
                                         </span>
                                     </a>
                                     <a href="https://www.linkedin.com/shareArticle?mini=true&url={{#encodeURIComponent}}{{web_host}}/survey/{{encr_id}}{{/encodeURIComponent}}" target="_blank">
-                                        <span class="share-sq fa fa-linkedin">
+                                        <span class="share-sq fab fa-linkedin-in">
                                         </span>
                                     </a>
                                 </div>

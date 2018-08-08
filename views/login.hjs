@@ -30,8 +30,8 @@
 					<p>{{#__}}or_login_with{{/__}}</p>
 				</div>
 				<div class="col-xs-12">
-					<a href="/auth/google" class="btn btn-google"><span class="fa fa-google"></span><span>{{#__}}Google{{/__}}</span></a>
-					<a href="/auth/facebook" class="btn btn-facebook"><span class="fa fa-facebook-official"></span><span>{{#__}}Facebook{{/__}}</span></a>
+					<a href="/auth/google" class="btn btn-google"><span class="fab fa-google"></span><span>{{#__}}Google{{/__}}</span></a>
+					<a href="/auth/facebook" class="btn btn-facebook"><span class="fab fa-facebook"></span><span>{{#__}}Facebook{{/__}}</span></a>
 				</div>
 			</form>
 	  </div>

@@ -1019,14 +1019,14 @@ span.user-inline {
 }
 
 .btn-facebook,
-.share-sq.fa-facebook-official {
+.share-sq.fa-facebook {
     background: rgba(0, 0, 0, 0) linear-gradient(#4c69ba, #3b55a0) repeat scroll 0 0;
     color: white;
 }
 
 .btn-facebook:hover,
 .btn-facebook:focus,
-.share-sq.fa-facebook-official:hover {
+.share-sq.fa-facebook:hover {
     background: rgba(0, 0, 0, 0) linear-gradient(#5b7bd5, #4864b1) repeat scroll 0 0;
     color: white;
 }
@@ -1041,18 +1041,18 @@ span.user-inline {
     color: white;
 }
 
-.share-sq.fa-linkedin {
+.share-sq.fa-linkedin-in {
     background-color: #0077b5;
     color: white;
 }
 
-.share-sq.fa-linkedin:hover {
+.share-sq.fa-linkedin-in:hover {
     background-color: #2d86b6;
     color: white;
 }
 
 .btn-google,
-.share-sq.fa-google-plus {
+.share-sq.fa-google-plus-g {
     background-color: #db4437;
     color: white;
     font-size: 1.4em;
@@ -1061,7 +1061,7 @@ span.user-inline {
 
 .btn-google:hover,
 .btn-google:focus,
-.share-sq.fa-google-plus:hover {
+.share-sq.fa-google-plus-g:hover {
     background-color: #dc6d63;
     color: white;
 }
@@ -1071,14 +1071,14 @@ span.user-inline {
     padding: 6px 9px;
     display: inline-block;
 }
-.btn-facebook .fa,
-.btn-google .fa {
+.btn-facebook .fab,
+.btn-google .fab {
     font-size: 1.3em;
     display: table-cell;
     padding-right: 5px;
 }
-.btn-facebook span:not(.fa),
-.btn-google span:not(.fa) {
+.btn-facebook span:not(.fab),
+.btn-google span:not(.fab) {
     display: table-cell;
     line-height: 22px;
     vertical-align: middle;

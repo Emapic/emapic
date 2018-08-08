@@ -9,7 +9,7 @@
 	"facebook_language": "en_US",
 	"twitter_language": "en_US",
 	"emapic_index_title": "Emapic",
-	"source_code_available_at": "Original source code available at <a id='github_link' href='https://github.com/Emapic/emapic'><span class='fa fa-github'></span> github</a>",
+	"source_code_available_at": "Original source code available at <a id='github_link' href='https://github.com/Emapic/emapic'><span class='fab fa-github'></span> github</a>",
 	"source_code_under_license": "Source code released under license <a href='https://github.com/Emapic/emapic/blob/master/LICENSE-AGPLv3.md'>Affero General Public License V3</a>",
 	"powered_by": "Powered by",
 	"cookies_message_body": "This website uses its own cookies and of third parties in order to collect statistical information on the visits and be able to offer you a better experience and service. When browsing or using our services, you accept the way the cookies are used.",
