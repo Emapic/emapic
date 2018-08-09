@@ -396,7 +396,9 @@ var EmapicApp = function() {
         self.app.use(passport.authenticate('remember-me'));
         // Save OAuth user as the logged in user
         self.app.use(function(req, res, next) {
-            if (self.app.oauth && req.originalUrl !== self.app.oauthUrl && !req.user) {
+            var authHeader = req.header('Authorization');
+            if (self.app.oauth && req.originalUrl !== self.app.oauthUrl && !req.user &&
+              authHeader && authHeader.substring(0, 7) === 'Bearer ') {
                 return self.app.oauth.authenticate()(req, res, function(e) {
                     if (e && e.name !== 'unauthorized_request' ) {
                         res.status(e.code);
