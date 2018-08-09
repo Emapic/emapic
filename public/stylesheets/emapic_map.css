@@ -102,7 +102,12 @@ button > div.img-with-caption > img {
 .btn-primary {
 	background-color: #A2C73A;
 	border: solid 1px #A2C73A;
-	color: white;
+}
+.btn-primary,
+.btn-primary span,
+.btn-success,
+.btn-success span {
+    color: white !important;
 }
 .btn-primary:hover,
 .btn-primary:focus,
@@ -1112,20 +1117,19 @@ div.col > #thanks-msg {
        margin-left: 12px;
 }
 #sidebarPanel {
-    overflow:hidden;
+    display: flex;
+    flex-flow: column;
+    overflow: hidden;
 }
 #sidebarPanel #titlesidebarPanel {
-    height: 20px;
+    flex: 0 0;
     width: 100%;
     text-align: left;
 }
 #sidebarPanel #indivData {
-    margin-top: 10px;
-    margin-left: 10px;
+    flex: 1 1;
     padding-right: 5px;
-    height: calc(100% - 100px);
     width: 100%;
-    margin-bottom:  300px;
     overflow-y: auto;
 }
 #sidebarPanel #indivData ul.user-answers-list {
@@ -1153,7 +1157,19 @@ div.col > #thanks-msg {
     border: 1px solid black;
     vertical-align: top;
 }
-#closesidebarPanel button {
+#sidebarPanel #navContainer {
+    flex: 0 0;
+    text-align: center;
+    margin-top: 10px;
+}
+#sidebarPanel #navContainer button {
+    margin: 3px;
+}
+#sidebarPanel #navContainer label{
+    color: black;
+    margin-right: 3px;
+}
+#sidebarPanel #closesidebarPanel button {
     background-color: #A2C73A;
     border: 1px solid white;
     border-radius: 10px;
@@ -1168,31 +1184,16 @@ div.col > #thanks-msg {
     position: absolute;
     top: 50%;
 }
-#closesidebarPanel button > .glyphicon {
+#sidebarPanel #closesidebarPanel button > .glyphicon {
     margin-top: 6px;
     margin-left: 12px;
 }
-#navContainer {
-    bottom: 11px;
-    position: absolute;
-    height: 30px;
-    background-color: white;
-    right: 0;
-    left:0;
-    text-align: center;
-}
-#navContainer button {
-    margin: 3px;
-}
-#navContainer label{
-    color: black;
-    margin-right: 3px;
-}
-#CurrentFeatureNumber {
+#sidebarPanel #CurrentFeatureNumber {
     text-align: right;
     margin-right: 3px;
     font-weight: bold;
     width: auto;
+    margin-bottom: 0;
 }
 .leaflet-sidebar .search-countries {
     background-color: #DDD;

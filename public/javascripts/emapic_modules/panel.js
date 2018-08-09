@@ -18,15 +18,15 @@ var emapic = emapic || {};
     closesidebarPanel = $('#closesidebarPanel'),
     navContainer = $('#navContainer'),
     sidebarPanel,
-    titlesidebarPanelHtml = "<h3>" + emapic.utils.getI18n('js_see_answers', 'Ver respuestas') + "</h3>\n",
     closesidebarPanelHtml = "<button type='button' title='" + emapic.utils.getI18n('js_close_panel', 'Cerrar') + "' onclick='emapic.sidebarPanelClose();'><span class='glyphicon glyphicon-chevron-right'></span></button>",
     navHtml = "<button id='FirstButton' title='" + emapic.utils.getI18n('js_go_first', 'Ir al primero') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToFirst();'><span class='glyphicon glyphicon-fast-backward'></span></button>\n" +
     "<button id='PrevButton' title='" + emapic.utils.getI18n('js_go_previous', 'Ir al anterior') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToPrevious();'><span class='glyphicon glyphicon-step-backward'></span></button>\n" +
     "<input type='text' id='CurrentFeatureNumber' maxlength='7'></input><label>/</label><label id='TotalFeatures'></label>\n" +
     "<button id='NextButton' title='" + emapic.utils.getI18n('js_go_next', 'Ir al siguiente') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToNext();'><span class='glyphicon glyphicon-step-forward'></span></button>\n" +
     "<button id='LastButton' title='" + emapic.utils.getI18n('js_go_last', 'Ir al último') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToLast();'><span class='glyphicon glyphicon-fast-forward'></span></button>\n",
-    currentFeature,
-    currentIcon = null,
+    currentFeature = null,
+    oldIcon = null,
+    currentMarker = null,
     nrLayers,
     selectedLayerNr,
     layers;
@@ -37,13 +37,15 @@ var emapic = emapic || {};
     emapic.disableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.disableIndivLayerExclusiveComponents, null, function() {
         sidebarPanel.hide();
         currentFeature = null;
-        currentIcon = null;
+        oldIcon = null;
+        currentMarker = null;
     });
 
     emapic.enableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.enableIndivLayerExclusiveComponents, null, function() {
         sidebarPanel.hide();
         currentFeature = null;
-        currentIcon = null;
+        oldIcon = null;
+        currentMarker = null;
     });
 
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
@@ -58,14 +60,25 @@ var emapic = emapic || {};
     });
 
     function bodysidebarPanel() {
-        titlesidebarPanel.html(titlesidebarPanelHtml);
+        var title = emapic.modules.panel.getPanelTitleHTML();
+        if (title !== null) {
+            titlesidebarPanel.html(title);
+        } else {
+            titlesidebarPanel.hide();
+        }
         navContainer.html(navHtml);
         closesidebarPanel.html(closesidebarPanelHtml);
     }
 
     emapic.sidebarPanelClose = emapic.utils.overrideFunction(emapic.sidebarPanelClose, null, function() {
         sidebarPanel.hide();
+        emapic.modules.panel.getColorPanelUnselect();
+        currentFeature = null;
     });
+
+    emapic.modules.panel.getPanelTitleHTML = function() {
+        return "<h3>" + emapic.utils.getI18n('js_see_answers', 'Ver respuestas') + "</h3>\n";
+    };
 
     emapic.modules.panel.updateData = function(number) {
         currentFeature = number;
@@ -83,40 +96,33 @@ var emapic = emapic || {};
     };
 
     emapic.modules.panel.getColorPanelSelect = function(number) {
-        layers[number].setIcon(
-            L.divIcon({
-                className: 'svg-marker',
-                html: emapic.utils.getGlyphiconMarkerIconHtml (null, emapic.getIconColor(layers[number].feature.properties),0.5,7),
-                iconAnchor: [16.5, 45]
-            })
-        );
+        oldIcon = layers[number].options.icon;
+        layers[number].setIcon(emapic.modules.panel.getSelectedIcon(layers[number].feature.properties));
     };
 
-    emapic.modules.panel.getColorPanelUnselect = function(number) {
-        layers[number].setIcon(
-            L.divIcon({
-                className: 'svg-marker',
-                html: emapic.utils.getGlyphiconMarkerIconHtml (null, emapic.getIconColor(layers[number].feature.properties),0.5,7),
-                iconAnchor: [16.5, 45]
-            })
-        );
-        if (currentIcon !== null) {
-            currentIcon.setIcon(
-                L.divIcon({
-                    className: 'circle-icon',
-                    html: emapic.getIconHtml(currentIcon.feature.properties)
-                })
-            );
+    emapic.modules.panel.getColorPanelUnselect = function() {
+        if (currentMarker !== null && oldIcon !== null) {
+            currentMarker.setIcon(oldIcon);
         }
-        currentIcon = layers[number];
+        currentMarker = null;
+        oldIcon = null;
+    };
+
+    emapic.modules.panel.getSelectedIcon = function(properties) {
+        return L.divIcon({
+            className: 'svg-marker',
+            html: emapic.utils.getGlyphiconMarkerIconHtml(null, emapic.getIconColor(properties), 0.5, 7),
+            iconAnchor: [16.5, 45]
+        });
     };
 
     emapic.modules.panel.goToRegister = function(number) {
-        if (currentFeature !== number) {
-            emapic.modules.panel.getColorPanelUnselect(number);
+        if (number !== null && currentFeature !== number) {
+            emapic.modules.panel.getColorPanelUnselect();
+            currentMarker = layers[number];
+            emapic.modules.panel.getColorPanelSelect(number);
+            emapic.modules.panel.updateData(number);
         }
-        emapic.modules.panel.getColorPanelSelect(number);
-        emapic.modules.panel.updateData(number);
     };
 
     emapic.modules.panel.goToFirst =  function () {
@@ -137,7 +143,7 @@ var emapic = emapic || {};
 
     emapic.indivVotesLayerOnEachFeature = emapic.utils.overrideFunction(emapic.indivVotesLayerOnEachFeature, null, function(data) {
         data.layer.unbindPopup();
-        data.layer.on('click', function() {
+        data.layer.on('click', function(e) {
             layers = emapic.getIndivVotesLayerLeafletLayers();
             nrLayers = layers.length;
             selectedLayerNr = null;
@@ -151,8 +157,10 @@ var emapic = emapic || {};
                 console.error("Can't find layer for panel.");
                 return;
             }
+            if (currentFeature === null) {
+                emapic.sidebarPanelClose();
+            }
             emapic.modules.panel.goToRegister(selectedLayerNr);
-            emapic.sidebarPanelClose();
             sidebarPanel.show();
         });
     });

@@ -504,11 +504,15 @@ var emapic = emapic || {};
     emapic.getIconMarker = function (feature, latlng) {
         var clickable = emapic.getPopupHtml(feature.properties) !== null;
         return L.marker(latlng, {
-            icon: L.divIcon({
-                className: 'circle-icon',
-                html: emapic.getIconHtml(feature.properties, clickable)
-            }),
+            icon: emapic.getIcon(feature.properties, clickable),
             clickable: clickable
+        });
+    };
+
+    emapic.getIcon = function(properties, clickable) {
+        return L.divIcon({
+            className: 'circle-icon',
+            html: emapic.getIconHtml(properties, clickable)
         });
     };
 
