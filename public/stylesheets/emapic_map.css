@@ -112,10 +112,18 @@ button > div.img-with-caption > img {
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active,
+.btn-primary:hover span,
+.btn-primary:focus span,
+.btn-primary:active span,
 .open > .dropdown-toggle.btn-primary {
 	background-color: white !important;
-	border: solid 1px #EBEBEB !important;
 	color: #A2C73A !important;
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.open > .dropdown-toggle.btn-primary {
+	border: solid 1px #EBEBEB !important;
 }
 .btn-default, .btn-default:focus {
 	color: #A2C73A;
