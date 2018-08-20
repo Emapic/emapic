@@ -151,14 +151,14 @@ if (typeof $.fn.validator !== 'undefined' &&
         return null;
     };
 
-    var i18n = {};
+    emapic.utils.i18n = emapic.utils.i18n || {};
 
     emapic.utils.registerI18n = function(i18nStr, translation) {
-        i18n[i18nStr] = (typeof i18n[i18nStr] === 'undefined') ? translation : i18n[i18nStr];
+        emapic.utils.i18n[i18nStr] = (typeof emapic.utils.i18n[i18nStr] === 'undefined') ? translation : emapic.utils.i18n[i18nStr];
     };
 
     emapic.utils.getI18n = function(i18nStr, defaultTranslation) {
-        return (typeof i18n[i18nStr] === 'undefined') ? ((typeof defaultTranslation !== 'undefined') ? defaultTranslation : i18nStr ) : i18n[i18nStr];
+        return (typeof emapic.utils.i18n[i18nStr] === 'undefined') ? ((typeof defaultTranslation !== 'undefined') ? defaultTranslation : i18nStr ) : emapic.utils.i18n[i18nStr];
     };
 
     emapic.utils.setLocale = function(value) {
