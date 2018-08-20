@@ -60,12 +60,6 @@ var emapic = emapic || {};
     });
 
     function bodysidebarPanel() {
-        var title = emapic.modules.panel.getPanelTitleHTML();
-        if (title !== null) {
-            titlesidebarPanel.html(title);
-        } else {
-            titlesidebarPanel.hide();
-        }
         navContainer.html(navHtml);
         closesidebarPanel.html(closesidebarPanelHtml);
     }
@@ -76,7 +70,7 @@ var emapic = emapic || {};
         currentFeature = null;
     });
 
-    emapic.modules.panel.getPanelTitleHTML = function() {
+    emapic.modules.panel.getPanelTitleHTML = function(properties) {
         return "<h3>" + emapic.utils.getI18n('js_see_answers', 'Ver respuestas') + "</h3>\n";
     };
 
@@ -89,6 +83,13 @@ var emapic = emapic || {};
         currentFeatureInput.val(currentFeature + 1);
         $('#PrevButton').prop('disabled', currentFeature === 0);
         $('#NextButton').prop('disabled', currentFeature === (nrLayers - 1));
+        var title = emapic.modules.panel.getPanelTitleHTML(layers[number].feature.properties);
+        if (title !== null) {
+            titlesidebarPanel.html(title);
+            titlesidebarPanel.show();
+        } else {
+            titlesidebarPanel.hide();
+        }
         $("#indivData").html(emapic.getPopupHtml(layers[number].feature.properties));
         if (!(emapic.map.getBounds().contains(layers[number].getLatLng()))) {
             emapic.map.setView(layers[number].getLatLng());
