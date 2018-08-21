@@ -142,6 +142,10 @@ var emapic = emapic || {};
         emapic.modules.panel.goToRegister(currentFeature + 1);
     };
 
+    emapic.modules.panel.getDisplayedFeature = function() {
+        return currentFeature !== null ? layers[currentFeature].feature : null;
+    };
+
     emapic.indivVotesLayerOnEachFeature = emapic.utils.overrideFunction(emapic.indivVotesLayerOnEachFeature, null, function(data) {
         data.layer.unbindPopup();
         data.layer.on('click', function(e) {
