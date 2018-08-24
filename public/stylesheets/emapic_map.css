@@ -96,6 +96,9 @@ li {
 button > div.img-with-caption > img {
     width: 100%;
 }
+h2 small {
+    color: #AAAAAA;
+}
 .btn {
     white-space: normal;
 }

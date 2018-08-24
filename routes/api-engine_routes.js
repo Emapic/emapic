@@ -28,7 +28,7 @@ module.exports = function(app) {
             if (survey.active === false) {
                 return res.redirect('/survey/' + req.params.id + '/results');
             }
-            return Promise.join(survey.getHtml(), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
+            return Promise.join(survey.getHtml(req), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
                 // If the survey allows multiple answers, then we don't
                 // set an already voted position
                 var position = survey.multiple_answer ? null : responses.geometry.coordinates;
@@ -59,7 +59,7 @@ module.exports = function(app) {
             (survey.active === true && survey.public_results) ||
             // It's a local request from the server itself
             (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                return Promise.join(survey.getHtml(), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
+                return Promise.join(survey.getHtml(req), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
                     // If the survey allows multiple answers, then we don't
                     // set an already voted position
                     var position = survey.multiple_answer ? null : responses.geometry.coordinates;

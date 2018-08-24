@@ -117,11 +117,15 @@ module.exports = function(app) {
                         msg += "<li><label>" + questions[j].question + ':</label><span>' + value + '</span></li>';
                         break;
                     case 'text-answer':
-                        msg += "<li><label>" + questions[j].question + ':</label><span>' + results[i]['q' + questions[j].question_order + '.value'] + '</span></li>';
+                        if (results[i]['q' + questions[j].question_order + '.value'] && results[i]['q' + questions[j].question_order + '.value'].trim()){
+                            msg += "<li><label>" + questions[j].question + ':</label><span>' + results[i]['q' + questions[j].question_order + '.value'].trim() + '</span></li>';
+                        }
                         break;
                     case 'image-url':
-                        msg += "<li><label>" + questions[j].question + ':</label><span><a href="' + results[i]['q' + questions[j].question_order + '.value'] +
-                            '" target="_blank"><img class="image-url-answer" src="' + results[i]['q' + questions[j].question_order + '.value'] + '"><img/></a></span></li>';
+                        if (results[i]['q' + questions[j].question_order + '.value'] && results[i]['q' + questions[j].question_order + '.value'].trim()){
+                            msg += "<li><label>" + questions[j].question + ':</label><span><a href="' + results[i]['q' + questions[j].question_order + '.value'] +
+                                '" target="_blank"><img class="image-url-answer" src="' + results[i]['q' + questions[j].question_order + '.value'].trim() + '"><img/></a></span></li>';
+                        }
                         break;
                     case 'explanatory-text':
                         break;
@@ -321,7 +325,8 @@ module.exports = function(app) {
                     }
                     questions.push({
                         question : req.body['question_' + i],
-                        type: req.body['question_type_' + i]
+                        type: req.body['question_type_' + i],
+                        mandatory: (req.body['optional_question_' + i] === undefined)
                     });
                     break;
                 default:
@@ -368,8 +373,13 @@ module.exports = function(app) {
                         answers: answers
                     };
                 case 'text-answer':
-                case 'explanatory-text':
                 case 'image-url':
+                    return {
+                        question: question.question,
+                        type: question.type,
+                        mandatory: question.mandatory
+                    };
+                case 'explanatory-text':
                     return {
                         question: question.question,
                         type: question.type

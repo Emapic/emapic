@@ -216,6 +216,15 @@ input.form-control[type="checkbox"] {
     color: #A94442;
 }
 
+div.tooltip[role="tooltip"] {
+    width: 200px;
+    max-width: 70vw;
+}
+
+div.tooltip[role="tooltip"] .inner-tooltip {
+    max-width: 100%;
+}
+
 div.alert, div.alert a {
     font-family: Helvetica, Arial, sans-serif;
 }
@@ -263,6 +272,7 @@ form#survey-form .with-errors {
     width: 100%;
     display: inline-block;
     padding-left: 5px;
+    margin-top: 10px;
 }
 .form-horizontal .form-checkbox-line .form-field-help {
     vertical-align: top;

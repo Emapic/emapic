@@ -142,6 +142,7 @@
                     addNewQuestion(questionMap.type);
                 }
                 $('input[name="question_' + qstn + '"]').val(questionMap.question);
+                $('input[type="checkbox"][name="optional_question_' + qstn + '"]').prop("checked", !questionMap.mandatory);
                 break;
             case 'explanatory-text':
                 if (!$('#qstn_' + qstn).length) {
@@ -154,6 +155,7 @@
                     addNewQuestion(questionMap.type);
                 }
                 $('input[name="question_' + qstn + '"]').val(questionMap.question);
+                $('input[type="checkbox"][name="optional_question_' + qstn + '"]').prop("checked", !questionMap.mandatory);
                 break;
         }
     }
@@ -402,6 +404,17 @@
                                 <div class="col-xs-12 col-md-4 col-md-offset-4">\
                                     <input spellcheck="true" class="form-control" type="text" required maxlength="150" name="question_' + qstn + '" data-error="{{#__}}type_a_question{{/__}}" >\
                                     <div class="help-block with-errors"></div>\
+                                    <div class="form-checkbox-line">\
+                                        <div class="col-xs-2">\
+                                            <input id="optional_question_' + qstn + '" class="form-control pull-right" type="checkbox" name="optional_question_' + qstn + '">\
+                                        </div>\
+                                        <div class="col-xs-8">\
+                                            <label class="control-label adi-opts-label text-left" for="optional_question_' + qstn + '">{{#__}}optional_question{{/__}}</label>\
+                                        </div>\
+                                        <div class="col-xs-2">\
+                                            <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="{{#__}}help_tooltip_new_survey_optional_question{{/__}}"></span>\
+                                        </div>\
+                                    </div>\
                                 </div>\
                             </div>\
                         </div>\
@@ -452,6 +465,17 @@
                                 <div class="col-xs-12 col-md-4 col-md-offset-4">\
                                     <input spellcheck="true" class="form-control" type="text" required maxlength="150" name="question_' + qstn + '" data-error="{{#__}}type_a_question{{/__}}" >\
                                     <div class="help-block with-errors"></div>\
+                                    <div class="form-checkbox-line">\
+                                        <div class="col-xs-2">\
+                                            <input id="optional_question_' + qstn + '" class="form-control pull-right" type="checkbox" name="optional_question_' + qstn + '">\
+                                        </div>\
+                                        <div class="col-xs-8">\
+                                            <label class="control-label adi-opts-label text-left" for="optional_question_' + qstn + '">{{#__}}optional_question{{/__}}</label>\
+                                        </div>\
+                                        <div class="col-xs-2">\
+                                            <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="{{#__}}help_tooltip_new_survey_optional_question{{/__}}"></span>\
+                                        </div>\
+                                    </div>\
                                 </div>\
                             </div>\
                         </div>\

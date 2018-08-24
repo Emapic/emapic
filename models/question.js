@@ -18,6 +18,7 @@ function parseQuestionsfromPost(req, survey) {
             textLimit = 150,
             legend = null,
             type = questionType,
+            mandatory = true,
             order = i - 1;
         if (questionType === '') {
             continue;
@@ -37,6 +38,10 @@ function parseQuestionsfromPost(req, survey) {
             case 'image-url':
                 if (req.body['question_' + i].trim() === '') {
                     type = null;
+                } else {
+                    if (req.body['optional_question_' + i] !== undefined) {
+                        mandatory = false;
+                    }
                 }
                 break;
             case 'explanatory-text':
@@ -53,6 +58,7 @@ function parseQuestionsfromPost(req, survey) {
                 survey_id : survey.id,
                 type : type,
                 question : (req.body['question_' + i] ? req.body['question_' + i].substring(0, textLimit).trim() : null),
+                mandatory: mandatory,
                 question_order : order,
                 legend_question : legend
             });
@@ -204,15 +210,18 @@ function generateExclusiveBtnAnswerHtml(answer, layout, question) {
     return html;
 }
 
-function generateTextInputQuestionHtml(question, validator) {
+function generateTextInputQuestionHtml(question, validator, req) {
     validator = validator || null;
-    return '<h2>' + escape(question.question) + '</h2>\n' +
+    var opt = req.i18n.__('optional_note'),
+        html,
+        mandatory = question.mandatory;
+    return '<h2>' + escape(question.question) + (mandatory ? '' : '<small><i> (' + opt + ') </i></small>') + '</h2>\n' +
         '<div class="col-xs-12 text-left"><div id="q' + question.question_order + '-other"' +
         ' class="col-xs-12 btn btn-lg survey-answer text-answer"><div class="flex-container"><input autocomplete="off" id="q' +
         question.question_order + '-input" type="text" target="q' + question.question_order +
         '-ok" onkeydown="emapic.utils.inputEnterToClick(event)" ' + (validator !== null ?
-        ' onkeyup="' + validator + '(this)" onchange="' + validator + '(this)"' : '') + '/><button id="q' + question.question_order +
-        '-ok" autocomplete="off" disabled class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + question.question_order +
+        ' onkeyup="' + validator + '(this, ' + mandatory + ')" onchange="' + validator + '(this, ' + mandatory + ')"' : '') + '/><button id="q' + question.question_order +
+        '-ok"'  + (mandatory ? ' disabled' : '') + ' autocomplete="off" class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + question.question_order +
         '\', \'q' + question.question_order + '-input\')">OK</button></div></div></div>';
 }
 
@@ -277,7 +286,7 @@ module.exports = function(sequelize, DataTypes) {
             },
 
             getFieldsToHideInDescription: function() {
-                return ['title', 'mandatory', 'language', 'Answers'];
+                return ['title', 'language', 'Answers'];
             }
         },
         instanceMethods: {
@@ -288,11 +297,11 @@ module.exports = function(sequelize, DataTypes) {
             getDdlSql: function() {
                 switch (this.type) {
                     case 'list-radio-other':
-                        return "q" + this.question_order + " text NOT NULL, q" + this.question_order + "_other text";
+                        return "q" + this.question_order + " text" + (this.mandatory ? " NOT NULL" : "") + ", q" + this.question_order + "_other text";
                     case 'list-radio':
                     case 'text-answer':
                     case 'image-url':
-                        return "q" + this.question_order + " text NOT NULL";
+                        return "q" + this.question_order + " text" + (this.mandatory ? " NOT NULL" : "");
                     case 'explanatory-text':
                         return "";
                     default:
@@ -323,16 +332,22 @@ module.exports = function(sequelize, DataTypes) {
                     var answer = null;
                     switch (question.type) {
                         case 'list-radio-other':
-                            if (('q' + question.question_order + '.id') in responses) {
+                            if (responses['q' + question.question_order + '.id']) {
                                 answer = parseInt(responses['q' + question.question_order + '.id'], 10);
-                                if (answer === -1 && ('q' + question.question_order + '.value') in responses &&
-                                responses['q' + question.question_order + '.value'].trim() !== '') {
+                                if (answer === -1) {
+                                    if (responses['q' + question.question_order + '.value']) {
+                                        responses['q' + question.question_order + '.value'] = responses['q' + question.question_order + '.value'].trim();
+                                    }
+                                    if (!responses['q' + question.question_order + '.value']) {
+                                        answer = answer + ' [null]';
+                                        break;
+                                    }
                                     return Promise.resolve();
                                 }
                             }
                             /* falls through */
                         case 'list-radio':
-                            if (('q' + question.question_order + '.id') in responses) {
+                            if (responses['q' + question.question_order + '.id']) {
                                 answer = parseInt(responses['q' + question.question_order + '.id'], 10);
                                 for (var i = 0, len = answers.length; i<len; i++) {
                                     if (answers[i].sortorder === answer) {
@@ -342,19 +357,35 @@ module.exports = function(sequelize, DataTypes) {
                             }
                             break;
                         case 'text-answer':
-                            if (('q' + question.question_order + '.value') in responses) {
+                            answer = responses['q' + question.question_order + '.value'];
+                            if (!question.mandatory || responses['q' + question.question_order + '.value']) {
+                                if (responses['q' + question.question_order + '.value']) {
+                                    responses['q' + question.question_order + '.value'] = responses['q' + question.question_order + '.value'].trim();
+                                }
+                                if (!responses['q' + question.question_order + '.value']) {
+                                    if (question.mandatory) {
+                                        break;
+                                    } else {
+                                        responses['q' + question.question_order + '.value'] = null;
+                                    }
+                                }
                                 return Promise.resolve();
                             }
                             break;
                         case 'explanatory-text':
                             return Promise.resolve();
                         case 'image-url':
-                            if (('q' + question.question_order + '.value') in responses) {
-                                answer = responses['q' + question.question_order + '.value'];
+                            answer = responses['q' + question.question_order + '.value'];
+                            if (answer) {
+                                responses['q' + question.question_order + '.value'] = responses['q' + question.question_order + '.value'].trim();
                                 if (answer.lastIndexOf('http', 0) !== 0) {
                                     responses['q' + question.question_order + '.value'] = answer = 'http://' + answer;
                                 }
                                 return Utils.checkUrlIsImage(responses['q' + question.question_order + '.value']);
+                            } else if (!question.mandatory) {
+                                responses['q' + question.question_order + '.value'] = null;
+                                // Image is empty because it is not mandatory
+                                return Promise.resolve();
                             }
                             break;
                         default:
@@ -413,7 +444,7 @@ module.exports = function(sequelize, DataTypes) {
                 });
             },
 
-            getHtml: function() {
+            getHtml: function(req) {
                 var parent = this,
                     html = '';
                 switch (parent.type) {
@@ -456,10 +487,10 @@ module.exports = function(sequelize, DataTypes) {
                             }
                         );
                     case 'text-answer':
-                        html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputNotVoid');
+                        html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputNotVoid', req);
                         break;
                     case 'image-url':
-                        html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputUrlIsImage');
+                        html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputUrlIsImage', req);
                         break;
                     case 'explanatory-text':
                         html += '<div class="col-xs-12 text-center"><div id="q' + parent.question_order + '-other"' +

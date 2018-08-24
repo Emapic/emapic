@@ -166,13 +166,70 @@ if (typeof $.fn.validator !== 'undefined' &&
         location.reload();
     };
 
-    emapic.utils.checkInputNotVoid = function(input) {
+    emapic.utils.checkInputNotVoid = function(input, mandatory) {
+        if (mandatory) {
+            var $input = $(input),
+                val = $input.val(),
+                $tgt = $('#' + $input.attr('target'));
+            if ($tgt != null) {
+                $tgt.attr('disabled', !(val != null && val.trim() != ''));
+            }
+        }
+    };
+
+    var checkInputUrlIsImageTargetsDeferred = {};
+
+    emapic.utils.checkInputUrlIsImage = function(input, mandatory) {
         var $input = $(input),
             val = $input.val(),
-            $tgt = $('#' + $input.attr('target'));
-        if ($tgt != null) {
-            $tgt.attr('disabled', !(val != null && val.trim() != ''))
+            tgt = $input.attr('target'),
+            $tgt = $('#' + tgt);
+        if ($tgt !== null) {
+            if (mandatory || (val !== null && val.trim() !== '')) {
+                $tgt.attr('disabled', true);
+            }
+            if (val !== null && val.trim() !== '') {
+                val = val.trim();
+                if (val.lastIndexOf('http', 0) !== 0) {
+                    val = 'http://' + val;
+                }
+                var dfd = checkInputUrlIsImageTargetsDeferred[tgt] = emapic.utils.checkUrlIsImage(val);
+                checkInputUrlIsImageTargetsDeferred[tgt].promise().done(function(result) {
+                    // If a more recent deferred has been created for the same
+                    // target, then we ignore the result
+                    if (checkInputUrlIsImageTargetsDeferred[tgt] === dfd) {
+                        $tgt.attr('disabled', !result);
+                    }
+                }).fail(function(error) {
+                    if (error !== null) {
+                        console.error(error);
+                    }
+                });
+            }
         }
+    };
+
+    emapic.utils.checkUrlIsImage = function(url, timeout) {
+        timeout = timeout || 5000;
+        var dfd = $.Deferred(),
+            timer,
+            img = new Image();
+        img.onerror = img.onabort = function () {
+            clearTimeout(timer);
+            dfd.resolve(false);
+        };
+        img.onload = function () {
+            clearTimeout(timer);
+            dfd.resolve(true);
+        };
+        timer = setTimeout(function () {
+            // reset .src to invalid URL so it stops previous
+            // loading, but doesn't trigger new load
+            img.src = null;
+            dfd.resolve(false);
+        }, timeout);
+        img.src = url;
+        return dfd;
     };
 
     emapic.utils.inputEnterToClick = function(event) {
@@ -367,59 +424,6 @@ if (typeof $.fn.validator !== 'undefined' &&
             params.email = emapic.utils.nominatimEmail;
         }
         return $.getJSON('https://nominatim.openstreetmap.org/reverse', params);
-    };
-
-    var checkInputUrlIsImageTargetsDeferred = {};
-
-    emapic.utils.checkInputUrlIsImage = function(input) {
-        var $input = $(input),
-            val = $input.val(),
-            tgt = $input.attr('target'),
-            $tgt = $('#' + tgt);
-        $tgt.attr('disabled', true);
-        if ($tgt !== null) {
-            if (val !== null && val.trim() !== '') {
-                val = val.trim();
-                if (val.lastIndexOf('http', 0) !== 0) {
-                    val = 'http://' + val;
-                }
-                var dfd = checkInputUrlIsImageTargetsDeferred[tgt] = emapic.utils.checkUrlIsImage(val);
-                checkInputUrlIsImageTargetsDeferred[tgt].promise().done(function(result) {
-                    // If a more recent deferred has been created for the same
-                    // target, then we ignore the result
-                    if (checkInputUrlIsImageTargetsDeferred[tgt] === dfd) {
-                        $tgt.attr('disabled', !result);
-                    }
-                }).fail(function(error) {
-                    if (error !== null) {
-                        console.error(error);
-                    }
-                });
-            }
-        }
-    };
-
-    emapic.utils.checkUrlIsImage = function(url, timeout) {
-        timeout = timeout || 5000;
-        var dfd = $.Deferred(),
-            timer,
-            img = new Image();
-        img.onerror = img.onabort = function () {
-            clearTimeout(timer);
-            dfd.resolve(false);
-        };
-        img.onload = function () {
-            clearTimeout(timer);
-            dfd.resolve(true);
-        };
-        timer = setTimeout(function () {
-            // reset .src to invalid URL so it stops previous
-            // loading, but doesn't trigger new load
-            img.src = null;
-            dfd.resolve(false);
-        }, timeout);
-        img.src = url;
-        return dfd;
     };
 
     emapic.utils.filterKeydownOnlyDigits = function(e) {

@@ -501,11 +501,11 @@ module.exports = function(sequelize, DataTypes) {
                 });
             },
 
-            getHtml: function() {
+            getHtml: function(req) {
                 return Promise.map(this.getQuestions({
                     scope: 'includeAnswers'
                 }), function(question) {
-                    return question.getHtml();
+                    return question.getHtml(req);
                 }).then(function(results){
                     if (results.length === 1) {
                         return results[0];

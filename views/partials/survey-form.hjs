@@ -18,7 +18,7 @@
               <div id="question-type-list" class="btn-group-vertical">
                 <div id="question-type-list-radio-group" class="input-group">
                   <span class="input-group-addon">
-                    <input autocomplete="off" id="question-type-list-radio" type="radio" name="question-type" value="list-radio" checked>
+                    <input id="question-type-list-radio" autocomplete="off" type="radio" name="question-type" value="list-radio" checked>
                   </span>
                   <div class="form-control question-type-item">
                       <div>
@@ -32,6 +32,8 @@
                             <p class="question-type-description">{{#__}}question_type_list_radio_description{{/__}}</p>
                             <h4>{{#__}}question_type_legend_title{{/__}}</h4>
                             <p class="question-type-legend">{{#__}}question_type_list_radio_legend{{/__}}</p>
+                            <h4>{{#__}}question_type_optional_question_title{{/__}}</h4>
+                            <p class="question-type-legend">{{#__}}question_type_list_radio_optional_question{{/__}}</p>
                           </label>
                       </div>
                   </div>
@@ -52,6 +54,8 @@
                             <p class="question-type-description">{{#__}}question_type_text_answer_description{{/__}}</p>
                             <h4>{{#__}}question_type_legend_title{{/__}}</h4>
                             <p class="question-type-legend">{{#__}}question_type_text_answer_legend{{/__}}</p>
+                            <h4>{{#__}}question_type_optional_question_title{{/__}}</h4>
+                            <p class="question-type-legend">{{#__}}question_type_text_answer_optional_question{{/__}}</p>
                           </label>
                       </div>
                   </div>
@@ -90,6 +94,8 @@
                             <p class="question-type-description">{{#__}}question_type_image_url_description{{/__}}</p>
                             <h4>{{#__}}question_type_legend_title{{/__}}</h4>
                             <p class="question-type-legend">{{#__}}question_type_image_url_legend{{/__}}</p>
+                            <h4>{{#__}}question_type_optional_question_title{{/__}}</h4>
+                            <p class="question-type-legend">{{#__}}question_type_image_url_optional_question{{/__}}</p>
                           </label>
                       </div>
                   </div>
