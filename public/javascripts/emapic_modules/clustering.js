@@ -22,49 +22,42 @@ var emapic = emapic || {};
     };
 
     emapic.loadIndivVotesLayer = emapic.utils.overrideFunction(emapic.loadIndivVotesLayer, null, function(markers) {
-        if (clusteringActive) {
-            if (emapic.legend && emapic.legend.color) {
-                emapic.indivVotesLayer = new L.MarkerClusterGroup({
-                    iconCreateFunction: function(cluster) {
-                        var markers = cluster.getAllChildMarkers(),
-                            total = markers.length,
-                            statusNr = [];
-                        for (var i=0, len=emapic.legend.color.responses_array.length; i<len; i++) {
-                            statusNr.push({
-                                value: emapic.legend.color.responses_array[i].id,
-                                votes: 0
-                            });
-                        }
-                        for (i = 0; i < total; i++) {
-                            for (var j=0, leng=statusNr.length; j<leng; j++) {
-                                if (markers[i].feature.properties[emapic.legend.color.question + '.id'] == statusNr[j].value) {
-                                    statusNr[j].votes++;
-                                }
-                            }
-                        }
-                        return new L.DivIcon({ className: 'marker-cluster-svg', iconSize: L.point(pieCenter.x * 2, pieCenter.y * 2),
-                            html: getClusterIcon(statusNr, total)
-                        });
-                    }
-                });
-            } else {
-                emapic.indivVotesLayer = new L.MarkerClusterGroup({
-                    iconCreateFunction: function(cluster) {
-                        var markers = cluster.getAllChildMarkers(),
-                            total = markers.length,
-                            statusNr = [{votes: total, value: null}];
-                        return new L.DivIcon({ className: 'marker-cluster-svg', iconSize: L.point(pieCenter.x * 2, pieCenter.y * 2),
-                            html: getClusterIcon(statusNr, total)
-                        });
-                    }
-                });
-            }
-            emapic.indivVotesLayer.addLayer(markers);
-            return emapic.indivVotesLayer;
-        } else {
+        if (!clusteringActive) {
             return markers;
         }
+        emapic.indivVotesLayer = new L.MarkerClusterGroup({
+            iconCreateFunction: function(cluster) {
+                var markers = cluster.getAllChildMarkers();
+                return new L.DivIcon({ className: 'marker-cluster-svg', iconSize: L.point(pieCenter.x * 2, pieCenter.y * 2),
+                    html: getClusterIcon(emapic.modules.clustering.getClusterColors(markers), markers.length)
+                });
+            }
+        });
+        emapic.indivVotesLayer.addLayer(markers);
+        return emapic.indivVotesLayer;
     });
+
+    emapic.modules.clustering.getClusterColors = function(markers) {
+        var colors = {};
+        for (var i = 0, iLen = markers.length; i < iLen; i++) {
+            var color = emapic.getIconColor(markers[i].feature.properties);
+            if (!(color in colors)) {
+                colors[color] = 0;
+            }
+            colors[color]++;
+        }
+        var colorsOrdered = [];
+        for (var color in colors) {
+            colorsOrdered.push({
+                color: color,
+                votes: colors[color]
+            });
+        }
+        colorsOrdered.sort(function(a, b) {
+            return b.votes - a.votes;
+        });
+        return colorsOrdered;
+    };
 
     emapic.modules.clustering.toggleClustering = function(element) {
         clusteringActive = !clusteringActive;
@@ -95,21 +88,22 @@ var emapic = emapic || {};
         return {x: pieCenter.x + mX, y: pieCenter.y - mY};
     }
 
-    function getSVGPie(votes, total, text) {
+    function getSVGPie(colors, total, text) {
         var htmlStart = '<svg id="svg" width="' + (pieCenter.x*2) + 'px" height="' + (pieCenter.y*2) + 'px" xmlns="http://www.w3.org/2000/svg" version="1.1" onmouseover="$(this).children(\'circle\').attr(\'stroke-width\', \'2\');" onmouseout="$(this).children(\'circle\').attr(\'stroke-width\', \'0\');">',
             htmlEnd = text + '</svg>',
             html = '',
             previousAngle = 0,
             previousPoint = resolveToPoint(previousAngle);
         html += '<circle cx="' + pieCenter.x + '" cy="' + pieCenter.y + '" r="' + (pieRadius + 1) + '" stroke="black" stroke-width="1"/>';
-        for (var i=0, len=votes.length; i<len; i++) {
-            var color = emapic.getCurrentIconColorForAnswer(votes[i].value);
-            if (votes[i].votes === total) {
+        for (var i = 0, iLen = colors.length; i<iLen; i++) {
+            var color = colors[i].color,
+                votes = colors[i].votes;
+            if (votes === total) {
                 html += '<circle cx="' + pieCenter.x + '" cy="' + pieCenter.y + '" r="' + pieRadius + '" fill="' + color + '" stroke="black" stroke-width="0"/>';
                 break;
             }
-            if (votes[i].votes > 0) {
-                angle_dif = (360 * votes[i].votes / total);
+            if (votes > 0) {
+                angle_dif = (360 * votes / total);
                 angle = previousAngle + angle_dif;
                 next_point = resolveToPoint(angle);
                 html += '<path d="M' + pieCenter.x + ',' + pieCenter.y + ' L' + previousPoint.x + ',' + previousPoint.y + ' A' + pieRadius + ',' + pieRadius + ' 0 ' + (angle_dif > 180 ? '1' : '0') + ',1 ' + next_point.x + ',' + next_point.y + ' z" fill="' + color + '" />';
@@ -120,9 +114,9 @@ var emapic = emapic || {};
         return htmlStart + html + htmlEnd;
     }
 
-    function getClusterIcon(votes, total) {
+    function getClusterIcon(colors, total) {
         text = '<text x="21" y="27" font-family="Verdana" font-weight="bold" fill="#FFFFFF" stroke="#000000" stroke-width="0.7" font-size="17" style="text-anchor: middle;">' + total + '</text>';
-        return getSVGPie(votes, total, text);
+        return getSVGPie(colors, total, text);
     }
 
 })(emapic);
