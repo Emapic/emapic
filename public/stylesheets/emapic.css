@@ -85,10 +85,15 @@ a[data-toggle="collapse"] {
     cursor: pointer;
 }
 
-h1, h2 {
+h1, h2,
+.jumbotron h1, .jumbotron h2 {
 	color: #A2C73A;
 	margin-top: 2em;
 	margin-bottom: 1em;
+}
+
+.jumbotron h1 {
+    font-size: 40px;
 }
 
 
