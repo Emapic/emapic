@@ -108,6 +108,10 @@ module.exports = function(app) {
         }).catch(handleInternalError(req, res));
     });
 
+    app.get('/api/user', requireRole(null, true), function(req, res) {
+        res.json(req.user.getDescription());
+    });
+
     app.get('/api/surveys', function(req, res) {
         var login = req.query.login && req.query.login.trim() !== '' ? req.query.login : null,
             userId = isNaN(req.query.userId) ? null : req.query.userId,
