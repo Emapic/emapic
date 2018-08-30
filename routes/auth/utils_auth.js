@@ -9,7 +9,7 @@ var nodemailer = require('nodemailer'),
     sequelize = models.sequelize;
 
 module.exports = function(app) {
-    requireRole = function(roles) {
+    requireRole = function(roles, json) {
         return function(req, res, next) {
             delete req.session.lastUnauthPage;
             var allowedPromise;
@@ -32,8 +32,12 @@ module.exports = function(app) {
                 if (allowed) {
                     return next();
                 } else {
-                    req.session.lastUnauthPage = req.path;
-                    return res.redirect('/login');
+                    if (json) {
+                        return res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
+                    } else {
+                        req.session.lastUnauthPage = req.path;
+                        return res.redirect('/login');
+                    }
                 }
             });
         };

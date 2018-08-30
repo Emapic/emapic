@@ -137,7 +137,7 @@ module.exports = function(app) {
         }).catch(handleInternalError(req, res));
     });
 
-    app.get('/api/surveys/own', function(req, res) {
+    app.get('/api/surveys/own', requireRole(null, true), function(req, res) {
         var query = req.query.q && req.query.q.trim() !== '' ? req.query.q : null,
             tag = req.query.tag && req.query.tag.trim() !== '' ? req.query.tag : null,
             status = req.query.status && req.query.status.trim() !== '' ? req.query.status : null,
