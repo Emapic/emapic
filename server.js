@@ -509,7 +509,10 @@ var EmapicApp = function() {
                 '404': function err404(err, req, res) {
                     logger.warn('404 request: ' + err);
                     res.status(404);
-                    res.render('error/404', {
+                    if (req.path.lastIndexOf('/api/', 0) === 0) {
+                        return res.json({ error_code: 'invalid_url', error: "requested url doesn't exist." });
+                    }
+                    return res.render('error/404', {
                         title : req.i18n.__('404_title')
                     });
                 }
