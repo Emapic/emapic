@@ -37,7 +37,7 @@
                 <span class="glyphicon glyphicon-share" aria-hidden="true"></span>  <span class="hide-small">{{#__}}share{{/__}}</span>
             </button>
             <ul class="dropdown-menu share-url{{#addThisId}} addThis{{/addThisId}}" aria-labelledby="share-url-btn">
-                <input class="share-url-box" onclick="this.select();" value="{{web_host}}/survey/{{survey.encr_id}}"/>
+                <input class="share-url-box" readonly onclick="this.select();" value="{{web_host}}/survey/{{survey.encr_id}}"/>
                 {{#addThisId}}
                 <!-- Go to www.addthis.com/dashboard to customize your tools -->
                 <div class="addthis_inline_share_toolbox"></div>
