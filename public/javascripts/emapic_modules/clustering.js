@@ -7,7 +7,8 @@ var emapic = emapic || {};
 (function(emapic) {
 
     var clusteringActive = true,
-        clusteringButtonsHtml = "<a id='clustering-control-activate' title='" + emapic.utils.getI18n('js_disable_clustering', 'Desactivar clustering') + "' href='javascript:void(0)' onclick='emapic.modules.clustering.toggleClustering(this)'><img src='/images/icon-clustering.png' style='width: 16px; height: 16px;'/></a>",
+        clusteringButtonId = 'clustering-control-activate',
+        clusteringButtonsHtml = "<a id='" + clusteringButtonId + "' title='" + emapic.utils.getI18n('js_disable_clustering', 'Desactivar clustering') + "' href='javascript:void(0)' onclick='emapic.modules.clustering.toggle()'><img src='/images/icon-clustering.png' style='width: 16px; height: 16px;'/></a>",
         pieCenter = {x: 21.0, y: 21.0},
         pieRadius = 19.0;
 
@@ -15,9 +16,7 @@ var emapic = emapic || {};
     emapic.modules.clustering = emapic.modules.clustering || {};
 
     emapic.getIndivVotesLayerLeafletLayers = function () {
-        if (clusteringActive) {
-            emapic.modules.clustering.toggleClustering($('#clustering-control-activate'));
-        }
+        emapic.modules.clustering.deactivate();
         return emapic.indivVotesLayer.getLayers();
     };
 
@@ -59,11 +58,31 @@ var emapic = emapic || {};
         return colorsOrdered;
     };
 
-    emapic.modules.clustering.toggleClustering = function(element) {
+    emapic.modules.clustering.isActive = function() {
+        return clusteringActive;
+    };
+
+    emapic.modules.clustering.toggle = function() {
         clusteringActive = !clusteringActive;
-        emapic.toggleButton(element);
+        emapic.toggleButton(emapic.modules.clustering.getButton());
         emapic.updateIndivVotesLayer();
     };
+
+    emapic.modules.clustering.activate = function() {
+        if (!emapic.modules.clustering.isActive()) {
+            emapic.modules.clustering.toggle();
+        }
+    };
+
+    emapic.modules.clustering.deactivate = function() {
+        if (emapic.modules.clustering.isActive()) {
+            emapic.modules.clustering.toggle();
+        }
+    };
+
+    emapic.modules.clustering.getButton = function() {
+        return $('#' + clusteringButtonId);
+    }
 
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
         var groupingViewsControl = L.control({position: 'topleft'});

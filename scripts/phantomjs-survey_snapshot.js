@@ -63,7 +63,7 @@ page.open(url, function(status) {
 
             $.when(emapic.allLayersLoadedPromise, emapic.baseLayerLoadedPromise).done(function() {
                 // Disable clustering
-                emapic.modules.clustering.toggleClustering($('#clustering-control-activate'));
+                emapic.modules.clustering.deactivate();
                 window.callPhantom();
             });
         });
