@@ -171,7 +171,7 @@
     <script src="/javascripts/emapic_modules/counter_stats.js"></script>
 
     <!-- Add clustering -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/leaflet.markercluster.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.0.0/leaflet.markercluster.js"></script>
     <script src="/javascripts/emapic_modules/clustering.js"></script>
 
     <!-- Add answers panel -->

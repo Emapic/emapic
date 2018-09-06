@@ -49,7 +49,7 @@ var emapic = emapic || {};
         var control = emapic.modules.geocoder.control = L.Control.geocoder(baseParams);
         control.addTo(emapic.map);
 
-        control.on('markgeocode', function(result) {
+        emapic.map.on('markgeocode', function(result) {
             emapic.modules.geocoder.processGeocodingResult(result);
             return this;
         }, control);
@@ -65,7 +65,7 @@ var emapic = emapic || {};
         if (emapic.modules.geocoder.control !== null &&
             '_map' in emapic.modules.geocoder.control &&
             emapic.modules.geocoder.control._map !== null) {
-            emapic.modules.geocoder.control.removeFrom(emapic.map);
+            emapic.modules.geocoder.control.remove();
         }
     }
 

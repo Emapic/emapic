@@ -48,7 +48,7 @@ var emapic = emapic || {};
 
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
         sidebarPanel = L.control.sidebar('sidebarPanel', {
-            position: 'right',
+            position: 'topright',
             autoPan: false,
             closeButton: false
         });

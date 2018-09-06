@@ -25,7 +25,7 @@ module.exports = {
 			appendHtml: null
 		},
 
-		includes: L.Mixin.Events,
+		includes: L.Evented,
 
 		initialize: function (options) {
 			L.Util.setOptions(this, options);
@@ -195,13 +195,13 @@ module.exports = {
 			}
 
 			if (this.options.defaultMarkGeocode) {
-				this.on('markgeocode', this.markGeocode, this);
+				this._map.on('markgeocode', this.markGeocode, this);
 			}
 
-			this.on('startgeocode', function() {
+			this._map.on('startgeocode', function() {
 				L.DomUtil.addClass(this._container, 'leaflet-control-geocoder-throbber');
 			}, this);
-			this.on('finishgeocode', function() {
+			this._map.on('finishgeocode', function() {
 				L.DomUtil.removeClass(this._container, 'leaflet-control-geocoder-throbber');
 			}, this);
 
@@ -255,10 +255,10 @@ module.exports = {
 				this._clearResults();
 			}
 
-			this.fire('start' + mode);
+			this._map.fire('start' + mode);
 			this.options.geocoder[mode](this._input.value, function(results) {
 				if (requestCount === this._requestCount) {
-					this.fire('finish' + mode);
+					this._map.fire('finish' + mode);
 					this._geocodeResult(results, suggest);
 				}
 			}, this);
@@ -270,7 +270,7 @@ module.exports = {
 				this._clearResults();
 			}
 
-			this.fire('markgeocode', {geocode: result});
+			this._map.fire('markgeocode', {geocode: result});
 		},
 
 		_toggle: function() {
@@ -284,14 +284,14 @@ module.exports = {
 		_expand: function () {
 			L.DomUtil.addClass(this._container, 'leaflet-control-geocoder-expanded');
 			this._input.select();
-			this.fire('expand');
+			this._map.fire('expandgeocoder');
 		},
 
 		_collapse: function () {
 			this._container.className = this._container.className.replace(' leaflet-control-geocoder-expanded', '');
 			L.DomUtil.addClass(this._alts, 'leaflet-control-geocoder-alternatives-minimized');
 			L.DomUtil.removeClass(this._errorElement, 'leaflet-control-geocoder-error');
-			this.fire('collapse');
+			this._map.fire('collapsegeocoder');
 		},
 
 		_clearResults: function () {

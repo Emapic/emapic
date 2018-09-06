@@ -1,12 +1,14 @@
 L.Control.Sidebar = L.Control.extend({
 
-    includes: L.Mixin.Events,
+    includes: L.Evented,
 
     options: {
         closeButton: true,
-        position: 'left',
+        position: 'topleft',
         autoPan: true,
     },
+
+    controlsToMove: null,
 
     initialize: function (placeholder, options) {
         L.setOptions(this, options);
@@ -19,9 +21,15 @@ L.Control.Sidebar = L.Control.extend({
 
         var l = 'leaflet-';
 
+        var horizontalPosition = this.options.position.indexOf('left', this.options.position.length - 5) !== -1 ? 'left' : 'right',
+            verticalPosition = this.options.position.indexOf('bottom', this.options.position.length - 5) !== -1 ? 'bottom' : 'top';
+
         // Create sidebar container
         var container = this._container =
-            L.DomUtil.create('div', l + 'sidebar ' + this.options.position);
+            L.DomUtil.create('div', l + 'sidebar ' + horizontalPosition);
+
+        this.controlsToMove = document.querySelector('.' + l + horizontalPosition + '.' + l + (verticalPosition === 'top' ? 'bottom' : 'top'));
+        this.controlsToMove.className += ' sidebar-control-sibling';
 
         // Style and attach content container
         L.DomUtil.addClass(content, l + 'control');
@@ -35,7 +43,7 @@ L.Control.Sidebar = L.Control.extend({
         }
     },
 
-    addTo: function (map) {
+    onAdd: function (map) {
         var container = this._container;
         var content = this._contentContainer;
 
@@ -68,10 +76,10 @@ L.Control.Sidebar = L.Control.extend({
             .on(content, 'mousewheel', stop)
             .on(content, 'MozMousePixelScroll', stop);
 
-        return this;
+        return this._container;
     },
 
-    removeFrom: function (map) {
+    onRemove: function (map) {
         //if the control is visible, hide it before removing it.
         this.hide();
 
@@ -115,25 +123,29 @@ L.Control.Sidebar = L.Control.extend({
 
     show: function () {
         if (!this.isVisible()) {
-            this.fire('show');
+            this._map.fire('sidebar-show');
             L.DomUtil.addClass(this._container, 'visible');
             if (this.options.autoPan) {
                 this._map.panBy([-this.getOffset() / 2, 0], {
                     duration: 0.5
                 });
             }
+            if (this.controlsToMove.className.indexOf('sidebar-control-visible') === -1) {
+                this.controlsToMove.className += ' sidebar-control-visible';
+            }
         }
     },
 
     hide: function (e) {
         if (this.isVisible()) {
-            this.fire('hide');
+            this._map.fire('sidebar-hide');
             L.DomUtil.removeClass(this._container, 'visible');
             if (this.options.autoPan) {
                 this._map.panBy([this.getOffset() / 2, 0], {
                     duration: 0.5
                 });
             }
+            this.controlsToMove.className = this.controlsToMove.className.replace(/\bsidebar-control-visible\b/g, '');
         }
         if(e) {
             L.DomEvent.stopPropagation(e);
@@ -170,8 +182,9 @@ L.Control.Sidebar = L.Control.extend({
     },
 
     _handleTransitionEvent: function (e) {
-        if (e.propertyName == 'left' || e.propertyName == 'right')
-            this.fire(this.isVisible() ? 'shown' : 'hidden');
+        if (e.propertyName == 'left' || e.propertyName == 'right') {
+            this._map.fire(this.isVisible() ? 'sidebar-shown' : 'sidebar-hidden');
+        }
     }
 });
 

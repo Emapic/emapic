@@ -40,9 +40,15 @@
     .leaflet-sidebar {
       width: 100%;
       padding: 0; }
+      .leaflet-sidebar.visible {
+        width: 100vw; }
       .leaflet-sidebar.left.visible ~ .leaflet-left {
         left: 100%; }
+      .leaflet-left.sidebar-control-sibling.sidebar-control-visible {
+        left: 100%; }
       .leaflet-sidebar.right.visible ~ .leaflet-right {
+        right: 100%; }
+      .leaflet-right.sidebar-control-sibling.sidebar-control-visible {
         right: 100%; }
       .leaflet-sidebar.left {
         left: -100%; }
@@ -61,23 +67,47 @@
   @media (min-width: 768px) and (max-width: 991px) {
     .leaflet-sidebar {
       width: 305px; }
-      .leaflet-sidebar.left.visible ~ .leaflet-left {
+      .leaflet-sidebar.left:not(.visible) ~ .leaflet-control:not(.leaflet-sidebar) {
+        left: 0; }
+      .leaflet-sidebar.right:not(.visible) ~ .leaflet-control:not(.leaflet-sidebar) {
+        right: 0; }
+      .leaflet-sidebar.left.visible ~ .leaflet-control:not(.leaflet-sidebar) {
         left: 305px; }
-      .leaflet-sidebar.right.visible ~ .leaflet-right {
+      .leaflet-left.sidebar-control-sibling.sidebar-control-visible {
+        left: 305px; }
+      .leaflet-sidebar.right.visible ~ .leaflet-control:not(.leaflet-sidebar) {
+        right: 305px; }
+      .leaflet-right.sidebar-control-sibling.sidebar-control-visible {
         right: 305px; } }
   @media (min-width: 992px) and (max-width: 1199px) {
     .leaflet-sidebar {
       width: 390px; }
-      .leaflet-sidebar.left.visible ~ .leaflet-left {
+      .leaflet-sidebar.left:not(.visible) ~ .leaflet-control:not(.leaflet-sidebar) {
+        left: 0; }
+      .leaflet-sidebar.right:not(.visible) ~ .leaflet-control:not(.leaflet-sidebar) {
+        right: 0; }
+      .leaflet-sidebar.left.visible ~ .leaflet-control:not(.leaflet-sidebar) {
         left: 390px; }
-      .leaflet-sidebar.right.visible ~ .leaflet-right {
+      .leaflet-left.sidebar-control-sibling.sidebar-control-visible {
+        left: 390px; }
+      .leaflet-sidebar.right.visible ~ .leaflet-control:not(.leaflet-sidebar) {
+        right: 390px; }
+      .leaflet-right.sidebar-control-sibling.sidebar-control-visible {
         right: 390px; } }
   @media (min-width: 1200px) {
     .leaflet-sidebar {
       width: 460px; }
-      .leaflet-sidebar.left.visible ~ .leaflet-left {
+      .leaflet-sidebar.left:not(.visible) ~ .leaflet-control:not(.leaflet-sidebar) {
+        left: 0; }
+      .leaflet-sidebar.right:not(.visible) ~ .leaflet-control:not(.leaflet-sidebar) {
+        right: 0; }
+      .leaflet-sidebar.left.visible ~ .leaflet-control:not(.leaflet-sidebar) {
         left: 460px; }
-      .leaflet-sidebar.right.visible ~ .leaflet-right {
+      .leaflet-left.sidebar-control-sibling.sidebar-control-visible {
+        left: 460px; }
+      .leaflet-sidebar.right.visible ~ .leaflet-control:not(.leaflet-sidebar) {
+        right: 460px; }
+      .leaflet-right.sidebar-control-sibling.sidebar-control-visible {
         right: 460px; } }
   .leaflet-sidebar .close {
     position: absolute;
@@ -95,8 +125,19 @@
     cursor: pointer;
     z-index: 8; }
 
-.leaflet-left {
+.leaflet-top {
+    height: 100%;
+}
+
+#sidebarPanel, #sidebarLocator {
+    margin-top: -10px;
+    margin-right: -10px;
+}
+
+.leaflet-sidebar.left ~ .leaflet-control:not(.leaflet-sidebar),
+.leaflet-left.sidebar-control-sibling {
   transition: left 0.5s; }
 
-.leaflet-right {
+.leaflet-sidebar.right ~ .leaflet-control:not(.leaflet-sidebar),
+.leaflet-right.sidebar-control-sibling {
   transition: right 0.5s; }

@@ -287,17 +287,21 @@ var emapic = emapic || {};
         emapic.position = [lat, long];
 
         var radius = accuracy * 0.5,
-            areaAprox = L.circle([lat, long], radius, {
+            areaAprox = L.circle([lat, long], {
+                radius: radius,
                 fillColor: '#575757',
                 color: '#575757',
                 title: "Accuracy zone",
+                opacity: 0,
+                fillOpacity: 0,
                 clickable: false
             });
 
+        emapic.map.setView(emapic.position, 16);
         if (typeof accuracy !== 'undefined') {
+            areaAprox.addTo(emapic.map);
             emapic.map.fitBounds(areaAprox.getBounds());
-        } else {
-            emapic.map.setView(emapic.position, 16);
+            areaAprox.remove();
         }
     };
 

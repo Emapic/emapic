@@ -68,14 +68,14 @@ var emapic = emapic || {};
 
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
         sidebar = L.control.sidebar('sidebarLocator', {
-            position: 'right',
+            position: 'topright',
             autoPan: false,
             closeButton: false
         });
-        sidebar.on('hide', function() {
+        emapic.map.on('sidebar-hide', function() {
             resetFixedTableHeader('#voted_countries table');
         });
-        sidebar.on('shown', function() {
+        emapic.map.on('sidebar-shown', function() {
             setFixedTableHeader('#voted_countries table');
             emapic.modules.locators.searchCountries('voted_countries');
         });

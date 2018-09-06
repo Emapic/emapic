@@ -207,6 +207,7 @@ var emapic = emapic || {};
         $('#time-slider').bind('touchmove', function(e) {
             e.stopPropagation();
         });
+        L.DomEvent.disableClickPropagation($('#time-control')[0]);
         filterDates = [sliderDates[sliderLevel][0], sliderDates[sliderLevel][sliderDates[sliderLevel][1].length - 1]];
         $('.ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
         $('.ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');

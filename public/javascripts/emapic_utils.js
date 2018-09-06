@@ -158,7 +158,9 @@ if (typeof $.fn.validator !== 'undefined' &&
             /*.on(element, 'touchstart', stop)
             .on(element, 'touchend', stop)
             .on(element, 'touchmove', stop)
-            .on(element, 'touchcancel', stop)*/;
+            .on(element, 'touchcancel', stop)*/
+            .disableClickPropagation(element)
+            .disableScrollPropagation(element);
     };
 
     emapic.utils.overrideFunction = function(originalFunction, beforeFunction, afterFunction) {
