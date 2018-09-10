@@ -17,6 +17,7 @@ var emapic = emapic || {};
         votedCountries = $('#voted_countries'),
         closesidebarLocator = $('#closesidebarLocator'),
         allCountriesSpinner = null,
+        scrollbars = {},
         votedCountriesSpinner = null,
         sidebar,
         countriesProvincesData = {},
@@ -76,7 +77,7 @@ var emapic = emapic || {};
             resetFixedTableHeader('#voted_countries table');
         });
         emapic.map.on('sidebar-shown', function() {
-            setFixedTableHeader('#voted_countries table');
+            setFixedTableHeader('#voted_countries table', scrollbars['voted_countries']);
             emapic.modules.locators.searchCountries('voted_countries');
         });
         emapic.map.addControl(sidebar);
@@ -133,7 +134,9 @@ var emapic = emapic || {};
             ).promise();
         }
         promise.done(function() {
-            $('#' + component + ' .table-scroll').perfectScrollbar('update');
+            if (scrollbars[component]) {
+                scrollbars[component].update();
+            }
         });
     };
 
@@ -174,7 +177,7 @@ var emapic = emapic || {};
     emapic.modules.locators.showSidebarVotedCountries = function() {
         allCountries.hide();
         votedCountries.show(0, function() {
-            setFixedTableHeader('#voted_countries table');
+            setFixedTableHeader('#voted_countries table', scrollbars['voted_countries']);
             emapic.modules.locators.searchCountries('voted_countries');
         });
     };
@@ -183,7 +186,7 @@ var emapic = emapic || {};
         allCountries.html(allCountriesHtml);
         allCountriesSpinner = new Spinner().spin($('#all_countries tbody')[0]);
         votedCountries.html(votedCountriesHtml);
-        $('#voted_countries .table-scroll').perfectScrollbar();
+        scrollbars['voted_countries'] = new PerfectScrollbar('#voted_countries .table-scroll');
         votedCountriesSpinner = new Spinner().spin($('#voted_countries tbody')[0]);
         emapic.modules.locators.showSidebarVotedCountries();
         closesidebarLocator.html(closesidebarLocatorHtml);
@@ -323,7 +326,9 @@ var emapic = emapic || {};
                 if (countryCode !== '') {
                     $this.find('.fa.fa-caret-down').toggleClass('fa-caret-up');
                     $('tr.province-' + countryCode).toggle();
-                    $('#voted_countries .table-scroll').perfectScrollbar('update');
+                    if (scrollbars['voted_countries']) {
+                        scrollbars['voted_countries'].update();
+                    }
                 }
             });
 
@@ -336,7 +341,7 @@ var emapic = emapic || {};
 
             if ($('#voted_countries table').is(':visible')) {
                 resetFixedTableHeader('#voted_countries table');
-                setFixedTableHeader('#voted_countries table');
+                setFixedTableHeader('#voted_countries table', scrollbars['voted_countries']);
                 emapic.modules.locators.searchCountries('voted_countries');
             }
         });
@@ -352,7 +357,7 @@ var emapic = emapic || {};
                     "<td><span class='label label-default pull-left'>" + code + "</span></td>\n" +
                     "</tr>");
             });
-            $('#all_countries .table-scroll').perfectScrollbar();
+            scrollbars['all_countries'] = new PerfectScrollbar('#all_countries .table-scroll');
             $('#all_countries tbody tr').on("click", function() {
                 var countryCode = $(this).find('.label').html();
                 emapic.centerViewCountryBounds(countryCode);
@@ -360,7 +365,7 @@ var emapic = emapic || {};
         });
     }
 
-    function setFixedTableHeader(selector) {
+    function setFixedTableHeader(selector, scrollbar) {
         // If the table data has been already loaded and it's
         // visible, then we set its fixed header
         if ($(selector + ':visible td').length > 0) {
@@ -371,7 +376,9 @@ var emapic = emapic || {};
                     return $table.closest('.table-scroll');
                 }
             });
-            $table.closest('.table-scroll').perfectScrollbar('update');
+            if (scrollbar) {
+                scrollbar.update();
+            }
         }
     }
 

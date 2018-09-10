@@ -201,7 +201,7 @@ if (typeof $.fn.validator !== 'undefined' &&
     };
 
     emapic.utils.setLocale = function(value) {
-        $.cookie('locale', value, { expires: 30, path: '/' });
+        Cookies.set('locale', value, { expires: 30, path: '/' });
         location.reload();
     };
 

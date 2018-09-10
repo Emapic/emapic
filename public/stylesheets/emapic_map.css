@@ -27,7 +27,8 @@
 .table-scroll .table {
     margin: 0px;
 }
-.ps-container>.ps-scrollbar-y-rail {
+.ps-container > .ps-scrollbar-y-rail,
+.ps > .ps__rail-y {
     z-index: 1002;
 }
 body {

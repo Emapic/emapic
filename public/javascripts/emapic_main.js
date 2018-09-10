@@ -152,7 +152,7 @@ var emapic = emapic || {};
 
         emapic.addTooltips();
         emapic.map.on('popupopen', function(e) {
-            $(e.popup.getContent()).find("img").load(function() {
+            $(e.popup.getContent()).find("img").on("load", function() {
                 e.popup.update();
             });
         });
