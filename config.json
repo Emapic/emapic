@@ -41,6 +41,7 @@
         "httpport": "3001",
         "robotsHeader": "# Emapic robots.txt file\n\n",
         "autoScanFiles": false,
+        "uploadedFilesFolder": "uploaded_files",
         "secrets": {
             "cookie": "4ZBIwmMCq15K+MelM=+EsxNc4bsxGYQNtDhEjDpJ11JP",
             "session": "w2Bopk5tFe34uNqoc5sf90ge18K8RfrUCx0aJqBD"

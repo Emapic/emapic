@@ -142,7 +142,7 @@ __Contraseña:__ emapic
 
 ### Configuración
 
-No es necesario modificar la configuración por defecto para lanzar la aplicación en local, entrar con el usuario «emapic» y probar el motor de encuestas, pero sí lo será si queremos ponerla en producción o probar funcionalidades que requieren servicios externos (SMTP & OAuth).  
+No es necesario modificar la configuración por defecto para lanzar la aplicación en local, entrar con el usuario «emapic» y probar el motor de encuestas, pero sí lo será si queremos ponerla en producción o probar funcionalidades que requieren servicios externos (SMTP & OAuth). Sí deberemos revisar que la aplicación tenga los permisos adecuados para modificar la carpeta donde se guardarán los archivos subidos a ella (parámetro _uploadedFilesFolder_ dentro de _server_).
 El fichero _config.json_ contiene la mayoría de los parámetros de configuración de la aplicación:
 
 #### Configuración propia de Emapic (_app_)
@@ -228,6 +228,10 @@ No tiene efecto sobre la aplicación y podemos dejar el valor por defecto o sust
 * ##### Escaneo automático mediante ClamAV de ficheros subidos al servidor (_autoScanFiles_)
 Indica si la aplicación escaneará los archivos subidos en busca de virus mediante ClamAV antes de procesar las peticiones. En caso de encontrar un archivo sospechoso, terminará la petición y borrará todos los archivos subidos por la misma.
 Por defecto está desactivado. Si queremos que se realicen estos escaneos de manera automática, antes deberemos instalar en local ClamAV (más información en el [apartado de prerrequisitos](#prerrequisitos)) y asegurarnos de que los comandos _clamscan_ y/o _clamdscan_ son ejecutables por el usuario que lance la aplicación del servidor Node.js. Una vez que el antivirus esté configurado, le daríamos el valor «true» a este parámetro de configuración para activar el escaneo.
+
+* ##### Ruta en la que guardar los ficheros subidos al servidor (_uploadedFilesFolder_)
+Aquí se indica la carpeta donde queremos guardar los ficheros que los usuarios suban al servidor, principalmente en las respuestas a las encuestas. La aplicación creará también carpetas anidadas dentro de esta ruta según lo requiera. Si la ruta comienza con «/», se considerará absoluta, y en caso contrario, relativa a la carpeta base del proyecto.
+Por defecto se guardarán en la carpeta _uploaded_files_ que ya viene incluida con el proyecto. Sea cual sea la carpeta designada, debemos asegurarnos de que la aplicación tendrá permisos para crear carpetas y archivos dentro de la misma.
 
 * ##### Secretos de encriptación (_secrets_)
 Las cadenas empleadas para encriptar los elementos que nos permiten mantener una comunicación inequívoca entre Emapic y cada usuario web.  
