@@ -45,12 +45,37 @@ if (typeof $.fn.validator !== 'undefined' &&
             var reader = new FileReader();
 
             reader.onload = function (e) {
-                $('#' + id).attr('src', e.target.result);
+                var $el = $('#' + id),
+                    $noimage = $('#' + id + '-noimage');
+
+                $el.attr('src', e.target.result);
+                $('#' + id + '-noimage').hide();
+                $el.show();
             };
 
             reader.readAsDataURL(input.files[0]);
+        } else {
+            var $el = $('#' + id),
+                $noimage = $('#' + id + '-noimage');
+
+            $el.attr('src', null);
+            if ($noimage.length > 0) {
+                $el.hide();
+                $('#' + id + '-noimage').show();
+            }
         }
     };
+
+    emapic.utils.clearInput = function(name) {
+        var $input = $('input[name="' + name + '"]');
+        $input.val('');
+        $input.trigger('change');
+    };
+
+    emapic.utils.checkClearInput = function(input) {
+        var $input = $(input);
+        $input.siblings('.clear-input').toggleClass('disabled', $input.val() === '');
+    }
 
     emapic.utils.disableDefaultClickEvents = function(element) {
         var stop = L.DomEvent.stopPropagation;
@@ -182,7 +207,7 @@ if (typeof $.fn.validator !== 'undefined' &&
         if (mandatory) {
             var $input = $(input),
                 val = $input.val(),
-                $tgt = $('#' + $input.attr('target'));
+                $tgt = $($input.attr('target'));
             if ($tgt != null) {
                 $tgt.attr('disabled', !(val != null && val.trim() != ''));
             }
@@ -195,7 +220,7 @@ if (typeof $.fn.validator !== 'undefined' &&
         var $input = $(input),
             val = $input.val(),
             tgt = $input.attr('target'),
-            $tgt = $('#' + tgt);
+            $tgt = $(tgt);
         if ($tgt !== null) {
             if (mandatory || (val !== null && val.trim() !== '')) {
                 $tgt.attr('disabled', true);
@@ -247,19 +272,19 @@ if (typeof $.fn.validator !== 'undefined' &&
     emapic.utils.checkImageNotVoid = function(input, mandatory) {
         var $input = $(input),
             val = $input.val(),
-            $tgt = $('#' + $input.attr('target')),
-            $helpBlock = $('#' + $input.attr('target2')),
+            $tgt = $($input.attr('target')),
+            $helpBlock = $('#' + $input.attr('target-help')),
             maxFileSize = $('#' + $input.attr('data-maxfilesize')).selector;
 
         maxFileSize = maxFileSize.replace('#', '');
         if ($tgt != null) {
-            if (input.files[0].size > maxFileSize) {
+            if (input.files[0] && input.files[0].size > maxFileSize) {
                 $tgt.attr('disabled', 'true');
                 if ($helpBlock != null) {
                     $helpBlock.parent().addClass('has-error');
                 }
             } else {
-                $tgt.attr('disabled', !(val != null && val.trim() != ''));
+                $tgt.attr('disabled', !(!mandatory || (val != null && val.trim() != '')));
                 if ($helpBlock != null) {
                     $helpBlock.parent().removeClass('has-error');
                 }
@@ -275,7 +300,7 @@ if (typeof $.fn.validator !== 'undefined' &&
         // Enter is pressed
         if (event.keyCode == 13) {
             var $input = $(event.target);
-            var $tgt = $('#' + $input.attr('target'));
+            var $tgt = $($input.attr('target-ok'));
             if ($tgt.attr('disabled') != 'disabled') {
                 $tgt.click();
             }

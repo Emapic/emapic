@@ -177,8 +177,9 @@ function generateExclusiveBtnAnswerHtml(answer, layout, question) {
             divClass = ' text-left';
             btnClass = '';
             btnContent = '<input autocomplete="off" id="btn-q' + question.question_order +
-                '-other-input" placeholder="' + escape(answer.answer) + '" type="text" target="btn-q' + question.question_order +
-                '-other-ok" onkeydown="emapic.utils.inputEnterToClick(event)" onkeyup="emapic.utils.checkInputNotVoid(this)"/><button id="btn-q' + question.question_order +
+                '-other-input" placeholder="' + escape(answer.answer) + '" type="text" target="#btn-q' + question.question_order +
+                '-other-ok, #end-survey-btn, #block-nav-btns .edit-question-btn.btn-success ~ .edit-question-btn:not([disabled])" target-ok="#btn-q' + question.question_order +
+                '-other-ok" onkeydown="emapic.utils.inputEnterToClick(event)" onkeyup="emapic.utils.checkInputNotVoid(this, true)"/><button id="btn-q' + question.question_order +
                 '-other-ok" autocomplete="off" disabled class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + question.question_order +
                 '\', \'btn-q' + question.question_order + '-other-input\', \'' + answer.sortorder + '\')">OK</button>';
             if (answer.img !== null && answer.img.length > 0) {
@@ -221,8 +222,9 @@ function generateTextInputQuestionHtml(question, validator, req) {
     return '<h2>' + escape(question.question) + (mandatory ? '' : '<small><i> (' + opt + ') </i></small>') + '</h2>\n' +
         '<div class="col-xs-12 text-left"><div id="q' + question.question_order + '-other"' +
         ' class="col-xs-12 survey-answer text-answer"><div class="flex-container"><input autocomplete="off" id="q' +
-        question.question_order + '-input" type="text" target="q' + question.question_order +
-        '-ok" onkeydown="emapic.utils.inputEnterToClick(event)" ' + (validator !== null ?
+        question.question_order + '-input" type="text" target="#q' + question.question_order +
+        '-ok, #end-survey-btn, #block-nav-btns .edit-question-btn.btn-success ~ .edit-question-btn:not([disabled])" target-ok="#q' +
+        question.question_order + '-ok" onkeydown="emapic.utils.inputEnterToClick(event)" ' + (validator !== null ?
         ' onkeyup="' + validator + '(this, ' + mandatory + ')" onchange="' + validator + '(this, ' + mandatory + ')"' : '') + '/><button id="q' + question.question_order +
         '-ok"'  + (mandatory ? ' disabled' : '') + ' autocomplete="off" class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + question.question_order +
         '\', \'q' + question.question_order + '-input\')">OK</button></div></div></div>';
@@ -238,17 +240,20 @@ function generateImageInputQuestionHtml(question, validator, req) {
         '<div class="col-xs-12"><div id="q' + question.question_order + '-other"' +
         ' class="col-xs-12 survey-answer upload-file-answer">' +
         '<div><img class="img-responsive img-thumbnail" id="inputfileimg_' + question.question_order +
-        '" src=\'data:image/svg+xml;utf8,' + encodeURIComponent(Utils.getLocalizedSelectAnImageSVG(req)) + '\' style="max-width:50%"></div>' +
-        '<div class="flex-container"><div><input autocomplete="off"' +
-        ' required type="file" accept="image/*" name="img_upload_"' + question.question_order +
-        ' id="q' + question.question_order + '-input" target="q' + question.question_order + '-ok"' +
-        ' target2="help-block_'+ question.question_order +'" data-maxfilesize="4000000"' +
-        (validator !== null ? ' onchange="emapic.utils.loadInputImage(this,\'inputfileimg_' + question.question_order + '\'); ' +
-        validator + '(this, ' + mandatory + ')"' : '') +
-        ' /><div id="help-block_'+ question.question_order +'" class="help-block">' + fileSizeText + '</div></div>' +
-        '<button id="q' + question.question_order + '-ok" autocomplete="off" ' + (mandatory ? ' disabled="true"' : '') +
-        ' class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + question.question_order +
-        '\', \'q' + question.question_order + '-input\')">OK</button></div></div></div>';
+        '-noimage" src=\'data:image/svg+xml;utf8,' + encodeURIComponent(Utils.getLocalizedSelectAnImageSVG(req)) + '\' style="max-width:50%">' +
+        '<img class="img-responsive img-thumbnail" id="inputfileimg_' + question.question_order + '" src=\'\' style="max-width:50%;display:none;"></div>' +
+        '<div class="flex-container"><div><div class="input-with-clear-btn"><input autocomplete="off"' +
+        (mandatory ? ' required' : '') + ' type="file" accept="image/*" name="img_upload_'  + question.question_order +
+        '"' + ' id="q' + question.question_order + '-input" target="#q' + question.question_order +
+        '-ok, #end-survey-btn, #block-nav-btns .edit-question-btn.btn-success ~ .edit-question-btn:not([disabled])" target-ok="#q' +
+        question.question_order + '-ok" target-help="help-block_'+ question.question_order + '" data-maxfilesize="4000000"' +
+        (validator !== null ? ' onchange="emapic.utils.checkClearInput(this);emapic.utils.loadInputImage(this,\'inputfileimg_' +
+        question.question_order + '\'); ' + validator + '(this, ' + mandatory + ')"' : '') +
+        ' /><a class="clear-input disabled" onclick="emapic.utils.clearInput(\'img_upload_'  + question.question_order + '\')">' +
+        '<i class="fas fa-times-circle"></i></a></div><div id="help-block_'+ question.question_order +'" class="help-block">' +
+        fileSizeText + '</div></div>' + '<button id="q' + question.question_order + '-ok" autocomplete="off" ' +
+        (mandatory ? ' disabled="true"' : '') + ' class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' +
+        question.question_order + '\', \'q' + question.question_order + '-input\')">OK</button></div></div></div>';
 }
 
 module.exports = function(sequelize, DataTypes) {

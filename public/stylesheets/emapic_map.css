@@ -410,6 +410,22 @@ div.alert-danger a {
 .leaflet-control-container .leaflet-top.leaflet-right .leaflet-control {
 	clear: left;
 }
+div.input-with-clear-btn {
+    display: flex;
+    align-items: center;
+}
+div.input-with-clear-btn input {
+    flex: 1 1 auto;
+}
+div.input-with-clear-btn a.clear-input {
+    margin-left: 5px;
+    font-size: 20px;
+    cursor: pointer;
+}
+div.input-with-clear-btn a.clear-input.disabled {
+    flex: 0 0 auto;
+    visibility: hidden;
+}
 div.upload-file-answer > div.flex-container {
     max-width: 600px;
     margin: auto;
