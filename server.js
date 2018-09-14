@@ -383,7 +383,7 @@ var EmapicApp = function() {
                 ttl: 18000,
                 logFn: logger.info,
                 fallbackSessionFn: function(sessionId) {
-                    logger.warn('Error while reading session with id "' + sessionId + '". Session will be considered expired.');
+                    logger.notice('Error while reading session with id "' + sessionId + '". Session will be considered expired.');
                     // Workaround for expiring the session
                     return {cookie: {originalMaxAge: 0 }};
                 }
