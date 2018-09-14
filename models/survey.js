@@ -363,13 +363,14 @@ module.exports = function(sequelize, DataTypes) {
                 if ((body.emapic_experience_comments && body.emapic_experience_comments !== 'null') ||
                 (body.emapic_experience_final_position_reason && body.emapic_experience_final_position_reason !== 'null') ||
                 (body.emapic_experience_geolocation_result && body.emapic_experience_geolocation_result !== 'null')) {
-                    var strquery = 'INSERT INTO metadata.emapic_opinions (browser_os, geolocation_result, final_position_reason, comments, geom, "timestamp", accuracy) VALUES (?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326), now(), ?)';
+                    var strquery = 'INSERT INTO metadata.emapic_opinions (browser_os, geolocation_result, final_position_reason, comments, geom, "timestamp", accuracy) VALUES (?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326), now(), ?)',
+                        precision = parseFloat(body.precision);
                     return sequelize.query(strquery, {
                         replacements: [body.browser_os,
                             body.emapic_experience_geolocation_result && body.emapic_experience_geolocation_result !== 'null' ? body.emapic_experience_geolocation_result : null,
                             body.emapic_experience_final_position_reason && body.emapic_experience_final_position_reason !== 'null' ? body.emapic_experience_final_position_reason : null,
                             body.emapic_experience_comments && body.emapic_experience_comments !== 'null' ? body.emapic_experience_comments : null,
-                            body.lng, body.lat, body.precision],
+                            body.lng, body.lat, isNaN(precision) ? null : Math.round(precision)],
                         type: sequelize.QueryTypes.INSERT
                     });
                 } else {
@@ -381,9 +382,11 @@ module.exports = function(sequelize, DataTypes) {
                 var body = req.body;
                 if (body.lat0 !== null && body.lat0 !== 'null' &&
                 body.lng0 !== null && body.lng0 !== 'null') {
-                    var strquery = "INSERT INTO metadata.geolocation_distances (browser_os, distance, accuracy) VALUES (?, ST_Distance(ST_GeogFromText('SRID=4326;POINT(' || ? || ' ' || ? || ')'), ST_GeogFromText('SRID=4326;POINT(' || ? || ' ' || ? || ')')), ?)";
+                    var strquery = "INSERT INTO metadata.geolocation_distances (browser_os, distance, accuracy) VALUES (?, ST_Distance(ST_GeogFromText('SRID=4326;POINT(' || ? || ' ' || ? || ')'), ST_GeogFromText('SRID=4326;POINT(' || ? || ' ' || ? || ')')), ?)",
+                        precision = parseFloat(body.precision);
                     return sequelize.query(strquery, {
-                        replacements: [body.browser_os, body.lng0, body.lat0, body.lng, body.lat, body.precision],
+                        replacements: [body.browser_os, body.lng0, body.lat0, body.lng,
+                            body.lat, isNaN(precision) ? null : Math.round(precision)],
                         type: sequelize.QueryTypes.INSERT
                     });
                 } else {
@@ -571,8 +574,10 @@ module.exports = function(sequelize, DataTypes) {
                         Survey.saveGeolocationDistance(req);
 
                         var insert_query1 = 'INSERT INTO opinions.survey_' + survey.id + ' (usr_id, precision, timestamp, geom',
-                        insert_query2 = ') VALUES (?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326)',
-                        insert_params = [usr_id, body.precision, dateUtc, body.lng, body.lat];
+                            insert_query2 = ') VALUES (?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326)',
+                            precision = parseFloat(body.precision),
+                            insert_params = [usr_id, isNaN(precision) ? null : Math.round(precision),
+                                dateUtc, body.lng, body.lat];
                         for (var i = 0, iLen = questions.length; i<iLen; i++) {
                             var vars = questions[i].getInsertSql(body);
                             insert_query1 += (vars[0] !== '' ? ', ' : '') + vars[0];
