@@ -507,8 +507,10 @@ module.exports = function(sequelize, DataTypes) {
 
             getSubTitle: function() {
                 // The subTitle should serve as a description of the survey question(s)
-                return this.getQuestions().then(function(questions) {
-                    // As of now we only return it if the survey has only one question
+                return this.getQuestions({
+                    scope: 'withLegend'
+                }).then(function(questions) {
+                    // As of now we only return it if the survey has only one question with legend
                     if (questions.length !== 1) {
                         return null;
                     } else {

@@ -272,6 +272,13 @@ module.exports = function(sequelize, DataTypes) {
                 return {
                     order: Question.getDefaultOrder()
                 };
+            },
+            withLegend: {
+                where: {
+                    legend_question: {
+                        $ne: null
+                    }
+                }
             }
         },
         classMethods: {
