@@ -13,5 +13,35 @@ db/revert/update_province_names.sql linguist-vendored
 db/deploy/add_simplified_geoms.sql linguist-vendored
 db/verify/add_simplified_geoms.sql linguist-vendored
 db/revert/add_simplified_geoms.sql linguist-vendored
+db/deploy/fix_municipalities_simpl_geoms.sql linguist-vendored
+db/verify/fix_municipalities_simpl_geoms.sql linguist-vendored
+db/revert/fix_municipalities_simpl_geoms.sql linguist-vendored
+db/deploy/country_names_gl.sql linguist-vendored
+db/verify/country_names_gl.sql linguist-vendored
+db/revert/country_names_gl.sql linguist-vendored
+db/deploy/fix_vigo_municipality_geoms.sql linguist-vendored
+db/verify/fix_vigo_municipality_geoms.sql linguist-vendored
+db/revert/fix_vigo_municipality_geoms.sql linguist-vendored
+db/deploy/update_province_names.sql linguist-vendored
+db/verify/update_province_names.sql linguist-vendored
+db/revert/update_province_names.sql linguist-vendored
+db/deploy/fix_vatican_city_geoms.sql linguist-vendored
+db/verify/fix_vatican_city_geoms.sql linguist-vendored
+db/revert/fix_vatican_city_geoms.sql linguist-vendored
+db/deploy/ignore_null_provinces.sql linguist-vendored
+db/verify/ignore_null_provinces.sql linguist-vendored
+db/revert/ignore_null_provinces.sql linguist-vendored
+db/deploy/ceuta_melilla_spain.sql linguist-vendored
+db/verify/ceuta_melilla_spain.sql linguist-vendored
+db/revert/ceuta_melilla_spain.sql linguist-vendored
+db/deploy/province_names_gl.sql linguist-vendored
+db/verify/province_names_gl.sql linguist-vendored
+db/revert/province_names_gl.sql linguist-vendored
+
+libs/* linguist-vendored
+libs/leaflet/js/L.Control.Geocoder.js linguist-vendored=false
+libs/leaflet/js/L.Control.SelectQuestion.js linguist-vendored=false
+libs/leaflet/js/L.Control.Sidebar.js linguist-vendored=false
+libs/leaflet/css/* linguist-vendored=false
 
 *.hjs linguist-language=HTML
