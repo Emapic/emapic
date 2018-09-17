@@ -1,0 +1,25 @@
+<!-- More Sharing Options Modal -------->
+<div class="modal" id="more-sharing-modal" role="dialog">
+  <div class="modal-dialog">
+	<div class="modal-content">
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span aria-hidden="true">&times;</span><span class="sr-only">{{#__}}close{{/__}}</span></button>
+		<h3 class="modal-title">{{#__}}more_sharing_options_title{{/__}}</h3>
+	  </div>
+	  <div class="modal-body">
+		  <p>{{#__}}more_sharing_options_body_1{{/__}}</p>
+		  <p>{{#__}}more_sharing_options_body_2{{/__}}</p>
+		  <p>{{#__}}more_sharing_options_body_3{{/__}}</p>
+		  <ul>
+			<li>
+				<span>{{#__}}more_sharing_options_list_1{{/__}}</span>
+			</li>
+		  </ul>
+	  </div>
+	  <div class="modal-footer">
+		<button type="button" class="btn btn-primary" data-dismiss="modal">{{#__}}accept{{/__}}</button>
+	  </div>
+	</div>
+  </div>
+</div>
+<!-- End More Sharing Options Modal -------->

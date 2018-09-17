@@ -88,7 +88,7 @@
                                 </a>
                             </div>
                             {{/survey.active}}
-                            <div class="dropdown pull-left">
+                            <div class="dropdown pull-left share-dropdown">
                                 <button class="btn btn-default btn-md dropdown-toggle bs-tooltip" type="button" id="share-url-btn" survey-id="{{survey.encr_id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-placement="right" title="{{#__}}share{{/__}}">
                                     <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
                                 </button>
@@ -98,7 +98,6 @@
 	                                <!-- Go to www.addthis.com/dashboard to customize your tools -->
 	                                <div class="addthis_inline_share_toolbox" data-url="{{web_host}}/survey/{{survey.encr_id}}" data-title="{{survey.title}}"></div>
 	                                {{/addThisId}}
-	                                {{^addThisId}}
                                     <div class="social-btns">
                                         <a href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u={{#encodeURIComponent}}{{web_host}}/survey/{{survey.encr_id}}{{/encodeURIComponent}}&display=popup&src=share_button" target="_blank">
                                             <span class="share-sq fab fa-facebook">
@@ -116,8 +115,8 @@
                                             <span class="share-sq fab fa-linkedin-in">
                                             </span>
                                         </a>
+	                                    {{#addThisId}}<div class="more-sharing"><a href="javascript:void(0);" onclick="$('#more-sharing-modal').modal('show')">{{#__}}more_sharing_options{{/__}}</a></div>{{/addThisId}}
                                     </div>
-	                                {{/addThisId}}
                                 </ul>
                             </div>
 
@@ -138,6 +137,9 @@
 
 </div> <!-- /content -->
 
+{{#addThisId}}
+    {{> more_sharing_options_modal}}
+{{/addThisId}}
 
 {{#yield-scripts}}
 {{#addThisId}}

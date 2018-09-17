@@ -355,6 +355,7 @@ var EmapicApp = function() {
             survey_form: 'partials/survey-form',
             survey_form_scripts: 'partials/survey-form-scripts',
             user_menubar: 'partials/user-menubar',
+            more_sharing_options_modal: 'partials/more-sharing-options-modal',
             map_header: 'partials/map-header',
             map_simplegeoposwarn: 'partials/map-simplegeoposwarn',
             map_geoposwarn: 'partials/map-geoposwarn',

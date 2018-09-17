@@ -14,6 +14,9 @@
 
 </div> <!-- /content -->
 
+{{#addThisId}}
+    {{> more_sharing_options_modal}}
+{{/addThisId}}
 
 {{#yield-scripts}}
 {{#addThisId}}

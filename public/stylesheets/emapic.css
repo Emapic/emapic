@@ -1001,6 +1001,67 @@ span.user-inline {
 	min-width: 220px;
 }
 
+.dropdown-menu.share-url.addThis .addthis_inline_share_toolbox:not(:empty) ~ div {
+    display: none;
+}
+
+.dropdown-menu.share-url.addThis .more-sharing {
+    background-color: #FFFFFF;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+
+.dropdown-menu.share-url.addThis .more-sharing a {
+    color: #004F71;
+}
+
+.dropdown-menu.share-url.addThis .more-sharing a:hover,
+.dropdown-menu.share-url.addThis .more-sharing a:focus,
+.dropdown-menu.share-url.addThis .more-sharing a:active {
+    color: #85A330;
+}
+
+#more-sharing-modal h3 {
+    color: #FFFFFF;
+    text-align: center;
+}
+
+#more-sharing-modal p,
+#more-sharing-modal li {
+    color: #d0d0d0;
+}
+
+#more-sharing-modal li {
+    list-style: disc outside none;
+}
+
+#more-sharing-modal .modal-dialog {
+    margin-top: 100px;
+}
+
+#more-sharing-modal .modal-content {
+    background-color: #004F71;
+}
+
+#more-sharing-modal .modal-content a {
+    color: #FFFFFF;
+}
+
+#more-sharing-modal .modal-content a:hover,
+#more-sharing-modal .modal-content a:focus,
+#more-sharing-modal .modal-content a:active {
+    color: #ADD8E6;
+}
+
+#more-sharing-modal .modal-header button {
+    color: white;
+}
+
+#more-sharing-modal .modal-footer button {
+    margin-bottom: 5px;
+    margin-left: 0px;
+}
+
 .share-url-box {
 	background-color: #A2C73A;
 	border: solid 1px #A2C73A;
@@ -1009,7 +1070,7 @@ span.user-inline {
 	-moz-border-radius: 3px;
 	font-size: 0.9em !important;
 	color: white !important;
-	min-width: 260px;
+	min-width: 220px;
     margin: 0 0 5px;
     padding: 0px 6px;
 }
@@ -1586,17 +1647,11 @@ div.legal-text ol > li {
     .badge.counter {
         font-size: 13px;
     }
-    .dropdown-menu.share-url {
-        margin-left: -110px;
-    }
-    .dropdown-menu.share-url.addThis {
-    	margin-left: -135px;
-    }
     .share-sq {
         font-size: 3em;
         padding-bottom: 3px;
     }
-    .share-sq.fa-google-plus {
+    .share-sq.fa-google-plus-g {
         font-size: 2.1em;
         padding: 10px 4px 9px;
     }
@@ -1650,12 +1705,17 @@ div.legal-text ol > li {
     .dropdown-menu.share-url {
         position: fixed;
         left: 50%;
-        top: 30%;
-        margin-left: -151px;
+        top: 50%;
+        -ms-transform: translate(-50%, -50%);/* IE 9 */
+        -webkit-transform: translate(-50%, -50%); /* Chrome, Safari, Opera */
+        transform: translate(-50%, -50%);
         padding: 20px;
         background: rgba(150, 150, 150, 1);
     }
     .dropdown-menu.share-url input.share-url-box {
         margin-bottom: 20px;
+    }
+    .dropdown-menu.share-url.addThis .more-sharing {
+        margin-top: 20px;
     }
 }
