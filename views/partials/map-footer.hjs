@@ -25,7 +25,7 @@
     <script src="/javascripts/emapic_main.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            $('[data-toggle="tooltip"], .bs-tooltip').tooltip();
+            $('[data-toggle="tooltip"], .bs-tooltip').tooltip({ container: 'body' });
             $('.date-to-locale').each(function(i, element) {
                 var el = $(element);
                 var date = new Date(el.attr('date'));

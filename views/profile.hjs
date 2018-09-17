@@ -304,11 +304,11 @@
     }
 
     $(function() {
-        <!-- Preview the avatar img -->
+        // Preview the avatar img
         $("#avatarinput").change(function(){
             emapic.utils.loadInputImage(this, 'avatarimg');
         });
-        $('.help-tooltip').tooltip({placement: 'left', html: true});
+        $('.help-tooltip').tooltip({placement: 'left', container: 'body', html: true});
     });
 </script>
 {{/yield-scripts}}

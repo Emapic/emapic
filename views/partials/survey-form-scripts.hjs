@@ -219,7 +219,7 @@
     }
     function addNewOptionEffective(qstn, answ, value, legend, imageUrl, id) {
         addNewOptionHtml(qstn, answ, value, legend, imageUrl, id);
-        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
         $('#qstn_' + qstn + ' #answers').find('button.delete-survey-answer').prop('disabled', false);
     }
     function addSelectedNewQuestion() {
@@ -234,7 +234,7 @@
         $('.panel-heading span').addClass('glyphicon-chevron-down');
         addNewQuestionHtml($('div.question-group').length + 1, type);
         $('#questions > .panel > .panel-body').last().removeClass('collapse');
-        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
         $('#survey-form').find('input[type="submit"], button[type="submit"]').addClass('disabled');
     }
     function addNewQuestionHtml(qstn, type) {
