@@ -11,10 +11,6 @@ var express = require('express'),
     slashes = require('connect-slashes'),
     i18n = require('i18n-2'),
     logger = require('./utils/logger'),
-    morgan = require('morgan'),
-    cookieParser = require('cookie-parser'),
-    bodyParser = require('body-parser'),
-    methodOverride = require('method-override'),
     passport = require('passport'),
     // Load configuration:
     // First consider commandline arguments and environment variables, respectively,
@@ -371,7 +367,7 @@ var EmapicApp = function() {
         self.app.set('view engine', 'hjs');
         self.app.engine('hjs', hoganExpress);
         self.app.use(express.favicon());
-        self.app.use(morgan('{"remote_addr": ":remote-addr", "remote_user": ":remote-user", "method": ":method", "url": ":url", "http_version": ":http-version", "status": ":status", "result_length": ":res[content-length]", "referrer": ":referrer", "user_agent": ":user-agent", "response_time": ":response-time"}',
+        self.app.use(express.logger('{"remote_addr": ":remote-addr", "remote_user": ":remote-user", "method": ":method", "url": ":url", "http_version": ":http-version", "status": ":status", "result_length": ":res[content-length]", "referrer": ":referrer", "user_agent": ":user-agent", "response_time": ":response-time"}',
             { "stream": logger.stream }
         ));
         self.app.use(express.json());
@@ -391,7 +387,6 @@ var EmapicApp = function() {
             }),
             secret: serverConfig.secrets.session
         }));
-        self.app.use(cookieParser());
         self.app.use(passport.initialize());
         self.app.use(passport.session());
         self.app.use(passport.authenticate('remember-me'));
@@ -498,8 +493,7 @@ var EmapicApp = function() {
             next();
         });
         self.app.use(self.app.router);
-        self.app.use(bodyParser.urlencoded({ extended: false }));
-        self.app.use(bodyParser.json());
+        self.app.use(express.bodyParser());
 
         routes(self.app);
 
