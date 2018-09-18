@@ -186,7 +186,7 @@ module.exports = function(app) {
             return props;
         },
 
-        takeSnapshot: function(url, imgPath, width, height, wait, minSize) {
+        takeSnapshot: function(url, imgPath, width, height, wait, minSize, retries) {
             return takeSnapshotRaw(url, imgPath, width, height, wait, minSize).then(function() {
                 // Compress the image content
                 return childProcess.execFileAsync(optipng, [
@@ -194,7 +194,13 @@ module.exports = function(app) {
                         '-clobber',
                         imgPath
                     ]);
-            }).return(imgPath);
+            }).return(imgPath).catch(function(err) {
+                if (retries) {
+                    logger.debug('Retrying snapshot take for url "' + url + '" after error: ' + err);
+                    return Utils.takeSnapshot(url, imgPath, width, height, wait, minSize, retries - 1);
+                }
+                throw err;
+            });
         },
 
         getRandomInt: function(min, max) {

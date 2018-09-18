@@ -572,7 +572,7 @@ var EmapicApp = function() {
         nodeSchedule.scheduleJob('0 3 * * *', function() {
             logger.info('Updating survey thumbnails...');
             models.Survey.updateAllThumbnails().then(function() {
-                logger.info('Survey thumbnails updated.');
+                logger.info('Survey thumbnails update finished.');
             }).catch(function(err) {
                 logger.error('Some error happened while updating survey thumbnails: ' + err);
             });

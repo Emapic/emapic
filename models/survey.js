@@ -482,18 +482,22 @@ module.exports = function(sequelize, DataTypes) {
             },
 
             generateThumbnails: function() {
-                var encrId = this.encr_id,
+                var id = this.id,
+                    encrId = this.encr_id,
                     url = 'http://localhost:3001/survey/' + encrId + '/results';
                 // TODO resize the snapshots from the optimal size (512x288 / 512x512) to the smaller possible sizes (256x144 / 400x400)
                 return Promise.all([
-                    Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 3000, 20000),
-                    Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 3000, 30000)
-                ]);
+                    Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 3000, 20000, 5),
+                    Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 3000, 30000, 5)
+                ]).catch(function(err) {
+                    logger.error('Could not generate all thumbnails for survey with id ' + id + ' : ' + err);
+                });
             },
 
             deleteThumbnails: function() {
                 var encrId = this.encr_id,
-                    paths = ['thumbnails/survey/small/' + encrId + '.png', 'thumbnails/survey/share/' + encrId + '.png'];
+                    paths = [thumbnailsFolder + path.sep + 'small' + path.sep + encrId + '.png',
+                        thumbnailsFolder + path.sep + 'share' + path.sep + encrId + '.png'];
                 return Promise.map(paths, function(path) {
                     return fsp.stat(path).catch(function(error) {
                         // We ignore the error when file doesn't exist
