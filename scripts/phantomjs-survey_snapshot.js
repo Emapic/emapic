@@ -13,8 +13,7 @@ var page = require('webpage').create(),
     destination = 'snapshot.png',
     width = 1024,
     height = 768,
-    wait = 1000,
-    headerHeight = 85;
+    wait = 1000;
 
 if (args.length >= 3) {
     destination = args[2];
@@ -29,21 +28,10 @@ if (args.length >= 3) {
     }
 }
 
-// We add extra pixels for the header
-height += headerHeight;
-
 // viewportSize being the actual size of the headless browser
 page.viewportSize = {
     width: width,
     height: height
-};
-// the clipRect is the portion of the page you are taking a screenshot of
-// We remove the navbar from view
-page.clipRect = {
-    top: headerHeight,
-    left: 0,
-    width: width,
-    height: height - headerHeight
 };
 page.onCallback = function(data){
     window.setTimeout(function () {
@@ -54,6 +42,10 @@ page.onCallback = function(data){
 page.open(url, function(status) {
     if(status === "success") {
         page.evaluate(function() {
+            // Remove the header
+            $('<style>#header { display: none !important; }</style>').appendTo('head');
+            // Extend the map to the whole page
+            $('<style>body > div.container-fluid { height: 100% !important; }</style>').appendTo('head');
             // Remove the cookie warning
             $('<style>.cc_banner-wrapper { display: none !important; }</style>').appendTo('head');
             // Remove the login message
