@@ -378,7 +378,7 @@ var EmapicApp = function() {
             store: new FileStore({
                 path: './.sessions',
                 ttl: 18000,
-                logFn: logger.info,
+                logFn: logger.notice,
                 fallbackSessionFn: function(sessionId) {
                     logger.notice('Error while reading session with id "' + sessionId + '". Session will be considered expired.');
                     // Workaround for expiring the session
