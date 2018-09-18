@@ -7,12 +7,8 @@ var Promise = require('bluebird'),
     uploadedFilesFolder = require('nconf').get('server').uploadedFilesFolder,
     sequelize = models.sequelize;
 
-if (uploadedFilesFolder.charAt(0) !== '/') {
-    uploadedFilesFolder = './' + uploadedFilesFolder;
-}
-
-if (uploadedFilesFolder.charAt(uploadedFilesFolder.length - 1) !== '/') {
-    uploadedFilesFolder += '/';
+if (uploadedFilesFolder.charAt(uploadedFilesFolder.length - 1) !== path.sep) {
+    uploadedFilesFolder += path.sep;
 }
 
 function deleteFile(filePath) {
@@ -34,7 +30,7 @@ module.exports = function(app) {
 
         saveFileFromBuffer: function(buffer, dstPath, fileName, defaultMime) {
             var cleanDstPath = dstPath;
-            while(cleanDstPath.charAt(0) === '/') {
+            while(cleanDstPath.charAt(0) === path.sep) {
                 cleanDstPath = cleanDstPath.substr(1);
             }
             var fullDstPath = uploadedFilesFolder + cleanDstPath;
@@ -86,7 +82,7 @@ module.exports = function(app) {
 
         saveFileFromPath: function(srcPath, dstPath, fileName, defaultMime) {
             var cleanDstPath = dstPath;
-            while(cleanDstPath.charAt(0) === '/') {
+            while(cleanDstPath.charAt(0) === path.sep) {
                 cleanDstPath = cleanDstPath.substr(1);
             }
             var fullDstPath = uploadedFilesFolder + cleanDstPath;
@@ -169,11 +165,11 @@ module.exports = function(app) {
 
         deleteAllFilesFromFolder: function(folderPath) {
             var cleanFolderPath = folderPath;
-            while(cleanFolderPath.charAt(0) === '/') {
+            while(cleanFolderPath.charAt(0) === path.sep) {
                 cleanFolderPath = cleanFolderPath.substr(1);
             }
-            if (cleanFolderPath.charAt(cleanFolderPath.length - 1) !== '/') {
-                cleanFolderPath += '/';
+            if (cleanFolderPath.charAt(cleanFolderPath.length - 1) !== path.sep) {
+                cleanFolderPath += path.sep;
             }
             var fullFolderPath = uploadedFilesFolder + cleanFolderPath;
             return rimraf(fullFolderPath).then(function() {
