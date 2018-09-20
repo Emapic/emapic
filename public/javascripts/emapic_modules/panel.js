@@ -35,17 +35,15 @@ var emapic = emapic || {};
     emapic.modules.panel = emapic.modules.panel || {};
 
     emapic.disableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.disableIndivLayerExclusiveComponents, null, function() {
-        sidebarPanel.hide();
-        currentFeature = null;
         oldIcon = null;
         currentMarker = null;
+        emapic.sidebarPanelClose();
     });
 
     emapic.enableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.enableIndivLayerExclusiveComponents, null, function() {
-        sidebarPanel.hide();
-        currentFeature = null;
         oldIcon = null;
         currentMarker = null;
+        emapic.sidebarPanelClose();
     });
 
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
