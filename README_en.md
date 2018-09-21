@@ -30,7 +30,7 @@ You can check a throrough list of technologies, libraries and other data sources
 For launching Emapic locally you need before starting:
 
 * [git](https://git-scm.com/)
-* [Node.js](https://nodejs.org/) (>=0.10.25 <4.0.0)
+* [Node.js](https://nodejs.org/) (>=0.10.25 <4.0.0) [we recommend using [nvm](https://github.com/creationix/nvm) for installing specific versions of _Node.js_]
 * [npm](https://www.npmjs.com/) (usually installed along with Node.js)
 * [PostgreSQL](https://www.postgresql.org/) (>=9.2)
 * [PostGIS](http://postgis.net/) (>=2.0)
@@ -231,7 +231,7 @@ Indicates whether the application will scan every uploaded file for virus with C
 This comes disabled by default. If we want this scan to be automatically performed, we must first install ClamAV onto the local machine (more information onto this in [the prerequisites section](#prerequisites)) and make sure that commands _clamscan_ and/or _clamdscan_ are executable by the user that will launch the Node.js server application. Once the antivirus is configured, we would set this parameter to "true" in order to activate the scanning.
 
 * ##### Path where files uploaded to the server will be stored (_uploadedFilesFolder_)
-Here we must specify the folder where we want to store all the files uploaded to the server by the users, mainly from the surveys' answers. The application will also create nested folders inside this path when it has to. If the path starts with "/", it will be considered and absolute one, otherwise it will be considered relative to the project base folder.
+Here we must specify the folder where we want to store all the files uploaded to the server by the users, mainly from the surveys' answers. The application will also create nested folders inside this path when it has to. If the path is not an absolute one, it will be considered relative to the project base folder.
 By default they will be stored inside the _uploaded_files_ folder which is already included with the project. Whichever path we configure, we must make sure the application will have the required permissions for creating neste folders and files inside it.
 
 * ##### Encryption secrets (_secrets_)

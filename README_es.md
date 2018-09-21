@@ -30,7 +30,7 @@ Puedes ver un listado más detallado de las tecnologías, librerías y fuentes d
 Para poder ejecutar Emapic en local en un entorno Unix necesitas antes de empezar:
 
 * [git](https://git-scm.com/)
-* [Node.js](https://nodejs.org/) (>=0.10.25 <4.0.0)
+* [Node.js](https://nodejs.org/) (>=0.10.25 <4.0.0) [recomendamos el uso de [nvm](https://github.com/creationix/nvm) para la instalación de versiones específicas de _Node.js_]
 * [npm](https://www.npmjs.com/) (normalmente ya instalado con Node.js)
 * [PostgreSQL](https://www.postgresql.org/) (>=9.2)
 * [PostGIS](http://postgis.net/) (>=2.0)
@@ -230,7 +230,7 @@ Indica si la aplicación escaneará los archivos subidos en busca de virus media
 Por defecto está desactivado. Si queremos que se realicen estos escaneos de manera automática, antes deberemos instalar en local ClamAV (más información en el [apartado de prerrequisitos](#prerrequisitos)) y asegurarnos de que los comandos _clamscan_ y/o _clamdscan_ son ejecutables por el usuario que lance la aplicación del servidor Node.js. Una vez que el antivirus esté configurado, le daríamos el valor «true» a este parámetro de configuración para activar el escaneo.
 
 * ##### Ruta en la que guardar los ficheros subidos al servidor (_uploadedFilesFolder_)
-Aquí se indica la carpeta donde queremos guardar los ficheros que los usuarios suban al servidor, principalmente en las respuestas a las encuestas. La aplicación creará también carpetas anidadas dentro de esta ruta según lo requiera. Si la ruta comienza con «/», se considerará absoluta, y en caso contrario, relativa a la carpeta base del proyecto.
+Aquí se indica la carpeta donde queremos guardar los ficheros que los usuarios suban al servidor, principalmente en las respuestas a las encuestas. La aplicación creará también carpetas anidadas dentro de esta ruta según lo requiera. Si no es una ruta absoluta, se considerará relativa a la carpeta base del proyecto.
 Por defecto se guardarán en la carpeta _uploaded_files_ que ya viene incluida con el proyecto. Sea cual sea la carpeta designada, debemos asegurarnos de que la aplicación tendrá permisos para crear carpetas y archivos dentro de la misma.
 
 * ##### Secretos de encriptación (_secrets_)
