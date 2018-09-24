@@ -1043,9 +1043,9 @@ module.exports = {
 						'">{postcode} {city} {town} {village} {hamlet}</span>');
 				}
 
-				if (a.state || a.country) {
+				if (a.county || a.state || a.country) {
 					parts.push('<span class="' + (parts.length > 0 ? 'leaflet-control-geocoder-address-context' : '') +
-						'">{state} {country}</span>');
+						'">{county} {state} {country}</span>');
 				}
 
 				return Util.template(parts.join('<br/>'), a, true);
@@ -1407,13 +1407,16 @@ module.exports = {
 	template: function (str, data) {
 		return str.replace(/\{ *([\w_]+) *\}/g, function (str, key) {
 			var value = data[key];
-			if (value === undefined) {
-				value = '';
-			} else if (typeof value === 'function') {
+			if (typeof value === 'function') {
 				value = value(data);
 			}
+			if (value === undefined) {
+				value = '';
+			} else {
+				value += ',';
+			}
 			return htmlEscape(value);
-		});
+		}).replace(/[ ,]+($|\n)/g, '').replace(/[ ,]+</g, '<');
 	},
 
 	htmlEscape: htmlEscape
