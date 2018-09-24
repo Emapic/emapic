@@ -37,13 +37,17 @@ var emapic = emapic || {};
     emapic.disableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.disableIndivLayerExclusiveComponents, null, function() {
         oldIcon = null;
         currentMarker = null;
-        emapic.sidebarPanelClose();
+        if (currentFeature !== null) {
+            emapic.sidebarPanelClose();
+        }
     });
 
     emapic.enableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.enableIndivLayerExclusiveComponents, null, function() {
         oldIcon = null;
         currentMarker = null;
-        emapic.sidebarPanelClose();
+        if (currentFeature !== null) {
+            emapic.sidebarPanelClose();
+        }
     });
 
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
