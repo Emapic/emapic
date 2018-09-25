@@ -276,9 +276,8 @@ if (typeof $.fn.validator !== 'undefined' &&
             val = $input.val(),
             $tgt = $($input.attr('target')),
             $helpBlock = $('#' + $input.attr('target-help')),
-            maxFileSize = $('#' + $input.attr('data-maxfilesize')).selector;
+            maxFileSize = parseInt($input.attr('data-maxfilesize'));
 
-        maxFileSize = maxFileSize.replace('#', '');
         if ($tgt != null) {
             if (input.files[0] && input.files[0].size > maxFileSize) {
                 $tgt.attr('disabled', 'true');
