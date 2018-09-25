@@ -10,8 +10,13 @@
     "Aida Vidal"
   ],
   "scripts": {
-    "debug": "./node_modules/.bin/supervisor server.js",
+    "autoreload": "./node_modules/.bin/supervisor server.js",
+    "debug": "./node_modules/.bin/node-debug --save-live-edit --hidden node_modules/ --hidden node_modules_src/ server.js",
+    "debug-full": "./node_modules/.bin/node-debug --save-live-edit server.js",
     "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=0.10.25 <4.0.0"
   },
   "dependencies": {
     "bases": "0.2.1",
@@ -68,6 +73,7 @@
   "description": "Spatial enabled surveys",
   "main": "server.js",
   "devDependencies": {
-    "supervisor": "0.9.1"
+    "supervisor": "0.9.1",
+    "node-inspector": "1.1.2"
   }
 }
