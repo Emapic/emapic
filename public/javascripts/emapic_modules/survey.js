@@ -12,6 +12,7 @@ var emapic = emapic || {};
     emapic.modules = emapic.modules || {};
     emapic.modules.survey = emapic.modules.survey || {};
 
+    emapic.modules.survey.surveyPostFormat = 'json';
     emapic.modules.survey.marker = null;
     emapic.modules.survey.data = {};
     emapic.modules.survey.responses = {};
@@ -285,7 +286,7 @@ var emapic = emapic || {};
         emapic.utils.enableMapInteraction();
         if (($("#popup-form").length === 0) ||
             ($("#popup-form").children().length === 0)) {
-            emapic.modules.survey.postMood('multipart');
+            emapic.modules.survey.postMood(emapic.modules.survey.surveyPostFormat);
         } else {
             createMarkerPopupQuestions();
         }
