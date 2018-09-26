@@ -26,3 +26,4 @@ add_accept_info_email [emapic_tables] 2018-05-23T20:34:03Z Jorge López Fernánd
 create_files_table [emapic_tables] 2018-09-10T09:11:54Z Jorge López Fernández <jlopez@emapic.es> # Create files metadata table.
 add_image_upload_question [emapic_tables] 2018-07-23T10:13:33Z Aida Vidal Balea <aidavidalbalea@gmail.com> # Add new question type: image upload
 files_table_add_time [create_files_table] 2018-09-13T18:29:16Z Jorge López Fernández <jlopez@emapic.es> # Store file creation instant as datetime instead of date.
+add_honduras_provinces_isocodes [base_layers] 2018-09-26T14:37:28Z Jorge López Fernández <jlopez@emapic.es> # Set the proper iso codes for all Honduras departments
