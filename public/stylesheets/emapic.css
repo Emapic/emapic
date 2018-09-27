@@ -212,6 +212,16 @@ input.form-control[type="checkbox"] {
     margin-top: 5px;
 }
 
+.help-block.with-errors {
+    display: inline-block;
+}
+
+.help-block.with-errors,
+.help-block.with-errors ul,
+.help-block.with-errors ul > li {
+    margin-top: 0px;
+}
+
 .help-block.with-errors ul > li {
     color: #A94442;
 }
