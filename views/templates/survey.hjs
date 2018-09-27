@@ -273,6 +273,7 @@
 
         {{/emapicOpinion}}
         emapic.modules.survey.prepareSurveyData = function() {
+            var responsesAux = [];
             emapic.modules.survey.data = (!(emapic.modules.survey.data instanceof FormData)) ? new FormData() : emapic.modules.survey.data;
 
             emapic.modules.survey.data.append('browser_os', navigator.userAgent);
@@ -282,9 +283,28 @@
             emapic.modules.survey.data.append('lat', emapic.position[0]);
             emapic.modules.survey.data.append('lng', emapic.position[1]);
 
+            // Transform responses to new format and serialize them
+            var responses = {};
             for (var i in emapic.modules.survey.responses) {
-                emapic.modules.survey.data.append(i, emapic.modules.survey.responses[i]);
+                var splits = i.split('.'),
+                    questionOrder = splits[0].split('q')[1];
+                if (!(questionOrder in responses)) {
+                    responses[questionOrder] = {};
+                }
+                responses[questionOrder][splits[1]] = emapic.modules.survey.responses[i];
             }
+            for (i in responses) {
+                if (responses[i].value instanceof File) {
+                    responses[i].file = true;
+                    emapic.modules.survey.data.append('file_' + i, responses[i].value);
+                    responses[i].value = 'file_' + i;
+                }
+                responsesAux.push({
+                    questionOrder: i,
+                    response: responses[i]
+                });
+            }
+            emapic.modules.survey.data.append('responses', JSON.stringify(responsesAux));
         };
 
         {{/results}}

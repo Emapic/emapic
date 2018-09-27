@@ -544,10 +544,6 @@ module.exports = function(sequelize, DataTypes) {
                     dateUtc = date.toISOString().replace(/T/, ' ').replace(/Z/, ''),
                     body = req.body;
 
-                for (var i = 0; i < Object.keys(req.files).length; i++) {
-                    body[Object.values(req.files)[i].fieldName] = Object.values(req.files)[i];
-                }
-
                 return Promise.join(this.getOwner(), this.getQuestions({
                     scope: ['includeAnswers', 'includeSurvey']
                 }), function(owner, questions) {

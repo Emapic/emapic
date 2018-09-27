@@ -308,7 +308,26 @@ module.exports = function(app) {
             if (typeof req.body.responses === undefined) {
                 return res.status(400).json({ error_code: 'invalid_request',  error: 'you must provide a response to save.' });
             }
-            survey.saveResponse(req).then(function(response) {
+            Promise.try(function() {
+                // We translate the stringified responses object to the previously
+                // used plain POST structure
+                var body = req.body,
+                    responses = JSON.parse(body.responses);
+                for (i in responses) {
+                    if (responses[i].response.id !== null) {
+                        body['q' + responses[i].questionOrder+ '.id']  = responses[i].response.id;
+                    }
+                    if (responses[i].response.file === undefined) { //no file
+                        body['q' + responses[i].questionOrder+ '.value']  = responses[i].response.value;
+                    } else {
+                        if (req.files['file_'+responses[i].questionOrder] !== undefined) {
+                            body['q' + responses[i].questionOrder+ '.value']  = req.files['file_'+responses[i].questionOrder];
+                        }
+                    }
+                }
+                delete body.responses;
+                return survey.saveResponse(req);
+            }).then(function(response) {
                 res.end();
             }).catch(function(err) {
                 logger.error('Error while saving response for survey with id ' + survey.id + ' : ' + err.message);
