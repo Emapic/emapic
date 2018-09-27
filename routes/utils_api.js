@@ -122,17 +122,12 @@ module.exports = function(app) {
                         }
                         break;
                     case 'image-upload':
-                        if (results[i]['q' + questions[j].question_order + '.value'] && results[i]['q' + questions[j].question_order + '.value'].trim()){
-                            msg += "<li><label>" + questions[j].question + ':</label><div class="survey-answer-img"><a href="' +
-                                results[i]['q' + questions[j].question_order + '.value'] + '" target="_blank"><img title="' +
-                                req.i18n.__('click_image_full_size') + '"  class="image-upload" src="' +
-                                results[i]['q' + questions[j].question_order + '.value'] + '"></img></a></div></li>';
-                        }
-                        break;
                     case 'image-url':
                         if (results[i]['q' + questions[j].question_order + '.value'] && results[i]['q' + questions[j].question_order + '.value'].trim()){
-                            msg += "<li><label>" + questions[j].question + ':</label><span><a href="' + results[i]['q' + questions[j].question_order + '.value'] +
-                                '" target="_blank"><img class="image-url-answer" src="' + results[i]['q' + questions[j].question_order + '.value'].trim() + '"><img/></a></span></li>';
+                            msg += "<li><label>" + questions[j].question + ':</label><div class="survey-answer-img"><a href="' +
+                                results[i]['q' + questions[j].question_order + '.value'].trim() + '" target="_blank"><img title="' +
+                                req.i18n.__('click_image_full_size') + '"  class="' + questions[j].type + '" src="' +
+                                results[i]['q' + questions[j].question_order + '.value'].trim() + '"></img></a></div></li>';
                         }
                         break;
                     case 'explanatory-text':
