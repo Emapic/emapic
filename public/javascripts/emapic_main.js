@@ -286,19 +286,18 @@ var emapic = emapic || {};
         emapic.precision = typeof accuracy !== 'undefined' ? accuracy : 50;
         emapic.position = [lat, long];
 
-        var radius = accuracy * 0.5,
-            areaAprox = L.circle([lat, long], {
-                radius: radius,
-                fillColor: '#575757',
-                color: '#575757',
-                title: "Accuracy zone",
-                opacity: 0,
-                fillOpacity: 0,
-                clickable: false
-            });
-
         emapic.map.setView(emapic.position, 16);
         if (typeof accuracy !== 'undefined') {
+            var radius = accuracy * 0.5,
+                areaAprox = L.circle([lat, long], {
+                    radius: radius,
+                    fillColor: '#575757',
+                    color: '#575757',
+                    title: "Accuracy zone",
+                    opacity: 0,
+                    fillOpacity: 0,
+                    clickable: false
+                });
             areaAprox.addTo(emapic.map);
             emapic.map.fitBounds(areaAprox.getBounds());
             areaAprox.remove();
