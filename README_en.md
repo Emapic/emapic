@@ -126,12 +126,11 @@ Now you must install the required Node.js packages before launching the applicat
 npm install
 ```
 
-Now we can launch the application with the command:
+Now we can launch the application with either of these commands:
 
 ```
-nodejs server.js
+npm run start
 ```
-Or (depending on your Node.js version):
 ```
 node server.js
 ```
@@ -140,6 +139,23 @@ Right now we should be able to open our application with any browser through the
 
 __User:__ emapic  
 __Password:__ emapic
+
+We also provide other options for launching the application in development environments:
+
+* For launching the application and having it reload automatically whenever any source code file is modified:
+```
+npm run autoreload
+```
+
+* For launching the application and opening the debugging environment _node-inspector_ (requires having installed either _Chrome_, _Chromium_ or _Opera_):
+```
+npm run debug
+```
+
+* Similar to the previous option but allowing us to debug not just Emapic source code but also its dependencies:
+```
+npm run debug-full
+```
 
 ### Configuration
 

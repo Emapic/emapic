@@ -125,12 +125,11 @@ Ahora para poder lanzar la aplicación primero hay que instalar los paquetes req
 npm install
 ```
 
-La aplicación ya se puede lanzar con el comando:
+La aplicación ya se puede lanzar con cualquiera de estos comandos:
 
 ```
-nodejs server.js
+npm run start
 ```
-O (dependiendo de tu versión de Node.js):
 ```
 node server.js
 ```
@@ -139,6 +138,23 @@ Con un navegador deberíamos poder entrar a la web en la URL https://localhost:3
 
 __Usuario:__ emapic  
 __Contraseña:__ emapic
+
+También proporcionamos otras opciones de ejecución de la aplicación enfocadas a entornos de desarrollo:
+
+* Para ejecutar la aplicación y que se recargue de manera automática cuando cambie cualquiera de sus ficheros de código fuente:
+```
+npm run autoreload
+```
+
+* Para ejecutar la aplicación y que se abra el entorno de «debugging» _node-inspector_ (requiere tener instalado alguno de los navegadores _Chrome_, _Chromium_ u _Opera_):
+```
+npm run debug
+```
+
+* Similar a la opción anterior pero permitiéndonos hacer «debugging» no sólo del código de Emapic sino también de sus dependencias:
+```
+npm run debug-full
+```
 
 ### Configuración
 
