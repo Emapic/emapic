@@ -15,8 +15,9 @@
     emapic.utils.registerI18n('js_see_only_negative_votes', '{{#__}}js_see_only_negative_votes{{/__}}');
     emapic.utils.registerI18n('js_see_only_votes', '{{#__}}js_see_only_votes{{/__}}');
     emapic.utils.registerI18n('js_see_all_votes', '{{#__}}js_see_all_votes{{/__}}');
-    emapic.utils.registerI18n('js_see_my_position', '{{#__}}js_see_my_position{{/__}}');
-    emapic.utils.registerI18n('js_see_my_country', '{{#__}}js_see_my_country{{/__}}');
+    emapic.utils.registerI18n('js_see_my_answer_position', '{{#__}}js_see_my_answer_position{{/__}}');
+    emapic.utils.registerI18n('js_see_my_answer_country', '{{#__}}js_see_my_answer_country{{/__}}');
+    emapic.utils.registerI18n('js_see_my_current_position', '{{#__}}js_see_my_current_position{{/__}}');
     emapic.utils.registerI18n('js_see_per_country', '{{#__}}js_see_per_country{{/__}}');
     emapic.utils.registerI18n('js_see_whole_world', '{{#__}}js_see_whole_world{{/__}}');
     emapic.utils.registerI18n('js_most_voted', '{{#__}}js_most_voted{{/__}}');
@@ -52,4 +53,7 @@
     emapic.utils.registerI18n('js_geocoder_write_select', '{{#__}}js_geocoder_write_select{{/__}}');
     emapic.utils.registerI18n('js_geocoder_country', '{{#__}}js_geocoder_country{{/__}}');
     emapic.utils.registerI18n('js_geocoder_province', '{{#__}}js_geocoder_province{{/__}}');
+    emapic.utils.registerI18n('js_accept', '{{#__}}accept{{/__}}');
+    emapic.utils.registerI18n('js_geoposerror_title', '{{#__}}geoposerror_title{{/__}}');
+    emapic.utils.registerI18n('js_geoposerror_body', '{{#__}}geoposerrordefault_body{{/__}}');
 </script>

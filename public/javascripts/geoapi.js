@@ -84,7 +84,7 @@ var emapic = emapic || {};
             });
     }
 
-    emapic.geoapi.getApiLocationRaw = function(successCallback, failCallback) {
+    emapic.geoapi.getApiLocationPromise = function() {
         // standard geolocation api location
         apidfd = new $.Deferred();
 
@@ -143,7 +143,11 @@ var emapic = emapic || {};
             console.log("GEOLOCATION ERROR: Standard Geolocation API no available");
             apidfd.reject();
         }
-        apidfd.promise().done(function(pos) {
+        return apidfd.promise();
+    };
+
+    emapic.geoapi.getApiLocationRaw = function(successCallback, failCallback) {
+        emapic.geoapi.getApiLocationPromise().done(function(pos) {
             emapic.geoapi.geoapiLat = pos.coords.latitude;
             emapic.geoapi.geoapiLon = pos.coords.longitude;
             reverseGeocodeRetrievedPosition(emapic.geoapi.geoapiLat, emapic.geoapi.geoapiLon);

@@ -7,6 +7,21 @@ $('html body').append("<!-- sidebarLocator -------------------------------------
     "<div id='all_countries'></div>\n" +
     "<div id='voted_countries'></div>\n" +
     "<div id='closesidebarLocator'></div>\n" +
+    "</div>\n" +
+    "<div class='modal' id='geolocatecurrentfailed'>\n" +
+      "<div class='modal-dialog'>\n" +
+        "<div class='modal-content'>\n" +
+          "<div class='modal-header'>\n" +
+            "<h4 class='modal-title'>" + emapic.utils.getI18n('js_geoposerror_title', 'Error de geoposicionamiento') + "</h4>\n" +
+          "</div>\n" +
+          "<div class='modal-body'>\n" +
+            "<p>" + emapic.utils.getI18n('js_geoposerror_body', 'Lamentablemente no hemos sido capaces de localizar tu posición de manera automática.') + "</p>\n" +
+          "</div>\n" +
+          "<div class='modal-footer'>\n" +
+            "<button id='accept-btn' type='button' class='btn btn-primary' data-dismiss='modal'>" + emapic.utils.getI18n('js_accept', 'Aceptar') + "</button>\n" +
+          "</div>\n" +
+        "</div><!-- /.modal-content -->\n" +
+      "</div><!-- /.modal-dialog -->\n" +
     "</div>");
 
 var emapic = emapic || {};
@@ -22,10 +37,11 @@ var emapic = emapic || {};
         sidebar,
         countriesProvincesData = {},
         allCountriesBbox = [[null, null], [null, null]],
-        locatorsButtonsHtml = "<a id='control-user' title='" + emapic.utils.getI18n('js_see_my_position', 'Ver mi posición') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"user\");'><span class='glyphicon glyphicon-user'></span></a>\n" +
-            "<a id='control-country' title='" + emapic.utils.getI18n('js_see_my_country', 'Ver mi país') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"country\");'><img src='/images/icon-espana.png' /></a>\n" +
+        locatorsButtonsHtml = "<a id='control-user' title='" + emapic.utils.getI18n('js_see_my_answer_position', 'Ver posición de mi respuesta') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"user\");'><span class='glyphicon glyphicon-user'></span></a>\n" +
+            "<a id='control-country' title='" + emapic.utils.getI18n('js_see_my_answer_country', 'Ver el país de mi respuesta') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"country\");'><img src='/images/icon-espana.png' /></a>\n" +
             "<a id='control-country-filter' title='" + emapic.utils.getI18n('js_see_per_country', 'Ver por país') + "' href='javascript:void(0)' onclick='emapic.modules.locators.filterCountry();'><span class='glyphicon glyphicon-flag'></span></a>\n" +
-            "<a id='control-world' title='" + emapic.utils.getI18n('js_see_whole_world', 'Ver todo el mundo') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"world\");'><span class='glyphicon glyphicon-globe'></span></a>",
+            "<a id='control-world' title='" + emapic.utils.getI18n('js_see_whole_world', 'Ver todo el mundo') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"world\");'><span class='glyphicon glyphicon-globe'></span></a>\n" +
+            "<a id='control-user' title='" + emapic.utils.getI18n('js_see_my_current_position', 'Centrar en mi posición actual') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"currentPos\");'><span class='glyphicon glyphicon-map-marker'></span></a>",
         closesidebarLocatorHtml = "<button type='button' onclick='emapic.modules.locators.closeSidebar();'><span class='glyphicon glyphicon-chevron-right'></span></button>",
         geolocationDependantBtns = ['control-user', 'control-country'],
         allCountriesHtml = "<div><h3>" + emapic.utils.getI18n('js_see_country', 'Ver país') + "</h3>\n" +
@@ -141,16 +157,27 @@ var emapic = emapic || {};
     };
 
     emapic.modules.locators.controlViewTo = function(view) {
-        if ( view == 'user' ) {
-            emapic.centerView({pos: emapic.position, zoom:12});
-        } else if ( view == 'country' ) {
-            if ( emapic.geoapi.userCountryCode ) {
-                emapic.centerViewCountryBounds(emapic.geoapi.userCountryCode);
-            } else {
-                emapic.centerView({pos: emapic.position, zoom:5});
-            }
-        } else if ( view == 'world' ) {
-            emapic.centerView({world: true});
+        switch(view) {
+            case 'user':
+                emapic.centerView({pos: emapic.position, zoom:12});
+                break;
+            case 'country':
+                if ( emapic.geoapi.userCountryCode ) {
+                    emapic.centerViewCountryBounds(emapic.geoapi.userCountryCode);
+                } else {
+                    emapic.centerView({pos: emapic.position, zoom:5});
+                }
+                break;
+            case 'world':
+                emapic.centerView({world: true});
+                break;
+            case 'currentPos':
+                emapic.geoapi.getApiLocationPromise().done(function(position) {
+                    emapic.centerView({pos: [ position.coords.latitude, position.coords.longitude], zoom: 15});
+                }).fail(function() {
+                    $('#geolocatecurrentfailed').modal('show');
+                });
+                break;
         }
     };
 
