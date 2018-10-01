@@ -203,6 +203,10 @@ postgresql://emapic:emapic@localhost:5432/emapic
 
 Here we have the configuration parameters required for external services with geographic component, mainly used by the viewer:
 
+* ##### API access key for [ipgeolocation](https://ipgeolocation.io) (_ipgeolocationAPIKey_)
+Key for accessing our [ipgeolocation](https://ipgeolocation.io) account API, which allows us to obtain an approximate position of our users through their IP without having to use the browser's geolocation. It's used whenever that geolocation functionality fails or if the user decides not to use it, in order to provide the users an approximate location from which they can define their position.  
+If we don't have an account and/or we don't require that approximate position, we can simply leave this field blank and a the application will use a default position at Madrid which the user must edit and set at their actual location.
+
 * ##### [Mapbox](https://www.mapbox.com/) token (_mapboxToken_)
 ID token from our [Mapbox](https://www.mapbox.com/) account which will allow us to load the satellite layer they offer.  
 If we don't have an account and/or we don't require that layer, we can simply leave this field blank and it will be ignored.

@@ -21,6 +21,7 @@
         "password": "emapic"
     },
     "geoServices": {
+        "ipgeolocationAPIKey": "",
         "mapboxToken": "",
         "nominatimEmail": ""
     },

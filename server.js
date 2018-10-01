@@ -330,6 +330,9 @@ var EmapicApp = function() {
             res.locals.ogSiteName = ('ogSiteName' in socialConfig &&
                 socialConfig.ogSiteName !== '') ? socialConfig.ogSiteName : null;
 
+            res.locals.ipgeolocationAPIKey = ('ipgeolocationAPIKey' in geoConfig &&
+                geoConfig.ipgeolocationAPIKey !== '') ? geoConfig.ipgeolocationAPIKey : null;
+
             res.locals.mapboxToken = ('mapboxToken' in geoConfig &&
                 geoConfig.mapboxToken !== '') ? geoConfig.mapboxToken : null;
 

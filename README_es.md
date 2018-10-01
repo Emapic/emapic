@@ -202,6 +202,10 @@ postgresql://emapic:emapic@localhost:5432/emapic
 
 Aquí se incluyen los parámetros de configuración necesarios para servicios externos con componente geográfico, principalmente empleados en el visor:
 
+* ##### Clave de acceso a la API de [ipgeolocation](https://ipgeolocation.io) (_ipgeolocationAPIKey_)
+Clave de acceso a la API de nuestra cuenta de [ipgeolocation](https://ipgeolocation.io), que nos permite obtener una posición aproximada de los usuarios a partir de su IP sin emplear la geolocalización del navegador. Se usa cuando dicha geolocalización falla o si el usuario prefiere no emplearla, con el fin de que el usuario pueda definir su posición partiendo de esa localización cercana.  
+Si no tenemos cuenta y/o no vemos necesario disponer de dicha localización aproximada, podemos simplemente dejarlo en blanco y se empleará una posición por defecto en Madrid que el usuario deberá editar y colocar en su posición real.
+
 * ##### Token de [Mapbox](https://www.mapbox.com/) (_mapboxToken_)
 Token de identificación de nuestra cuenta de [Mapbox](https://www.mapbox.com/) que nos permitirá cargar la capa de satélite que ofrecen.  
 Si no tenemos cuenta y/o no vemos necesario disponer de dicha capa, podemos simplemente dejarlo en blanco y se ignorará.

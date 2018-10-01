@@ -52,6 +52,10 @@
 
         emapic.locale = '{{web_locale}}';
 
+        {{#ipgeolocationAPIKey}}
+        emapic.geoapi.ipgeolocationAPIKey = "{{{ipgeolocationAPIKey}}}";
+        {{/ipgeolocationAPIKey}}
+
         {{#mapboxToken}}
         emapic.mapboxToken = "{{{mapboxToken}}}";
         {{/mapboxToken}}

@@ -22,6 +22,7 @@ var emapic = emapic || {};
         }
     };
 
+    emapic.geoapi.ipgeolocationAPIKey = null;
     emapic.geoapi.geoapiLat = null;
     emapic.geoapi.geoapiLon = null;
     emapic.geoapi.position0 = null;
@@ -32,7 +33,7 @@ var emapic = emapic || {};
     emapic.geoapi.userCountryCode = 'es';
 
     emapic.geoapi.getLocation = function(callApi) {
-        if (emapic.geoapi.useDefaultOverIp) {
+        if (emapic.geoapi.useDefaultOverIp || !emapic.geoapi.ipgeolocationAPIKey) {
             ipLocationFinished = true;
             ipLocationFail = true;
         } else {
@@ -62,13 +63,13 @@ var emapic = emapic || {};
     };
 
     function getIpLocation() {
-        var json = $.getJSON("https://www.freegeoip.net/json/").done(
+        var json = $.getJSON("https://api.ipgeolocation.io/ipgeo?apiKey=" + emapic.geoapi.ipgeolocationAPIKey).done(
             function(data) {
                 //~ Country codes as in "ISO 3166-1 alfa-2"
-                emapic.geoapi.userCountryCode = data.country_code.toLowerCase() || emapic.geoapi.userCountryCode;
-                if (emapic.geoapi.geoapiLat === null && emapic.geoapi.geoapiLon === null) {
-                    emapic.geoapi.defaultPosition.coords.latitude = data.latitude;
-                    emapic.geoapi.defaultPosition.coords.longitude = data.longitude;
+                emapic.geoapi.userCountryCode = data.country_code2.toLowerCase() || emapic.geoapi.userCountryCode;
+                if (emapic.geoapi.geoapiLat === null && emapic.geoapi.geoapiLon === null && !isNaN(data.latitude) && !isNaN(data.longitude)) {
+                    emapic.geoapi.defaultPosition.coords.latitude = parseFloat(data.latitude);
+                    emapic.geoapi.defaultPosition.coords.longitude = parseFloat(data.longitude);
                     if (emapic.map === null) {
                         emapic.initializeMap();
                     }
@@ -79,7 +80,7 @@ var emapic = emapic || {};
             }).fail(function() {
                 ipLocationFinished = true;
                 ipLocationFail = true;
-                console.log("Not able to connect to freegeoip");
+                console.log("Not able to connect to ipgeolocation");
                 autolocationFailed();
             });
     }
