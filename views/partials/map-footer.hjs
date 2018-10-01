@@ -33,7 +33,32 @@
             });
         });
     </script>
+
     {{{yield-scripts}}}
 
+    <script type="text/javascript">
+        {{#addThisId}}
+        {{#twitterVia}}
+        var addthis_share = addthis_share || {};
+        addthis_share = {
+            passthrough : {
+                twitter: {
+                    via: "{{twitterVia}}"
+                }
+            }
+        };
+        {{/twitterVia}}
+        {{/addThisId}}
+
+        emapic.locale = '{{web_locale}}';
+
+        {{#mapboxToken}}
+        emapic.mapboxToken = "{{{mapboxToken}}}";
+        {{/mapboxToken}}
+
+        {{#nominatimEmail}}
+        emapic.utils.nominatimEmail = "{{{nominatimEmail}}}";
+        {{/nominatimEmail}}
+    </script>
 </body>
 </html>
