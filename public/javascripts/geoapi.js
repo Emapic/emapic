@@ -9,7 +9,7 @@ var emapic = emapic || {};
     var ipLocationFinished = false,
         ipLocationFail = false,
         apiLocationFail = false,
-        apiTimeout = 30000000,
+        apiTimeout = 30000,
         apidfd = null;
 
     emapic.geoapi = emapic.geoapi || {};
@@ -62,7 +62,7 @@ var emapic = emapic || {};
     };
 
     function getIpLocation() {
-        var json = $.getJSON( "https://www.freegeoip.net/json/").done(
+        var json = $.getJSON("https://www.freegeoip.net/json/").done(
             function(data) {
                 //~ Country codes as in "ISO 3166-1 alfa-2"
                 emapic.geoapi.userCountryCode = data.country_code.toLowerCase() || emapic.geoapi.userCountryCode;
