@@ -126,31 +126,38 @@
     <div class="col-xs-12 col-sm-9 panel panel-default" id="profile-avatar" style="display: none;">
         <div class="panel-body">
             <form class="form-horizontal" data-toggle="validator" role="form" id="avatar-update" action="/profile" method="post" enctype="multipart/form-data">
-                    <label class="col-md-4 control-label" for="login">{{#__}}avatar{{/__}}</label>
-                    <input class="form-control" type="hidden" name="email" value="{{ userFormData.email }}">
-                    <div class="form-group col-md-8">
-                        <div class="avatar-wrapper">
-                            <img id="avatarimg" class="img-responsive img-thumbnail user-avatar" src="/avatar">
-                        </div>
-                        <input id="avatarinput" class="form-control" type="file" accept="image/*" data-maxfilesize="250000" data-error="{{#__}}maximum_avatar_size{{/__}}" name="avatar" />
-                        <div class="help-block">{{#__}}maximum_avatar_size{{/__}}</div>
+                <label class="col-md-4 control-label" for="login">{{#__}}avatar{{/__}}</label>
+                <input type="hidden" name="email" value="{{ userFormData.email }}">
+                <div class="form-group col-md-8">
+                    <div class="avatar-wrapper">
+                        <img id="avatarimg-noimage" class="img-responsive img-thumbnail user-avatar" src="/avatar">
+                        <img id="avatarimg" class="img-responsive img-thumbnail user-avatar" style="display: none;">
                     </div>
-                    <button type="submit" class="col-md-offset-4 btn btn-primary btn-md">{{#__}}update_avatar{{/__}}</button>
+                    <div class="input-with-clear-btn">
+                        <input id="avatarinput" required class="form-control" type="file" accept="image/*" data-maxfilesize="250000" data-error="{{#__}}maximum_avatar_size{{/__}}" name="avatar" onchange="emapic.utils.checkClearInput(this);emapic.utils.loadInputImage(this, 'avatarimg');"/>
+                        <a class="clear-input disabled" onclick="emapic.utils.clearInput('avatar')">
+                            <i class="fas fa-times-circle"></i>
+                        </a>
+                    </div>
+                    <div class="help-block">{{#__}}maximum_avatar_size{{/__}}</div>
+                </div>
+                <button type="submit" class="col-md-offset-4 btn btn-primary btn-md">{{#__}}update_avatar{{/__}}</button>
+                <button type="button" class="pull-right btn btn-default btn-close btn-md" {{^userFormData.avatar}}disabled="true" {{/userFormData.avatar}}onclick="deleteAvatar()">{{#__}}delete_stored_avatar{{/__}}</button>
             </form>
         </div>
     </div>
 
     <div class="col-xs-12 col-sm-9 panel panel-default" id="profile-localization" style="display: none;">
         <div class="panel-body">
-            <form class="form-horizontal" role="form" id="position-update" action="/profile" method="post">
-                <input class="form-control" type="hidden" name="email" value="{{ userFormData.email }}">
-                <input class="form-control" type="hidden" name="lat">
-                <input class="form-control" type="hidden" name="lon">
+            <form class="form-horizontal" data-toggle="validator" role="form" id="position-update" action="/profile" method="post">
+                <input class="form-control" class="form-control" type="hidden" required name="email" value="{{ userFormData.email }}">
+                <input class="form-control" class="form-control" type="hidden" required name="lat">
+                <input class="form-control" class="form-control" type="hidden" required name="lon">
                 <div class="form-group">
-                        <label class="control-label" for="position">{{#__}}default_position{{/__}}</label><div class="pull-right control-label"><span title="{{#__}}help_tooltip_default_position{{/__}}" class="help-tooltip glyphicon glyphicon-question-sign" aria-hidden="true"></span></div>
-                        <div id="map"></div>
-                <button id="delete-position-btn" type="button" autocomplete="off" class="btn btn-default btn-close btn-md" {{^userFormData.geom}} disabled="true" {{/userFormData.geom}} onclick="deletePosition();">{{#__}}delete_stored_position{{/__}}</button>
-                <button id="update-position-btn" type="submit" autocomplete="off" class="pull-right btn btn-primary btn-md" disabled="true">{{#__}}update_position{{/__}}</button>
+                    <label class="control-label" for="position">{{#__}}default_position{{/__}}</label><div class="pull-right control-label"><span title="{{#__}}help_tooltip_default_position{{/__}}" class="help-tooltip glyphicon glyphicon-question-sign" aria-hidden="true"></span></div>
+                    <div id="map"></div>
+                    <button type="submit" class="btn btn-primary btn-md">{{#__}}update_position{{/__}}</button>
+                    <button type="button" class="pull-right btn btn-default btn-close btn-md" {{^userFormData.geom}}disabled="true" {{/userFormData.geom}}onclick="deletePosition();">{{#__}}delete_stored_position{{/__}}</button>
                 </div>
             </form>
         </div>
@@ -215,28 +222,34 @@
     };
 
     function setMarker(position) {
-        $('#update-position-btn').prop('disabled', false);
         if (marker == null) {
             marker = L.marker(position);
             map.addLayer(marker);
             marker.dragging.enable();
             marker.on('dragend', function() {
                 var position = marker.getLatLng();
-                $('input[name="lat"]').val(position.lat);
-                $('input[name="lon"]').val(position.lng);
+                $('input[name="lat"]').val(position.lat).trigger('change');
+                $('input[name="lon"]').val(position.lng).trigger('change');
             });
         } else {
             marker.setLatLng(position);
         }
         var position = marker.getLatLng();
-        $('input[name="lat"]').val(position.lat);
-        $('input[name="lon"]').val(position.lng);
+        $('input[name="lat"]').val(position.lat).trigger('change');
+        $('input[name="lon"]').val(position.lng).trigger('change');
     }
 
     function deletePosition() {
-        $('input[name="lat"]').val('null');
-        $('input[name="lon"]').val('null');
+        $('#position-update').validator('destroy');
+        $('input[name="lat"]').val('');
+        $('input[name="lon"]').val('');
         $('#position-update').submit();
+    }
+
+    function deleteAvatar() {
+        $('#avatar-update').validator('destroy');
+        $('input[name="avatar"]').val('');
+        $('#avatar-update').submit();
     }
 
     function initializeMap() {
@@ -304,10 +317,6 @@
     }
 
     $(function() {
-        // Preview the avatar img
-        $("#avatarinput").change(function(){
-            emapic.utils.loadInputImage(this, 'avatarimg');
-        });
         $('.help-tooltip').tooltip({placement: 'left', container: 'body', html: true});
     });
 </script>

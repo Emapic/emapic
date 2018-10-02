@@ -293,12 +293,11 @@ module.exports = function(app) {
     });
 
     app.get('/avatar', requireRole(null), function(req, res){
-        img_data = req.user.avatar;
-        if (img_data === null || img_data.length === 0) {
+        if (req.user.avatar === null || req.user.avatar.length === 0) {
             res.contentType("image/png");
             res.send(fs.readFileSync("public/images/default-avatar.png"));
         } else {
-            var buffer = new Buffer(img_data);
+            var buffer = new Buffer(req.user.avatar);
             res.contentType(Utils.getFileMimeType(buffer, 'image/png'));
             res.send(buffer);
         }

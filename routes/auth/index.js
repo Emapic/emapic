@@ -388,14 +388,25 @@ module.exports = function(app) {
                 res.redirect('/profile');
                 return;
             }
-            req.user.avatar = fs.readFileSync(req.files.avatar.path);
+            var isNull = req.files.avatar.size === 0;
+            req.user.avatar = isNull ? null : fs.readFileSync(req.files.avatar.path);
             req.user.save().then(function(user) {
-                req.session.success = 'update_avatar_success_msg';
-                logger.info("Sucessfully updated avatar for user with mail " + user.email + " and id " + user.id);
+                if (isNull) {
+                    req.session.success = 'delete_avatar_success_msg';
+                    logger.info("Sucessfully deleted avatar for user with mail " + user.email + " and id " + user.id);
+                } else {
+                    req.session.success = 'update_avatar_success_msg';
+                    logger.info("Sucessfully updated avatar for user with mail " + user.email + " and id " + user.id);
+                }
                 return res.redirect('/profile');
             }).catch(function(err) {
-                req.session.error = 'update_avatar_error_msg';
-                logger.error('Error while updating avatar for user with mail ' + user.email + ' and id ' + user.id + ': ', err);
+                if (isNull) {
+                    req.session.error = 'delete_avatar_error_msg';
+                    logger.error('Error while deleting avatar for user with mail ' + user.email + ' and id ' + user.id + ': ', err);
+                } else {
+                    req.session.error = 'update_avatar_error_msg';
+                    logger.error('Error while updating avatar for user with mail ' + user.email + ' and id ' + user.id + ': ', err);
+                }
                 req.user.reload().then(function() {
                     Utils.copyAttributes({
                         userFormData: req.body
@@ -403,9 +414,9 @@ module.exports = function(app) {
                     return res.render('profile', {layout: 'layouts/main'});
                 });
             });
-        } else if (req.body.lat && req.body.lon) {
+        } else if (req.body.lat !== undefined && req.body.lon !== undefined) {
             // User default position update
-            var isNull = (req.body.lon === 'null' && req.body.lat === 'null');
+            var isNull = (req.body.lon === '' && req.body.lat === '');
             req.user.geom = !isNull ? {
                 type: 'Point',
                 coordinates: [ parseFloat(req.body.lon), parseFloat(req.body.lat) ],

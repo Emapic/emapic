@@ -54,9 +54,15 @@
 					<div class="col-xs-12"><p><b class="text-uppercase">{{#__}}optional_note{{/__}}:</b> {{#__}}avatar_help{{/__}}:</p></div>
 					<div class="col-xs-12">
 					    <div class="avatar-wrapper">
-                            <img id="avatarimg" class="img-responsive img-thumbnail user-avatar" src="/images/default-avatar.png">
+                            <img id="avatarimg-noimage" class="img-responsive img-thumbnail user-avatar" src="/images/default-avatar.png">
+                            <img id="avatarimg" class="img-responsive img-thumbnail user-avatar" style="display: none;">
 					    </div>
-					    <input id="avatarinput" class="form-control" type="file" accept="image/*" data-maxfilesize="250000" data-error="{{#__}}maximum_avatar_size{{/__}}" name="avatar" />
+					    <div class="input-with-clear-btn">
+					        <input id="avatarinput" class="form-control" type="file" accept="image/*" data-maxfilesize="250000" data-error="{{#__}}maximum_avatar_size{{/__}}" name="avatar" onchange="emapic.utils.checkClearInput(this);emapic.utils.loadInputImage(this, 'avatarimg');"/>
+					        <a class="clear-input disabled" onclick="emapic.utils.clearInput('avatar')">
+					            <i class="fas fa-times-circle"></i>
+					        </a>
+					    </div>
 					    <div class="help-block with-errors">{{#__}}maximum_avatar_size{{/__}}</div>
 					</div>
 			    </div>
@@ -101,18 +107,6 @@
 <script type="text/javascript">
     var map = null,
         marker = null;
-
-    function readURL(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-                $('#avatarimg').attr('src', e.target.result);
-            };
-
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
 
     emapic.geoapi.afterGeopos = function() {
         var position = [emapic.geoapi.geoapiLat, emapic.geoapi.geoapiLon];
@@ -183,10 +177,6 @@
     }
 
     $(function() {
-        // Preview the avatar img
-        $('#avatarinput').change(function(){
-            readURL(this);
-        });
         $('.help-tooltip').tooltip({placement: 'left', container: 'body', html: true});
         initializeMap();
     });

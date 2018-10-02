@@ -1182,6 +1182,30 @@ span.user-inline {
     text-transform: capitalize
 }
 
+#avatarinput {
+    max-width: 400px;
+}
+
+div.input-with-clear-btn {
+    display: flex;
+    align-items: center;
+}
+
+div.input-with-clear-btn input {
+    flex: 1 1 auto;
+}
+
+div.input-with-clear-btn a.clear-input {
+    margin-left: 5px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+div.input-with-clear-btn a.clear-input.disabled {
+    flex: 0 0 auto;
+    visibility: hidden;
+}
+
 .user-avatar {
 	border: 1px solid #000000;
 	margin-bottom: 10px;
