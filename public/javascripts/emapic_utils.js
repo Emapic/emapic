@@ -103,6 +103,14 @@ if (typeof $.fn.validator !== 'undefined' &&
             emapic.map.keyboard.disable();
             if (emapic.map.tap) emapic.map.tap.disable();
             $('.leaflet-control-container').addClass('force-disable');
+            $('.leaflet-interactive').addClass('force-disable');
+            $('path.leaflet-interactive').each(function(i, el) {
+                var $el = $(el),
+                    cls = $el.attr('class');
+                if (cls.indexOf('force-disable') === -1) {
+                    $el.attr('class', cls + ' force-disable');
+                }
+            });
         }
     };
 
@@ -118,6 +126,11 @@ if (typeof $.fn.validator !== 'undefined' &&
             $('.leaflet-container').removeClass('force-disable');
             $('#map').removeClass('disable-all');
             $('.leaflet-control-container').removeClass('force-disable');
+            $('.leaflet-interactive').removeClass('force-disable');
+            $('path.leaflet-interactive').each(function(i, el) {
+                var $el = $(el);
+                $el.attr('class', $el.attr('class').replace('force-disable', ''));
+            });
             emapic.map.spin(false);
         }
     };

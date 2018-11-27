@@ -60,7 +60,10 @@ label {
 }
 .force-disable, .leaflet-control-container.force-disable a,
 .leaflet-control-container.force-disable button,
-.leaflet-control-container.force-disable input {
+.leaflet-control-container.force-disable input,
+.leaflet-marker-icon.leaflet-interactive.force-disable,
+.leaflet-image-layer.leaflet-interactive.force-disable,
+.leaflet-pane > svg path.leaflet-interactive.force-disable {
     cursor: default !important;
     pointer-events: none;
 }
