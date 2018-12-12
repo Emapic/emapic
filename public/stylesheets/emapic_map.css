@@ -1493,6 +1493,9 @@ div.col > #thanks-msg {
 .modal-body .row {
     padding: 10px;
 }
+#stats-modal .modal-dialog {
+    max-width: 350px;
+}
 .dc-chart g.axis text {
     fill: white;
 }
@@ -1505,6 +1508,40 @@ div.col > #thanks-msg {
 	fill: #FFFFFF;
 	font-size: 14px;
 	font-weight: bold;
+}
+.dc-chart g.row text {
+	stroke-width: 0.7;
+	stroke: #000000;
+	fill: #FFFFFF;
+	font-size: 14px;
+	font-weight: bold;
+}
+.dc-chart g.row rect {
+	fill-opacity: 1;
+}
+.dc-chart g.row rect:hover {
+	fill-opacity: .8;
+}
+.dc-legend-item {
+    font-size: 14px;
+    fill: white;
+}
+#vote-chart.dc-chart {
+    float: none;
+}
+#vote-chart > p,
+#vote-chart > #chart-buttons {
+    text-align: center;
+}
+#vote-chart > svg {
+    display: block;
+    margin: auto;
+}
+#vote-chart-clear {
+    padding-left: 15px;
+}
+#chart-type-btn {
+    margin-left: 10px;
 }
 #time-control {
     width: 50vw;

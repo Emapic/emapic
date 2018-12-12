@@ -20,7 +20,9 @@ var emapic = emapic || {};
             "<span class='glyphicon glyphicon-chevron-down'>\n" +
             "</span>\n" +
             "</span>\n" +
-            "</div>";
+            "</div>",
+        currentLegend,
+        currentVoteChart;
 
     emapic.modules = emapic.modules || {};
     emapic.modules.counterStats = emapic.modules.counterStats || {};
@@ -33,11 +35,15 @@ var emapic = emapic || {};
             return this._div;
         };
         countersControl.addTo(emapic.map);
+        $('#vote-chart .reset').click(function() {
+            currentVoteChart.filterAll();
+            currentVoteChart.redraw();
+        });
     });
 
     emapic.updateIndivVotesLayerControls = emapic.utils.overrideFunction(emapic.updateIndivVotesLayerControls, null, function() {
-        var statusNr = {};
-        layers = emapic.indivVotesLayer.getLayers();
+        var statusNr = {},
+            layers = emapic.indivVotesLayer.getLayers();
         chartFeatures = [];
         if (emapic.legend && emapic.legend.color) {
             for (var i in emapic.legend.color.responses_array) {
@@ -70,8 +76,223 @@ var emapic = emapic || {};
 
     emapic.modules.counterStats.loadStats = function(data) {
         dc.chartRegistry.clear();
-        return data;
+
+        var legendHeight = 18,
+            maxLen = 0,
+            width = 180,
+            chartType = $('#chart-type-btn').attr('name'),
+            votesById = {},
+            votes = [],
+            maxDataLen = 0;
+
+        currentVoteChart = (chartType === 'pie') ? dc.pieChart("#vote-chart").cy(width/2) : dc.rowChart("#vote-chart");
+
+        // Count the votes for each option
+        for (var i = 0, iLen = data.length; i<iLen; i++) {
+            if (data[i].properties[currentLegend.color.question + '.id'] in votesById) {
+                votesById[data[i].properties[currentLegend.color.question + '.id']]++;
+            } else {
+                votesById[data[i].properties[currentLegend.color.question + '.id']] = 1;
+            }
+        }
+
+        // Add a row for each option with its nr of votes
+        for (var j = 0, jLen = currentLegend.color.responses_array.length; j<jLen; j++) {
+            votes.push({
+                value: currentLegend.color.responses_array[j].id,
+                nr: votesById[currentLegend.color.responses_array[j].id] ? votesById[currentLegend.color.responses_array[j].id] : 0
+            });
+            if (votes[j].nr > maxDataLen) {
+                maxDataLen = votes[j].nr;
+            }
+        }
+
+        //### Create Crossfilter Dimensions and Groups
+        //See the [crossfilter API](https://github.com/square/crossfilter/wiki/API-Reference) for reference.
+        var ndx = crossfilter(votes);
+        var all = ndx.groupAll().reduce(function(p, d) {
+            return p + d.nr;
+        }, function(p, d) {
+            return p - d.nr;
+        }, function() {
+            return 0;
+        });
+        // dimension by vote value
+        var voteDimension = ndx.dimension(function (d) {
+            return d.value;
+        });
+        // count by vote nr
+        var voteDimensionGroup = voteDimension.group().reduceSum(function(d) {
+            return d.nr;
+        });
+
+        // calculate max legend size between all questions (it depends on number of different answers)
+        emapic.fullLegend.color.forEach(function(el) {
+            if (el.responses_array.length > maxLen) {
+                maxLen = el.responses_array.length;
+            }
+        });
+        legendHeight = legendHeight * maxLen + width;
+
+        (chartType == 'pie') ? configPieChart(currentVoteChart, width, legendHeight, voteDimension, voteDimensionGroup, all) : configRowChart(currentVoteChart, legendHeight, voteDimension, voteDimensionGroup, all, maxDataLen);
+
+        //simply call renderAll() to render all charts on the page
+        dc.renderAll();
     };
+
+    emapic.modules.counterStats.chartTypeChanged = function(el) {
+        var chartFeatures = [],
+            btn = $('#chart-type-btn'),
+            chartType = btn.attr('name'),
+            layers = emapic.getIndivVotesLayerLeafletLayers();
+
+        $('#vote-chart-clear').hide();
+
+        if (currentLegend && currentLegend.color) {
+            counterFilterProperty = currentLegend.color.question + '.id';
+            for (i = 0, len = layers.length; i < len; i++) {
+                chartFeatures.push(layers[i].feature);
+            }
+        }
+
+        if (chartType === 'pie') {
+            btn.attr('name', 'row');
+            $('#pie-icon').show();
+            $('#row-icon').hide();
+
+        } else {
+            btn.attr('name', 'pie');
+            $('#pie-icon').hide();
+            $('#row-icon').show();
+        }
+
+        emapic.modules.counterStats.loadStats(chartFeatures); // update chart
+    };
+
+    function configPieChart(voteChart, width, legendHeight, voteDimension, voteDimensionGroup, all) {
+        voteChart
+            .width(180) // (optional) define chart width, :default = 200
+            .height(legendHeight) // (optional) define chart height, :default = 200
+            .radius(80) // define pie radius
+            .dimension(voteDimension) // set dimension
+            .group(voteDimensionGroup) // set group
+            .legend(dc.legend().legendText(function(d) {
+                return currentLegend.color.responses[d.name].value + ': ' + d.data;
+            }).y(width))
+            .title(function(d) {
+                var id = ('data' in d) ? d.data.key : d.key;
+                return currentLegend.color.responses[id].value + ": " + d.value;
+            }).label(function (d) {
+                var label = '';
+                if (voteChart.hasFilter() && !voteChart.hasFilter(d.key)) {
+                    return label + ' (0%)';
+                }
+                if (all.value()) {
+                    label += ' (' + Math.floor(d.value / all.value() * 100) + '%)';
+                }
+                return label;
+            })
+            .colors(function(d){ return (d && currentLegend && currentLegend.color) ? currentLegend.color.responses[d].legend : 'grey';}); // set colors function
+
+        return voteChart;
+    };
+
+    function configRowChart(voteChart, legendHeight, voteDimension, voteDimensionGroup, all, maxDataLen) {
+        voteChart
+            .width(330) // (optional) define chart width, :default = 200
+            .height(legendHeight) // (optional) define chart height, :default = 200
+            .dimension(voteDimension) // set dimension
+            .group(voteDimensionGroup) // set group
+            .title(function(d) {
+                var id = ('data' in d) ? d.data.key : d.key;
+                return currentLegend.color.responses[id].value + ": " + d.value;
+            }).label(function (d) {
+                var label = currentLegend.color.responses[d.key].value;
+                if (voteChart.hasFilter() && !voteChart.hasFilter(d.key)) {
+                    return label + ' (0%)';
+                }
+                if (all.value()) {
+                    label += ' (' + Math.floor(d.value / all.value() * 100) + '%)';
+                }
+                return label;
+            })
+            .colors(function(d){ return (d && currentLegend && currentLegend.color) ? currentLegend.color.responses[d].legend : 'grey';}); // set colors function
+            // if there are more than 3 answers in the most answered question, 4 ticks
+            (maxDataLen > 3) ? voteChart.xAxis().ticks(4) : voteChart.xAxis().ticks(maxDataLen);
+
+        return voteChart;
+    };
+
+
+    function getQuestionsLen() {
+        return parseInt(emapic.fullLegend.color.length) - 1;
+    }
+
+    function getCurrentQuestionNr() {
+        return parseInt(currentLegend.color.question.split('q')[1]);
+    }
+
+    function getCurrentQuestionPosition() {
+        for (i = 0, len = emapic.fullLegend.color.length; i < len; i++) {
+            if (emapic.fullLegend.color[i].question === currentLegend.color.question) {
+                return i;
+            }
+        }
+        return i;
+    }
+
+    function updateQuestionTitle() {
+        $('#vote-chart-title').text(currentLegend.color.text);
+        $('#vote-chart-title').attr('name', getCurrentQuestionNr());
+    }
+
+    function setCurrentLegend(legendColor) {
+        if (legendColor !== undefined) { // there are question list in survey
+            return currentLegend = {
+                color : {
+                    question : legendColor.question,
+                    responses : legendColor.responses,
+                    responses_array : legendColor.responses_array,
+                    text : legendColor.text
+                }
+            };
+        } else { // there are not question list
+            return undefined;
+        }
+    }
+
+    function updateChart(n) {
+        currentLegend = setCurrentLegend(emapic.fullLegend.color[n]);
+        var layers = emapic.indivVotesLayer.getLayers();
+            chartFeatures = [];
+        $('#vote-chart-clear').hide();
+        $('#prev-question-btn').attr('disabled', n === 0);
+        $('#next-question-btn').attr('disabled', n === getQuestionsLen());
+        if (currentLegend && currentLegend.color) {
+            counterFilterProperty = currentLegend.color.question + '.id';
+            for (i = 0, len = layers.length; i < len; i++) {
+                chartFeatures.push(layers[i].feature);
+            }
+        }
+        updateQuestionTitle();
+        emapic.modules.counterStats.loadStats(chartFeatures); // update chart
+    }
+
+    emapic.modules.counterStats.prevQuestionChart = function () {
+        var nr = getCurrentQuestionPosition() - 1;
+        if (nr < 0) {
+            return;
+        }
+        updateChart(nr);
+    }
+
+    emapic.modules.counterStats.nextQuestionChart = function () {
+        var nr = getCurrentQuestionPosition() + 1;
+        if (nr > getQuestionsLen()) {
+            return;
+        }
+        updateChart(nr);
+    }
 
     function populateCounter(statusNr, total) {
         var specificVotesHtml = '';
@@ -98,7 +319,21 @@ var emapic = emapic || {};
             $('#stats-modal div.modal-body').hide();
         }
         $('#app-total-counter-header').click(function() {
+            currentLegend = setCurrentLegend(emapic.legend.color);
             $('#stats-modal').modal('show');
+            $('#vote-chart-clear').hide();
+            // check if buttons should be disabled or not
+                // firstQuestionNr = parseInt(emapic.fullLegend.color[0].question.split('q')[1]);
+                // lastQuestionNr = parseInt(emapic.fullLegend.color[emapic.fullLegend.color.length-1].question.split('q')[1]);
+            if (emapic.fullLegend.color && emapic.legend.color) {
+                $('#prev-question-btn').attr('disabled', parseInt(emapic.legend.color.question.split('q')[1]) === parseInt(emapic.fullLegend.color[0].question.split('q')[1]));
+                $('#next-question-btn').attr('disabled', parseInt(emapic.legend.color.question.split('q')[1]) === parseInt(emapic.fullLegend.color[emapic.fullLegend.color.length-1].question.split('q')[1]));
+            }
+            // hide buttons when only one question list
+            if (emapic.fullLegend.color === undefined || emapic.fullLegend.color.length === 1){
+                $('#next-question-btn').hide();
+                $('#prev-question-btn').hide();
+            }
             if (emapic.legend && emapic.legend.color && chartFeatures.length > 0) {
                 emapic.modules.counterStats.loadStats(chartFeatures);
             }

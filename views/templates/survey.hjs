@@ -123,7 +123,7 @@
 
     <!-- Stats Modal -------->
     <div class="modal" id="stats-modal" role="dialog">
-      <div class="modal-dialog" style="width: 230px;">
+      <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span aria-hidden="true">&times;</span><span class="sr-only">{{#__}}close{{/__}}</span></button>
@@ -134,9 +134,21 @@
                 <div class="dc-chart" id="vote-chart">
                     <p>
                         <span id="vote-chart-title">{{#__}}vote_stats_title{{/__}}</span>
-                        <a id="vote-chart-clear" class="reset" href="#" style="display: none;"><span class="glyphicon glyphicon-repeat"></span></a>
                     </p>
-                    <div class="clearfix"></div>
+                    <div id="chart-buttons">
+                        <button id="prev-question-btn" type="button" class="btn btn-primary" onclick="emapic.modules.counterStats.prevQuestionChart()" title="{{#__}}prev_question{{/__}}" style="padding: 3px 6px 1px;">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                        </button>
+                        <button id="next-question-btn" type="button" class="btn btn-primary" onclick="emapic.modules.counterStats.nextQuestionChart()" title="{{#__}}next_question{{/__}}" style="padding: 3px 6px 1px;">
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                        </button>
+                        <button id="chart-type-btn" type="button" class="btn btn-primary" onclick="emapic.modules.counterStats.chartTypeChanged(this)" title="{{#__}}toggle_chart{{/__}}" name="pie" style="padding: 3px 6px 1px;">
+                            <span id="row-icon" class="glyphicon glyphicon-align-left"></span>
+                            <span id="pie-icon" class="fas fa-chart-pie" style="display: none;"></span>
+                        </button>
+                        <a id="vote-chart-clear" class="reset" href="#" style="display: none;"><span class="glyphicon glyphicon-repeat"></span></a>
+                        <div class="clearfix"></div>
+                    </div>
                 </div>
             </div>
           </div>
@@ -289,48 +301,5 @@
         };
 
         {{/results}}
-        emapic.modules.counterStats.loadStats = emapic.utils.overrideFunction(emapic.modules.counterStats.loadStats, null, function(data) {
-            var voteChart = dc.pieChart("#vote-chart");
-
-            $('#vote-chart .reset').click(function() {
-                voteChart.filterAll();
-                voteChart.redraw();
-            });
-
-            //### Create Crossfilter Dimensions and Groups
-            //See the [crossfilter API](https://github.com/square/crossfilter/wiki/API-Reference) for reference.
-            var ndx = crossfilter(data);
-            var all = ndx.groupAll();
-
-            // dimension by vote
-            var voteDimension = ndx.dimension(function (d) {
-                return (d.properties[emapic.legend.color.question + '.id']) ? d.properties[emapic.legend.color.question + '.id'] : 'NC';
-            });
-            var voteDimensionGroup = voteDimension.group();
-
-            voteChart
-                .width(180) // (optional) define chart width, :default = 200
-                .height(180) // (optional) define chart height, :default = 200
-                .radius(80) // define pie radius
-                .dimension(voteDimension) // set dimension
-                .group(voteDimensionGroup) // set group
-                .title(function(d) {
-                    var id = ('data' in d) ? d.data.key : d.key;
-                    return emapic.legend.color.responses[id].value + ": " + d.value;
-                }).label(function (d) {
-                    var label = emapic.legend.color.responses[d.key].value;
-                    if (voteChart.hasFilter() && !voteChart.hasFilter(d.key)) {
-                        return label + ' (0%)';
-                    }
-                    if (all.value()) {
-                        label += ' (' + Math.floor(d.value / all.value() * 100) + '%)';
-                    }
-                    return label;
-                })
-                .colors(function(d){ return (d && emapic.legend && emapic.legend.color) ? emapic.legend.color.responses[d].legend : 'grey';}); // set colors function
-
-            //simply call renderAll() to render all charts on the page
-            dc.renderAll();
-        });
     </script>
 {{/yield-scripts}}

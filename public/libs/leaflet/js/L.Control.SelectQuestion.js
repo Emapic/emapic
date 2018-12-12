@@ -85,8 +85,9 @@ L.Control.SelectQuestion = L.Control.extend({
 
   ,_onQuestionOptionChange: function (e) {
 	  var val = e.target.value;
-	  var text = $(e.target).find('option:selected').text()
+	  var text = $(e.target).find('option:selected').text();
 	  $('#vote-chart-title').text(text);
+	  $('#vote-chart-title').attr('name', val);
 	  $('.leaflet-control.question-selector button span.selected').text(text);
 	  emapic.changeActiveLegend('color', val);
   }

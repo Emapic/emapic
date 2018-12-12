@@ -326,6 +326,7 @@ var emapic = emapic || {};
     	if (questions.length > 0) {
     		L.control.selectQuestion(questions).addTo(emapic.map);
     		$('#vote-chart-title').text(questions[0]);
+    		$('#vote-chart-title').attr('name', 0);
     	}
     };
 
