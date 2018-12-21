@@ -18,6 +18,8 @@ var emapic = emapic || {};
     emapic.modules = emapic.modules || {};
     emapic.modules.aggregation = emapic.modules.aggregation || {};
 
+    emapic.modules.aggregation.hideIndivLayer = true;
+
     emapic.modules.aggregation.getProvinceResultsUrl = function() {
         return "/api/survey/" + emapic.surveyId + "/totals/provinces?lang=" + emapic.locale;
     };
@@ -37,14 +39,16 @@ var emapic = emapic || {};
     });
 
     emapic.updateIndivVotesLayer = emapic.utils.overrideFunction(emapic.updateIndivVotesLayer, function() {
-        emapic.deactivateButton($('#grouping-control-region'));
-        emapic.deactivateButton($('#grouping-control-country'));
-        if (emapic.map.hasLayer(provincesLayer)) {
-            emapic.map.removeLayer(provincesLayer);
-        }
+        if (emapic.modules.aggregation.hideIndivLayer) {
+            emapic.deactivateButton($('#grouping-control-region'));
+            emapic.deactivateButton($('#grouping-control-country'));
+            if (emapic.map.hasLayer(provincesLayer)) {
+                emapic.map.removeLayer(provincesLayer);
+            }
 
-        if (emapic.map.hasLayer(countriesLayer)) {
-            emapic.map.removeLayer(countriesLayer);
+            if (emapic.map.hasLayer(countriesLayer)) {
+                emapic.map.removeLayer(countriesLayer);
+            }
         }
     });
 
@@ -56,7 +60,9 @@ var emapic = emapic || {};
         if (emapic.map.hasLayer(countriesLayer)) {
             emapic.map.removeLayer(countriesLayer);
         }
-        emapic.addIndivVotesLayer();
+        if (emapic.modules.aggregation.hideIndivLayer) {
+            emapic.addIndivVotesLayer();
+        }
     }
 
     emapic.modules.aggregation.showVotesByProvince = function(element) {
@@ -71,11 +77,13 @@ var emapic = emapic || {};
                 }).always(emapic.utils.enableMapInteraction);
             }
             provinceResultsDfd.done(function() {
-                emapic.disableIndivLayerExclusiveComponents();
                 if (element !== null) {
                     emapic.activateExclusiveButton(element);
                 }
-                emapic.map.removeLayer(emapic.indivVotesLayer);
+                if (emapic.modules.aggregation.hideIndivLayer) {
+                    emapic.disableIndivLayerExclusiveComponents();
+                    emapic.map.removeLayer(emapic.indivVotesLayer);
+                }
                 if (countriesLayer !== null) {
                     emapic.map.removeLayer(countriesLayer);
                 }
@@ -99,11 +107,13 @@ var emapic = emapic || {};
                 }).always(emapic.utils.enableMapInteraction);
             }
             countryResultsDfd.done(function() {
-                emapic.disableIndivLayerExclusiveComponents();
                 if (element !== null) {
                     emapic.activateExclusiveButton(element);
                 }
-                emapic.map.removeLayer(emapic.indivVotesLayer);
+                if (emapic.modules.aggregation.hideIndivLayer) {
+                    emapic.disableIndivLayerExclusiveComponents();
+                    emapic.map.removeLayer(emapic.indivVotesLayer);
+                }
                 if (provincesLayer !== null) {
                     emapic.map.removeLayer(provincesLayer);
                 }

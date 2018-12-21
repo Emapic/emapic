@@ -148,6 +148,10 @@ var emapic = emapic || {};
         return currentFeature !== null ? layers[currentFeature].feature : null;
     };
 
+    emapic.modules.panel.getDisplayedFeatureLayer = function() {
+        return currentFeature !== null ? layers[currentFeature] : null;
+    };
+
     emapic.indivVotesLayerOnEachFeature = emapic.utils.overrideFunction(emapic.indivVotesLayerOnEachFeature, null, function(data) {
         data.layer.unbindPopup();
         data.layer.on('click', function(e) {

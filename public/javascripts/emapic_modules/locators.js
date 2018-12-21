@@ -264,10 +264,10 @@ var emapic = emapic || {};
                                 totals[i] = 0;
                             }
                             totals[i] += votes;
-                            total += votes;
                             specificVotesHtml += "<td><small>" + votes + "</small></td>\n";
                         }
                     }
+                    total += parseInt(stat.total_responses);
                     if (stat.iso_code in emapic.allCountriesData) {
                         if (allCountriesBbox[0][0] === null ||
                             allCountriesBbox[0][0] > emapic.allCountriesData[stat.iso_code].bbox[0][0]) {
