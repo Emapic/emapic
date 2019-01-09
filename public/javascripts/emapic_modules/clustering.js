@@ -21,7 +21,7 @@ var emapic = emapic || {};
     };
 
     emapic.loadIndivVotesLayer = emapic.utils.overrideFunction(emapic.loadIndivVotesLayer, null, function(markers) {
-        if (!clusteringActive) {
+        if (!clusteringActive && !emapic.indivVotesLayer.enableClustering) {
             return markers;
         }
         emapic.indivVotesLayer = new L.MarkerClusterGroup({
@@ -33,6 +33,15 @@ var emapic = emapic || {};
             }
         });
         emapic.indivVotesLayer.addLayer(markers);
+        emapic.indivVotesLayer.on('add', function(ev) {
+            // We remove and later readd the markers in order to avoid the
+            // unclustering animation on loading
+            emapic.indivVotesLayer.removeLayer(markers);
+            if (!clusteringActive) {
+                emapic.indivVotesLayer.disableClustering();
+            }
+            emapic.indivVotesLayer.addLayer(markers);
+        });
         return emapic.indivVotesLayer;
     });
 
@@ -65,7 +74,13 @@ var emapic = emapic || {};
     emapic.modules.clustering.toggle = function() {
         clusteringActive = !clusteringActive;
         emapic.toggleButton(emapic.modules.clustering.getButton());
-        emapic.updateIndivVotesLayer();
+        if (emapic.indivVotesLayer.enableClustering) {
+            clusteringActive ? emapic.indivVotesLayer.enableClustering() : emapic.indivVotesLayer.disableClustering();
+        } else {
+            // There are some instances where it's preferrable to handle layer
+            // reloading manually and we simply don't use markercluster.freezable
+            emapic.updateIndivVotesLayer();
+        }
     };
 
     emapic.modules.clustering.activate = function() {
