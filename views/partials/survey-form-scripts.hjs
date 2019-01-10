@@ -1,7 +1,7 @@
 {{#yield-scripts}}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.4.4/randomColor.min.js"></script>
-<script src="/libs/spectrum/spectrum.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.js" integrity="sha256-WpfqoE3LHoVHNieOvGSqQPlSvh7it+cE5Urm01ZJPyE=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.4.4/randomColor.min.js" integrity="sha256-adAIPeaY+E7djbbAif2yaAJHMWebIfQhsxmAGiyzIhA=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/libs/spectrum/spectrum.js"></script>
 <script type="text/javascript">
     window.onbeforeunload = emapic.utils.checkLeavingPageSafely;
 

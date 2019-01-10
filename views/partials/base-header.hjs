@@ -30,15 +30,15 @@
     </noscript>
 
     <!-- Bootstrap Styles -->
-    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc=" crossorigin="anonymous" />
+    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" integrity="sha256-j+P6EZJVrbXgwSR5Mx+eCS6FvP9Wq27MBRC/ogVriY0=" crossorigin="anonymous" />
 
     <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
     <script type="text/javascript">
         window.cookieconsent_options = {"message":"{{#__}}cookies_message_body{{/__}}","dismiss":"{{#__}}cookies_dismiss{{/__}}","learnMore":"{{#__}}cookies_learn_more{{/__}}","domain":"localhost","link":"/legal_terms#cookie-policy","theme":"light-floating"};
     </script>
 
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js" integrity="sha256-GQ/ALY6PHdWsxA9I0NYgPmEV6zHj9H9V2ww/B3l9aPA=" crossorigin="anonymous"></script>
     <!-- End Cookie Consent plugin -->
 
     <link rel="stylesheet" media="screen" href="/stylesheets/flag-icon-css/css/flag-icon.min.css">

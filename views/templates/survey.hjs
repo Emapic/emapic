@@ -155,28 +155,28 @@
 
     {{^results}}
     <!-- Add survey -->
-    <script src="/javascripts/emapic_modules/survey.js"></script>
+    <script type="text/javascript" src="/javascripts/emapic_modules/survey.js"></script>
     {{/results}}
 
     <!-- Add locators -->
-    <script src="/javascripts/emapic_modules/locators.js"></script>
+    <script type="text/javascript" src="/javascripts/emapic_modules/locators.js"></script>
 
     <!-- Add vote aggregation by region/country -->
-    <script src="/javascripts/emapic_modules/aggregation.js"></script>
+    <script type="text/javascript" src="/javascripts/emapic_modules/aggregation.js"></script>
 
     <!-- Add vote filtering by time slider -->
-    <script src="/javascripts/emapic_modules/time_slider.js"></script>
+    <script type="text/javascript" src="/javascripts/emapic_modules/time_slider.js"></script>
 
     <!-- Add counter & stats -->
-    <script src="/javascripts/emapic_modules/counter_stats.js"></script>
+    <script type="text/javascript" src="/javascripts/emapic_modules/counter_stats.js"></script>
 
     <!-- Add clustering -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster.freezable@1.0.0/dist/leaflet.markercluster.freezable.js"></script>
-    <script src="/javascripts/emapic_modules/clustering.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js" integrity="sha256-WL6HHfYfbFEkZOFdsJQeY7lJG/E5airjvqbznghUzRw=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet.markercluster.freezable@1.0.0/dist/leaflet.markercluster.freezable.js" integrity="sha256-548rvpeOHcXiFZzxe9WrE2HAw70aDtSlQPnwvSNp7Oc=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/javascripts/emapic_modules/clustering.js"></script>
 
     <!-- Add answers panel -->
-    <script src="/javascripts/emapic_modules/panel.js"></script>
+    <script type="text/javascript" src="/javascripts/emapic_modules/panel.js"></script>
 
     {{#survey.already_opened}}
     {{#addThisId}}
