@@ -36,14 +36,13 @@
 						<input class="form-control" type="text" required pattern="^[A-Za-z0-9_.\-~]+$" maxlength="25" name="login" data-error="{{#__}}type_a_username{{/__}}" value="{{ userFormData.login }}" placeholder="{{#__}}username{{/__}}">
                         <div class="help-block with-errors"></div>
 					</div>
-					<div class="col-sm-4 help-block with-errors"></div>
 				</div>
 				<div class="form-group form-group-sm">
 					<label class="col-xs-12 col-sm-4 control-label">{{#__}}name{{/__}}</label>
 					<div class="col-xs-12 col-sm-8 col-md-6 col-lg-5">
 						<input class="form-control" type="text" maxlength="100" name="name" value="{{ userFormData.name }}" placeholder="{{#__}}name{{/__}}">
+						<div class="help-block with-errors"></div>
 					</div>
-					<div class="col-sm-4 help-block with-errors"></div>
 				</div>
                 <div>
                     <button type="submit" class="btn btn-primary btn-md col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-5 col-lg-offset-4">
