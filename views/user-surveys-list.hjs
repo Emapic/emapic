@@ -5,6 +5,14 @@
 
 	<div class="col-xs-12 list-complex-header">
 		<h2 class="col-xs-12">{{#__}}user_surveys{{/__}} <small>/ {{owner.display_name}}</small></h2>
+        <div class="col-xs-12 text-right order-div">
+            <label>{{#__}}order_by{{/__}}</label>
+            <select name="order" style="visibility: hidden;">
+                <option value="default">{{#__}}order_creation_date{{/__}}</option>
+                <option value="votes">{{#__}}order_nr_votes{{/__}}</option>
+                <option value="activity">{{#__}}order_recent_activity{{/__}}</option>
+            </select>
+        </div>
 	</div>
 
     {{> surveys_list}}
@@ -32,4 +40,21 @@
 </script>
 {{/twitterVia}}
 {{/addThisId}}
+<script type="text/javascript">
+	$(function() {
+		var order = emapic.utils.getURLParameter('order');
+		if (order) {
+			$('select[name="order"]').val(order);
+		}
+		$('select[name="order"]').show();
+		$('select[name="order"]').selectmenu({
+			classes: {
+				'ui-selectmenu-menu': 'order-selectmenu-menu'
+			},
+			change: function() {
+				window.location = emapic.utils.changeURLParameter('order', $('select[name="order"]').val());
+			}
+		});
+	});
+</script>
 {{/yield-scripts}}

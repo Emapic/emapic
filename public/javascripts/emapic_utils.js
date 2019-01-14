@@ -40,6 +40,24 @@ if (typeof $.fn.validator !== 'undefined' &&
         return null;
     };
 
+    emapic.utils.changeURLParameter = function(sParam, value) {
+        var baseUrl = window.location.href.split('?')[0];
+        var sPageURL = window.location.search.substring(1);
+        var sURLParams = [];
+        if (sPageURL) {
+            var sURLVariables = sPageURL.split('&');
+            for (var i = 0; i < sURLVariables.length; i++) {
+                var sParameterSplit = sURLVariables[i].split('=');
+                if (sParameterSplit[0] === sParam) {
+                    continue;
+                }
+                sURLParams.push(sParameterSplit[0] + '=' + sParameterSplit[1]);
+            }
+        }
+        sURLParams.push(sParam + '=' + value);
+        return baseUrl + '?' + sURLParams.join('&');
+    };
+
     emapic.utils.loadInputImage = function(input, id) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();

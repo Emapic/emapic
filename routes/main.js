@@ -74,10 +74,11 @@ module.exports = function(app) {
     });
 
     app.get('/surveys/list', function(req, res){
-        var query = req.query.q,
+        var query = req.query.q && req.query.q.trim() !== '' ? req.query.q : null,
+            order = req.query.order && req.query.order.trim() !== '' ? req.query.order : null,
             pageNr = isNaN(req.query.page) ? 1 : req.query.page,
             pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
-        models.Survey.findPublicSurveys(null, null, query && query.trim() !== '' ? query : null, null, pageSize, pageNr).then(function(results) {
+        models.Survey.findPublicSurveys(null, null, query, null, order, pageSize, pageNr).then(function(results) {
             res.render('surveys-list', {
                 surveys: results.rows,
                 pagination: Utils.getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
@@ -89,9 +90,10 @@ module.exports = function(app) {
 
     app.get('/surveys/tag/:tag', function(req, res){
         var tag = req.params.tag.trim(),
+            order = req.query.order && req.query.order.trim() !== '' ? req.query.order : null,
             pageNr = isNaN(req.query.page) ? 1 : req.query.page,
             pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
-        models.Survey.findPublicSurveys(null, null, null, tag, pageSize, pageNr).then(function(results) {
+        models.Survey.findPublicSurveys(null, null, null, tag, order, pageSize, pageNr).then(function(results) {
             res.render('tag-surveys-list', {
                 surveys: results.rows,
                 tag: tag,
@@ -103,12 +105,13 @@ module.exports = function(app) {
 
     app.get('/surveys/user/:login', function(req, res){
         var userLogin = req.params.login.trim(),
+            order = req.query.order && req.query.order.trim() !== '' ? req.query.order : null,
             pageNr = isNaN(req.query.page) ? 1 : req.query.page,
             pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size,
             user;
         models.User.findByLogin(userLogin).then(function(usr) {
             user = usr;
-            return models.Survey.findPublicSurveys(user.id, null, null, null, pageSize, pageNr);
+            return models.Survey.findPublicSurveys(user.id, null, null, null, order, pageSize, pageNr);
         }).then(function(results) {
             res.render('user-surveys-list', {
                 surveys: results.rows,
@@ -122,9 +125,10 @@ module.exports = function(app) {
     });
 
     app.get('/surveys/own', requireRole(null), function(req, res) {
-        var pageNr = isNaN(req.query.page) ? 1 : req.query.page,
+        var order = req.query.order && req.query.order.trim() !== '' ? req.query.order : null,
+            pageNr = isNaN(req.query.page) ? 1 : req.query.page,
             pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
-        models.Survey.findSurveys(req.user.id, false, null, null, null, pageSize, pageNr).then(function(results) {
+        models.Survey.findSurveys(req.user.id, false, null, null, null, order, pageSize, pageNr).then(function(results) {
             res.render('own-surveys-list', {
                 surveys: results.rows,
                 pagination: Utils.getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),

@@ -790,6 +790,25 @@ div.preferences-block input[type="checkbox"] {
     min-width: 50px;
 }
 
+.order-div {
+    margin-top: 5px;
+}
+
+.order-div > label {
+    color: #A2C73A;
+    font-size: 13px;
+}
+
+.order-div > .ui-widget *,
+.order-selectmenu-menu .ui-menu-item {
+    font-size: 15px;
+}
+
+.order-div .ui-selectmenu-button.ui-button {
+    width: auto;
+    padding: .2em .5em;
+}
+
 .list-complex-header .search-div > button,
 .list-complex-header .search-div > input {
     margin-bottom: 0px;

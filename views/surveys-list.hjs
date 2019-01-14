@@ -8,6 +8,15 @@
             <input class="form-control" id="search-surveys" type="text" value="{{query}}" onkeypress="searchInputKeyPressed(event)"></input>
             <button class="btn btn-default" onclick="searchSurveys()">{{#__}}search{{/__}}</button>
         </div>
+        <div class="col-xs-12 text-right order-div">
+            <label>{{#__}}order_by{{/__}}</label>
+            <select name="order" style="visibility: hidden;">
+                <option value="default">{{#query}}{{#__}}order_relevance{{/__}}{{/query}}{{^query}}{{#__}}order_creation_date{{/__}}{{/query}}</option>
+                {{#query}}<option value="dates">{{#__}}order_creation_date{{/__}}</option>{{/query}}
+                <option value="votes">{{#__}}order_nr_votes{{/__}}</option>
+                <option value="activity">{{#__}}order_recent_activity{{/__}}</option>
+            </select>
+        </div>
 	</div>
 
     {{> surveys_list}}
@@ -49,5 +58,21 @@
         var terms = $('#search-surveys').val();
         window.location = window.location.pathname + ((terms.trim() !== '') ? ('?q=' + encodeURIComponent(terms)) : (''));
     }
+
+    $(function() {
+        var order = emapic.utils.getURLParameter('order');
+        if (order) {
+            $('select[name="order"]').val(order);
+        }
+        $('select[name="order"]').show();
+        $('select[name="order"]').selectmenu({
+            classes: {
+                'ui-selectmenu-menu': 'order-selectmenu-menu'
+            },
+            change: function() {
+                window.location = emapic.utils.changeURLParameter('order', $('select[name="order"]').val());
+            }
+        });
+    });
 </script>
 {{/yield-scripts}}

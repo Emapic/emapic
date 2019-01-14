@@ -157,6 +157,30 @@ module.exports = function(sequelize, DataTypes) {
                 };
             },
 
+            stateDatesOrdering: function() {
+                return {
+                    order: Survey.getStateDatesOrder()
+                };
+            },
+
+            votesOrdering: function() {
+                return {
+                    order: Survey.getVotesOrder()
+                };
+            },
+
+            recentActivityOrdering: function() {
+                return {
+                    order: Survey.getRecentActivityOrder()
+                };
+            },
+
+            ordering: function(order) {
+                return {
+                    order: Survey.getOrder(order)
+                };
+            },
+
             alreadyOpened: {
                 where: {
                     active: {
@@ -192,7 +216,7 @@ module.exports = function(sequelize, DataTypes) {
                 }
             },
 
-            search: function(query, defaultOrdering) {
+            search: function(query, ordering) {
                 var params = {
                     where: {
                         // Workaround for a Sequelize bug (https://github.com/sequelize/sequelize/issues/6440)
@@ -212,10 +236,16 @@ module.exports = function(sequelize, DataTypes) {
                             sequelize.fn('plainto_tsquery', searchEngineLang, query)
                         ), 'DESC']]
                 };
-                if (defaultOrdering === true) {
-                    var defaultOrder = Survey.getDefaultOrder();
-                    for (var i = 0, len = defaultOrder.length; i<len; i++) {
-                        params.order.push(defaultOrder[i]);
+                var order = Survey.getOrder(ordering);
+                if (ordering && ordering !== 'default') {
+                    // If ordering is different than default, it takes precedence
+                    for (var i = order.length - 1; i>=0; i--) {
+                        params.order.unshift(order[i]);
+                    }
+                } else {
+                    // Default ordering prioritizes search rel
+                    for (var i = 0, iLen = order.length; i<iLen; i++) {
+                        params.order.push(order[i]);
                     }
                 }
                 return params;
@@ -248,7 +278,38 @@ module.exports = function(sequelize, DataTypes) {
         },
         classMethods: {
             getDefaultOrder: function() {
-                return [['active', 'DESC'], ['date_opened', 'DESC'], ['date_created', 'DESC']];
+                return models.Survey.getStateDatesOrder();
+            },
+
+            getStateDatesOrder: function() {
+                return [['active', 'DESC NULLS FIRST'], ['date_opened', 'DESC'], ['date_created', 'DESC']];
+            },
+
+            getVotesOrder: function() {
+                var order = models.Survey.getDefaultOrder();
+                // First make sure draft surveys are shown the last
+                order.unshift([sequelize.literal('CASE WHEN active IS NULL THEN 1 ELSE 0 END'), 'ASC'], ['nr_votes', 'DESC']);
+                return order;
+            },
+
+            getRecentActivityOrder: function() {
+                var order = models.Survey.getDefaultOrder();
+                // First make sure draft surveys are shown the last
+                order.unshift([sequelize.literal('CASE WHEN active IS NULL THEN 1 ELSE 0 END'), 'ASC'], [sequelize.literal('nr_votes / extract(epoch from (now() - date_opened)) ^ 1.5'), 'DESC']);
+                return order;
+            },
+
+            getOrder: function(order) {
+                switch(order) {
+                    case 'votes':
+                        return Survey.getVotesOrder();
+                    case 'activity':
+                        return Survey.getRecentActivityOrder();
+                    case 'dates':
+                        return Survey.getStateDatesOrder();
+                    default:
+                        return Survey.getDefaultOrder();
+                }
             },
 
             associate: function(models) {
@@ -290,7 +351,7 @@ module.exports = function(sequelize, DataTypes) {
                 });
             },
 
-            findSurveys: function(userId, onlyPublic, status, query, tag, pageSize, pageNr) {
+            findSurveys: function(userId, onlyPublic, status, query, tag, order, pageSize, pageNr) {
                 var params = {},
                     scopes = ['includeAuthor'];
                 if (onlyPublic === true) {
@@ -313,26 +374,26 @@ module.exports = function(sequelize, DataTypes) {
                     scopes.push({ method: ['filterByTag', tag] });
                 }
                 if (query !== null) {
-                    scopes.push({ method: ['search', query, true] });
+                    scopes.push({ method: ['search', query, order] });
                 } else {
-                    scopes.push('defaultOrdering');
+                    scopes.push({ method: ['ordering', order] });
                 }
                 return Survey.scope(scopes).findAndCountAll(params);
             },
 
-            findPublicSurveys: function(userId, status, query, tag, pageSize, pageNr) {
+            findPublicSurveys: function(userId, status, query, tag, order, pageSize, pageNr) {
                 if (['open', 'closed'].indexOf(status) === -1) {
                     status = null;
                 }
-                return Survey.findSurveys(userId, true, status, query, tag, pageSize, pageNr);
+                return Survey.findSurveys(userId, true, status, query, tag, order, pageSize, pageNr);
             },
 
-            findPublicSurveysByUserLogin: function(login, status, query, tag, pageSize, pageNr) {
+            findPublicSurveysByUserLogin: function(login, status, query, tag, order, pageSize, pageNr) {
                 if (login === null) {
-                    return Survey.findPublicSurveys(null, status, query, tag, pageSize, pageNr);
+                    return Survey.findPublicSurveys(null, status, query, tag, order, pageSize, pageNr);
                 }
                 return models.User.findByLogin(login).then(function(user) {
-                    return Survey.findPublicSurveys(user.id, status, query, tag, pageSize, pageNr);
+                    return Survey.findPublicSurveys(user.id, status, query, tag, order, pageSize, pageNr);
                 });
             },
 

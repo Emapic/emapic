@@ -7,6 +7,14 @@
         <div class="col-xs-12 col-md-6">
             <a href="/surveys/new"><button class="btn btn-primary pull-right"><span class="glyphicon glyphicon-plus"></span> {{#__}}create_new_survey{{/__}}</button></a>
         </div>
+        <div class="col-xs-12 text-right order-div">
+            <label>{{#__}}order_by{{/__}}</label>
+            <select name="order" style="visibility: hidden;">
+                <option value="default">{{#__}}order_state_creation_date{{/__}}</option>
+                <option value="votes">{{#__}}order_nr_votes{{/__}}</option>
+                <option value="activity">{{#__}}order_recent_activity{{/__}}</option>
+            </select>
+        </div>
 	</div>
 
 	<div class="col-xs-12">
@@ -202,5 +210,21 @@
             window.location = '/survey/' + id + '/delete';
         }
     }
+
+	$(function() {
+		var order = emapic.utils.getURLParameter('order');
+		if (order) {
+			$('select[name="order"]').val(order);
+		}
+		$('select[name="order"]').show();
+		$('select[name="order"]').selectmenu({
+			classes: {
+				'ui-selectmenu-menu': 'order-selectmenu-menu'
+			},
+			change: function() {
+				window.location = emapic.utils.changeURLParameter('order', $('select[name="order"]').val());
+			}
+		});
+	});
 </script>
 {{/yield-scripts}}

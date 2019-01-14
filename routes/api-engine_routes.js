@@ -119,14 +119,15 @@ module.exports = function(app) {
             query = req.query.q && req.query.q.trim() !== '' ? req.query.q : null,
             tag = req.query.tag && req.query.tag.trim() !== '' ? req.query.tag : null,
             status = req.query.status && req.query.status.trim() !== '' ? req.query.status : null,
+            order = req.query.order && req.query.order.trim() !== '' ? req.query.order : null,
             pageNr = isNaN(req.query.page) ? null : req.query.page,
             pageSize = isNaN(req.query.size) ? null : req.query.size,
             surveysPromise = (userId !== null) ?
                 models.Survey.findPublicSurveys(userId,
-                    status, query, tag,
+                    status, query, tag, order,
                     pageSize, pageNr) :
                 models.Survey.findPublicSurveysByUserLogin(login,
-                    status, query, tag,
+                    status, query, tag, order,
                     pageSize, pageNr);
         surveysPromise.then(function(surveys) {
             var results = [];
@@ -146,9 +147,10 @@ module.exports = function(app) {
         var query = req.query.q && req.query.q.trim() !== '' ? req.query.q : null,
             tag = req.query.tag && req.query.tag.trim() !== '' ? req.query.tag : null,
             status = req.query.status && req.query.status.trim() !== '' ? req.query.status : null,
+            order = req.query.order && req.query.order.trim() !== '' ? req.query.order : null,
             pageNr = isNaN(req.query.page) ? null : req.query.page,
             pageSize = isNaN(req.query.size) ? null : req.query.size;
-        models.Survey.findSurveys(req.user.id, false, status, query, tag, pageSize, pageNr).then(function(surveys) {
+        models.Survey.findSurveys(req.user.id, false, status, query, tag, order, pageSize, pageNr).then(function(surveys) {
             var results = [];
             for (var i = 0, len = surveys.rows.length; i<len; i++) {
                 results.push(surveys.rows[i].getDescription());
