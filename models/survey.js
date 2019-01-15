@@ -169,9 +169,9 @@ module.exports = function(sequelize, DataTypes) {
                 };
             },
 
-            recentActivityOrdering: function() {
+            popularityOrdering: function() {
                 return {
-                    order: Survey.getRecentActivityOrder()
+                    order: Survey.getPopularityOrder()
                 };
             },
 
@@ -292,7 +292,7 @@ module.exports = function(sequelize, DataTypes) {
                 return order;
             },
 
-            getRecentActivityOrder: function() {
+            getPopularityOrder: function() {
                 var order = models.Survey.getDefaultOrder();
                 // First make sure draft surveys are shown the last
                 order.unshift([sequelize.literal('CASE WHEN active IS NULL THEN 1 ELSE 0 END'), 'ASC'], [sequelize.literal('nr_votes / extract(epoch from (now() - date_opened)) ^ 1.5'), 'DESC']);
@@ -303,8 +303,8 @@ module.exports = function(sequelize, DataTypes) {
                 switch(order) {
                     case 'votes':
                         return Survey.getVotesOrder();
-                    case 'activity':
-                        return Survey.getRecentActivityOrder();
+                    case 'popular':
+                        return Survey.getPopularityOrder();
                     case 'dates':
                         return Survey.getStateDatesOrder();
                     default:

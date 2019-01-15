@@ -14,7 +14,7 @@
                 <option value="default">{{#query}}{{#__}}order_relevance{{/__}}{{/query}}{{^query}}{{#__}}order_creation_date{{/__}}{{/query}}</option>
                 {{#query}}<option value="dates">{{#__}}order_creation_date{{/__}}</option>{{/query}}
                 <option value="votes">{{#__}}order_nr_votes{{/__}}</option>
-                <option value="activity">{{#__}}order_recent_activity{{/__}}</option>
+                <option value="popular">{{#__}}order_popularity{{/__}}</option>
             </select>
         </div>
 	</div>
