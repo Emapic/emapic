@@ -416,6 +416,7 @@
 	"delete_survey_question_confirmation": "¿Seguro que quieres borrar esta pregunta?",
 	"delete_survey_answer": "Borrar respuesta",
 	"delete_survey_answer_confirmation": "¿Seguro que quieres borrar esta respuesta?",
+	"duplicate_survey_question_input_file_warn": "Tu navegador no permite duplicar los archivos de imagen seleccionados, por lo que debes asignar manualmente las imágenes de cualquier pregunta duplicada.",
 	"open_survey_confirmation": "¿Seguro que quieres activar esta encuesta?\\nYa no podrás volver a editarla, los demás usuarios podrán emitir votos desde el momento en que lo hagas y posteriormente sólo podrás cerrarla una vez para obtener los resultados definitivos.",
 	"dont_list": "No mostrar en listados públicos",
 	"help_tooltip_new_survey_dont_list": "Indica si queremos que la encuesta aparezca en los listados públicos de encuestas de la web de Emapic.",

@@ -416,6 +416,7 @@
 	"delete_survey_question_confirmation": "Are you sure you want to delete this question?",
 	"delete_survey_answer": "Delete answer",
 	"delete_survey_answer_confirmation": "Are you sure you want to delete this answer?",
+	"duplicate_survey_question_input_file_warn": "Your browser doesn't allow duplication of selected images, so you must assign manually all images of any duplicated question.",
 	"open_survey_confirmation": "Are you sure you want to activate this survey?\\nYou no longer will be able to edit it, people will be able to submit their votes from the moment you do it and then you will only be able to close it once to obtain the final results.",
 	"dont_list": "Don't show in public lists",
 	"help_tooltip_new_survey_dont_list": "Indicates if we want the survey to appear in public survey lists in Emapic's website.",

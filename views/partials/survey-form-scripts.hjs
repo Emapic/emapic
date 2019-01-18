@@ -44,7 +44,8 @@
                 ["#900","#b45f06","#bf9000","#38761d","#134f5c","#0b5394","#351c75","#741b47"],
                 ["#600","#783f04","#7f6000","#274e13","#0c343d","#073763","#20124d","#4c1130"]
             ]
-        };
+        },
+        inputFileWarningAlreadyShown = false;
 
     $(function() {
         var questionsDrake = dragula([document.getElementById('questions')], {
@@ -590,7 +591,8 @@
 
         var $qstn = $(btn).parents('div.panel'),
             qstnNr = parseInt($qstn.attr('id').split('_')[1]),
-            newQstnNr = 0;
+            newQstnNr = 0,
+            showInputFileWarning = false;
 
         addNewQuestionHtml($('div.question-group').length + 1, type);
         newQstnNr = ($('div.question-group').length);
@@ -627,6 +629,8 @@
                             $('input[type="file"][name="img_' + newQstnNr + '_' + i + '"]').replaceWith(
                                 $('input[type="file"][name="img_' + qstnNr + '_' + i + '"]').clone().attr('name', 'img_' + newQstnNr + '_' + i)
                             );
+                            showInputFileWarning = showInputFileWarning ||
+                                ($('input[type="file"][name="img_' + qstnNr + '_' + i + '"]').val() !== $('input[type="file"][name="img_' + newQstnNr + '_' + i + '"]').val());
                         }
                         if ($("#answer_img_" + qstnNr + "_" + i)[0] !== undefined) {
                             if ($("#answer_img_" + qstnNr + "_" + i)[0].style.backgroundImage.split('/')[2] !== undefined) {
@@ -651,6 +655,8 @@
                         $('input[type="file"][name="img_' + newQstnNr + '_other"]').replaceWith(
                             $('input[type="file"][name="img_' + qstnNr + '_other"]').clone().attr('name', 'img_' + newQstnNr + '_other')
                         );
+                        showInputFileWarning = showInputFileWarning ||
+                            ($('input[type="file"][name="img_' + newQstnNr + '_other"]').val() !== $('input[type="file"][name="img_' + qstnNr + '_other"]').val());
                     }
                     var $img_other = $('#answer_' + newQstnNr + '_other .answer-img');
                     if (($("#answer_img_" + qstnNr + "_other")[0].style.backgroundImage.split('/')[2]) !== undefined) {
@@ -675,6 +681,10 @@
         });
         $('.tooltip').tooltip('hide');
         $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
+        if (showInputFileWarning && !inputFileWarningAlreadyShown) {
+            alert('{{#__}}duplicate_survey_question_input_file_warn{{/__}}');
+            inputFileWarningAlreadyShown = true;
+        }
     }
     function deleteQuestion(btn) {
         if (confirm('{{#__}}delete_survey_question_confirmation{{/__}}')) {
