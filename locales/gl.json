@@ -411,6 +411,7 @@
 	"survey_cloned_error_msg": "Ocorreu un problema e non puidemos copiar a enquisa.",
 	"survey_cloned_success_msg": "A enquisa foi copiada correctamente. Revisa os seus datos para cambiar o que consideres pertinente.",
 	"help_tooltip_saved_answer_image": "Esta é a imaxe asociada actualmente a esta resposta, que se manterá a non ser que selecciones unha nova.",
+	"duplicate_survey_question": "Duplicar pregunta",
 	"delete_survey_question": "Borrar pregunta",
 	"delete_survey_question_confirmation": "Seguro que queres borrar esta pregunta?",
 	"delete_survey_answer": "Borrar resposta",

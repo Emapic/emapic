@@ -411,6 +411,7 @@
 	"survey_cloned_error_msg": "There has been a problem and we have not been able to copy the survey.",
 	"survey_cloned_success_msg": "Survey has been copied successfully. Check its data and update what you consider appropiate.",
 	"help_tooltip_saved_answer_image": "This image is currently selected for this answer, and will be kept unless you upload a new one.",
+	"duplicate_survey_question": "Duplicate question",
 	"delete_survey_question": "Delete question",
 	"delete_survey_question_confirmation": "Are you sure you want to delete this question?",
 	"delete_survey_answer": "Delete answer",

@@ -254,6 +254,9 @@
                                         <button class="btn btn-danger pull-right delete-survey-question" onclick="deleteQuestion(this)" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_question{{/__}}">\
                                             <span class="glyphicon glyphicon-trash"></span>\
                                         </button>\
+                                        <button class="btn btn-primary pull-right duplicate-survey-question" onclick="duplicateQuestion(this, \''+type+'\')" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}duplicate_survey_question{{/__}}">\
+                                            <span class="glyphicon glyphicon-duplicate"></span>\
+                                        </button>\
                                     </h4>\
                                 </div>\
                                 <div class="col-xs-12 col-md-4 col-md-offset-4">\
@@ -273,10 +276,10 @@
                                 </div>\
                                 <div class="form-group form-group-sm form-checkbox-line">\
                                     <div class="col-xs-2 col-md-1 col-sm-offset-1 col-md-offset-3">\
-                                        <input id="responses_img_' + qstn + '" class="form-control pull-right" type="checkbox" onchange="responsesImgChanged(this)" name="responses_img_' + qstn + '" {{#responses_img}}checked{{/responses_img}}>\
+                                        <input id="responses_img_' + qstn + '" class="form-control pull-right update-id" type="checkbox" onchange="responsesImgChanged(this)" name="responses_img_' + qstn + '" {{#responses_img}}checked{{/responses_img}}>\
                                     </div>\
                                     <div class="col-xs-8 col-sm-5 col-md-4 col-lg-3">\
-                                        <label class="control-label" for="responses_img_' + qstn + '">{{#__}}responses_image{{/__}}</label>\
+                                        <label class="control-label update-for" for="responses_img_' + qstn + '">{{#__}}responses_image{{/__}}</label>\
                                     </div>\
                                     <div class="col-xs-2 col-md-1">\
                                         <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="{{#__}}help_tooltip_new_survey_responses_image{{/__}}"></span>\
@@ -296,6 +299,7 @@
                                                 </div>\
                                             </label>\
                                             <div class="col-xs-12 col-sm-6 form-group-sm">\
+                                                <input class="img-id" name="option_' + qstn + '_1_img_id" type="text">\
                                                 <input spellcheck="true" class="form-control" required type="text" required maxlength="150" name="option_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" >\
                                                 <div class="help-block with-errors"></div>\
                                             </div>\
@@ -304,7 +308,7 @@
                                             </div>\
                                         </div>\
                                         <div class="form-group answer-img-group" style="display: none;">\
-                                            <div class="col-xs-12 col-md-2 col-md-offset-1"><div class="answer-img-container" style="display:none;"><div class="answer-img pull-left"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
+                                            <div class="col-xs-12 col-md-2 col-md-offset-1"><div class="answer-img-container" style="display: none;"><div id="answer_img_' + qstn + '_1" class="answer-img pull-left update-id"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
                                             <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
                                             <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
                                                 <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" />\
@@ -325,6 +329,7 @@
                                                 </div>\
                                             </label>\
                                             <div class="col-xs-12 col-sm-6 form-group-sm">\
+                                                <input class="img-id" name="option_' + qstn + '_2_img_id" type="text">\
                                                 <input spellcheck="true" class="form-control" required type="text" required maxlength="150" name="option_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" >\
                                                 <div class="help-block with-errors"></div>\
                                             </div>\
@@ -333,7 +338,7 @@
                                             </div>\
                                         </div>\
                                         <div class="form-group answer-img-group" style="display: none;">\
-                                            <div class="col-xs-12 col-md-2 col-md-offset-1"><div class="answer-img-container" style="display:none;"><div class="answer-img pull-left"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
+                                            <div class="col-xs-12 col-md-2 col-md-offset-1"><div class="answer-img-container" style="display: none;"><div id="answer_img_' + qstn + '_2" class="answer-img pull-left update-id"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
                                             <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
                                             <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
                                                 <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" />\
@@ -359,6 +364,7 @@
                                             <span>{{#__}}option_other{{/__}}:</span>\
                                         </label>\
                                         <div class="col-xs-12 col-sm-6 form-group-sm">\
+                                            <input class="img-id" name="option_' + qstn + '_other_img_id" type="text">\
                                             <input spellcheck="true" class="form-control" required maxlength="150" disabled type="text" value="{{#__}}option_other_default_value{{/__}}" name="option_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}">\
                                             <div class="help-block with-errors"></div>\
                                         </div>\
@@ -367,7 +373,7 @@
                                         </div>\
                                     </div>\
                                     <div class="form-group answer-img-group" style="display: none;">\
-                                        <div class="col-xs-12 col-sm-2 col-sm-offset-1"><div class="answer-img-container" style="display:none;"><div class="answer-img pull-left"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
+                                        <div class="col-xs-12 col-sm-2 col-sm-offset-1"><div class="answer-img-container" style="display: none;"><div id="answer_img_' + qstn + '_other" class="answer-img pull-left update-id"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
                                         <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
                                         <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
                                             <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}" />\
@@ -407,6 +413,9 @@
                                         <button class="btn btn-danger pull-right delete-survey-question" onclick="deleteQuestion(this)" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_question{{/__}}">\
                                             <span class="glyphicon glyphicon-trash"></span>\
                                         </button>\
+                                        <button class="btn btn-primary pull-right duplicate-survey-question" onclick="duplicateQuestion(this, \''+type+'\')" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}duplicate_survey_question{{/__}}">\
+                                            <span class="glyphicon glyphicon-duplicate"></span>\
+                                        </button>\
                                     </h4>\
                                 </div>\
                                 <div class="col-xs-12 col-md-4 col-md-offset-4">\
@@ -414,10 +423,10 @@
                                     <div class="help-block with-errors"></div>\
                                     <div class="form-checkbox-line">\
                                         <div class="col-xs-2">\
-                                            <input id="optional_question_' + qstn + '" class="form-control pull-right" type="checkbox" name="optional_question_' + qstn + '">\
+                                            <input id="optional_question_' + qstn + '" class="form-control pull-right update-id" type="checkbox" name="optional_question_' + qstn + '">\
                                         </div>\
                                         <div class="col-xs-8">\
-                                            <label class="control-label adi-opts-label text-left" for="optional_question_' + qstn + '">{{#__}}optional_question{{/__}}</label>\
+                                            <label class="control-label adi-opts-label text-left update-for" for="optional_question_' + qstn + '">{{#__}}optional_question{{/__}}</label>\
                                         </div>\
                                         <div class="col-xs-2">\
                                             <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="{{#__}}help_tooltip_new_survey_optional_question{{/__}}"></span>\
@@ -442,6 +451,9 @@
                                         <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_explanatory_text{{/__}}"></span>\
                                         <button class="btn btn-danger pull-right delete-survey-question" onclick="deleteQuestion(this)" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_question{{/__}}">\
                                             <span class="glyphicon glyphicon-trash"></span>\
+                                        </button>\
+                                        <button class="btn btn-primary pull-right duplicate-survey-question" onclick="duplicateQuestion(this, \''+type+'\')" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}duplicate_survey_question{{/__}}">\
+                                            <span class="glyphicon glyphicon-duplicate"></span>\
                                         </button>\
                                     </h4>\
                                 </div>\
@@ -468,6 +480,9 @@
                                         <button class="btn btn-danger pull-right delete-survey-question" onclick="deleteQuestion(this)" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_question{{/__}}">\
                                             <span class="glyphicon glyphicon-trash"></span>\
                                         </button>\
+                                        <button class="btn btn-primary pull-right duplicate-survey-question" onclick="duplicateQuestion(this, \''+type+'\')" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}duplicate_survey_question{{/__}}">\
+                                            <span class="glyphicon glyphicon-duplicate"></span>\
+                                        </button>\
                                     </h4>\
                                 </div>\
                                 <div class="col-xs-12 col-md-4 col-md-offset-4">\
@@ -475,10 +490,10 @@
                                     <div class="help-block with-errors"></div>\
                                     <div class="form-checkbox-line">\
                                         <div class="col-xs-2">\
-                                            <input id="optional_question_' + qstn + '" class="form-control pull-right" type="checkbox" name="optional_question_' + qstn + '">\
+                                            <input id="optional_question_' + qstn + '" class="form-control pull-right update-id" type="checkbox" name="optional_question_' + qstn + '">\
                                         </div>\
                                         <div class="col-xs-8">\
-                                            <label class="control-label adi-opts-label text-left" for="optional_question_' + qstn + '">{{#__}}optional_question{{/__}}</label>\
+                                            <label class="control-label adi-opts-label text-left update-for" for="optional_question_' + qstn + '">{{#__}}optional_question{{/__}}</label>\
                                         </div>\
                                         <div class="col-xs-2">\
                                             <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="{{#__}}help_tooltip_new_survey_optional_question{{/__}}"></span>\
@@ -504,6 +519,9 @@
                                         <button class="btn btn-danger pull-right delete-survey-question" onclick="deleteQuestion(this)" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}delete_survey_question{{/__}}">\
                                             <span class="glyphicon glyphicon-trash"></span>\
                                         </button>\
+                                        <button class="btn btn-primary pull-right duplicate-survey-question" onclick="duplicateQuestion(this, \''+type+'\')" data-placement="left" data-toggle="tooltip" type="button" title="{{#__}}duplicate_survey_question{{/__}}">\
+                                            <span class="glyphicon glyphicon-duplicate"></span>\
+                                        </button>\
                                     </h4>\
                                 </div>\
                                 <div class="col-xs-12 col-md-4 col-md-offset-4">\
@@ -511,10 +529,10 @@
                                     <div class="help-block with-errors"></div>\
                                     <div class="form-checkbox-line">\
                                         <div class="col-xs-2">\
-                                            <input id="optional_question_' + qstn + '" class="form-control pull-right" type="checkbox" name="optional_question_' + qstn + '">\
+                                            <input id="optional_question_' + qstn + '" class="form-control pull-right update-id" type="checkbox" name="optional_question_' + qstn + '">\
                                         </div>\
                                         <div class="col-xs-8">\
-                                            <label class="control-label adi-opts-label text-left" for="optional_question_' + qstn + '">{{#__}}optional_question{{/__}}</label>\
+                                            <label class="control-label adi-opts-label text-left update-for" for="optional_question_' + qstn + '">{{#__}}optional_question{{/__}}</label>\
                                         </div>\
                                         <div class="col-xs-2">\
                                             <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="{{#__}}help_tooltip_new_survey_optional_question{{/__}}"></span>\
@@ -543,6 +561,7 @@
                         </div>\
                     </label>\
                     <div class="col-xs-12 col-sm-6 form-group-sm">\
+                        <input class="img-id" name="option_' + qstn + '_' + answ + '_img_id" type="text">\
                         <input spellcheck="true" class="form-control" type="text" required maxlength="150" name="option_' + qstn + '_' + answ + '" data-error="{{#__}}type_an_option{{/__}}" value="' + value + '">\
                         <div class="help-block with-errors"></div>\
                     </div>\
@@ -552,7 +571,8 @@
                 </div>\
                 <div class="form-group answer-img-group"' + (responses_img ? '' : ' style="display: none;"' ) + '>\
                     <div class="col-xs-12 col-md-2 col-md-offset-1">' +
-                    (imageUrl != null ? '<div class="answer-img-container"><div class="answer-img pull-left" style="background-image: url(\'' + imageUrl + '\');"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div>' : '') +
+                    '<div class="answer-img-container"' + (imageUrl ? '' : ' style="display: none;"') + '><div id="answer_img_' + qstn + '_' + answ + '" class="answer-img pull-left update-id"' + (imageUrl != null ? ' style="background-image: url(\'' + imageUrl + '\');"' : '') +
+                    '></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div>' +
                     '</div>\
                     <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
                     <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
@@ -563,9 +583,103 @@
             </div>');
         $("#answer_" + qstn + "_" + answ + " .spectrum").spectrum(spectrumOptions);
     }
+    function duplicateQuestion(btn, type) {
+        $('.panel-body').addClass('collapse');
+        $('.panel-heading span').removeClass('glyphicon-chevron-up');
+        $('.panel-heading span').addClass('glyphicon-chevron-down');
+
+        var $qstn = $(btn).parents('div.panel'),
+            qstnNr = parseInt($qstn.attr('id').split('_')[1]),
+            newQstnNr = 0;
+
+        addNewQuestionHtml($('div.question-group').length + 1, type);
+        newQstnNr = ($('div.question-group').length);
+
+        $("[name=question_" + newQstnNr + "]")[0].value = $("[name=question_" + qstnNr + "]")[0].value + ' (copy)';
+
+        switch (type) {
+            case 'explanatory-text':
+                break;
+            case 'list-radio':
+                var $answers = $('*[id^="answer_' + qstnNr + '_"]'),
+                    $newAnswers = $('*[id^="answer_' + newQstnNr + '"]');
+                if($("[name=responses_" + qstnNr + "_other]").prop("checked")) {
+                    $("[name=responses_" + newQstnNr + "_other]").prop("checked", true).trigger("change");
+                }
+                if($("#responses_img_" + qstnNr).prop("checked")) {
+                    $("#responses_img_" + newQstnNr).prop("checked", true).trigger("change");
+                }
+                for(var i=$answers.length; $newAnswers.length < $answers.length; i++) {
+                    addNewOptionEffective(newQstnNr, $newAnswers.length, '', randomColor(), '', null);
+                    $newAnswers = $('*[id^="answer_' + newQstnNr + '"]');
+                }
+
+                for(var i=1; i<$answers.length; i++) {
+                    $("[name=option_" + newQstnNr + "_" + i + "]")[0].value = $("[name=option_" + qstnNr + "_" + i + "]")[0].value;
+                    $("#answer_" + newQstnNr + "_" + i + " .spectrum").spectrum("set", $("[name=option_" + qstnNr + "_" + i + "_color]").val().replace('#', ''));
+                    if ($("#responses_img_" + qstnNr).prop("checked")) {
+                        var $img = $('#answer_' + newQstnNr + '_' + i + ' .answer-img');
+                        // We can't change a file input value because it's
+                        // considered insecure. As an alternative, we clone the
+                        // original input field and replace the new one.
+                        // Also, we only clone the element if it has no input errors.
+                        if ($('div.answer-img-group:not(.has-error) input[type="file"][name="img_' + qstnNr + '_' + i + '"]').length) {
+                            $('input[type="file"][name="img_' + newQstnNr + '_' + i + '"]').replaceWith(
+                                $('input[type="file"][name="img_' + qstnNr + '_' + i + '"]').clone().attr('name', 'img_' + newQstnNr + '_' + i)
+                            );
+                        }
+                        if ($("#answer_img_" + qstnNr + "_" + i)[0] !== undefined) {
+                            if ($("#answer_img_" + qstnNr + "_" + i)[0].style.backgroundImage.split('/')[2] !== undefined) {
+                                var imgId = $("#answer_img_" + qstnNr + "_" + i)[0].style.backgroundImage.split('/')[2].replace('")', '');
+                                $img.css('background-image', "url('/answer_img/" + imgId + "')");
+                                $('input[type="file"][name="img_' + newQstnNr + '_' + i + '"]').removeAttr('required');
+                                $('#answer_' + newQstnNr + '_' + i + ' .answer-img-container').show();
+                                $('input[name="option_' + newQstnNr + '_' + i + '_img_id"]').val(imgId);
+                                $('input[name="id_' + newQstnNr + '_' + i + '"]').val(imgId);
+                            }
+                        }
+                    }
+                }
+                $("[name=option_" + newQstnNr + "_other]")[0].value = $("[name=option_" + qstnNr + "_other]")[0].value;
+                $("#answer_" + newQstnNr + "_other .spectrum").spectrum("set", $("[name=option_" + qstnNr + "_other_color]").val().replace('#', ''));
+                if ($("#responses_img_" + qstnNr).prop("checked")) {
+                    // We can't change a file input value because it's
+                    // considered insecure. As an alternative, we clone the
+                    // original input field and replace the new one.
+                    // Also, we only clone the element if it has no input errors.
+                    if ($('div.answer-img-group:not(.has-error) input[type="file"][name="img_' + qstnNr + '_other"]').length) {
+                        $('input[type="file"][name="img_' + newQstnNr + '_other"]').replaceWith(
+                            $('input[type="file"][name="img_' + qstnNr + '_other"]').clone().attr('name', 'img_' + newQstnNr + '_other')
+                        );
+                    }
+                    var $img_other = $('#answer_' + newQstnNr + '_other .answer-img');
+                    if (($("#answer_img_" + qstnNr + "_other")[0].style.backgroundImage.split('/')[2]) !== undefined) {
+                        var imgIdOther = $("#answer_img_" + qstnNr + "_other")[0].style.backgroundImage.split('/')[2].replace('")', '');
+                        $img_other.css('background-image', "url('/answer_img/" + imgIdOther + "')");
+                        $('input[type="file"][name="img_' + newQstnNr + '_other"]').removeAttr('required');
+                        $('#answer_' + newQstnNr + '_other .answer-img-container').show();
+                        $('input[name="option_' + newQstnNr + '_other_img_id"]').val(imgIdOther);
+                        $('input[name="id_' + newQstnNr + '_other"]').val(imgIdOther);
+                    }
+                }
+                break;
+            default:
+                if ($("#optional_question_" + qstnNr).prop("checked")) {
+                    $("#optional_question_" + newQstnNr).prop("checked", true).trigger("change");
+                }
+                break;
+        }
+        $('#questions > .panel > .panel-body').last().removeClass('collapse');
+        $('html, body').animate({
+            scrollTop: $('#questions > .question-group').last().offset().top - $('nav.navbar').outerHeight() - 10
+        });
+        $('.tooltip').tooltip('hide');
+        $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
+    }
     function deleteQuestion(btn) {
         if (confirm('{{#__}}delete_survey_question_confirmation{{/__}}')) {
             deleteQuestionEffective($(btn).parents('div.panel'));
+            $('.tooltip').tooltip('hide');
             $('#survey-form').validator('validate');
         }
     }
@@ -585,6 +699,15 @@
             $heading.html(headingText.replace('{{#__}}question{{/__}} ' + oldNr, '{{#__}}question{{/__}} ' + newNr));
             $qstn.find('input, textarea').each(function(idx, el) {
                 updateQuestionComponentAttr($(el), 'name', newNr);
+            });
+            $qstn.find('.answer-group').each(function(idx, el) {
+                updateQuestionComponentAttr($(el), 'id', newNr);
+            });
+            $qstn.find('.update-id').each(function(idx, el) {
+                updateQuestionComponentAttr($(el), 'id', newNr);
+            });
+            $qstn.find('.update-for').each(function(idx, el) {
+                updateQuestionComponentAttr($(el), 'for', newNr);
             });
         }
     }
@@ -606,6 +729,7 @@
         var nrAnswers = $answers.find('div.answer-group').length;
         if (nrAnswers > 2 && confirm('{{#__}}delete_survey_answer_confirmation{{/__}}')) {
             deleteOptionEffective($(btn).parents('div.answer-group'));
+            $('.tooltip').tooltip('hide');
             $('#survey-form').validator('validate');
             if (nrAnswers == 3) {
                 $answers.find('button.delete-survey-answer').prop('disabled', true);

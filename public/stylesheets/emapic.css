@@ -1416,6 +1416,14 @@ label.adi-opts-label {
     color: #fff;
 }
 
+.duplicate-survey-question {
+    margin-right: 2%;
+}
+
+.img-id {
+    display: none;
+}
+
 .question-group .question-handle.grabbing,
 .answer-group .answer-handle.grabbing {
     cursor: grabbing;
