@@ -1446,7 +1446,8 @@ label.adi-opts-label {
     text-align: left;
 }
 
-.answer-img-group label.control-label {
+.answer-img-group label.control-label,
+#answer_other .answer-img-group label.control-label {
     text-align: right;
 }
 
