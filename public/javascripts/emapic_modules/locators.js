@@ -37,7 +37,8 @@ var emapic = emapic || {};
         sidebar,
         countriesProvincesData = {},
         allCountriesBbox = [[null, null], [null, null]],
-        locatorsButtonsHtml = "<a id='control-user' title='" + emapic.utils.getI18n('js_see_my_answer_position', 'Ver posición de mi respuesta') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"user\");'><span class='glyphicon glyphicon-user'></span></a>\n" +
+        locatorsButtonsHtml = "<a id='control-extent' title='" + emapic.utils.getI18n('js_see_all_answers', 'Zoom a todas las respuestas') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"answers\");'><span class='glyphicon glyphicon-fullscreen'></span></a>\n" +
+            "<a id='control-user' title='" + emapic.utils.getI18n('js_see_my_answer_position', 'Ver posición de mi respuesta') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"user\");'><span class='glyphicon glyphicon-user'></span></a>\n" +
             "<a id='control-country' title='" + emapic.utils.getI18n('js_see_my_answer_country', 'Ver el país de mi respuesta') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"country\");'><img src='/images/icon-espana.png' /></a>\n" +
             "<a id='control-country-filter' title='" + emapic.utils.getI18n('js_see_per_country', 'Ver por país') + "' href='javascript:void(0)' onclick='emapic.modules.locators.filterCountry();'><span class='glyphicon glyphicon-flag'></span></a>\n" +
             "<a id='control-world' title='" + emapic.utils.getI18n('js_see_whole_world', 'Ver todo el mundo') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"world\");'><span class='glyphicon glyphicon-globe'></span></a>\n" +
@@ -170,6 +171,9 @@ var emapic = emapic || {};
                 break;
             case 'world':
                 emapic.centerView({world: true});
+                break;
+            case 'answers':
+                emapic.centerView({answers: true});
                 break;
             case 'currentPos':
                 emapic.geoapi.getApiLocationPromise().done(function(position) {

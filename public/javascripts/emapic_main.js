@@ -264,12 +264,12 @@ var emapic = emapic || {};
     emapic.centerView = function(opts) {
         if ( opts.world ) {
             emapic.map.fitWorld();
+        } else if ( opts.answers ) {
+            emapic.map.fitBounds(emapic.indivVotesLayer.getBounds());
+        } else if ( opts.zoom ) {
+            emapic.map.setView(opts.pos, opts.zoom);
         } else {
-            if ( opts.zoom ) {
-                emapic.map.setView(opts.pos, opts.zoom);
-            } else {
-                emapic.map.setView(opts.pos);
-            }
+            emapic.map.setView(opts.pos);
         }
     };
 

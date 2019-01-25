@@ -15,6 +15,7 @@
     emapic.utils.registerI18n('js_see_only_negative_votes', '{{#__}}js_see_only_negative_votes{{/__}}');
     emapic.utils.registerI18n('js_see_only_votes', '{{#__}}js_see_only_votes{{/__}}');
     emapic.utils.registerI18n('js_see_all_votes', '{{#__}}js_see_all_votes{{/__}}');
+    emapic.utils.registerI18n('js_see_all_answers', '{{#__}}js_see_all_answers{{/__}}');
     emapic.utils.registerI18n('js_see_my_answer_position', '{{#__}}js_see_my_answer_position{{/__}}');
     emapic.utils.registerI18n('js_see_my_answer_country', '{{#__}}js_see_my_answer_country{{/__}}');
     emapic.utils.registerI18n('js_see_my_current_position', '{{#__}}js_see_my_current_position{{/__}}');
