@@ -682,12 +682,12 @@
         $('.tooltip').tooltip('hide');
         $('[data-toggle="tooltip"]').tooltip({ container: 'body' });
         if (showInputFileWarning && !inputFileWarningAlreadyShown) {
-            alert('{{#__}}duplicate_survey_question_input_file_warn{{/__}}');
+            alert("{{#__}}duplicate_survey_question_input_file_warn{{/__}}");
             inputFileWarningAlreadyShown = true;
         }
     }
     function deleteQuestion(btn) {
-        if (confirm('{{#__}}delete_survey_question_confirmation{{/__}}')) {
+        if (confirm("{{#__}}delete_survey_question_confirmation{{/__}}")) {
             deleteQuestionEffective($(btn).parents('div.panel'));
             $('.tooltip').tooltip('hide');
             $('#survey-form').validator('validate');
