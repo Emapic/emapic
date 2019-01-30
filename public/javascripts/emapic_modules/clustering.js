@@ -10,15 +10,25 @@ var emapic = emapic || {};
         clusteringButtonId = 'clustering-control-activate',
         clusteringButtonsHtml = "<a id='" + clusteringButtonId + "' title='" + emapic.utils.getI18n('js_disable_clustering', 'Desactivar clustering') + "' href='javascript:void(0)' onclick='emapic.modules.clustering.toggle()'><img src='/images/icon-clustering.png' style='width: 16px; height: 16px;'/></a>",
         pieCenter = {x: 21.0, y: 21.0},
-        pieRadius = 19.0;
+        pieRadius = 19.0,
+        currentSpiderfied = null;
 
     emapic.modules = emapic.modules || {};
     emapic.modules.clustering = emapic.modules.clustering || {};
 
-    emapic.getIndivVotesLayerLeafletLayers = function () {
-        emapic.modules.clustering.deactivate();
-        return emapic.indivVotesLayer.getLayers();
-    };
+    emapic.showMarker = emapic.utils.overrideFunction(emapic.showMarker, null, function(dumb, marker) {
+        if (clusteringActive) {
+            var parent = emapic.indivVotesLayer.getVisibleParent(marker);
+            if (parent.spiderfy) {
+                parent.spiderfy();
+                currentSpiderfied = parent;
+            } else if (currentSpiderfied && currentSpiderfied.getAllChildMarkers().indexOf(marker) === -1) {
+                currentSpiderfied.unspiderfy();
+                currentSpiderfied = null;
+            }
+        }
+        return marker;
+    });
 
     emapic.loadIndivVotesLayer = emapic.utils.overrideFunction(emapic.loadIndivVotesLayer, null, function(markers) {
         if (!clusteringActive && !emapic.indivVotesLayer.enableClustering) {

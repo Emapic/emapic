@@ -93,9 +93,7 @@ var emapic = emapic || {};
             titlesidebarPanel.hide();
         }
         $("#indivData").html(emapic.getPopupHtml(layers[number].feature.properties));
-        if (!(emapic.map.getBounds().contains(layers[number].getLatLng()))) {
-            emapic.map.setView(layers[number].getLatLng());
-        }
+        emapic.showMarker(layers[number]);
     };
 
     emapic.modules.panel.getColorPanelSelect = function(number) {

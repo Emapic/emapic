@@ -304,6 +304,13 @@ var emapic = emapic || {};
         }
     };
 
+    emapic.showMarker = function(marker) {
+        if (emapic.map.getBounds().contains(marker.getLatLng())) {
+            return;
+        }
+        emapic.map.setView(marker.getLatLng());
+    };
+
     emapic.addViewsControls = function() {
     };
 
