@@ -1212,6 +1212,7 @@ div.input-with-clear-btn {
 
 div.input-with-clear-btn input {
     flex: 1 1 auto;
+    margin-bottom: 0;
 }
 
 div.input-with-clear-btn a.clear-input {
@@ -1389,6 +1390,17 @@ label.adi-opts-label {
     width: 75px;
     height: 75px;
     border: 1px solid black;
+    margin-bottom: 10px;
+    display: flex;
+}
+
+.answer-group .answer-img .img-thumbnail {
+    max-height: 100%;
+    border: none;
+}
+
+.answerimg {
+    margin: auto;
 }
 
 .question-group .question-handle,

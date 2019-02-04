@@ -122,6 +122,52 @@
             }
         }
     }
+    function imageInputChanged(input) {
+        var $this = $(input),
+            name = $this.attr('name'),
+            $answ = $('#answer_' + name.split('_')[1] + '_' + name.split('_')[2]);
+
+        emapic.utils.checkClearInput(input);
+
+        if ($this.val() === '') {
+            $answ.find('img[name="answerimg"]').hide();
+            $answ.find('img[name="answerimg-old"]').show();
+            $answ.find('span.help-tooltip').show();
+        } else {
+            $answ.find('img[name="answerimg"]').show();
+            $answ.find('img[name="answerimg-old"]').hide();
+            $answ.find('span.help-tooltip').hide();
+        }
+
+        if ($this.val() === '' && $answ.find('img[name="answerimg-old"]').attr('src') === '') {
+            $answ.find('.answer-img-container').attr('style', 'display: none;');
+        } else {
+            $answ.find('.answer-img-container').attr('style', 'display: block;');
+        }
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                var $el = $answ.find('img[name="answerimg"]');
+
+                $el.attr('src', e.target.result);
+                $el.show();
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            var $el = $answ.find('img[name="answerimg"]');
+
+            $el.attr('src', null);
+            $el.hide();
+        }
+    }
+    function deleteInputImage(input) {
+        var $this = $(input),
+            imgId = $this.siblings('input:file').attr('name');
+
+        emapic.utils.clearInput(imgId);
+    }
     function populateQuestions() {
 		for (var i = 0, len = questionsMap.length; i<len; i++) {
 			populateQuestion(i + 1, questionsMap[i]);
@@ -183,8 +229,8 @@
                         $('input[name="option_' + qstn + '_' + ansr + '_color"]').spectrum("set", answerMap.legend);
                         if (answerMap.imageUrl != null) {
                             $('input[type="checkbox"][name="responses_img_' + qstn + '"]').prop("checked",true).trigger("change");
-                            var $img = $('#answer_' + qstn + '_' + ansr + ' .answer-img');
-                            $img.css('background-image', "url('" + answerMap.imageUrl + "')");
+                            var $img = $('#answer_' + qstn + '_' + ansr + ' .answer-img').find('img');
+                            $img.attr('src', answerMap.imageUrl);
                             $('input[type="file"][name="img_' + qstn + '_' + ansr + '"]').removeAttr('required');
                             $('#answer_' + qstn + '_' + ansr + ' .answer-img-container').show();
                         }
@@ -196,8 +242,8 @@
                     $('input[name="option_' + qstn + '_other_color"]').spectrum("set", answerMap.legend);
                     if (answerMap.imageUrl != null) {
                         $('input[type="checkbox"][name="responses_img_' + qstn + '"]').prop("checked",true).trigger("change");
-                        var $img = $('#answer_' + qstn + '_other .answer-img');
-                        $img.css('background-image', "url('" + answerMap.imageUrl + "')");
+                        var $img = $('#answer_' + qstn + '_other .answer-img').find('img');
+                        $img.attr('src', answerMap.imageUrl);
                         $('input[type="file"][name="img_' + qstn + '_other"]').removeAttr('required');
                         $('#answer_' + qstn + '_other .answer-img-container').show();
                     }
@@ -309,10 +355,23 @@
                                             </div>\
                                         </div>\
                                         <div class="form-group answer-img-group" style="display: none;">\
-                                            <div class="col-xs-12 col-md-2 col-md-offset-1"><div class="answer-img-container" style="display: none;"><div id="answer_img_' + qstn + '_1" class="answer-img pull-left update-id"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
-                                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
-                                            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
-                                                <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" />\
+                                            <div class="col-xs-12 col-sm-3 col-md-2 col-md-offset-1">\
+                                                <div class="answer-img-container" style="display: none;">\
+                                                    <div id="answer_img_' + qstn + '_1" class="answer-img pull-left update-id">\
+                                                        <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="" style="display: none;">\
+                                                        <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="">\
+                                                    </div>\
+                                                    <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span>\
+                                                </div>\
+                                            </div>\
+                                            <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
+                                            <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
+                                                <div class="input-with-clear-btn">\
+                                                    <input class="form-control" required disabled type="file" accept="image/*" onchange="imageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" />\
+                                                    <a class="clear-input disabled" onclick="deleteInputImage(this)">\
+                                                        <i class="fas fa-times-circle"></i>\
+                                                    </a>\
+                                                </div>\
                                                 <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
                                             </div>\
                                         </div>\
@@ -339,10 +398,23 @@
                                             </div>\
                                         </div>\
                                         <div class="form-group answer-img-group" style="display: none;">\
-                                            <div class="col-xs-12 col-md-2 col-md-offset-1"><div class="answer-img-container" style="display: none;"><div id="answer_img_' + qstn + '_2" class="answer-img pull-left update-id"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
-                                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
-                                            <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
-                                                <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" />\
+                                            <div class="col-xs-12 col-sm-3 col-md-2 col-md-offset-1">\
+                                                <div class="answer-img-container" style="display: none;">\
+                                                    <div id="answer_img_' + qstn + '_2" class="answer-img pull-left update-id">\
+                                                        <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="" style="display: none;">\
+                                                        <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="">\
+                                                    </div>\
+                                                    <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span>\
+                                                </div>\
+                                            </div>\
+                                            <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
+                                            <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
+                                                <div class="input-with-clear-btn">\
+                                                    <input class="form-control" required disabled type="file" accept="image/*" onchange="imageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" />\
+                                                    <a class="clear-input disabled" onclick="deleteInputImage(this)">\
+                                                        <i class="fas fa-times-circle"></i>\
+                                                    </a>\
+                                                </div>\
                                                 <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
                                             </div>\
                                         </div>\
@@ -374,10 +446,23 @@
                                         </div>\
                                     </div>\
                                     <div class="form-group answer-img-group" style="display: none;">\
-                                        <div class="col-xs-12 col-sm-2 col-sm-offset-1"><div class="answer-img-container" style="display: none;"><div id="answer_img_' + qstn + '_other" class="answer-img pull-left update-id"></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div></div>\
-                                        <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
-                                        <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
-                                            <input class="form-control" required disabled type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}" />\
+                                        <div class="col-xs-12 col-sm-3 col-md-2 col-md-offset-1">\
+                                            <div class="answer-img-container" style="display: none;">\
+                                                <div id="answer_img_' + qstn + '_other" class="answer-img pull-left update-id">\
+                                                    <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="" style="display: none;">\
+                                                    <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="">\
+                                                </div>\
+                                                <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span>\
+                                            </div>\
+                                        </div>\
+                                        <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
+                                        <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
+                                            <div class="input-with-clear-btn">\
+                                                <input class="form-control" required disabled type="file" accept="image/*" onchange="imageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}" />\
+                                                <a class="clear-input disabled" onclick="deleteInputImage(this)">\
+                                                    <i class="fas fa-times-circle"></i>\
+                                                </a>\
+                                            </div>\
                                             <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
                                         </div>\
                                     </div>\
@@ -571,13 +656,23 @@
                     </div>\
                 </div>\
                 <div class="form-group answer-img-group"' + (responses_img ? '' : ' style="display: none;"' ) + '>\
-                    <div class="col-xs-12 col-md-2 col-md-offset-1">' +
-                    '<div class="answer-img-container"' + (imageUrl ? '' : ' style="display: none;"') + '><div id="answer_img_' + qstn + '_' + answ + '" class="answer-img pull-left update-id"' + (imageUrl != null ? ' style="background-image: url(\'' + imageUrl + '\');"' : '') +
-                    '></div><span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span></div>' +
-                    '</div>\
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">{{#__}}image{{/__}}:</label>\
-                    <div class="col-xs-12 col-sm-9 col-md-6 col-lg-5">\
-                        <input class="form-control" ' + (imageUrl ? '' : 'required ' ) + (responses_img ? '' : 'disabled ' ) + 'type="file" accept="image/*" data-maxfilesize="1000000" name="img_' + qstn + '_' + answ + '" />\
+                    <div class="col-xs-12 col-sm-3 col-md-2 col-md-offset-1">\
+                        <div class="answer-img-container" style="display: ' + (imageUrl != null ? 'block;' : 'none;') + '">\
+                            <div id="answer_img_' + qstn + '_' + answ + '" class="answer-img pull-left update-id">\
+                                <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="' + (imageUrl != null ? imageUrl : '') + '" style="display: none;">\
+                                <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="' + (imageUrl != null ? imageUrl : '') + '">\
+                            </div>\
+                            <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span>\
+                        </div>\
+                    </div>\
+                    <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
+                    <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
+                        <div class="input-with-clear-btn">\
+                            <input class="form-control" ' + (imageUrl ? '' : 'required ' ) + (responses_img ? '' : 'disabled ' ) + 'type="file" accept="image/*" onchange="imageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_' + answ + '" />\
+                            <a class="clear-input disabled" onclick="deleteInputImage(this)">\
+                                <i class="fas fa-times-circle"></i>\
+                            </a>\
+                        </div>\
                         <div class="help-block">{{#__}}maximum_answer_image_size{{/__}}</div>\
                     </div>\
                 </div>\
@@ -620,7 +715,6 @@
                     $("[name=option_" + newQstnNr + "_" + i + "]")[0].value = $("[name=option_" + qstnNr + "_" + i + "]")[0].value;
                     $("#answer_" + newQstnNr + "_" + i + " .spectrum").spectrum("set", $("[name=option_" + qstnNr + "_" + i + "_color]").val().replace('#', ''));
                     if ($("#responses_img_" + qstnNr).prop("checked")) {
-                        var $img = $('#answer_' + newQstnNr + '_' + i + ' .answer-img');
                         // We can't change a file input value because it's
                         // considered insecure. As an alternative, we clone the
                         // original input field and replace the new one.
@@ -633,14 +727,27 @@
                                 ($('input[type="file"][name="img_' + qstnNr + '_' + i + '"]').val() !== $('input[type="file"][name="img_' + newQstnNr + '_' + i + '"]').val());
                         }
                         if ($("#answer_img_" + qstnNr + "_" + i)[0] !== undefined) {
-                            if ($("#answer_img_" + qstnNr + "_" + i)[0].style.backgroundImage.split('/')[2] !== undefined) {
-                                var imgId = $("#answer_img_" + qstnNr + "_" + i)[0].style.backgroundImage.split('/')[2].replace('")', '');
-                                $img.css('background-image', "url('/answer_img/" + imgId + "')");
+                            var $img = $('#answer_' + qstnNr + '_' + i + ' .answer-img').find('img[name="answerimg"]'),
+                                $imgOld = $('#answer_' + qstnNr + '_' + i + ' .answer-img').find('img[name="answerimg-old"]'),
+                                $new_img = $('#answer_' + newQstnNr + '_' + i + ' .answer-img').find('img[name="answerimg"]'),
+                                $new_imgOld = $('#answer_' + newQstnNr + '_' + i + ' .answer-img').find('img[name="answerimg-old"]');
+
+                            if ($imgOld.attr('src') !== "") {
+                                var imgId_old = $imgOld.attr('src').split('/')[2];
+                                $new_imgOld.attr('src', $imgOld.attr('src'));
+                                // update hidden inputs with current image id
+                                // only modified when there was a previous image loaded (i.e. not in new surveys)
                                 $('input[type="file"][name="img_' + newQstnNr + '_' + i + '"]').removeAttr('required');
                                 $('#answer_' + newQstnNr + '_' + i + ' .answer-img-container').show();
-                                $('input[name="option_' + newQstnNr + '_' + i + '_img_id"]').val(imgId);
-                                $('input[name="id_' + newQstnNr + '_' + i + '"]').val(imgId);
+                                $('input[name="option_' + newQstnNr + '_' + i + '_img_id"]').val(imgId_old);
+                                $('input[name="id_' + newQstnNr + '_' + i + '"]').val(imgId_old);
                             }
+                            if ($img.attr('src') !== "" && $img.attr('src') !== undefined) {
+                                //update image thumbnail
+                                $new_img.attr('src', $img.attr('src'));
+                            }
+                            // notify that input has been modified
+                            $('input[type="file"][name="img_' + newQstnNr + '_' + i + '"]').trigger('change');
                         }
                     }
                 }
@@ -658,14 +765,27 @@
                         showInputFileWarning = showInputFileWarning ||
                             ($('input[type="file"][name="img_' + newQstnNr + '_other"]').val() !== $('input[type="file"][name="img_' + qstnNr + '_other"]').val());
                     }
-                    var $img_other = $('#answer_' + newQstnNr + '_other .answer-img');
-                    if (($("#answer_img_" + qstnNr + "_other")[0].style.backgroundImage.split('/')[2]) !== undefined) {
-                        var imgIdOther = $("#answer_img_" + qstnNr + "_other")[0].style.backgroundImage.split('/')[2].replace('")', '');
-                        $img_other.css('background-image', "url('/answer_img/" + imgIdOther + "')");
-                        $('input[type="file"][name="img_' + newQstnNr + '_other"]').removeAttr('required');
-                        $('#answer_' + newQstnNr + '_other .answer-img-container').show();
-                        $('input[name="option_' + newQstnNr + '_other_img_id"]').val(imgIdOther);
-                        $('input[name="id_' + newQstnNr + '_other"]').val(imgIdOther);
+                    if ($("#answer_img_" + qstnNr + "_other")[0] !== undefined) {
+                        var $img = $('#answer_' + qstnNr + '_other .answer-img').find('img[name="answerimg"]'),
+                            $imgOld = $('#answer_' + qstnNr + '_other .answer-img').find('img[name="answerimg-old"]'),
+                            $new_img = $('#answer_' + newQstnNr + '_other .answer-img').find('img[name="answerimg"]'),
+                            $new_imgOld = $('#answer_' + newQstnNr + '_other .answer-img').find('img[name="answerimg-old"]');
+
+                        if ($imgOld.attr('src') !== "") {
+                            var imgId_old = $imgOld.attr('src').split('/')[2];
+                            $new_imgOld.attr('src', $imgOld.attr('src'));
+                            // update hidden inputs with current image id
+                            $('input[type="file"][name="img_' + newQstnNr + '_other"]').removeAttr('required');
+                            $('#answer_' + newQstnNr + '_other .answer-img-container').show();
+                            $('input[name="option_' + newQstnNr + '_other_img_id"]').val(imgId_old);
+                            $('input[name="id_' + newQstnNr + '_other"]').val(imgId_old);
+                        }
+                        if ($img.attr('src') !== "") {
+                            //update image thumbnail
+                            $new_img.attr('src', $img.attr('src'));
+                        }
+                        // notify that input has been modified
+                        $('input[type="file"][name="img_' + newQstnNr + '_other"]').trigger('change');
                     }
                 }
                 break;

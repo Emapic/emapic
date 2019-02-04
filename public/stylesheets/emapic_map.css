@@ -1129,7 +1129,7 @@ div.col > #thanks-msg {
     margin-right: 20px;
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: auto 100%;
+    background-size: contain;
     width: 75px;
     height: 75px;
 }
