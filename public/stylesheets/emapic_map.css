@@ -1539,7 +1539,7 @@ div.col > #thanks-msg {
     display: none;
 }
 
-@media screen and (max-device-width: 599px), screen and (max-device-height: 639px) {
+@media screen and (max-width: 599px), screen and (max-height: 639px) {
     .navbar-brand {
         padding: 5px;
         height: 35px;
@@ -1595,7 +1595,7 @@ div.col > #thanks-msg {
 }
 
 /* --- Styles for NOT very small screen devices --- */
-@media screen and (min-device-width: 361px) and (min-device-height: 551px) {
+@media screen and (min-width: 361px) and (min-height: 551px) {
     .always-show-not-extrasmall {
         display: inherit !important;
     }
@@ -1610,7 +1610,7 @@ div.col > #thanks-msg {
     display: none;
 }
 
-@media screen and (max-device-width: 360px), screen and (max-device-height: 550px) {
+@media screen and (max-width: 360px), screen and (max-height: 550px) {
     #header {
         height: 60px;
     }
@@ -1729,37 +1729,37 @@ div.col > #thanks-msg {
     display: none;
 }
 
-@media screen and (max-device-width: 767px) {
+@media screen and (max-width: 767px) {
     .hidden-xs-down {
         display: none;
     }
 }
 
-@media screen and (min-device-width: 768px) {
+@media screen and (min-width: 768px) {
     .hidden-sm-up {
         display: none;
     }
 }
 
-@media screen and (max-device-width: 991px) {
+@media screen and (max-width: 991px) {
     .hidden-sm-down {
         display: none;
     }
 }
 
-@media screen and (min-device-width: 992px) {
+@media screen and (min-width: 992px) {
     .hidden-md-up {
         display: none;
     }
 }
 
-@media screen and (max-device-width: 1199px) {
+@media screen and (max-width: 1199px) {
     .hidden-md-down {
         display: none;
     }
 }
 
-@media screen and (min-device-width: 1200px) {
+@media screen and (min-width: 1200px) {
     .hidden-lg-up {
         display: none;
     }

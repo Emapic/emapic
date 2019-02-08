@@ -1658,7 +1658,7 @@ div.legal-text ol > li {
 	opacity: 1;
 }
 
-@media screen and (max-device-width: 768px) {
+@media screen and (max-width: 768px) {
     .answer-group label.control-label {
         text-align: left;
     }
@@ -1674,7 +1674,7 @@ div.legal-text ol > li {
     display: none;
 }
 
-@media screen and (max-device-width: 991px) {
+@media screen and (max-width: 991px) {
     .content {
         min-height: calc(100% - 60px);
         padding-top: 30px;
@@ -1722,7 +1722,7 @@ div.legal-text ol > li {
     }
 }
 
-@media screen and (max-device-width: 767px) {
+@media screen and (max-width: 767px) {
     .navbar #menu-navbar {
         border: 1px solid #EBEBEB;
     }
@@ -1734,7 +1734,7 @@ div.legal-text ol > li {
     display: none;
 }
 
-@media screen and (max-device-width: 360px), screen and (max-device-height: 550px) {
+@media screen and (max-width: 360px), screen and (max-height: 550px) {
     .show-extrasmall {
         display: initial;
     }
