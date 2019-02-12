@@ -676,7 +676,7 @@ module.exports = function(app) {
                         var avatarPromise;
                         if ('image' in profile._json && 'url' in profile._json.image && !profile._json.image.isDefault) {
                             avatarPromise = imgRequest.getAsync(profile._json.image.url.split('?')[0]).then(function (values) {
-                                return Promise.resolve(new Buffer(values[1]));
+                                return Promise.resolve(Buffer.from(values[1]));
                             });
                         } else {
                             avatarPromise = Promise.resolve(null);
@@ -734,7 +734,7 @@ module.exports = function(app) {
                         if ('picture' in profile._json && 'data' in profile._json.picture &&
                             !profile._json.picture.data.is_silhouette && 'url' in profile._json.picture.data) {
                             avatarPromise = imgRequest.getAsync(profile._json.picture.data.url).then(function (values) {
-                                return Promise.resolve(new Buffer(values[1]));
+                                return Promise.resolve(Buffer.from(values[1]));
                             });
                         } else {
                             avatarPromise = Promise.resolve(null);

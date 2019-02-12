@@ -564,7 +564,7 @@ module.exports = function(sequelize, DataTypes) {
                         // We ignore the error when file doesn't exist
                     }).then(function(stats) {
                         if (stats && stats.isFile()) {
-                            return fsp.unlink(path);
+                            return fsp.unlinkSync(path);
                         }
                     });
                 });

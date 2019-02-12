@@ -301,7 +301,7 @@ module.exports = function(app) {
             res.contentType("image/png");
             res.send(fs.readFileSync("public/images/default-avatar.png"));
         } else {
-            var buffer = new Buffer(req.user.avatar);
+            var buffer = Buffer.from(req.user.avatar);
             res.contentType(Utils.getFileMimeType(buffer, 'image/png'));
             res.send(buffer);
         }
@@ -316,7 +316,7 @@ module.exports = function(app) {
                 res.contentType("image/png");
                 res.send(fs.readFileSync("public/images/default-avatar.png"));
             } else {
-                var buffer = new Buffer(user.avatar);
+                var buffer = Buffer.from(user.avatar);
                 res.contentType(Utils.getFileMimeType(buffer, 'image/png'));
                 res.send(buffer);
             }
@@ -328,7 +328,7 @@ module.exports = function(app) {
             if (answer === null || answer.img === null || answer.img.length === 0) {
                 return res.send(404);   // HTTP status 404: NotFound
             }
-            var buffer = new Buffer(answer.img);
+            var buffer = Buffer.from(answer.img);
             res.contentType(Utils.getFileMimeType(buffer, 'image/png'));
             res.send(buffer);
         });

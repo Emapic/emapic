@@ -350,7 +350,7 @@ module.exports = function(app) {
                 }
             }
             if (paths.length > 0) {
-                paths.map(fs.unlink);
+                paths.map(fs.unlinkSync);
                 logger.debug('Successfully deleted the following tmp files: ' + paths.join(' | '));
             }
         },
