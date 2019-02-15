@@ -18,6 +18,7 @@ var nodemailer = require('nodemailer'),
     smtpConfig = nconf.get('smtp'),
     fileType = require('file-type'),
     readChunk = require('read-chunk'),
+    tmp = require('tmp'),
     sharp,
     Jimp,
     selectAnImageSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="150px" width="150px" version="1.0" viewBox="-300 -300 600 600" xml:space="preserve"><circle stroke="#AAA" stroke-width="10" r="280" fill="#FFF"/><text style="letter-spacing:1;text-anchor:middle;text-align:center;stroke-opacity:.5;stroke:#000;stroke-width:2;fill:#444;font-size:360px;font-family:Bitstream Vera Sans,Liberation Sans, Arial, sans-serif;line-height:125%;writing-mode:lr-tb;" transform="scale(.2)">{INNER_TEXT}</text></svg>',
@@ -233,18 +234,27 @@ module.exports = function(app) {
             return props;
         },
 
-        takeSnapshot: function(url, imgPath, width, height, wait, minSize, retries) {
-            return takeSnapshotRaw(url, imgPath, width, height, wait, minSize).then(function() {
+        takeSnapshot: function(url, imgPath, nativeWidth, nativeHeight, wait, minSize, retries, imgWidth, imgHeight) {
+            imgWidth = imgWidth ? imgWidth : nativeWidth;
+            imgHeight = imgHeight ? imgHeight : nativeHeight;
+            var tmpFile = tmp.fileSync({ postfix: '.png' });
+            return takeSnapshotRaw(url, tmpFile.name, nativeWidth, nativeHeight, wait, minSize).then(function() {
+                // Resize the image
+                return Utils.transformImage(tmpFile.name, imgWidth, imgHeight, false, 'png', imgPath);
+            }).then(function() {
                 // Compress the image content
                 return childProcess.execFileAsync(optipng, [
                         '-o7',
                         '-clobber',
                         imgPath
                     ]);
+            }).finally(function() {
+                // Delete the tmp file
+                tmpFile.removeCallback();
             }).return(imgPath).catch(function(err) {
                 if (retries) {
                     logger.debug('Retrying snapshot take for url "' + url + '" after error: ' + err);
-                    return Utils.takeSnapshot(url, imgPath, width, height, wait, minSize, retries - 1);
+                    return Utils.takeSnapshot(url, imgPath, nativeWidth, nativeHeight, wait, minSize, retries - 1, imgWidth, imgHeight);
                 }
                 throw err;
             });

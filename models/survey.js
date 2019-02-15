@@ -548,8 +548,8 @@ module.exports = function(sequelize, DataTypes) {
                     url = 'http://localhost:3001/survey/' + encrId + '/results';
                 // TODO resize the snapshots from the optimal size (512x288 / 512x512) to the smaller possible sizes (256x144 / 400x400)
                 return Promise.all([
-                    Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 3000, 20000, 5),
-                    Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'share' + path.sep + encrId + '.png', 400, 400, 3000, 30000, 5)
+                    Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 3000, 20000, 5, 256, 144),
+                    Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'share' + path.sep + encrId + '.png', 512, 512, 3000, 30000, 5, 400, 400)
                 ]).catch(function(err) {
                     logger.error('Could not generate all thumbnails for survey with id ' + id + ' : ' + err);
                 });

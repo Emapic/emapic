@@ -69,6 +69,7 @@
     "sequelize": "3.14.0",
     "session-file-store": "0.0.24",
     "sharp": "0.16.2",
+    "tmp": "0.0.33",
     "url": "0.11.0",
     "winston": "2.4.3"
   },
