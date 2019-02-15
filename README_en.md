@@ -126,6 +126,16 @@ Now you must install the required Node.js packages before launching the applicat
 npm install
 ```
 
+> ##### Installation in 32-bit environments
+>
+> If we try to install the Node.js packages in a 32-bit environment, we'll probably have some problems regarding the _sharp_ package, used for image resizing. In this case, what we should do is edit the file _package.json_ and remove the line that details the version of said package to install, which should look like this one:
+> ```
+> "sharp": "0.16.2",
+> ```
+>
+> After doing that we can run the command again and there should be no more problems, although we should keep in mind that the application will now use _Jimp_ as a fallback package, which has a worse performance when resizing images.
+
+
 Now we can launch the application with either of these commands:
 
 ```

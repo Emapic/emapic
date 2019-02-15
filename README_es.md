@@ -116,7 +116,6 @@ Aunque intentamos evitarlo, hemos tenido que actualizar algunos commits de sqitc
 
 * Renombra/borra el esquema «sqitch» en tu base de datos de Emapic, despliega de nuevo la base de datos con un nombre distinto (o en un servidor distinto), haz una copia de seguridad del esquema «sqitch» de esta base de datos nueva y restáurala en la antigua. Si hubiere algún commit nuevo sin aplicar en tu base de datos antigua, deberías aplicarlos manualmente ejecutando su sql de despliegue. La mejor opción si eres un usuario avanzado y no puedes apagar la base de datos de Emapic temporalmente o simplemente no quieres manejar copias de seguridad complejas. Si despliegas de nuevo la base de datos con un nombre distinto en el mismo servidor, ten cuidado con el usuario de base de datos de Emapic.
 
-
 #### Código del servidor
 
 Ahora para poder lanzar la aplicación primero hay que instalar los paquetes requeridos de Node.js. Dentro de la carpeta base del repositorio ejecutamos:
@@ -124,6 +123,15 @@ Ahora para poder lanzar la aplicación primero hay que instalar los paquetes req
 ```
 npm install
 ```
+
+> ##### Instalación en entornos de 32 bits
+>
+> Si intentamos instalar los paquetes de Node.js en un entorno de 32 bits, lo normal es que encontremos problemas durante la instalación del paquete _sharp_, empleado para el redimensionamiento de imágenes. En este caso, lo que deberemos hacer es editar el archivo _package.json_ y eliminar la línea que indica la versión de dicho paquete a instalar, similar a ésta:
+> ```
+> "sharp": "0.16.2",
+> ```
+>
+> Posteriormente ejecutamos de nuevo el comando y ya no deberíamos tener problemas, pero hay que tener en cuenta que en este caso la aplicación empleará el paquete _Jimp_ como reemplazo, el cual ofrece un rendimiento peor a la hora de redimensionar las imágenes.
 
 La aplicación ya se puede lanzar con cualquiera de estos comandos:
 
