@@ -98,6 +98,7 @@
 
           <div id="thanks-msg" class="text-center" hidden>
               <h2>{{#__}}survey_thanks{{/__}}</h2>
+              {{#survey.results_after_vote}}<h3>{{#__}}survey_thanks_responses{{/__}}</h3>{{/survey.results_after_vote}}
           </div>
           <div id="check-loc" class="check-loc text-center" hidden>
               <div class="loc-description" style="display: none;">
@@ -206,6 +207,7 @@
         emapic.modules.survey.surveyPostFormat = 'multipart';
 
         {{^survey.results_after_vote}}
+        emapic.modules.survey.thksMsgTimeOut = 3000;
         emapic.resultsAfterVote = false;
         {{/survey.results_after_vote}}
         {{/results}}

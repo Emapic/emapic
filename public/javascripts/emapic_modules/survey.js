@@ -16,7 +16,7 @@ var emapic = emapic || {};
     emapic.modules.survey.marker = null;
     emapic.modules.survey.data = {};
     emapic.modules.survey.responses = {};
-    emapic.modules.survey.thksMsgTimeOut = 3000;
+    emapic.modules.survey.thksMsgTimeOut = 6000;
     emapic.modules.survey.statusMarkerIconHtml = "<svg width='51' height='46'>" +
         "<defs>\n" +
         "<pattern id='image' x='0' y='0' patternUnits='userSpaceOnUse' height='46' width='51'>\n" +
