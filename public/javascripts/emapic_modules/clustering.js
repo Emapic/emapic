@@ -133,7 +133,7 @@ var emapic = emapic || {};
     }
 
     function getSVGPie(colors, total, text) {
-        var htmlStart = '<svg id="svg" width="' + (pieCenter.x*2) + 'px" height="' + (pieCenter.y*2) + 'px" xmlns="http://www.w3.org/2000/svg" version="1.1" onmouseover="$(this).children(\'circle\').attr(\'stroke-width\', \'2\');" onmouseout="$(this).children(\'circle\').attr(\'stroke-width\', \'0\');">',
+        var htmlStart = '<svg width="' + (pieCenter.x*2) + 'px" height="' + (pieCenter.y*2) + 'px" xmlns="http://www.w3.org/2000/svg" version="1.1" onmouseover="$(this).children(\'circle\').attr(\'stroke-width\', \'2\');" onmouseout="$(this).children(\'circle\').attr(\'stroke-width\', \'0\');">',
             htmlEnd = text + '</svg>',
             html = '',
             previousAngle = 0,
@@ -159,7 +159,7 @@ var emapic = emapic || {};
     }
 
     function getClusterIcon(colors, total) {
-        text = '<text x="21" y="27" font-family="Verdana" font-weight="bold" fill="#FFFFFF" stroke="#000000" stroke-width="0.7" font-size="17" style="text-anchor: middle;">' + total + '</text>';
+        text = '<text x="' + pieCenter.x + '" y="27" font-family="Verdana" font-weight="bold" fill="#FFFFFF" stroke="#000000" stroke-width="0.7" font-size="17" style="text-anchor: middle;">' + total + '</text>';
         return getSVGPie(colors, total, text);
     }
 

@@ -67,6 +67,9 @@ label {
     cursor: default !important;
     pointer-events: none;
 }
+.leaflet-marker-icon.marker-cluster-svg svg {
+    overflow: visible;
+}
 #map.disable-all > div:not(.spinner) {
     opacity: 0.4;
 }
