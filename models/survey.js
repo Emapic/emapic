@@ -791,6 +791,7 @@ module.exports = function(sequelize, DataTypes) {
 
             getAggregatedTotals: function(layer, params) {
                 var survey = this,
+                    namePromise,
                     geom,
                     sql1,
                     sql2;
@@ -799,10 +800,22 @@ module.exports = function(sequelize, DataTypes) {
                     case 'countries':
                         sql1 = "SELECT lower(a.iso_code_2) AS iso_code, count(b.gid) AS total_responses";
                         sql2 = " FROM base_layers.countries a JOIN base_layers.provinces c ON a.gid = c.country_gid JOIN opinions.survey_" + survey.id + " b ON c.gid = b.province_gid GROUP BY a.gid ORDER BY total_responses DESC, iso_code ASC;";
+                        namePromise = ('lang' in params) ? checkColumnExists('name_' + params.lang, 'countries', 'base_layers').then(function(result) {
+                            return ', a.name' + (result[0].exists ? '_' + params.lang : '') + ' AS name';
+                        }) : Promise.resolve(', a.name AS name');
                         break;
                     case 'provinces':
                         sql1 = "SELECT gns_adm1 AS country_id, iso_3166_2 AS iso_code, adm1_code as adm_code, type_en AS adm_type, lower(iso_a2) AS country_iso_code, count(b.gid) AS total_responses";
-                        sql2 = " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid GROUP BY a.gid ORDER BY total_responses DESC, a.name ASC;";
+                        sql2 = " FROM base_layers.provinces a JOIN opinions.survey_" + survey.id + " b ON a.gid = b.province_gid JOIN base_layers.countries c ON a.country_gid = c.gid " +
+                            "GROUP BY a.gid, c.gid ORDER BY total_responses DESC, a.name ASC;";
+                        namePromise = ('lang' in params) ? Promise.join(
+                            checkColumnExists('name_' + params.lang, 'provinces', 'base_layers'),
+                            checkColumnExists('name_' + params.lang, 'countries', 'base_layers'),
+                            function(provinceName, countryName) {
+                                return ', a.name' + (provinceName[0].exists ? '_' + params.lang : '') + ' AS name, ' +
+                                    'c.name' + (countryName[0].exists ? '_' + params.lang : '') + ' AS superheader';
+                            }
+                        ) : Promise.resolve(', a.name AS name, c.name AS superheader');
                         break;
                     default:
                         return Promise.reject(new Error('INVALID BASE LAYER'));
@@ -828,11 +841,8 @@ module.exports = function(sequelize, DataTypes) {
                             return Promise.reject(new Error('INVALID GEOM TYPE'));
                     }
                 }
-                namePromise = ('lang' in params) ? checkColumnExists('name_' + params.lang, layer, 'base_layers').then(function(result) {
-                    return (result[0].exists) ? 'name_' + params.lang : 'name';
-                }) : Promise.resolve('name');
                 return Promise.join(namePromise, this.getLegend(), function(nameCol, legend) {
-                    var query = sql1 + ', a.' + nameCol + ' AS name';
+                    var query = sql1 + nameCol;
                     if (legend && legend.color) {
                         for (var i = 0, iLen = legend.color.length; i<iLen; i++) {
                             var legendResponses = legend.color[i].responses_array;

@@ -12,6 +12,8 @@ var emapic = emapic || {};
         countriesLayer = null,
         countriesLayerData,
         countryResultsDfd = null,
+        provinceJsonColumnsToIgnore = ['name', 'total_responses', 'iso_code', 'country_id', 'adm_code', 'adm_type', 'country_iso_code'],
+        countryJsonColumnsToIgnore = ['name', 'total_responses', 'iso_code'],
         aggregationButtonsHtml = "<a id='grouping-control-region' title='" + emapic.utils.getI18n('js_total_votes_region', 'Ver total de votos por región') + "' class='exclusive-control' href='javascript:void(0)' onclick='emapic.modules.aggregation.showVotesByProvince(this)'><img src='/images/icon-agg_region.png' style='width: 16px; height: 16px;'/></a>\n"+
             "<a id='grouping-control-country' class='exclusive-control' title='" + emapic.utils.getI18n('js_total_votes_country', 'Ver total de votos por país') + "' href='javascript:void(0)' onclick='emapic.modules.aggregation.showVotesByCountry(this)'><img src='/images/icon-agg_country.png' style='width: 16px; height: 16px;'/></a>";
 
@@ -125,19 +127,21 @@ var emapic = emapic || {};
         }
     };
 
-    function provincePopup(feature) {
+    function popup(feature, columnsToIgnore) {
     	if (feature.properties.popup_msg) {
     		return feature.properties.popup_msg;
     	}
-        var popup = '<h4><small>' + feature.properties.name + '</small></h4>',
+        var popup = '',
             popupProperties = '',
             orderedVotes = {},
             question;
+        if (feature.properties.superheader) {
+            popup += '<h5 class="popup-aggregated-superheader">' + feature.properties.superheader + '</h5>';
+        }
+        popup += '<h4 class="popup-aggregated-header">' + feature.properties.name + '</h4>';
         // We order the votes in descending order
         for (var i in feature.properties) {
-            if (i != 'name' && i != 'total_responses' && i != 'iso_code' &&
-                i != 'country_id' && i != 'adm_code' && i != 'adm_type' &&
-                i != 'country_iso_code' && i.split('_')[0] == emapic.legend.color.question) {
+            if (columnsToIgnore.indexOf(i) === -1 && i.split('_')[0] == emapic.legend.color.question) {
                 question = i.split('_')[0];
     			if (!orderedVotes[question]) {
     				orderedVotes[question] = [];
@@ -155,44 +159,18 @@ var emapic = emapic || {};
         for (i in orderedVotes) {
     		for (var k in orderedVotes[i]) {
     			var name = emapic.legend.color.responses[orderedVotes[i][k].name.split('_')[1]].value;
-    			popupProperties += '<small>' + name + ':</small> ' + orderedVotes[i][k].nr + '<br/>';
-    		}
-    		if (popupProperties !== '') {
-    			popupProperties = popupProperties.replace(new RegExp('<br/>$'), '<hr>');
+    			popupProperties += '<div class="popup-aggregated-result"><label>' + name + ':</label><span>' + orderedVotes[i][k].nr + '</span></div>';
     		}
         }
-        return popup + popupProperties + '<small>' + emapic.utils.getI18n('js_total_votes', 'Votos totales') + ':</small> ' + feature.properties.total_responses;
+        return popup + popupProperties + '<hr><div class="popup-aggregated-result popup-aggregated-total"><label>' + emapic.utils.getI18n('js_total_votes', 'Votos totales') + ':</label><span>' + feature.properties.total_responses + '</span></div>';
+    }
+
+    function provincePopup(feature) {
+        return popup(feature, provinceJsonColumnsToIgnore);
     }
 
     function countryPopup(feature) {
-    	if (feature.properties.popup_msg) {
-    		return feature.properties.popup_msg;
-    	}
-        var popup = '<h4><small>' + feature.properties.name + '</small></h4>',
-            popupProperties = '',
-            orderedVotes = [];
-        // We order the votes in descending order
-        for (var i in feature.properties) {
-            if (i != 'name' && i != 'total_responses' && i != 'iso_code' &&
-                i.split('_')[0] == emapic.legend.color.question) {
-                var position = orderedVotes.length;
-                for (var j in orderedVotes) {
-                    if (orderedVotes[j].nr < parseInt(feature.properties[i])) {
-                        position = j;
-                        break;
-                    }
-                }
-                orderedVotes.splice(position, 0, {nr: parseInt(feature.properties[i]), name: i});
-            }
-        }
-        for (i in orderedVotes) {
-    		var name = emapic.legend.color.responses[orderedVotes[i].name.split('_')[1]].value;
-            popupProperties += '<small>' + name + ':</small> ' + orderedVotes[i].nr + '<br/>';
-        }
-        if (popupProperties !== '') {
-            popupProperties = popupProperties.replace(new RegExp('<br/>$'), '<hr>');
-        }
-        return popup + popupProperties + '<small>' + emapic.utils.getI18n('js_total_votes', 'Votos totales') + ':</small> ' + feature.properties.total_responses;
+        return popup(feature, countryJsonColumnsToIgnore);
     }
 
     function getAreaStyle(feature) {
