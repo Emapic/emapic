@@ -1,7 +1,10 @@
 require('exit-on-epipe');
 
 var express = require('express'),
-    FileStore = require('session-file-store')(express.session),
+    session = require('express-session'),
+    FileStore = require('session-file-store')(session),
+    cookieParser = require('cookie-parser'),
+    favicon = require('serve-favicon'),
     fs = require('fs'),
     http = require('http'),
     https = require('https'),
@@ -11,6 +14,9 @@ var express = require('express'),
     slashes = require('connect-slashes'),
     i18n = require('i18n-2'),
     logger = require('./utils/logger'),
+    morgan = require('morgan'),
+    methodOverride = require('method-override'),
+    bodyParser = require('body-parser'),
     passport = require('passport'),
     // Load configuration:
     // First consider commandline arguments and environment variables, respectively,
@@ -67,6 +73,7 @@ var EmapicApp = function() {
         var sitemap = Sitemap({
             url: serverConfig.domain,
             http: 'https',
+            hideByRegex: false,
             route: {
                 // Never index the API
                 '/api/': {
@@ -124,13 +131,10 @@ var EmapicApp = function() {
                 sitemap = this.map
                 xmlGenerator = {
                     xml: this.originalXml,
-                    my: {
-                        url: this.my.url,
-                        route: {}
-                    },
+                    my: Object.assign({}, this.my),
                     map: this.map
                 };
-
+            xmlGenerator.routes = {};
             for (var uri in sitemap) {
                 if (uri in route) {
                     continue;
@@ -257,7 +261,7 @@ var EmapicApp = function() {
 
         utils(self.app);
 
-        self.app.use(express.cookieParser(serverConfig.secrets.cookie));
+        self.app.use(cookieParser(serverConfig.secrets.cookie));
         var localeFiles = fs.readdirSync('locales'),
             locales = [],
             localesWithIsos = [];
@@ -373,16 +377,17 @@ var EmapicApp = function() {
         self.app.set('views', path.join(__dirname, 'views'));
         self.app.set('view engine', 'hjs');
         self.app.engine('hjs', hoganExpress);
-        self.app.use(express.favicon());
-        self.app.use(express.logger({
-            format: '{"remote_addr": ":remote-addr", "remote_user": ":remote-user", "method": ":method", "url": ":url", "http_version": ":http-version", "status": ":status", "result_length": ":res[content-length]", "referrer": ":referrer", "user_agent": ":user-agent", "response_time": ":response-time"}',
-            stream: logger.stream
-        }));
+        self.app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.png')));
+        self.app.use(morgan(
+            '{"remote_addr": ":remote-addr", "remote_user": ":remote-user", "method": ":method", "url": ":url", "http_version": ":http-version", "status": ":status", "result_length": ":res[content-length]", "referrer": ":referrer", "user_agent": ":user-agent", "response_time": ":response-time"}',
+            { stream: logger.stream }
+        ));
         self.app.use(express.json());
-        self.app.use(express.urlencoded());
+        self.app.use(bodyParser.json());
+        self.app.use(bodyParser.urlencoded({ extended: true }));
         self.app.use(multiparty());
-        self.app.use(express.methodOverride());
-        self.app.use(express.session({
+        self.app.use(methodOverride());
+        self.app.use(session({
             store: new FileStore({
                 path: './.sessions',
                 ttl: 18000,
@@ -393,7 +398,9 @@ var EmapicApp = function() {
                     return {cookie: {originalMaxAge: 0 }};
                 }
             }),
-            secret: serverConfig.secrets.session
+            secret: serverConfig.secrets.session,
+            resave: false, // See https://github.com/expressjs/session#options for their values and meanings
+            saveUninitialized: false // See https://github.com/expressjs/session#options for their values and meanings
         }));
         self.app.use(passport.initialize());
         self.app.use(passport.session());
@@ -500,10 +507,11 @@ var EmapicApp = function() {
             };
             next();
         });
-        self.app.use(self.app.router);
-        self.app.use(express.bodyParser());
 
         routes(self.app);
+
+        // Create the sitemap and robots routes
+        self.loadSitemapRobots();
 
         self.app.use(httpErrorHandler.httpError(404));
 
@@ -542,9 +550,6 @@ var EmapicApp = function() {
 
         // Create the express server and routes.
         self.initializeServer();
-
-        // Create the sitemap and robots routes
-        self.loadSitemapRobots();
     };
 
 

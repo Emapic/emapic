@@ -1,6 +1,6 @@
 var util = require('util'),
     winston = require('winston'),
-    expressLogger = require('express').logger,
+    morganLogger = require('morgan'),
     loggingLevels = {
         levels: {
             emerg: 0,
@@ -100,11 +100,11 @@ var requestsLogger = winston.loggers.requests = new (winston.Logger)({
     emitErrs: false
 });
 
-expressLogger.token('user-agent', function (req, res) {
+morganLogger.token('user-agent', function (req, res) {
     return ('user-agent' in req.headers && req.headers['user-agent'] !== null) ? req.headers['user-agent'].replace(/"/g, '\\"') : null;
 });
 
-expressLogger.token('remote-user', function (req, res) {
+morganLogger.token('remote-user', function (req, res) {
     return req.user ? req.user.id : '-';
 });
 
