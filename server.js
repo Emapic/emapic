@@ -66,6 +66,7 @@ var EmapicApp = function() {
     self.loadSitemapRobots = function() {
         var sitemap = Sitemap({
             url: serverConfig.domain,
+            http: 'https',
             route: {
                 // Never index the API
                 '/api/': {
@@ -92,6 +93,9 @@ var EmapicApp = function() {
                     hide: true
                 },
                 '/activate': {
+                    hide: true
+                },
+                '/pwd_reset/confirm': {
                     hide: true
                 },
                 // Hide pages that require login
