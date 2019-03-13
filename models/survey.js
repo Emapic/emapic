@@ -1,11 +1,17 @@
 var Promise = require('bluebird'),
     nconf = require('nconf'),
-    linkifyHtml = require('linkifyjs/html'),
+    htmlToText = require('html-to-text'),
     fsp = require('fs-extra'),
     path = require('path'),
     fs = require('fs'),
     logger = require('../utils/logger'),
     sequelize = require('sequelize'),
+    md = require('markdown-it')('zero') // 'zero' preset deletes all config but essential features
+        .set({ breaks: true })
+        .enable([ 'emphasis', 'link', 'newline' ]),
+        // In case we want to add more rules to be parsed, check :
+        // https://github.com/markdown-it/markdown-it/tree/8.3.1/lib
+        // parser_block.js, parser_core.js, parser_inline.js
 
     searchEngineLang = nconf.get('app').searchEngineLang,
     defaultPageSize = nconf.get('app').defaultPageSize,
@@ -193,14 +199,26 @@ module.exports = function(sequelize, DataTypes) {
             // we return the title.
             type: DataTypes.VIRTUAL,
             get: function() {
-                return (this.description !== null && this.description.length > 0) ? this.description : this.title;
+                // HTML description must be transformed to plain text
+                return (this.description !== null && this.description.length > 0) ? htmlToText.fromString(this.description_markdown_to_html, {
+                    wordwrap: false,
+                    ignoreHref: true,
+                    ignoreImage: true,
+                    singleNewLineParagraphs: true
+                }) : this.title;
             }
         },
-        description_linkified: {
-            // If the survey has a description, we return it with URLs linkified
+        description_markdown_to_html: {
+            // 'Translate' description written in markdown to html
+            // Plaintext descriptions are also linkified during this process
             type: DataTypes.VIRTUAL,
             get: function() {
-                return (this.description !== null && this.description.length > 0) ? Utils.transformNewlinesToHtml(linkifyHtml(this.description)) : null;
+                // TUI editor raw value needs to be modified because it includes both newlines
+                // and <br> tags in some cases, resulting in an inconsistent behaviour.
+                // Can't modify it when saving because the editor itself expects that strange
+                // format when editing the previous value.
+                // See ticket #299: https://github.com/nhn/tui.editor/issues/299
+                return (this.description !== null && this.description.length > 0) ? md.renderInline(this.description.replace(/<br>[\n\r]/g , '')) : '';
             }
         },
         tags_array: {

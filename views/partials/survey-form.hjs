@@ -1,6 +1,11 @@
     {{#yield-styles}}
     <link rel="stylesheet" href="/libs/spectrum/spectrum.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.css"/>
+    <!-- WYSIWYG tui-editor: https://github.com/nhnent/tui.editor#-usage -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui-editor/v1.4.3/tui-editor.min.css"></link>
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui-editor/v1.4.3/tui-editor-contents.min.css"></link>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.33.0/codemirror.css"></link>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"></link>
     {{/yield-styles}}
 
     <div class="container content">
@@ -178,7 +183,9 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label" for="survey_description">{{#__}}description{{/__}}:</label>
                         <div class="col-md-4">
-                            <textarea class="form-control" maxlength="500" type="text" name="survey_description">{{survey.description}}</textarea>
+                            <textarea class="form-control" text-maxlength="500" type="text" name="survey_description" style="display:none;">{{survey.description}}</textarea>
+                            <div id="description-edit-section" class="markdown-input"></div>
+                            <div class="help-block with-errors" style="display: none;"><ul class="list-unstyled"><li>{{#__}}description_max_char_exceeded{{/__}}</li></ul></div>
                         </div>
                         <div class="col-md-4">
                             <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_description{{/__}}"></span>

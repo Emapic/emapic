@@ -1,4 +1,5 @@
 {{#yield-scripts}}
+<script type="text/javascript" src="https://uicdn.toast.com/tui-editor/v1.4.3/tui-editor-Editor-full.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.js" integrity="sha256-WpfqoE3LHoVHNieOvGSqQPlSvh7it+cE5Urm01ZJPyE=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.4.4/randomColor.min.js" integrity="sha256-adAIPeaY+E7djbbAif2yaAJHMWebIfQhsxmAGiyzIhA=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="/libs/spectrum/spectrum.js"></script>
@@ -15,7 +16,33 @@
         return ($('div.question-group:not(.not-question)').length === 0) || !!this.$element.find(':input[required]:enabled').filter(fieldIncomplete).length;
     };
 
-    var questionsMap
+    var editorLang = '{{web_locale}}',
+        editorDiv = $('#description-edit-section'),
+        tuiEditor = new tui.Editor({
+            el: editorDiv[0],
+            initialEditType: 'wysiwyg',
+            initialValue: $('#inputs-container textarea[name="survey_description"]').val(),
+            previewStyle: 'vertical',
+            height: '200px',
+            toolbarItems: [
+                'bold',
+                'italic',
+                'link'
+            ],
+            usageStatistics: false,
+            hideModeSwitch: true,
+            language: editorLang,
+            events: {
+                change: tuiEditorChanged,
+                focus: function(e) {
+                    tuiEditor.layout.$el.addClass('focus');
+                },
+                blur: function(e) {
+                    tuiEditor.layout.$el.removeClass('focus');
+                }
+            }
+        }),
+        questionsMap
         {{#questionsMap}}
         = {{{questionsMap}}}
         {{/questionsMap}},
@@ -45,45 +72,58 @@
                 ["#600","#783f04","#7f6000","#274e13","#0c343d","#073763","#20124d","#4c1130"]
             ]
         },
-        inputFileWarningAlreadyShown = false;
-
-    $(function() {
-        var questionsDrake = dragula([document.getElementById('questions')], {
+        inputFileWarningAlreadyShown = false,
+        questionsDrake = dragula([document.getElementById('questions')], {
             moves: function (el, container, handle) {
                 return $(handle).hasClass('question-handle');
             }
         });
-        questionsDrake.on('drag', function(el, source) {
-            $(el).find('.question-handle').addClass('grabbing');
-            collapsePanel(el);
-        });
-        questionsDrake.on('dragend', function(el) {
-            $(el).find('.question-handle').removeClass('grabbing');
-            renameQuestions($('.question-group'));
-        });
-        $('#survey-form').validator();
-        $(document).on('click', 'div.panel-heading[data-toggle="collapse"]', function(e){
-            $(this).parent().find('.panel-body').toggleClass('collapse');
-            $(this).find('span').toggleClass('glyphicon-chevron-up');
-            $(this).find('span').toggleClass('glyphicon-chevron-down');
-        });
-        $(".question-type-body").on("hide.bs.collapse", function(evt) {
-            var chevron = $(evt.target).parent().find('span.glyphicon-chevron-up');
-            chevron.removeClass('glyphicon-chevron-up');
-            chevron.addClass('glyphicon-chevron-down');
-        });
-        $(".question-type-body").on("show.bs.collapse", function(evt) {
-            var chevron = $(evt.target).parent().find('span.glyphicon-chevron-down');
-            chevron.removeClass('glyphicon-chevron-down');
-            chevron.addClass('glyphicon-chevron-up');
-            $('#question-type-list .collapse.in').collapse('hide');
-        });
-        $('.spectrum').spectrum(spectrumOptions);
-         if (questionsMap) {
-			populateQuestions();
-            $('#survey-form').validator('validate');
-         }
+    questionsDrake.on('drag', function(el, source) {
+        $(el).find('.question-handle').addClass('grabbing');
+        collapsePanel(el);
     });
+    questionsDrake.on('dragend', function(el) {
+        $(el).find('.question-handle').removeClass('grabbing');
+        renameQuestions($('.question-group'));
+    });
+    $('#survey-form').validator();
+    $(document).on('click', 'div.panel-heading[data-toggle="collapse"]', function(e){
+        $(this).parent().find('.panel-body').toggleClass('collapse');
+        $(this).find('span').toggleClass('glyphicon-chevron-up');
+        $(this).find('span').toggleClass('glyphicon-chevron-down');
+    });
+    $(".question-type-body").on("hide.bs.collapse", function(evt) {
+        var chevron = $(evt.target).parent().find('span.glyphicon-chevron-up');
+        chevron.removeClass('glyphicon-chevron-up');
+        chevron.addClass('glyphicon-chevron-down');
+    });
+    $(".question-type-body").on("show.bs.collapse", function(evt) {
+        var chevron = $(evt.target).parent().find('span.glyphicon-chevron-down');
+        chevron.removeClass('glyphicon-chevron-down');
+        chevron.addClass('glyphicon-chevron-up');
+        $('#question-type-list .collapse.in').collapse('hide');
+    });
+    $('.spectrum').spectrum(spectrumOptions);
+    if (questionsMap) {
+		populateQuestions();
+        $('#survey-form').validator('validate');
+    }
+
+    function tuiEditorChanged(change) {
+        var textarea = editorDiv.siblings('textarea'),
+            text = tuiEditor.getValue(),
+            plainText = (new DOMParser).parseFromString(tuiEditor.getHtml(), "text/html").documentElement.textContent,
+            formGroup = tuiEditor.layout.$el.closest('.form-group');
+        if ((textarea.attr('text-maxlength') && plainText.length > textarea.attr('text-maxlength')) ||
+          (textarea.attr('maxlength') && text.length > textarea.prop('maxlength'))) {
+            formGroup.addClass('md-error');
+            formGroup.find('div.help-block').show();
+        } else {
+            formGroup.removeClass('md-error');
+            formGroup.find('div.help-block').hide();
+            textarea.val(text);
+        }
+    }
     function collapsePanel(el) {
         $(el).find('.panel-body').addClass('collapse');
         $(el).find('span.glyphicon-chevron-up').addClass('glyphicon-chevron-down').removeClass('glyphicon-chevron-up');

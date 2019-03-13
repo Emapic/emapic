@@ -20,7 +20,7 @@
           <div class="modal-body">
               <h4>{{#__}}title{{/__}}:</h4> <span>{{survey.title}}</span><br>
               {{#subTitle}}<h4>{{#__}}question{{/__}}:</h4> <span>{{subTitle}}</span><br>{{/subTitle}}
-              {{#survey.description}}<h4>{{#__}}description{{/__}}:</h4> <span>{{{survey.description_linkified}}}</span>{{/survey.description}}
+              {{#survey.description}}<h4>{{#__}}description{{/__}}:</h4> <p>{{{survey.description_markdown_to_html}}}</p>{{/survey.description}}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">{{#__}}close{{/__}}</button>
