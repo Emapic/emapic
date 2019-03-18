@@ -163,7 +163,11 @@ var emapic = emapic || {};
         var mapboxAttrib = "<a href='https://www.mapbox.com/about/maps/' target='_blank'>&copy; Mapbox &copy; OpenStreetMap</a> <a class='mapbox-improve-map' href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a>";
 
         // Can't use "https://{s}.tiles.wmflabs.org" because their ssl cert is wrong
-        var osmMapnikBW = new L.TileLayer('https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+        var osmMapnikBW = (L.TileLayer.Grayscale) ? new L.TileLayer.Grayscale('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            minZoom : 1,
+            maxZoom : 18,
+            attribution : osmAttrib
+        }) : new L.TileLayer('https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
             minZoom : 1,
             maxZoom : 18,
             attribution : osmAttrib

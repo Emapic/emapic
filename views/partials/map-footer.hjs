@@ -17,6 +17,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.Spin/1.1.0/leaflet.spin.min.js" integrity="sha256-KT7wva6UUkBy5G7XBYA3/u7axZJEhcEh8/2WeTk2F48=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/libs/leaflet/js/L.Control.Sidebar.js"></script>
     <script type="text/javascript" src="/libs/leaflet/js/L.Control.SelectQuestion.js"></script>
+    <script type="text/javascript" src="/libs/leaflet/js/TileLayer.Grayscale.js"></script>
 
     <script type="text/javascript" src="/javascripts/emapic_utils.js"></script>
     {{> i18n_emapic_general }}
