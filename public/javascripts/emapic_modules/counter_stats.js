@@ -141,18 +141,15 @@ var emapic = emapic || {};
     };
 
     emapic.modules.counterStats.chartTypeChanged = function(el) {
-        var chartFeatures = [],
-            btn = $('#chart-type-btn'),
-            chartType = btn.attr('name'),
-            layers = emapic.getIndivVotesLayerLeafletLayers();
+        chartFeatures = [];
+        var btn = $('#chart-type-btn'),
+            chartType = btn.attr('name');
 
         $('#vote-chart-clear').hide();
 
         if (currentLegend && currentLegend.color) {
             counterFilterProperty = currentLegend.color.question + '.id';
-            for (i = 0, len = layers.length; i < len; i++) {
-                chartFeatures.push(layers[i].feature);
-            }
+            chartFeatures = emapic.indivVotesLayerData.features;
         }
 
         if (chartType === 'pie') {
@@ -263,16 +260,13 @@ var emapic = emapic || {};
 
     function updateChart(n) {
         currentLegend = setCurrentLegend(emapic.fullLegend.color[n]);
-        var layers = emapic.indivVotesLayer.getLayers();
-            chartFeatures = [];
+        chartFeatures = [];
         $('#vote-chart-clear').hide();
         $('#prev-question-btn').attr('disabled', n === 0);
         $('#next-question-btn').attr('disabled', n === getQuestionsLen());
         if (currentLegend && currentLegend.color) {
             counterFilterProperty = currentLegend.color.question + '.id';
-            for (i = 0, len = layers.length; i < len; i++) {
-                chartFeatures.push(layers[i].feature);
-            }
+            chartFeatures = emapic.indivVotesLayerData.features;
         }
         updateQuestionTitle();
         emapic.modules.counterStats.loadStats(chartFeatures); // update chart
