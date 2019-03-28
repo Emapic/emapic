@@ -158,20 +158,39 @@ var emapic = emapic || {};
         });
     };
 
-    emapic.addBaseLayers = function() {
-        var osmAttrib = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>';
-        var mapboxAttrib = "<a href='https://www.mapbox.com/about/maps/' target='_blank'>&copy; Mapbox &copy; OpenStreetMap</a> <a class='mapbox-improve-map' href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a>";
+    emapic.addBaseLayers = function(tryGrayScale) {
+        var control,
+            osmAttrib = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+            mapboxAttrib = "<a href='https://www.mapbox.com/about/maps/' target='_blank'>&copy; Mapbox &copy; OpenStreetMap</a> <a class='mapbox-improve-map' href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a>",
+            osmBW;
 
-        // Can't use "https://{s}.tiles.wmflabs.org" because their ssl cert is wrong
-        var osmMapnikBW = (L.TileLayer.Grayscale) ? new L.TileLayer.Grayscale('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            minZoom : 1,
-            maxZoom : 18,
-            attribution : osmAttrib
-        }) : new L.TileLayer('https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
-            minZoom : 1,
-            maxZoom : 18,
-            attribution : osmAttrib
-        });
+        if (tryGrayScale && L.TileLayer.Grayscale) {
+            osmBW = new L.TileLayer.Grayscale('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                minZoom : 1,
+                maxZoom : 18,
+                attribution : osmAttrib
+            });
+        } else {
+            // Can't use "https://{s}.tiles.wmflabs.org" because their ssl cert is wrong
+            osmBW = new L.TileLayer('https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
+                minZoom : 1,
+                maxZoom : 18,
+                attribution : osmAttrib
+            });
+
+            osmBW.on('tileerror', function() {
+                var ctrl = control;
+                if (L.TileLayer.Grayscale && control) {
+                    console.warn("WARNING: BW-Mapnik tile server doesn't seem to work properly. " +
+                        "Will try to load OSM tiles and convert them to grayscale instead.");
+                    control = null;
+                    emapic.map.removeControl(ctrl);
+                    emapic.map.removeLayer(osmBW);
+                    emapic.addBaseLayers(true);
+                }
+            });
+        }
+
         var osmMapnik = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             minZoom : 1,
             maxZoom : 18,
@@ -179,7 +198,7 @@ var emapic = emapic || {};
         });
 
         var baseMaps = {};
-        baseMaps[emapic.utils.getI18n('js_grayscale_osm_baselayer')] = osmMapnikBW;
+        baseMaps[emapic.utils.getI18n('js_grayscale_osm_baselayer')] = osmBW;
         baseMaps[emapic.utils.getI18n('js_color_osm_baselayer')] = osmMapnik;
 
         if (emapic.mapboxToken !== null) {
@@ -190,8 +209,7 @@ var emapic = emapic || {};
             });
             baseMaps[emapic.utils.getI18n('js_satellite_mapbox_baselayer')] = mapboxSatellite;
         }
-        emapic.currentBaseLayer = osmMapnikBW;
-        emapic.map.addLayer(osmMapnikBW);
+        emapic.currentBaseLayer = osmBW;
 
         $.each(baseMaps, function(index, value) {
             value.on('loading', function() {
@@ -205,7 +223,8 @@ var emapic = emapic || {};
                 }
             });
         });
-        emapic.addLayerSelector(baseMaps, null);
+        control = emapic.addLayerSelector(baseMaps, null);
+        emapic.map.addLayer(osmBW);
         emapic.map.on('baselayerchange', function(layer) {
             if (emapic.currentBaseLayer !== layer.layer) {
                 emapic.baseLayerLoadedPromise = null;
@@ -215,7 +234,9 @@ var emapic = emapic || {};
     };
 
     emapic.addLayerSelector = function(baselayers, overlays) {
-        L.control.layers(baselayers, overlays, {position: 'bottomright'}).addTo(emapic.map);
+        var control = L.control.layers(baselayers, overlays, {position: 'bottomright'});
+        control.addTo(emapic.map);
+        return control;
     }
 
     emapic.startMapLogic = function() {
