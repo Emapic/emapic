@@ -6,10 +6,10 @@ var passport = require('passport'),
     nconf = require('nconf'),
     bcrypt = require('bcryptjs'),
     Promise = require('bluebird'),
-    imgRequest = Promise.promisifyAll(require('request').defaults({ encoding: null }), {multiArgs: true}),
+    rp = require('request-promise'),
     randomstring = require('randomstring'),
     fs = require('fs'),
-    oauthserver = require('express-oauth-server'),
+    oauthserver = require('@compwright/express-oauth-server'),
     logger = require('../../utils/logger'),
     utils = require('./utils_auth'),
     sequelize = models.sequelize;
@@ -675,8 +675,11 @@ module.exports = function(app) {
                         };
                         var avatarPromise;
                         if ('image' in profile._json && 'url' in profile._json.image && !profile._json.image.isDefault) {
-                            avatarPromise = imgRequest.getAsync(profile._json.image.url.split('?')[0]).then(function (values) {
-                                return Promise.resolve(Buffer.from(values[1]));
+                            avatarPromise = rp.get({
+                                url: profile._json.image.url.split('?')[0],
+                                encoding: null
+                            }).then(function (data) {
+                                return Buffer.from(data);
                             });
                         } else {
                             avatarPromise = Promise.resolve(null);
@@ -733,8 +736,11 @@ module.exports = function(app) {
                         var avatarPromise;
                         if ('picture' in profile._json && 'data' in profile._json.picture &&
                             !profile._json.picture.data.is_silhouette && 'url' in profile._json.picture.data) {
-                            avatarPromise = imgRequest.getAsync(profile._json.picture.data.url).then(function (values) {
-                                return Promise.resolve(Buffer.from(values[1]));
+                            avatarPromise = rp.get({
+                                url: profile._json.picture.data.url,
+                                encoding: null
+                            }).then(function (data) {
+                                return Buffer.from(data);
                             });
                         } else {
                             avatarPromise = Promise.resolve(null);
