@@ -1,26 +1,42 @@
 {
   "name": "emapic",
   "version": "0.8.0-alpha",
-  "private": false,
-  "license": "AGPLV3",
+  "description": "Spatial enabled surveys",
+  "keywords": [
+    "survey",
+    "geolocation",
+    "maps",
+    "questionnaire",
+    "quizzes",
+    "coordinates"
+  ],
+  "homepage": "https://emapic.es",
+  "bugs": {
+    "url": "https://github.com/Emapic/emapic/issues",
+    "email": "jlopez@emapic.es"
+  },
+  "license": "AGPL-3.0-only",
   "author": "Jorge López",
   "contributors": [
     "Adrián Eirís",
     "Francisco Puga",
     "Aida Vidal"
   ],
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Emapic/emapic"
+  },
   "scripts": {
     "autoreload": "./node_modules/.bin/supervisor server.js",
     "debug": "node --inspect server.js",
     "start": "node server.js"
   },
-  "engines": {
-    "node": ">=5.10.0"
-  },
   "dependencies": {
+    "@compwright/express-oauth-server": "2.0.2",
     "bases": "0.2.1",
-    "bcryptjs": "0.7.12",
-    "bluebird": "3.5.1",
+    "bcryptjs": "2.4.3",
+    "bluebird": "3.5.4",
     "body-parser": "1.18.3",
     "clamscan": "0.8.4",
     "collections": "3.0.0",
@@ -32,32 +48,29 @@
     "exit-on-epipe": "1.0.1",
     "express": "4.16.4",
     "express-error-handler": "1.1.0",
-    "@compwright/express-oauth-server": "2.0.2",
     "express-rate-limit": "3.4.0",
     "express-session": "1.15.6",
     "express-sitemap": "1.8.0",
     "fast-csv": "2.3.0",
-    "file-type": "3.9.0",
+    "file-type": "10.10.0",
     "fs-promise": "0.4.1",
     "hjs": "0.0.6",
     "hogan-express": "0.5.2",
     "https": "1.0.0",
-    "i18n-2": "0.4.6",
-    "image-type": "2.0.0",
-    "jimp": "0.2.28",
+    "i18n-2": "0.7.3",
+    "image-type": "4.0.0",
+    "jimp": "0.6.1",
     "linkifyjs": "2.1.4",
     "method-override": "3.0.0",
     "mkdirp": "0.5.1",
     "moment": "2.22.2",
     "morgan": "1.9.1",
     "nconf": "0.7.1",
-    "node-schedule": "1.0.0",
-    "nodemailer": "1.3.2",
-    "nodemailer-smtp-transport": "1.0.3",
-    "nodemailer-wellknown": "0.1.5",
+    "node-schedule": "1.3.2",
+    "nodemailer": "6.0.0",
     "on-finished": "2.3.0",
     "optipng-bin": "5.1.0",
-    "pagination": "0.4.4",
+    "pagination": "0.4.6",
     "passport": "0.4.0",
     "passport-facebook": "3.0.0",
     "passport-google-oauth": "1.0.0",
@@ -73,15 +86,19 @@
     "rimraf": "2.6.2",
     "sequelize": "3.14.0",
     "serve-favicon": "2.5.0",
-    "session-file-store": "0.0.24",
-    "sharp": "0.16.2",
-    "tmp": "0.0.33",
+    "session-file-store": "1.2.0",
+    "tmp": "0.1.0",
     "url": "0.11.0",
     "winston": "2.4.3"
   },
-  "description": "Spatial enabled surveys",
-  "main": "server.js",
   "devDependencies": {
-    "supervisor": "0.9.1"
-  }
+    "supervisor": "0.12.0"
+  },
+  "optionalDependencies": {
+    "sharp": "0.22.0"
+  },
+  "engines": {
+    "node": ">=5.10.0"
+  },
+  "private": false
 }

@@ -126,12 +126,7 @@ npm install
 
 > ##### Instalación en entornos de 32 bits
 >
-> Si intentamos instalar los paquetes de Node.js en un entorno de 32 bits, lo normal es que encontremos problemas durante la instalación del paquete _sharp_, empleado para el redimensionamiento de imágenes. En este caso, lo que deberemos hacer es editar el archivo _package.json_ y eliminar la línea que indica la versión de dicho paquete a instalar, similar a ésta:
-> ```
-> "sharp": "0.16.2",
-> ```
->
-> Posteriormente ejecutamos de nuevo el comando y ya no deberíamos tener problemas, pero hay que tener en cuenta que en este caso la aplicación empleará el paquete _Jimp_ como reemplazo, el cual ofrece un rendimiento peor a la hora de redimensionar las imágenes.
+> Si intentamos instalar los paquetes de Node.js en un entorno de 32 bits, lo normal es que encontremos problemas durante la instalación del paquete _sharp_, empleado para el redimensionamiento de imágenes. En caso de que sea así, en principio podemos ignorar el error, pero hay que tener en cuenta que en este caso la aplicación empleará el paquete _Jimp_ como reemplazo, el cual ofrece un rendimiento peor a la hora de redimensionar las imágenes.
 
 La aplicación ya se puede lanzar con cualquiera de estos comandos:
 

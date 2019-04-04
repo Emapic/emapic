@@ -1,7 +1,6 @@
 // utils.js/
 var nodemailer = require('nodemailer'),
     fs = require('fs'),
-    smtpTransport = require('nodemailer-smtp-transport'),
     nconf = require('nconf'),
     Promise = require('bluebird'),
     url = require('url'),
@@ -78,14 +77,17 @@ function transformImageSharp(input, width, height, upscale, format) {
 
     return promise.metadata().then(function(metadata) {
         var w = (width && (upscale || width < metadata.width)) ? width : null,
-            h = (height && (upscale || height < metadata.height)) ? height : null;
+            h = (height && (upscale || height < metadata.height)) ? height : null,
+            options = {
+                fit: 'inside'
+            };
 
         if (w || h) {
             // Don't crop the image when resizing it by both dimensions
             if (w && h) {
-                promise = promise.ignoreAspectRatio();
+                options.fit = 'fill';
             }
-            promise = promise.resize(w, h);
+            promise = promise.resize(w, h, options);
         }
 
         if (!format && !sharp.format[metadata.format].output.buffer) {
@@ -119,7 +121,7 @@ module.exports = function(app) {
             if (typeof mail.from === 'undefined') {
                 mail.from = smtpConfig.from;
             }
-            var transporter = nodemailer.createTransport(smtpTransport({
+            var transporter = nodemailer.createTransport({
                 host: smtpConfig.host,
                 port: smtpConfig.port,
                 ignoreTLS: true,
@@ -131,7 +133,7 @@ module.exports = function(app) {
                     user: smtpConfig.user,
                     pass: smtpConfig.pass
                 }
-            }));
+            });
             return new Promise(function(resolve, reject) {
                 transporter.sendMail(mail, function(error, info){
                     if (error){
@@ -320,7 +322,7 @@ module.exports = function(app) {
         },
 
         getFileMetadata: function(input) {
-            return fileType(Buffer.isBuffer(input) ? input : readChunk.sync(input, 0, 4100));
+            return fileType(Buffer.isBuffer(input) ? input : readChunk.sync(input, 0, fileType.minimumBytes));
         },
 
         getFileMimeType: function(input, defaultMime) {

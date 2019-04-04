@@ -1,6 +1,5 @@
 // utils_auth.js/
-var nodemailer = require('nodemailer'),
-    i18n = require('i18n-2'),
+var i18n = require('i18n-2'),
     crypto = require('crypto'),
     bcrypt = require('bcryptjs'),
     randomstring = require('randomstring'),
