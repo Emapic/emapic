@@ -17,7 +17,7 @@ module.exports = function(app) {
     }
 
     app.get('/survey/:id', function(req, res) {
-        models.Survey.scope('includeAuthor').findById(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.redirect('/');
             }
@@ -48,7 +48,7 @@ module.exports = function(app) {
     });
 
     app.get('/survey/:id/results', function(req, res) {
-        models.Survey.scope('includeAuthor').findById(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.redirect('/');
             }
@@ -82,7 +82,7 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:id/results', function(req, res) {
-        models.Survey.scope('includeAuthor').findById(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -163,7 +163,7 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:id/description', function(req, res) {
-        models.Survey.scope('includeAuthor').findById(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -190,7 +190,7 @@ module.exports = function(app) {
         if (isNaN(qstnId) || isNaN(answrId)) {
             return res.send(404);   // HTTP status 404: NotFound
         }
-        models.Survey.scope('includeAuthor').findById(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
             return survey.getAnswerImagePath(qstnId, answrId);
         }).then(function(path) {
             if (path === null) {
@@ -202,7 +202,7 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:id/totals', function(req, res) {
-        models.Survey.scope('includeAuthor').findById(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -224,7 +224,7 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:id/totals/:layer', function(req, res) {
-        models.Survey.scope('includeAuthor').findById(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -281,7 +281,7 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:id/legend', function(req, res) {
-        models.Survey.scope('includeAuthor').findById(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -303,7 +303,7 @@ module.exports = function(app) {
     });
 
     app.post('/api/survey/:id/results', function(req, res) {
-        models.Survey.findById(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -347,7 +347,7 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:id/export', function(req, res) {
-        models.Survey.scope('includeAuthor').findById(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }

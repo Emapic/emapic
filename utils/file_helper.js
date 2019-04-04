@@ -14,9 +14,8 @@ if (uploadedFilesFolder.charAt(uploadedFilesFolder.length - 1) !== path.sep) {
 function deleteFile(filePath) {
     return fs.unlinkAsync(filePath).then(function() {
         return sequelize.query('DELETE FROM metadata.files WHERE path = ? RETURNING id;', {
-            type: sequelize.QueryTypes.DELETE,
             replacements: [filePath]
-        }).then(function(rows) {
+        }).spread(function(rows, metadata) {
             if (rows.length === 0) {
                 return null;
             }
@@ -67,10 +66,9 @@ module.exports = function(app) {
                 });
             }).then(function() {
                 return sequelize.query('INSERT INTO metadata.files(path, original_filename, mime_type) VALUES (?, ?, ?) RETURNING id;', {
-                    type: sequelize.QueryTypes.INSERT,
                     replacements: [fullDstPath, fileName, Utils.getFileMimeType(buffer, defaultMime)]
                 });
-            }).then(function(rows) {
+            }).spread(function(rows, metadata) {
                 return rows[0].id;
             }).tap(function(id) {
                 logger.debug('Created new file from buffer to path "' + fullDstPath + '" with id ' + id);
@@ -122,10 +120,9 @@ module.exports = function(app) {
                 });
             }).then(function() {
                 return sequelize.query('INSERT INTO metadata.files(path, original_filename, mime_type) VALUES (?, ?, ?) RETURNING id;', {
-                    type: sequelize.QueryTypes.INSERT,
                     replacements: [fullDstPath, fileName, Utils.getFileMimeType(srcPath, defaultMime)]
                 });
-            }).then(function(rows) {
+            }).spread(function(rows, metadata) {
                 return rows[0].id;
             }).tap(function(id) {
                 logger.debug('Created new file from path "' + srcPath + '" to path "' + fullDstPath + '" with id ' + id);
@@ -147,13 +144,12 @@ module.exports = function(app) {
         deleteFileFromId: function(fileId) {
             var filePath;
             return sequelize.query('SELECT path FROM metadata.files WHERE id = ?;', {
-                type: sequelize.QueryTypes.DELETE,
                 replacements: [fileId]
-            }).then(function(data) {
-                if (data.length === 0 || !data[0].path) {
+            }).spread(function(rows, metadata) {
+                if (rows.length === 0 || !rows[0].path) {
                     throw new Error('Requested file id doesn\'t exist: ' + fileId);
                 }
-                filePath = data[0].path;
+                filePath = rows[0].path;
                 return deleteFile(filePath);
             }).tap(function(id) {
                 logger.debug('Deleted file with path "' + filePath + '" and id ' + id);

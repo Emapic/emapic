@@ -30,7 +30,7 @@ You can check a throrough list of technologies, libraries and other data sources
 For launching Emapic locally you need before starting:
 
 * [git](https://git-scm.com/)
-* [Node.js](https://nodejs.org/) (>=5.10.0) [we recommend using [nvm](https://github.com/creationix/nvm) for installing specific versions of _Node.js_]
+* [Node.js](https://nodejs.org/) (>=6.0.0) [we recommend using [nvm](https://github.com/creationix/nvm) for installing specific versions of _Node.js_]
 * [npm](https://www.npmjs.com/) (usually installed along with Node.js)
 * [PostgreSQL](https://www.postgresql.org/) (>=9.2)
 * [PostGIS](http://postgis.net/) (>=2.0)

@@ -3,11 +3,13 @@ var fs = require('fs'),
     escape = require('escape-html'),
     Promise = require('bluebird'),
     linkifyHtml = require('linkifyjs/html'),
+    sequelize = require('sequelize'),
     answerLayout = {
         'row': 1,
         'list': 2,
         'listOther': 3
     };
+const Op = sequelize.Op;
 
 function parseQuestionsfromPost(req, survey) {
     var questions = [];
@@ -270,371 +272,371 @@ module.exports = function(sequelize, DataTypes) {
         scopes: {
             defaultOrdering: function() {
                 return {
-                    order: Question.getDefaultOrder()
+                    order: Utils.createOrderArray(Question.getDefaultOrder())
                 };
             },
             withLegend: {
                 where: {
                     legend_question: {
-                        $ne: null
+                        [Op.ne]: null
                     }
                 }
-            }
-        },
-        classMethods: {
-            getDefaultOrder: function() {
-                return ['question_order'];
-            },
-
-            associate: function(models) {
-                // Scope must be added here because models.Answer must be already defined
-                Question.addScope('includeAnswers', {
-                    include: [models.Answer],
-                    order: Question.getDefaultOrder().concat(models.Answer.getDefaultOrder())
-                });
-                Question.addScope('includeSurvey', {
-                    include: [models.Survey]
-                });
-                Question.belongsTo(models.Survey, {foreignKey: 'survey_id'});
-                models.Survey.hasMany(Question.scope('defaultOrdering'), {foreignKey: 'survey_id'});
-            },
-
-            createFromPost: function(req, survey) {
-                return Question.bulkCreate(parseQuestionsfromPost(req, survey), {individualHooks: true}).then(function(questions) {
-                    return models.Answer.bulkCreate(parseAnswersFromPost(req, questions), {individualHooks: true}).return(questions);
-                });
-            },
-
-            updateFromPost: function(req, survey) {
-                var oldQuestions, oldAnswers = [];
-                // We retrieve previous survey questions
-                return survey.getQuestions({
-                    scope: 'includeAnswers'
-                }).then(function(questions) {
-                    oldQuestions = questions;
-                    for (var j = 0, jLen = oldQuestions.length; j<jLen; j++) {
-                        oldAnswers.push(oldQuestions[j].Answers);
-                    }
-                    return Promise.map(oldQuestions, function(question) {
-                        // We destroy previous survey questions + answers
-                        return question.destroy();
-                    });
-                }).then(function() {
-                    return Question.bulkCreate(parseQuestionsfromPost(req, survey), {individualHooks: true});
-                }).then(function(questions) {
-                    return models.Answer.bulkCreate(parseAnswersFromPost(req, questions, oldAnswers), {individualHooks: true}).return(questions);
-                });
-            },
-
-            getFieldsToHideInDescription: function() {
-                return ['title', 'language', 'Answers'];
-            }
-        },
-        instanceMethods: {
-            checkGetAnswers: function() {
-                return (typeof this.Answers !== 'undefined') ? Promise.resolve(this.Answers) : this.getAnswers();
-            },
-
-            getDdlSql: function() {
-                switch (this.type) {
-                    case 'list-radio-other':
-                        return "q" + this.question_order + " text" + (this.mandatory ? " NOT NULL" : "") + ", q" + this.question_order + "_other text";
-                    case 'list-radio':
-                    case 'text-answer':
-                    case 'image-url':
-                        return "q" + this.question_order + " text" + (this.mandatory ? " NOT NULL" : "");
-                    case 'image-upload':
-                        return "q" + this.question_order + " int REFERENCES metadata.files ON UPDATE CASCADE ON DELETE SET NULL";
-                    case 'explanatory-text':
-                        return "";
-                    default:
-                        return new Error("Question type not contemplated.");
-                }
-            },
-
-            getSelectSql: function() {
-                switch (this.type) {
-                    case 'list-radio-other':
-                        return 'a.q' + this.question_order + ' AS "q' + this.question_order + '.id", a.q' + this.question_order + '_other AS "q' + this.question_order + '.value"';
-                    case 'list-radio':
-                        return 'a.q' + this.question_order + ' AS "q' + this.question_order + '.id"';
-                    case 'text-answer':
-                    case 'image-url':
-                        return 'a.q' + this.question_order + ' AS "q' + this.question_order + '.value"';
-                    case 'image-upload':
-                        if (!this.mandatory) {
-                            return 'CASE WHEN a.q' + this.question_order + ' IS NULL THEN NULL ELSE \'/api/survey/' + Utils.encryptSurveyId(this.Survey.id) + '/result/\' || a.gid || \'/image/' + this.question_order + '\' END AS "q' + this.question_order + '.value"';
-                        } else {
-                            return '\'/api/survey/' + Utils.encryptSurveyId(this.Survey.id) + '/result/\' || a.gid || \'/image/' + this.question_order + '\' AS "q' + this.question_order + '.value"';
-                        }
-                    case 'explanatory-text':
-                        return '';
-                    default:
-                        return new Error("Question type not contemplated.");
-                }
-            },
-
-            checkValidResponse: function(responses) {
-                var question = this,
-                    promise = (typeof this.Answers !== 'undefined') ? Promise.resolve(this.Answers) : this.getAnswers();
-                return promise.then(function(answers) {
-                    var answer = null;
-                    switch (question.type) {
-                        case 'list-radio-other':
-                            if (responses['q' + question.question_order + '.id']) {
-                                answer = parseInt(responses['q' + question.question_order + '.id'], 10);
-                                if (answer === -1) {
-                                    if (responses['q' + question.question_order + '.value']) {
-                                        responses['q' + question.question_order + '.value'] = responses['q' + question.question_order + '.value'].trim();
-                                    }
-                                    if (!responses['q' + question.question_order + '.value']) {
-                                        answer = answer + ' [null]';
-                                        break;
-                                    }
-                                    return Promise.resolve();
-                                }
-                            }
-                            /* falls through */
-                        case 'list-radio':
-                            if (responses['q' + question.question_order + '.id']) {
-                                answer = parseInt(responses['q' + question.question_order + '.id'], 10);
-                                for (var i = 0, len = answers.length; i<len; i++) {
-                                    if (answers[i].sortorder === answer) {
-                                        return Promise.resolve();
-                                    }
-                                }
-                            }
-                            break;
-                        case 'text-answer':
-                            answer = responses['q' + question.question_order + '.value'];
-                            if (!question.mandatory || responses['q' + question.question_order + '.value']) {
-                                if (responses['q' + question.question_order + '.value']) {
-                                    responses['q' + question.question_order + '.value'] = responses['q' + question.question_order + '.value'].trim();
-                                }
-                                if (!responses['q' + question.question_order + '.value']) {
-                                    if (question.mandatory) {
-                                        break;
-                                    } else {
-                                        responses['q' + question.question_order + '.value'] = null;
-                                    }
-                                }
-                                return Promise.resolve();
-                            }
-                            break;
-                        case 'explanatory-text':
-                            return Promise.resolve();
-                        case 'image-upload':
-                            if (!question.mandatory && responses['q' + question.question_order + '.value'] === "") {
-                                return Promise.resolve();
-                            } else {
-                                if (('q' + question.question_order + '.value') in responses &&
-                                  'path' in responses['q' + question.question_order + '.value']) {
-                                    answer = responses['q' + question.question_order + '.value'];
-                                    if (!(Utils.isImage(fs.readFileSync(responses['q' + question.question_order + '.value'].path)))) {
-                                        return Promise.reject({
-                                            message: "invalid answer for question nr " + question.question_order + " : selected file is not an image.",
-                                            status: 400,
-                                            code: 'invalid_request'
-                                        });
-                                    }
-                                    if (responses['q' + question.question_order + '.value'].size > 4000000) {
-                                        return Promise.reject({
-                                            message: "invalid answer for question nr " + question.question_order + " : image file exceeds the 4MB max size.",
-                                            status: 400,
-                                            code: 'invalid_request'
-                                        });
-                                    }
-                                    return Promise.resolve();
-                                }
-                            }
-                            break;
-                        case 'image-url':
-                            answer = responses['q' + question.question_order + '.value'];
-                            if (answer) {
-                                responses['q' + question.question_order + '.value'] = responses['q' + question.question_order + '.value'].trim();
-                                if (answer.lastIndexOf('http', 0) !== 0) {
-                                    responses['q' + question.question_order + '.value'] = answer = 'http://' + answer;
-                                }
-                                return Utils.checkUrlIsImage(responses['q' + question.question_order + '.value']);
-                            } else if (!question.mandatory) {
-                                responses['q' + question.question_order + '.value'] = null;
-                                // Image is empty because it is not mandatory
-                                return Promise.resolve();
-                            }
-                            break;
-                        default:
-                            return Promise.reject({
-                                message: "question type not contemplated.",
-                                status: 500,
-                                code: 'internal_error'
-                            });
-                    }
-                    return Promise.reject({
-                        message: "invalid answer for question nr " + question.question_order + " : " + answer,
-                        status: 400,
-                        code: 'invalid_request'
-                    });
-                });
-            },
-
-            getInsertSql: function(responses) {
-                var respField = 'q' + this.question_order + '.id';
-                switch (this.type) {
-                    case 'list-radio-other':
-                        if (respField in responses &&
-                            parseInt(responses[respField], 10) === -1 &&
-                            'q' + this.question_order + '.value' in responses) {
-                                return ['q' + this.question_order + ', q' + this.question_order + '_other', '?, ?', [responses[respField], responses['q' + this.question_order + '.value']]];
-                        }
-                        break;
-                    case 'list-radio':
-                        break;
-                    case 'text-answer':
-                    case 'image-url':
-                        respField = 'q' + this.question_order + '.value';
-                        break;
-                    case 'image-upload':
-                        // File is actually stored in a post-insert operation
-                        return ['q' + this.question_order, '?', [null]];
-                    case 'explanatory-text':
-                        return ['', '', []];
-                    default:
-                        return new Error("Question type not contemplated.");
-                }
-                if (respField in responses) {
-                    return ['q' + this.question_order, '?', [responses[respField]]];
-                }
-                return new Error("Question fields have not been sent: q" + this.question_order);
-            },
-
-            getPostInsertOperations: function(responses, answerId) {
-                var respField = 'q' + this.question_order + '.id',
-                    question = this,
-                    survey = this.Survey;
-                switch (this.type) {
-                    case 'image-upload':
-                        // Store the image in the local filesystem, save its
-                        // metadata inside database and set a reference to it
-                        // in the saved answer.
-                        respField = 'q' + question.question_order + '.value';
-                        if (respField in responses && responses[respField] !== '') {
-                            if ('path' in responses[respField]) {
-                                return FileHelper.saveFileFromPath(responses[respField].path, 'images/survey/' + survey.id + '/answer/' + answerId +
-                                '/answer_q' + question.question_order + path.extname(responses[respField].name), responses[respField].name).then(function(fileId) {
-                                    return sequelize.query('UPDATE opinions.survey_' + survey.id + ' SET q' + question.question_order + ' = ? WHERE gid = ?;',
-                                        { replacements: [fileId, answerId], type: sequelize.QueryTypes.UPDATE }
-                                    );
-                                });
-                            }
-                        }
-                        // Fall-through
-                    case 'list-radio-other':
-                    case 'list-radio':
-                    case 'text-answer':
-                    case 'image-url':
-                    case 'explanatory-text':
-                        // Nothing to do
-                        return Promise.resolve();
-                    default:
-                        return new Error("Question type not contemplated.");
-                }
-            },
-
-            clone: function(surveyId) {
-                var props = Utils.extractProperties(this, ['id', 'survey_id']);
-                props.survey_id = surveyId;
-                return this.checkGetAnswers().then(function(answers){
-                    return Question.create(props).then(function(question) {
-                        return Promise.map(answers, function(answer) {
-                            return answer.clone(question.id);
-                        });
-                    });
-                });
-            },
-
-            getHtml: function(req) {
-                var parent = this,
-                    html = '';
-                switch (parent.type) {
-                    case 'list-radio':
-                    case 'list-radio-other':
-                        return this.checkGetAnswers().then(
-                            function(answers){
-                                var html = '<div class="main-question" id="question-' + parent.question_order + '">\n';
-                                switch (parent.type) {
-                                    case 'list-radio':
-                                    case 'list-radio-other':
-                                        var otherAnswer = null;
-                                        html += '<h2>' + escape(parent.question) + '</h2>\n';
-                                        if (answers.length > 2) {
-                                            html += '<div class="listbtns row">\n';
-                                            // If we have more than two answers, we display them in a vertical list
-                                            for (var i = 0, iLen = answers.length; i < iLen; i++) {
-                                                if (answers[i].sortorder === -1) {
-                                                    otherAnswer = answers[i];
-                                                    continue;
-                                                }
-                                                html += generateExclusiveBtnAnswerHtml(answers[i], answerLayout.list, parent);
-                                            }
-                                        } else {
-                                            html += '<div class="rowbtns row">\n';
-                                            // If we have only two answers, we display them in as VS in a sole row
-                                            for (var j = 0, jLen = answers.length; j < jLen; j++) {
-                                                html += generateExclusiveBtnAnswerHtml(answers[j], answerLayout.row, parent);
-                                            }
-                                        }
-                                        if (otherAnswer !== null) {
-                                            html += generateExclusiveBtnAnswerHtml(otherAnswer, answerLayout.listOther, parent);
-                                        }
-                                        html += '</div>\n';
-                                        break;
-                                    default:
-                                        return new Error("Question type not contemplated.");
-                                }
-                                return html + '</div>';
-                            }
-                        );
-                    case 'text-answer':
-                        html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputNotVoid', req);
-                        break;
-                    case 'image-upload':
-                        html += generateImageInputQuestionHtml(parent, 'emapic.utils.checkImageNotVoid', req);
-                        break;
-                    case 'image-url':
-                        html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputUrlIsImage', req);
-                        break;
-                    case 'explanatory-text':
-                        html += '<div class="col-xs-12 text-center"><div id="q' + parent.question_order + '-other"' +
-                            '  class="col-xs-12 col-md-6 col-md-offset-3 survey-answer explanatory-text"><p id="q' + parent.question_order +
-                            '">' + Utils.transformNewlinesToHtml(linkifyHtml(escape(parent.question))) + '</p><br/><button id="q' + parent.question_order +
-                            '-ok" class="btn btn-primary" onclick="emapic.modules.survey.advanceSurvey()">OK</button></div></div>';
-                        break;
-                    default:
-                        return new Error("Question type not contemplated.");
-                }
-                return '<div class="main-question" id="question-' + parent.question_order + '">\n' + html + '\n</div>';
-            },
-
-            getFullDescription: function() {
-                var description = this.getDescription(),
-                    answersPromise = typeof this.Answers !== 'undefined' ?
-                        Promise.resolve(this.Answers) : this.getAnswers();
-                return answersPromise.then(function(answers) {
-                    return Promise.map(answers, function(answer) {
-                        return answer.getFullDescription();
-                    });
-                }).then(function(answersDesc) {
-                    for (var i = 0, iLen = answersDesc.length; i<iLen; i++) {
-                        delete answersDesc[i].question_id;
-                    }
-                    description.answers = answersDesc;
-                    return description;
-                });
             }
         },
         tableName: 'questions',
         schema: 'metadata'
     });
+
+    // Class methods
+    Question.getDefaultOrder = function() {
+        return ['question_order'];
+    };
+
+    Question.associate = function(models) {
+        // Scope must be added here because models.Answer must be already defined
+        Question.addScope('includeAnswers', {
+            include: [models.Answer],
+            order: Utils.createOrderArray(Question.getDefaultOrder()).concat(Utils.createOrderArray(models.Answer.getDefaultOrder(), models.Answer))
+        });
+        Question.addScope('includeSurvey', {
+            include: [models.Survey]
+        });
+        Question.belongsTo(models.Survey, {foreignKey: 'survey_id'});
+        models.Survey.hasMany(Question.scope('defaultOrdering'), {foreignKey: 'survey_id'});
+    };
+
+    Question.createFromPost = function(req, survey) {
+        return Question.bulkCreate(parseQuestionsfromPost(req, survey), {individualHooks: true}).then(function(questions) {
+            return models.Answer.bulkCreate(parseAnswersFromPost(req, questions), {individualHooks: true}).return(questions);
+        });
+    };
+
+    Question.updateFromPost = function(req, survey) {
+        var oldQuestions, oldAnswers = [];
+        // We retrieve previous survey questions
+        return survey.getQuestions({
+            scope: 'includeAnswers'
+        }).then(function(questions) {
+            oldQuestions = questions;
+            for (var j = 0, jLen = oldQuestions.length; j<jLen; j++) {
+                oldAnswers.push(oldQuestions[j].Answers);
+            }
+            return Promise.map(oldQuestions, function(question) {
+                // We destroy previous survey questions + answers
+                return question.destroy();
+            });
+        }).then(function() {
+            return Question.bulkCreate(parseQuestionsfromPost(req, survey), {individualHooks: true});
+        }).then(function(questions) {
+            return models.Answer.bulkCreate(parseAnswersFromPost(req, questions, oldAnswers), {individualHooks: true}).return(questions);
+        });
+    };
+
+    Question.getFieldsToHideInDescription = function() {
+        return ['title', 'language', 'Answers'];
+    };
+
+    // Instance Methods
+    Question.prototype.checkGetAnswers = function() {
+        return (typeof this.Answers !== 'undefined') ? Promise.resolve(this.Answers) : this.getAnswers();
+    };
+
+    Question.prototype.getDdlSql = function() {
+        switch (this.type) {
+            case 'list-radio-other':
+                return "q" + this.question_order + " text" + (this.mandatory ? " NOT NULL" : "") + ", q" + this.question_order + "_other text";
+            case 'list-radio':
+            case 'text-answer':
+            case 'image-url':
+                return "q" + this.question_order + " text" + (this.mandatory ? " NOT NULL" : "");
+            case 'image-upload':
+                return "q" + this.question_order + " int REFERENCES metadata.files ON UPDATE CASCADE ON DELETE SET NULL";
+            case 'explanatory-text':
+                return "";
+            default:
+                return new Error("Question type not contemplated.");
+        }
+    };
+
+    Question.prototype.getSelectSql = function() {
+        switch (this.type) {
+            case 'list-radio-other':
+                return 'a.q' + this.question_order + ' AS "q' + this.question_order + '.id", a.q' + this.question_order + '_other AS "q' + this.question_order + '.value"';
+            case 'list-radio':
+                return 'a.q' + this.question_order + ' AS "q' + this.question_order + '.id"';
+            case 'text-answer':
+            case 'image-url':
+                return 'a.q' + this.question_order + ' AS "q' + this.question_order + '.value"';
+            case 'image-upload':
+                if (!this.mandatory) {
+                    return 'CASE WHEN a.q' + this.question_order + ' IS NULL THEN NULL ELSE \'/api/survey/' + Utils.encryptSurveyId(this.Survey.id) + '/result/\' || a.gid || \'/image/' + this.question_order + '\' END AS "q' + this.question_order + '.value"';
+                } else {
+                    return '\'/api/survey/' + Utils.encryptSurveyId(this.Survey.id) + '/result/\' || a.gid || \'/image/' + this.question_order + '\' AS "q' + this.question_order + '.value"';
+                }
+            case 'explanatory-text':
+                return '';
+            default:
+                return new Error("Question type not contemplated.");
+        }
+    };
+
+    Question.prototype.checkValidResponse = function(responses) {
+        var question = this,
+            promise = (typeof this.Answers !== 'undefined') ? Promise.resolve(this.Answers) : this.getAnswers();
+        return promise.then(function(answers) {
+            var answer = null;
+            switch (question.type) {
+                case 'list-radio-other':
+                    if (responses['q' + question.question_order + '.id']) {
+                        answer = parseInt(responses['q' + question.question_order + '.id'], 10);
+                        if (answer === -1) {
+                            if (responses['q' + question.question_order + '.value']) {
+                                responses['q' + question.question_order + '.value'] = responses['q' + question.question_order + '.value'].trim();
+                            }
+                            if (!responses['q' + question.question_order + '.value']) {
+                                answer = answer + ' [null]';
+                                break;
+                            }
+                            return Promise.resolve();
+                        }
+                    }
+                    /* falls through */
+                case 'list-radio':
+                    if (responses['q' + question.question_order + '.id']) {
+                        answer = parseInt(responses['q' + question.question_order + '.id'], 10);
+                        for (var i = 0, len = answers.length; i<len; i++) {
+                            if (answers[i].sortorder === answer) {
+                                return Promise.resolve();
+                            }
+                        }
+                    }
+                    break;
+                case 'text-answer':
+                    answer = responses['q' + question.question_order + '.value'];
+                    if (!question.mandatory || responses['q' + question.question_order + '.value']) {
+                        if (responses['q' + question.question_order + '.value']) {
+                            responses['q' + question.question_order + '.value'] = responses['q' + question.question_order + '.value'].trim();
+                        }
+                        if (!responses['q' + question.question_order + '.value']) {
+                            if (question.mandatory) {
+                                break;
+                            } else {
+                                responses['q' + question.question_order + '.value'] = null;
+                            }
+                        }
+                        return Promise.resolve();
+                    }
+                    break;
+                case 'explanatory-text':
+                    return Promise.resolve();
+                case 'image-upload':
+                    if (!question.mandatory && responses['q' + question.question_order + '.value'] === "") {
+                        return Promise.resolve();
+                    } else {
+                        if (('q' + question.question_order + '.value') in responses &&
+                          'path' in responses['q' + question.question_order + '.value']) {
+                            answer = responses['q' + question.question_order + '.value'];
+                            if (!(Utils.isImage(fs.readFileSync(responses['q' + question.question_order + '.value'].path)))) {
+                                return Promise.reject({
+                                    message: "invalid answer for question nr " + question.question_order + " : selected file is not an image.",
+                                    status: 400,
+                                    code: 'invalid_request'
+                                });
+                            }
+                            if (responses['q' + question.question_order + '.value'].size > 4000000) {
+                                return Promise.reject({
+                                    message: "invalid answer for question nr " + question.question_order + " : image file exceeds the 4MB max size.",
+                                    status: 400,
+                                    code: 'invalid_request'
+                                });
+                            }
+                            return Promise.resolve();
+                        }
+                    }
+                    break;
+                case 'image-url':
+                    answer = responses['q' + question.question_order + '.value'];
+                    if (answer) {
+                        responses['q' + question.question_order + '.value'] = responses['q' + question.question_order + '.value'].trim();
+                        if (answer.lastIndexOf('http', 0) !== 0) {
+                            responses['q' + question.question_order + '.value'] = answer = 'http://' + answer;
+                        }
+                        return Utils.checkUrlIsImage(responses['q' + question.question_order + '.value']);
+                    } else if (!question.mandatory) {
+                        responses['q' + question.question_order + '.value'] = null;
+                        // Image is empty because it is not mandatory
+                        return Promise.resolve();
+                    }
+                    break;
+                default:
+                    return Promise.reject({
+                        message: "question type not contemplated.",
+                        status: 500,
+                        code: 'internal_error'
+                    });
+            }
+            return Promise.reject({
+                message: "invalid answer for question nr " + question.question_order + " : " + answer,
+                status: 400,
+                code: 'invalid_request'
+            });
+        });
+    };
+
+    Question.prototype.getInsertSql = function(responses) {
+        var respField = 'q' + this.question_order + '.id';
+        switch (this.type) {
+            case 'list-radio-other':
+                if (respField in responses &&
+                    parseInt(responses[respField], 10) === -1 &&
+                    'q' + this.question_order + '.value' in responses) {
+                        return ['q' + this.question_order + ', q' + this.question_order + '_other', '?, ?', [responses[respField], responses['q' + this.question_order + '.value']]];
+                }
+                break;
+            case 'list-radio':
+                break;
+            case 'text-answer':
+            case 'image-url':
+                respField = 'q' + this.question_order + '.value';
+                break;
+            case 'image-upload':
+                // File is actually stored in a post-insert operation
+                return ['q' + this.question_order, '?', [null]];
+            case 'explanatory-text':
+                return ['', '', []];
+            default:
+                return new Error("Question type not contemplated.");
+        }
+        if (respField in responses) {
+            return ['q' + this.question_order, '?', [responses[respField]]];
+        }
+        return new Error("Question fields have not been sent: q" + this.question_order);
+    };
+
+    Question.prototype.getPostInsertOperations = function(responses, answerId) {
+        var respField = 'q' + this.question_order + '.id',
+            question = this,
+            survey = this.Survey;
+        switch (this.type) {
+            case 'image-upload':
+                // Store the image in the local filesystem, save its
+                // metadata inside database and set a reference to it
+                // in the saved answer.
+                respField = 'q' + question.question_order + '.value';
+                if (respField in responses && responses[respField] !== '') {
+                    if ('path' in responses[respField]) {
+                        return FileHelper.saveFileFromPath(responses[respField].path, 'images/survey/' + survey.id + '/answer/' + answerId +
+                        '/answer_q' + question.question_order + path.extname(responses[respField].name), responses[respField].name).then(function(fileId) {
+                            return sequelize.query('UPDATE opinions.survey_' + survey.id + ' SET q' + question.question_order + ' = ? WHERE gid = ?;',
+                                { replacements: [fileId, answerId], type: sequelize.QueryTypes.UPDATE }
+                            );
+                        });
+                    }
+                }
+                // Fall-through
+            case 'list-radio-other':
+            case 'list-radio':
+            case 'text-answer':
+            case 'image-url':
+            case 'explanatory-text':
+                // Nothing to do
+                return Promise.resolve();
+            default:
+                return new Error("Question type not contemplated.");
+        }
+    };
+
+    Question.prototype.clone = function(surveyId) {
+        var props = Utils.extractProperties(this, ['id', 'survey_id']);
+        props.survey_id = surveyId;
+        return this.checkGetAnswers().then(function(answers){
+            return Question.create(props).then(function(question) {
+                return Promise.map(answers, function(answer) {
+                    return answer.clone(question.id);
+                });
+            });
+        });
+    };
+
+    Question.prototype.getHtml = function(req) {
+        var parent = this,
+            html = '';
+        switch (parent.type) {
+            case 'list-radio':
+            case 'list-radio-other':
+                return this.checkGetAnswers().then(
+                    function(answers){
+                        var html = '<div class="main-question" id="question-' + parent.question_order + '">\n';
+                        switch (parent.type) {
+                            case 'list-radio':
+                            case 'list-radio-other':
+                                var otherAnswer = null;
+                                html += '<h2>' + escape(parent.question) + '</h2>\n';
+                                if (answers.length > 2) {
+                                    html += '<div class="listbtns row">\n';
+                                    // If we have more than two answers, we display them in a vertical list
+                                    for (var i = 0, iLen = answers.length; i < iLen; i++) {
+                                        if (answers[i].sortorder === -1) {
+                                            otherAnswer = answers[i];
+                                            continue;
+                                        }
+                                        html += generateExclusiveBtnAnswerHtml(answers[i], answerLayout.list, parent);
+                                    }
+                                } else {
+                                    html += '<div class="rowbtns row">\n';
+                                    // If we have only two answers, we display them in as VS in a sole row
+                                    for (var j = 0, jLen = answers.length; j < jLen; j++) {
+                                        html += generateExclusiveBtnAnswerHtml(answers[j], answerLayout.row, parent);
+                                    }
+                                }
+                                if (otherAnswer !== null) {
+                                    html += generateExclusiveBtnAnswerHtml(otherAnswer, answerLayout.listOther, parent);
+                                }
+                                html += '</div>\n';
+                                break;
+                            default:
+                                return new Error("Question type not contemplated.");
+                        }
+                        return html + '</div>';
+                    }
+                );
+            case 'text-answer':
+                html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputNotVoid', req);
+                break;
+            case 'image-upload':
+                html += generateImageInputQuestionHtml(parent, 'emapic.utils.checkImageNotVoid', req);
+                break;
+            case 'image-url':
+                html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputUrlIsImage', req);
+                break;
+            case 'explanatory-text':
+                html += '<div class="col-xs-12 text-center"><div id="q' + parent.question_order + '-other"' +
+                    '  class="col-xs-12 col-md-6 col-md-offset-3 survey-answer explanatory-text"><p id="q' + parent.question_order +
+                    '">' + Utils.transformNewlinesToHtml(linkifyHtml(escape(parent.question))) + '</p><br/><button id="q' + parent.question_order +
+                    '-ok" class="btn btn-primary" onclick="emapic.modules.survey.advanceSurvey()">OK</button></div></div>';
+                break;
+            default:
+                return new Error("Question type not contemplated.");
+        }
+        return '<div class="main-question" id="question-' + parent.question_order + '">\n' + html + '\n</div>';
+    };
+
+    Question.prototype.getFullDescription = function() {
+        var description = this.getDescription(),
+            answersPromise = typeof this.Answers !== 'undefined' ?
+                Promise.resolve(this.Answers) : this.getAnswers();
+        return answersPromise.then(function(answers) {
+            return Promise.map(answers, function(answer) {
+                return answer.getFullDescription();
+            });
+        }).then(function(answersDesc) {
+            for (var i = 0, iLen = answersDesc.length; i<iLen; i++) {
+                delete answersDesc[i].question_id;
+            }
+            description.answers = answersDesc;
+            return description;
+        });
+    };
 
     return Question;
 };

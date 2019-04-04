@@ -1,5 +1,4 @@
 var Promise = require('bluebird'),
-    Map = require("collections/map"),
     logger = require('../utils/logger');
 
 module.exports = function(sequelize, DataTypes) {
@@ -36,108 +35,6 @@ module.exports = function(sequelize, DataTypes) {
                 };
             }
         },
-        classMethods: {
-            associate: function(models) {
-                models.Role.belongsToMany(User, { through: 'rel_users_roles', foreignKey: 'role_id' });
-                User.belongsToMany(models.Role, { through: 'rel_users_roles', foreignKey: 'user_id' });
-            },
-
-            findByLogin: function(login) {
-                return User.scope({method: ['findByLogin', login]}).findOne().then(function(usr) {
-                    if (usr === null) {
-                        throw new Error('NULL_USER');
-                    }
-                    return usr;
-                });
-            },
-
-            getFieldsToHideInDescription: function() {
-                return ['already_opened', 'display_name', 'email', 'google_id',
-                    'google_token', 'facebook_id', 'facebook_token', 'password', 'join_date',
-                    'url', 'salt', 'avatar', 'activated', 'geom'];
-            }
-        },
-        instanceMethods: {
-            getAnsweredSurveys: function() {
-                var userId = this.id;
-                return Promise.reduce(this.getVotes({
-                        include: [
-                            {
-                                model: models.Survey,
-                                include: [{model: User, as: 'owner'}]
-                            }
-                        ],
-                        order: ['survey_id', ['vote_date', 'DESC']]
-                    }),
-                    function(surveys, vote) {
-                        if (surveys.has(vote.Survey.id)) {
-                            var dates = surveys.get(vote.Survey.id).dates;
-                            dates.push(vote.vote_date);
-                            surveys.set(vote.Survey.id, {
-                                'survey': vote.Survey,
-                                'dates' : dates
-                            });
-                        } else {
-                            surveys.set(vote.Survey.id, {
-                                'survey': vote.Survey,
-                                'dates' : [vote.vote_date]
-                            });
-                        }
-                        return surveys;
-                    },
-                new Map({})).then(function(surveys) {
-                    var surveysArray = surveys.toArray(),
-                        answered = [];
-                    for (var i = 0, iLen = surveysArray.length; i<iLen; i++) {
-                        if (surveysArray[i].dates.length > 0) {
-                            var pos = answered.length;
-                            for (var j = 0, jLen = answered.length; j<jLen; j++) {
-                                if (answered[j].dates[0] < surveysArray[i].dates[0]) {
-                                    pos = j;
-                                    break;
-                                }
-                            }
-                            answered.splice(pos, 0, {
-                                'survey': surveysArray[i].survey,
-                                'dates' : surveysArray[i].dates
-                            });
-                        }
-                    }
-                    return answered;
-                });
-            },
-
-            isAdmin: function() {
-                return this.isRole('admin');
-            },
-
-            isRole: function(role) {
-                return this.getRoles({
-                    where: {
-                        name: role
-                    }
-                }).then(function(roles) {
-                    return roles.length > 0;
-                });
-            },
-
-            getAnsweredSurveysAndCount: function(options) {
-                return this.getAnsweredSurveys().then(function(rows) {
-                    var total = rows.length,
-                        offset = (options && options.offset && !isNaN(options.offset)) ? parseInt(options.offset, 10) : 0,
-                        limit = (options && options.limit && !isNaN(options.limit)) ? offset + parseInt(options.limit, 10) : total;
-                    return {
-                        count: total,
-                        rows: rows.slice(offset, limit)
-                    };
-                });
-            },
-
-            getCustomFieldsDescription: function(fields) {
-                fields.avatar_url = Utils.getApplicationBaseURL() + '/avatar/' + this.login;
-                return fields;
-            }
-        },
         hooks: {
             beforeDestroy: function(user) {
                 return user.getSurveys().each(function(survey) {
@@ -147,6 +44,108 @@ module.exports = function(sequelize, DataTypes) {
         },
         tableName: 'users'
     });
+
+    // Class methods
+    User.associate = function(models) {
+        models.Role.belongsToMany(User, { through: 'rel_users_roles', foreignKey: 'role_id' });
+        User.belongsToMany(models.Role, { through: 'rel_users_roles', foreignKey: 'user_id' });
+    };
+
+    User.findByLogin = function(login) {
+        return User.scope({method: ['findByLogin', login]}).findOne().then(function(usr) {
+            if (usr === null) {
+                throw new Error('NULL_USER');
+            }
+            return usr;
+        });
+    };
+
+    User.getFieldsToHideInDescription = function() {
+        return ['already_opened', 'display_name', 'email', 'google_id',
+            'google_token', 'facebook_id', 'facebook_token', 'password', 'join_date',
+            'url', 'salt', 'avatar', 'activated', 'geom'];
+    };
+
+    // Instance methods
+    User.prototype.getAnsweredSurveys = function() {
+        var userId = this.id;
+        return Promise.reduce(this.getVotes({
+                include: [
+                    {
+                        model: models.Survey,
+                        include: [{model: User, as: 'owner'}]
+                    }
+                ],
+                order: ['survey_id', ['vote_date', 'DESC']]
+            }),
+            function(surveys, vote) {
+                if (surveys.has(vote.Survey.id)) {
+                    var dates = surveys.get(vote.Survey.id).dates;
+                    dates.push(vote.vote_date);
+                    surveys.set(vote.Survey.id, {
+                        'survey': vote.Survey,
+                        'dates' : dates
+                    });
+                } else {
+                    surveys.set(vote.Survey.id, {
+                        'survey': vote.Survey,
+                        'dates' : [vote.vote_date]
+                    });
+                }
+                return surveys;
+            },
+        new Map([])).then(function(surveys) {
+            var surveysArray = Array.from(surveys.values()),
+                answered = [];
+            for (var i = 0, iLen = surveysArray.length; i<iLen; i++) {
+                if (surveysArray[i].dates.length > 0) {
+                    var pos = answered.length;
+                    for (var j = 0, jLen = answered.length; j<jLen; j++) {
+                        if (answered[j].dates[0] < surveysArray[i].dates[0]) {
+                            pos = j;
+                            break;
+                        }
+                    }
+                    answered.splice(pos, 0, {
+                        'survey': surveysArray[i].survey,
+                        'dates' : surveysArray[i].dates
+                    });
+                }
+            }
+            return answered;
+        });
+    };
+
+    User.prototype.isAdmin = function() {
+        return this.isRole('admin');
+    };
+
+    User.prototype.isRole = function(role) {
+        return this.getRoles({
+            where: {
+                name: role
+            }
+        }).then(function(roles) {
+            return roles.length > 0;
+        });
+    };
+
+    User.prototype.getAnsweredSurveysAndCount = function(options) {
+        return this.getAnsweredSurveys().then(function(rows) {
+            var total = rows.length,
+                offset = (options && options.offset && !isNaN(options.offset)) ? parseInt(options.offset, 10) : 0,
+                limit = (options && options.limit && !isNaN(options.limit)) ? offset + parseInt(options.limit, 10) : total;
+            return {
+                count: total,
+                rows: rows.slice(offset, limit)
+            };
+        });
+    };
+
+    User.prototype.getCustomFieldsDescription = function(fields) {
+        fields.avatar_url = Utils.getApplicationBaseURL() + '/avatar/' + this.login;
+        return fields;
+    };
 
     return User;
 };

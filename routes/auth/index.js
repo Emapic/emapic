@@ -32,7 +32,7 @@ module.exports = function(app) {
                         type: sequelize.QueryTypes.SELECT
                     }).then(function(features) {
                         if (features.length > 0) {
-                            return models.User.findById(features[0].user_id).then(function(usr) {
+                            return models.User.findByPk(features[0].user_id).then(function(usr) {
                                 return {
                                     accessToken: features[0].token,
                                     accessTokenExpiresAt: features[0].expiration_date,
@@ -512,7 +512,7 @@ module.exports = function(app) {
             return res.redirect('/login');
         }
         var user;
-        models.User.find({ where: {email: req.body.email, activated: true} }).then(function(usr) {
+        models.User.findOne({ where: {email: req.body.email, activated: true} }).then(function(usr) {
             user = usr;
             if (!user) {
                 throw new Error('password_reset_invalid_user');
@@ -537,7 +537,7 @@ module.exports = function(app) {
         }
         var password,
             user;
-        models.User.find({
+        models.User.findOne({
             where: models.Sequelize.where(
                 models.Sequelize.fn('md5', models.Sequelize.fn('concat', models.Sequelize.col('salt'), models.Sequelize.col('email'))),
                 req.query.id
@@ -572,7 +572,7 @@ module.exports = function(app) {
             return res.redirect('/login');
         }
         var user;
-        models.User.find({ where: {email: req.body.email} }).then(function(usr) {
+        models.User.findOne({ where: {email: req.body.email} }).then(function(usr) {
             user = usr;
             if (!user) {
                 throw new Error('resend_activation_mail_invalid_user');
@@ -632,10 +632,10 @@ module.exports = function(app) {
     //===============PASSPORT=================
     //used in local signin strategy
     function localAuth(email, password) {
-        return models.User.find({ where: {email: email, activated: true} }).then(function(user) {
+        return models.User.findOne({ where: {email: email, activated: true} }).then(function(user) {
             if (user === null) {
                 // If we don't find it by email, we try by login
-                return models.User.find({ where: {login: email, activated: true} });
+                return models.User.findOne({ where: {login: email, activated: true} });
             }
             return Promise.resolve(user);
         }).then(function(user) {
@@ -656,10 +656,10 @@ module.exports = function(app) {
     //used in google signin strategy
     function googleAuth (req, profile, token) {
         var usr;
-        return models.User.find({ where: { 'google_id' : profile.id } }).then(function(user) {
+        return models.User.findOne({ where: { 'google_id' : profile.id } }).then(function(user) {
             if (user === null) {
                 // If we don't find it by google id, we try by email
-                return models.User.find({ where: {email: profile.emails[0].value} }).then(function(user) {
+                return models.User.findOne({ where: {email: profile.emails[0].value} }).then(function(user) {
                     if (user === null) {
                         // If we don't find it either by google id or email, we
                         // create a new user.
@@ -713,13 +713,13 @@ module.exports = function(app) {
     //used in facebook signin strategy
     function facebookAuth (req, profile, token) {
         var usr;
-        return models.User.find({ where: { 'facebook_id' : profile.id } }).then(function(user) {
+        return models.User.findOne({ where: { 'facebook_id' : profile.id } }).then(function(user) {
             if (user === null) {
                 if (!('emails' in profile) || profile.emails.length === 0) {
                     throw new Error('facebook_no_mail');
                 }
                 // If we don't find it by facebook id, we try by email
-                return models.User.find({ where: {email: profile.emails[0].value} }).then(function(user) {
+                return models.User.findOne({ where: {email: profile.emails[0].value} }).then(function(user) {
                     if (user === null) {
                         // If we don't find it either by facebook id or email, we
                         // create a new user.
@@ -800,7 +800,7 @@ module.exports = function(app) {
     });
 
     passport.deserializeUser(function(id, done) {
-        models.User.findById(id).then(function(user) {
+        models.User.findByPk(id).then(function(user) {
             done(null, user);
         });
     });
@@ -809,7 +809,7 @@ module.exports = function(app) {
         function(token, done) {
             consumeRememberMeToken(token, function (err, id) {
                 if (err) { return done(err); }
-                models.User.findById(id).then(function(user) {
+                models.User.findByPk(id).then(function(user) {
                     if (!user) { return done(null, false); }
                     return done(null, user);
                 });

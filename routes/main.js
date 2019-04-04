@@ -3,8 +3,10 @@ var passport = require('passport'),
     nconf = require('nconf'),
     fs = require('fs'),
     logger = require('../utils/logger'),
+    sequelize = require('sequelize'),
 
     defaultPageSize = nconf.get('app').defaultPageSize;
+const Op = sequelize.Op;
 
 module.exports = function(app) {
 
@@ -31,7 +33,7 @@ module.exports = function(app) {
             req.user.getSurveys({
                 where: {
                     active: {
-                        $ne: null
+                        [Op.ne]: null
                     }
                 }
             }),
@@ -184,7 +186,7 @@ module.exports = function(app) {
             }
             if ('clone_survey' in req.body) {
                 // Clone survey
-                models.Survey.findById(req.body.survey_id).then(function(surv) {
+                models.Survey.findByPk(req.body.survey_id).then(function(surv) {
                     if (surv === null) {
                         return res.redirect('/surveys/own');
                     }
@@ -220,7 +222,7 @@ module.exports = function(app) {
             } else {
                 // Edit survey
                 var survey;
-                models.Survey.findById(req.body.survey_id).then(function(surv) {
+                models.Survey.findByPk(req.body.survey_id).then(function(surv) {
                     if (surv === null) {
                         return res.redirect('/surveys/own');
                     }
@@ -239,7 +241,11 @@ module.exports = function(app) {
     });
 
     app.get('/survey/:id/delete', requireRole(null), function(req, res) {
-        req.user.getSurveys({ where: ['id = ?', Utils.decryptSurveyId(req.params.id)] }).then(function(surveys) {
+        req.user.getSurveys({
+            where: {
+                id: Utils.decryptSurveyId(req.params.id)
+            }
+        }).then(function(surveys) {
             if (surveys.length === 0) {
                 return Promise.reject();
             }
@@ -256,7 +262,11 @@ module.exports = function(app) {
     });
 
     app.get('/survey/:id/open', requireRole(null), function(req, res) {
-        req.user.getSurveys({ where: ['id = ?', Utils.decryptSurveyId(req.params.id)] }).then(function(surveys) {
+        req.user.getSurveys({
+            where: {
+                id: Utils.decryptSurveyId(req.params.id)
+            }
+        }).then(function(surveys) {
             if ((surveys.length === 0) || (surveys[0].active === false)) {
                 return Promise.reject();
             }
@@ -278,7 +288,11 @@ module.exports = function(app) {
     });
 
     app.get('/survey/:id/close', requireRole(null), function(req, res) {
-        req.user.getSurveys({ where: ['id = ?', Utils.decryptSurveyId(req.params.id)] }).then(function(surveys) {
+        req.user.getSurveys({
+            where: {
+                id: Utils.decryptSurveyId(req.params.id)
+            }
+        }).then(function(surveys) {
             if ((surveys.length === 0) || (surveys[0].active === null)) {
                 return Promise.reject();
             }
@@ -324,7 +338,7 @@ module.exports = function(app) {
     });
 
     app.get('/answer_img/:id', function(req, res){
-        models.Answer.findById(req.params.id).then(function(answer) {
+        models.Answer.findByPk(req.params.id).then(function(answer) {
             if (answer === null || answer.img === null || answer.img.length === 0) {
                 return res.send(404);   // HTTP status 404: NotFound
             }

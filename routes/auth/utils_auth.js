@@ -84,7 +84,7 @@ module.exports = function(app) {
     };
 
     activateUser = function(userid) {
-        return models.User.find({
+        return models.User.findOne({
             where: models.Sequelize.where(
                 models.Sequelize.fn('md5', models.Sequelize.fn('concat', models.Sequelize.col('salt'), models.Sequelize.col('email'))),
                 userid

@@ -10,45 +10,45 @@ module.exports = function(sequelize, DataTypes) {
         scopes: {
             defaultOrdering: function() {
                 return {
-                    order: Answer.getDefaultOrder()
+                    order: Utils.createOrderArray(Answer.getDefaultOrder())
                 };
-            }
-        },
-        classMethods: {
-            getDefaultOrder: function() {
-                return ['sortorder'];
-            },
-
-            associate: function(models) {
-                Answer.belongsTo(models.Question, {foreignKey: 'question_id'});
-                models.Question.hasMany(Answer.scope('defaultOrdering'), {foreignKey: 'question_id'});
-            },
-
-            getFieldsToHideInDescription: function() {
-                return ['language', 'img'];
-            }
-        },
-        instanceMethods: {
-            clone: function(questionId) {
-                var props = Utils.extractProperties(this, ['id', 'question_id']);
-                props.question_id = questionId;
-                return Answer.create(props);
-            },
-
-            getCustomFieldsDescription: function(fields) {
-                if (typeof this.img !== 'undefined' && this.img !== null) {
-                    fields.img_url = Utils.getApplicationBaseURL() + '/answer_img/' + this.id;
-                }
-                return fields;
-            },
-
-            getFullDescription: function() {
-                return Promise.resolve(this.getDescription());
             }
         },
         tableName: 'answers',
         schema: 'metadata'
     });
+
+    // Class methods
+    Answer.getDefaultOrder = function() {
+        return ['sortorder'];
+    };
+
+    Answer.associate = function(models) {
+        Answer.belongsTo(models.Question, {foreignKey: 'question_id'});
+        models.Question.hasMany(Answer.scope('defaultOrdering'), {foreignKey: 'question_id'});
+    };
+
+    Answer.getFieldsToHideInDescription = function() {
+        return ['language', 'img'];
+    };
+
+    // Instance Methods
+    Answer.prototype.clone = function(questionId) {
+        var props = Utils.extractProperties(this, ['id', 'question_id']);
+        props.question_id = questionId;
+        return Answer.create(props);
+    };
+
+    Answer.prototype.getCustomFieldsDescription = function(fields) {
+        if (typeof this.img !== 'undefined' && this.img !== null) {
+            fields.img_url = Utils.getApplicationBaseURL() + '/answer_img/' + this.id;
+        }
+        return fields;
+    };
+
+    Answer.prototype.getFullDescription = function() {
+        return Promise.resolve(this.getDescription());
+    };
 
     return Answer;
 };

@@ -391,6 +391,18 @@ module.exports = function(app) {
                     });
                 });
             }
+        },
+
+        createOrderArray: function(thisFields, model) {
+            var scopeArray = [];
+            for (field of thisFields) {
+                if (model) {
+                    scopeArray.push([model, field]);
+                } else {
+                    scopeArray.push([field]);
+                }
+            }
+            return scopeArray
         }
     };
 };

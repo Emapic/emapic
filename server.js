@@ -28,7 +28,6 @@ var express = require('express'),
     Sitemap = require('express-sitemap'),
     nodeSchedule = require('node-schedule'),
     utils = require('./utils'),
-    routes = require('./routes'),
     onFinished = require('on-finished'),
     clamscan = require('clamscan'),
     clamscanConfig = {
@@ -508,7 +507,7 @@ var EmapicApp = function() {
             next();
         });
 
-        routes(self.app);
+        require('./routes')(self.app);
 
         // Create the sitemap and robots routes
         self.loadSitemapRobots();
