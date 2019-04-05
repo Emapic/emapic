@@ -168,9 +168,9 @@ var emapic = emapic || {};
 
     function configPieChart(voteChart, width, legendHeight, voteDimension, voteDimensionGroup, all) {
         voteChart
-            .width(180) // (optional) define chart width, :default = 200
+            .width(width) // (optional) define chart width, :default = 200
             .height(legendHeight) // (optional) define chart height, :default = 200
-            .radius(80) // define pie radius
+            .radius(0.45 * width) // define pie radius
             .dimension(voteDimension) // set dimension
             .group(voteDimensionGroup) // set group
             .legend(dc.legend().legendText(function(d) {
