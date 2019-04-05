@@ -1,6 +1,6 @@
 var Promise = require('bluebird'),
     nconf = require('nconf'),
-    fsp = require('fs-promise'),
+    fsp = require('fs-extra'),
     path = require('path'),
     fs = require('fs'),
     logger = require('../utils/logger'),
