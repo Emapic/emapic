@@ -15,9 +15,9 @@ var emapic = emapic || {};
         municipalitiesLayer = null,
         municipalitiesLayerData,
         municipalityResultsDfd = null,
-        provinceJsonColumnsToIgnore = ['name', 'total_responses', 'iso_code', 'country_id', 'adm_code', 'adm_type', 'country_iso_code'],
+        provinceJsonColumnsToIgnore = ['name', 'total_responses', 'iso_code', 'country_id', 'adm_code', 'adm_type', 'country_iso_code', 'supersuperheader'],
         countryJsonColumnsToIgnore = ['name', 'total_responses', 'iso_code'],
-        municipalityJsonColumnsToIgnore = ['name', 'total_responses', 'adm_code', 'cod_prov', 'provincia', 'cod_ccaa', 'comautonom', 'country_iso_code'],
+        municipalityJsonColumnsToIgnore = ['name', 'total_responses', 'adm_code', 'cod_prov', 'provincia', 'cod_ccaa', 'comautonom', 'province_adm_code', 'country_iso_code', 'superheader', 'supersuperheader'],
         aggregationMunicipalityButtonHtml = "<a id='grouping-control-municipality' title='" + emapic.utils.getI18n('js_total_votes_municipality', 'Ver total de votos por municipio (sólo España)') + "' class='exclusive-control' href='javascript:void(0)' onclick='emapic.modules.aggregation.showVotesByMunicipality(this)'><img src='/images/icon-agg_municipality.png' style='width: 16px; height: 16px;'/></a>",
         aggregationButtonsHtml = "<a id='grouping-control-country' class='exclusive-control' title='" + emapic.utils.getI18n('js_total_votes_country', 'Ver total de votos por país') + "' href='javascript:void(0)' onclick='emapic.modules.aggregation.showVotesByCountry(this)'><img src='/images/icon-agg_country.png' style='width: 16px; height: 16px;'/></a>\n" +
             "<a id='grouping-control-region' title='" + emapic.utils.getI18n('js_total_votes_region', 'Ver total de votos por región') + "' class='exclusive-control' href='javascript:void(0)' onclick='emapic.modules.aggregation.showVotesByProvince(this)'><img src='/images/icon-agg_region.png' style='width: 16px; height: 16px;'/></a>";
@@ -192,7 +192,7 @@ var emapic = emapic || {};
         popup += '<h4 class="popup-aggregated-header">' + feature.properties.name + '</h4>';
         // We order the votes in descending order
         for (var i in feature.properties) {
-            if (columnsToIgnore.indexOf(i) === -1 && i.split('_')[0] == emapic.legend.color.question) {
+            if (columnsToIgnore.indexOf(i) === -1 && emapic.legend && emapic.legend.color && i.split('_')[0] == emapic.legend.color.question) {
                 question = i.split('_')[0];
     			if (!orderedVotes[question]) {
     				orderedVotes[question] = [];
@@ -228,13 +228,13 @@ var emapic = emapic || {};
         return popup(feature, countryJsonColumnsToIgnore);
     }
 
-    function getAreaStyle(feature) {
+    function getAreaStyle(feature, columnsToIgnore) {
         var color,
             biggestNr = 0,
             biggestOpt = null,
             tie = false;
         for (var i in feature.properties) {
-            if (i != 'name' && i != 'total_responses' && i != 'iso_code' && i.split('_')[0] == emapic.legend.color.question) {
+            if (columnsToIgnore.indexOf(i) === -1 && emapic.legend && emapic.legend.color && i.split('_')[0] == emapic.legend.color.question) {
                 var nr = parseInt(feature.properties[i]);
                 if (nr == biggestNr) {
                     tie = true;
@@ -280,7 +280,9 @@ var emapic = emapic || {};
     				}
     			);
     		},
-    		style: getAreaStyle
+    		style: function(feature) {
+    			return getAreaStyle(feature, municipalityJsonColumnsToIgnore);
+    		}
     	});
     	if (emapic.map.hasLayer(oldLayer)) {
     		emapic.map.removeLayer(oldLayer);
@@ -299,7 +301,9 @@ var emapic = emapic || {};
     				}
     			);
     		},
-    		style: getAreaStyle
+    		style: function(feature) {
+    			return getAreaStyle(feature, provinceJsonColumnsToIgnore);
+    		}
     	});
     	if (emapic.map.hasLayer(oldLayer)) {
     		emapic.map.removeLayer(oldLayer);
@@ -318,7 +322,9 @@ var emapic = emapic || {};
     				}
     			);
     		},
-    		style: getAreaStyle
+    		style: function(feature) {
+    			return getAreaStyle(feature, countryJsonColumnsToIgnore);
+    		}
     	});
     	if (emapic.map.hasLayer(oldLayer)) {
     		emapic.map.removeLayer(oldLayer);
