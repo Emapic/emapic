@@ -160,6 +160,7 @@
 	"js_zoom_in": "Zoom in",
 	"js_zoom_out": "Zoom out",
 	"js_disable_clustering": "Disable clustering",
+	"js_total_votes_municipality": "See total votes per municipality (Spain only)",
 	"js_total_votes_region": "See total votes per region",
 	"js_total_votes_country": "See total votes per country",
 	"js_positive_votes": "Positive votes",

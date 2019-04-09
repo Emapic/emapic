@@ -199,6 +199,8 @@
     {{/survey.already_opened}}
 
     <script type="text/javascript">
+        emapic.modules.aggregation.showMunicipalities = emapic.modules.locators.showMunicipalities = true;
+
         emapic.surveyId = "{{survey.encr_id}}";
 
         emapic.oldResponses = {{{ responses }}};

@@ -6,6 +6,7 @@
     emapic.utils.registerI18n('js_zoom_in', '{{#__}}js_zoom_in{{/__}}');
     emapic.utils.registerI18n('js_zoom_out', '{{#__}}js_zoom_out{{/__}}');
     emapic.utils.registerI18n('js_disable_clustering', '{{#__}}js_disable_clustering{{/__}}');
+    emapic.utils.registerI18n('js_total_votes_municipality', '{{#__}}js_total_votes_municipality{{/__}}');
     emapic.utils.registerI18n('js_total_votes_region', '{{#__}}js_total_votes_region{{/__}}');
     emapic.utils.registerI18n('js_total_votes_country', '{{#__}}js_total_votes_country{{/__}}');
     emapic.utils.registerI18n('js_positive_votes', '{{#__}}js_positive_votes{{/__}}');

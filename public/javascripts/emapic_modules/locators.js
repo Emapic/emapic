@@ -36,6 +36,7 @@ var emapic = emapic || {};
         votedCountriesSpinner = null,
         sidebar,
         countriesProvincesData = {},
+        provincesMunicipalitiesData = {},
         allCountriesBbox = [[null, null], [null, null]],
         locatorsButtonsHtml = "<a id='control-extent' title='" + emapic.utils.getI18n('js_see_all_answers', 'Zoom a todas las respuestas') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"answers\");'><span class='glyphicon glyphicon-fullscreen'></span></a>\n" +
             "<a id='control-user' title='" + emapic.utils.getI18n('js_see_my_answer_position', 'Ver posición de mi respuesta') + "' href='javascript:void(0)' onclick='emapic.modules.locators.controlViewTo(\"user\");'><span class='glyphicon glyphicon-user'></span></a>\n" +
@@ -83,6 +84,8 @@ var emapic = emapic || {};
 
     emapic.modules = emapic.modules || {};
     emapic.modules.locators = emapic.modules.locators || {};
+
+    emapic.modules.locators.showMunicipalities = false;
 
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
         sidebar = L.control.sidebar('sidebarLocator', {
@@ -230,11 +233,13 @@ var emapic = emapic || {};
     }
 
     function populateSidebarDataVotedCountries() {
-        $.when(
+        var promise = $.when(
             emapic.getAllCountriesDataBbox(),
             emapic.getVotedCountriesDataNoGeom(),
             emapic.getVotedProvincesDataBbox()
-        ).done(function() {
+        );
+        (emapic.modules.locators.showMunicipalities ? $.when(promise,
+            emapic.getVotedMunicipalitiesDataBbox()) : promise).done(function() {
             votedCountriesSpinner.stop();
             var specificVotesHtml = '<tr>\n' +
                 "<th colspan='3'><small>" + emapic.utils.getI18n('js_country_of_origin', 'País de origen') + "</small></th>\n",
@@ -248,12 +253,30 @@ var emapic = emapic || {};
             }
             specificVotesHtml += "<th><small>" + emapic.utils.getI18n('js_total_votes', 'Votos totales') + "</small></th></tr>";
             $('#voted_countries thead').html(specificVotesHtml);
+            if (emapic.modules.locators.showMunicipalities && $.isEmptyObject(provincesMunicipalitiesData)) {
+        		$.each(emapic.votedMunicipalitiesData, function(code, municipality) {
+                    if (!(municipality.properties.province_adm_code in provincesMunicipalitiesData)) {
+                        provincesMunicipalitiesData[municipality.properties.province_adm_code] = [];
+                    }
+                    provincesMunicipalitiesData[municipality.properties.province_adm_code].push(municipality);
+                });
+        		$.each(provincesMunicipalitiesData, function(code, municipalities) {
+                    municipalities.sort(function(a, b) {
+                        return (b.properties.total_responses !== a.properties.total_responses) ? b.properties.total_responses - a.properties.total_responses : a.properties.name - b.properties.name;
+                    });
+                });
+            }
             if ($.isEmptyObject(countriesProvincesData)) {
         		$.each(emapic.votedProvincesData, function(code, province) {
                     if (!(province.properties.country_iso_code in countriesProvincesData)) {
                         countriesProvincesData[province.properties.country_iso_code] = [];
                     }
                     countriesProvincesData[province.properties.country_iso_code].push(province);
+                });
+        		$.each(countriesProvincesData, function(code, provinces) {
+                    provinces.sort(function(a, b) {
+                        return (b.properties.total_responses !== a.properties.total_responses) ? b.properties.total_responses - a.properties.total_responses : a.properties.name - b.properties.name;
+                    });
                 });
             }
     		$.each(emapic.votedCountriesData, function(i, stat) {
@@ -268,7 +291,7 @@ var emapic = emapic || {};
                                 totals[i] = 0;
                             }
                             totals[i] += votes;
-                            specificVotesHtml += "<td><small>" + votes + "</small></td>\n";
+                            specificVotesHtml += "<td>" + votes + "</td>\n";
                         }
                     }
                     total += parseInt(stat.total_responses);
@@ -291,7 +314,7 @@ var emapic = emapic || {};
                         }
                     }
                     countriesHtml += "<tr class='country country-" + stat.iso_code + "'>\n" +
-                        "<td class='stats-country-label'>" + stat.iso_code + "</td>\n" +
+                        "<td class='stats-country-label hidden'>" + stat.iso_code + "</td>\n" +
                         "<td class='show-provinces'><i class='fa fa-caret-down" +
                         (provincesShown ? ' fa-caret-up' : '') + "' aria-hidden='true'></i></td>\n" +
                         "<td class='country-flag'><div class='flag-container'><span title='" +
@@ -299,10 +322,12 @@ var emapic = emapic || {};
                         stat.iso_code + "'></div></span>" +
                         "</td>\n<td class='country-name'>" +
                         emapic.allCountriesData[stat.iso_code].properties.name + "</td>\n" +
-                        specificVotesHtml + "<td><small>" +
-                        stat.total_responses + "</small></td>\n</tr>";
+                        specificVotesHtml + "<td>" +
+                        stat.total_responses + "</td>\n</tr>";
                 	$.each(countriesProvincesData[stat.iso_code], function(i, province) {
-        				var specificVotesHtml = '';
+        				var specificVotesHtml = '',
+                            hasMunicipalities = province.properties.adm_code in provincesMunicipalitiesData && provincesMunicipalitiesData[province.properties.adm_code].length > 0,
+                            municipalitiesShown = $('tr.province-' + province.properties.adm_code + ' i.fa-caret-down').hasClass('fa-caret-up');
                         if (emapic.legend && emapic.legend.color) {
                             var votes;
                             for (i=0, len=emapic.legend.color.responses_array.length; i<len; i++) {
@@ -311,13 +336,36 @@ var emapic = emapic || {};
                                     '_' + emapic.legend.color.responses_array[i].id]) + "</small></td>\n";
                             }
                         }
-                        countriesHtml += "<tr class='province province-" + stat.iso_code + "' " +
+                        countriesHtml += "<tr class='province province-country-" + stat.iso_code +
+                            " province-" + province.properties.adm_code + "' " +
                             (provincesShown ? '' : "style='display: none;'") + ">\n" +
-                            "<td class='stats-province-label'>" + province.properties.adm_code + "</td>\n" +
-                            "<td colspan='3' class='province-name'>" +
+                            "<td class='stats-province-label hidden'>" + province.properties.adm_code + "</td>\n" +
+                            (hasMunicipalities ? "<td class='show-municipalities'><i class='fa fa-caret-down" +
+                            (municipalitiesShown ? ' fa-caret-up' : '') + "' aria-hidden='true'></i></td>\n" +
+                            "<td colspan='2' class='province-name'>" : "<td colspan='3' class='province-name'>") +
                             province.properties.name + "</td>\n" +
                             specificVotesHtml + "<td><small>" +
                             province.properties.total_responses + "</small></td>\n</tr>";
+                    	$.each(provincesMunicipalitiesData[province.properties.adm_code], function(j, municipality) {
+            				var specificVotesHtml = '';
+                            if (emapic.legend && emapic.legend.color) {
+                                var votes;
+                                for (i=0, len=emapic.legend.color.responses_array.length; i<len; i++) {
+                                    specificVotesHtml += "<td><small>" +
+                                        parseInt(municipality.properties[emapic.legend.color.question +
+                                        '_' + emapic.legend.color.responses_array[i].id]) + "</small></td>\n";
+                                }
+                            }
+                            countriesHtml += "<tr class='municipality municipality-country-" + stat.iso_code +
+                                " municipality-province-" + province.properties.adm_code +
+                                " municipality-" + municipality.properties.adm_code + "' " +
+                                (provincesShown && municipalitiesShown ? '' : "style='display: none;'") + ">\n" +
+                                "<td class='stats-municipality-label hidden'>" + municipality.properties.adm_code + "</td>\n" +
+                                "<td colspan='3' class='province-name'>" +
+                                municipality.properties.name + "</td>\n" +
+                                specificVotesHtml + "<td><small>" +
+                                municipality.properties.total_responses + "</small></td>\n</tr>";
+                        });
                     });
     			}
     		});
@@ -329,7 +377,7 @@ var emapic = emapic || {};
             }
             var votedProvincesNr = Object.keys(emapic.votedProvincesData).length;
             $('#voted_countries tbody').html("<tr class='stats-country-totals'>\n" +
-                "<td class='stats-country-label'></td>\n" +
+                "<td class='stats-country-label hidden'></td>\n" +
                 "<td colspan='3'><div>" + emapic.votedCountriesData.length +
                 " " + (emapic.votedCountriesData.length == 1 ?
                 emapic.utils.getI18n('js_totals_country', 'país') :
@@ -356,17 +404,40 @@ var emapic = emapic || {};
                     countryCode = $this.parent().find('.stats-country-label').html();
                 if (countryCode !== '') {
                     $this.find('.fa.fa-caret-down').toggleClass('fa-caret-up');
-                    $('tr.province-' + countryCode).toggle();
+                    $('tr.province-country-' + countryCode + ' td.show-municipalities .fa-caret-up').each(function() {
+                        var provinceCode = $(this).closest('.province').find('.stats-province-label').html();
+                        $('tr.municipality-province-' + provinceCode).toggle();
+                    });
+                    $('tr.province-country-' + countryCode).toggle();
                     if (scrollbars['voted_countries']) {
                         scrollbars['voted_countries'].update();
                     }
                 }
             });
 
-            $('#voted_countries tbody tr.province').on("click", function() {
-                var provinceCode = $(this).find('.stats-province-label').html();
+            $('#voted_countries tbody tr.province td:not(.show-municipalities)').on("click", function() {
+                var provinceCode = $(this).parent().find('.stats-province-label').html();
                 if (provinceCode !== '') {
                     emapic.map.fitBounds(emapic.votedProvincesData[provinceCode].bbox);
+                }
+            });
+
+            $('#voted_countries tbody tr.province td.show-municipalities').on("click", function() {
+                var $this = $(this),
+                    provinceCode = $this.parent().find('.stats-province-label').html();
+                if (provinceCode !== '') {
+                    $this.find('.fa.fa-caret-down').toggleClass('fa-caret-up');
+                    $('tr.municipality-province-' + provinceCode).toggle();
+                    if (scrollbars['voted_countries']) {
+                        scrollbars['voted_countries'].update();
+                    }
+                }
+            });
+
+            $('#voted_countries tbody tr.municipality').on("click", function() {
+                var municipalityCode = $(this).find('.stats-municipality-label').html();
+                if (municipalityCode !== '') {
+                    emapic.map.fitBounds(emapic.votedMunicipalitiesData[municipalityCode].bbox);
                 }
             });
 

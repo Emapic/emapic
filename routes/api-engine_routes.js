@@ -447,7 +447,7 @@ module.exports = function(app) {
                         where.push('a.cod_ccaa = :ccaa');
                         replacements.ccaa = params.ccaa;
                     }
-                    sql = 'SELECT a.codigo AS adm_code, ' + nameCol + ' AS name, a.cod_prov, a.provincia, a.cod_ccaa, a.comautonom, a.pobmun15_p AS pobumn15, a.pobmun15_h, a.pobmun15_m, lower(b.iso_a2) AS country_iso_code' + geom + ' FROM base_layers.municipalities a JOIN base_layers.provinces b ON a.province_gid = b.gid' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY adm_code;';
+                    sql = 'SELECT a.codigo AS adm_code, ' + nameCol + ' AS name, a.cod_prov, a.provincia, a.cod_ccaa, a.comautonom, a.pobmun15_p AS pobumn15, a.pobmun15_h, a.pobmun15_m, b.adm1_code as province_adm_code, lower(b.iso_a2) AS country_iso_code' + geom + ' FROM base_layers.municipalities a JOIN base_layers.provinces b ON a.province_gid = b.gid' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY adm_code;';
                     break;
                 case 'provinces':
                     if (!('includeMinor' in params && params.includeMinor.toLowerCase() === 'true')) {

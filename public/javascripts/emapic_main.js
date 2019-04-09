@@ -8,7 +8,8 @@ var emapic = emapic || {};
 
     var allCountriesDataBboxDfd = null,
         votedCountriesDataNoGeomDfd = null,
-        votedProvincesDataBboxDfd = null;
+        votedProvincesDataBboxDfd = null,
+        votedMunicipalitiesDataBboxDfd = null;
 
     emapic.map = null;
     emapic.mapboxToken = null;
@@ -26,6 +27,7 @@ var emapic = emapic || {};
     emapic.allCountriesData = {};
     emapic.votedCountriesData = {};
     emapic.votedProvincesData = {};
+    emapic.votedMunicipalitiesData = {};
     // We'll use this color, for example, in ties
     emapic.neutralColor = 'grey';
     emapic.fallbackColor = 'black';
@@ -62,6 +64,10 @@ var emapic = emapic || {};
 
     emapic.getStatsProvincesJsonBboxUrl = function() {
         return "/api/survey/" + emapic.surveyId + "/totals/provinces?geom=bbox&lang=" + emapic.locale;
+    };
+
+    emapic.getStatsMunicipalitiesJsonBboxUrl = function() {
+        return "/api/survey/" + emapic.surveyId + "/totals/municipalities?geom=bbox&lang=" + emapic.locale;
     };
 
     // Methods for loading additional JSON data. If we want to preload them, we
@@ -109,6 +115,22 @@ var emapic = emapic || {};
             });
         }
         return votedProvincesDataBboxDfd;
+    };
+
+    emapic.getVotedMunicipalitiesDataBbox = function() {
+        if (votedMunicipalitiesDataBboxDfd === null) {
+            votedMunicipalitiesDataBboxDfd = emapic.utils.getJsonAlertError(
+                emapic.getStatsMunicipalitiesJsonBboxUrl()
+            ).done(function(data) {
+                $.each(data.features, function(i, municipality) {
+                    emapic.votedMunicipalitiesData[municipality.properties.adm_code] = {};
+                    emapic.votedMunicipalitiesData[municipality.properties.adm_code].properties = municipality.properties;
+                    emapic.votedMunicipalitiesData[municipality.properties.adm_code].bbox = [[municipality.geometry.coordinates[0][0][1], municipality.geometry.coordinates[0][0][0]],
+                        [municipality.geometry.coordinates[0][2][1], municipality.geometry.coordinates[0][2][0]]];
+                });
+            });
+        }
+        return votedMunicipalitiesDataBboxDfd;
     };
 
     emapic.preinitEmapic = function() {

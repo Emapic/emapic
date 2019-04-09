@@ -501,8 +501,9 @@ module.exports = function(sequelize, DataTypes) {
                     // We create the survey specific table
                     return sequelize.query('CREATE TABLE opinions.survey_' + survey.id + '(gid bigserial NOT NULL PRIMARY KEY' + getAllFieldsSQL(questions, sqlType.ddl) + ', geom GEOMETRY(Point, 4326), "precision" integer, province_gid integer REFERENCES base_layers.provinces (gid) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION, "timestamp" timestamp without time zone, usr_id bigint' + (survey.multiple_answer ? '' : ' UNIQUE') + ' REFERENCES users (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE SET NULL);');
                 }).spread(function(results, metadata) {
-                    // We create the trigger for assigning provinces
-                    return sequelize.query('CREATE TRIGGER assign_province_trigger BEFORE INSERT OR UPDATE ON opinions.survey_' + survey.id + ' FOR EACH ROW EXECUTE PROCEDURE assign_province();');
+                    // We create the triggers for assigning provinces and municipalities
+                    return Promise.all([sequelize.query('CREATE TRIGGER a_assign_province_trigger BEFORE INSERT OR UPDATE ON opinions.survey_' + survey.id + ' FOR EACH ROW EXECUTE PROCEDURE assign_province();'),
+                        sequelize.query('CREATE TRIGGER b_assign_municipality_trigger BEFORE INSERT OR UPDATE ON opinions.survey_' + survey.id + ' FOR EACH ROW EXECUTE PROCEDURE assign_municipality();')]);
                 });
             },
 
@@ -813,9 +814,24 @@ module.exports = function(sequelize, DataTypes) {
                             checkColumnExists('name_' + params.lang, 'countries', 'base_layers'),
                             function(provinceName, countryName) {
                                 return ', a.name' + (provinceName[0].exists ? '_' + params.lang : '') + ' AS name, ' +
-                                    'c.name' + (countryName[0].exists ? '_' + params.lang : '') + ' AS superheader';
+                                    'c.name' + (countryName[0].exists ? '_' + params.lang : '') + ' AS supersuperheader';
                             }
                         ) : Promise.resolve(', a.name AS name, c.name AS superheader');
+                        break;
+                    case 'municipalities':
+                        sql1 = "SELECT a.codigo AS adm_code, a.cod_prov, a.provincia, a.cod_ccaa, a.comautonom, c.adm1_code as province_adm_code, lower(c.iso_a2) AS country_iso_code, count(b.gid) AS total_responses";
+                        sql2 = " FROM base_layers.municipalities a JOIN base_layers.provinces c ON a.province_gid = c.gid JOIN base_layers.countries d ON c.country_gid = d.gid" +
+                            " JOIN opinions.survey_" + survey.id + " b ON a.gid = b.municipality_gid GROUP BY a.gid, c.gid, d.gid ORDER BY total_responses DESC, a.name ASC;";
+                        namePromise = ('lang' in params) ? Promise.join(
+                            checkColumnExists('name_' + params.lang, 'municipalities', 'base_layers'),
+                            checkColumnExists('name_' + params.lang, 'provinces', 'base_layers'),
+                            checkColumnExists('name_' + params.lang, 'countries', 'base_layers'),
+                            function(municipalityName, provinceName, countryName) {
+                                return ', a.name' + (municipalityName[0].exists ? '_' + params.lang : '') + ' AS name, ' +
+                                    'c.name' + (provinceName[0].exists ? '_' + params.lang : '') + ' AS superheader, ' +
+                                    'd.name' + (countryName[0].exists ? '_' + params.lang : '') + ' AS supersuperheader';
+                            }
+                        ) : Promise.resolve(', a.name AS name, c.name AS superheader, d.name AS supersuperheader');
                         break;
                     default:
                         return Promise.reject(new Error('INVALID BASE LAYER'));
