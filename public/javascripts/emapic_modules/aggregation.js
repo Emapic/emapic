@@ -261,6 +261,9 @@ var emapic = emapic || {};
     }
 
     function updateAggregatedLayers() {
+        if (municipalitiesLayerData !== null) {
+            updateAggregatedMunicipalityLayer();
+        }
         if (provincesLayerData !== null) {
     	    updateAggregatedProvinceLayer();
         }
