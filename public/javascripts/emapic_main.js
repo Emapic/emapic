@@ -38,6 +38,8 @@ var emapic = emapic || {};
     // map programmatically.
     emapic.baseLayerLoadedPromise = $.Deferred();
 
+    emapic.filters = [];
+
     emapic.oldResponses = {};
     emapic.userLoggedIn = false;
     emapic.logicAlreadyStarted = false;
@@ -445,10 +447,37 @@ var emapic = emapic || {};
     };
 
     emapic.filterFeature = function(feature, layer) {
+        for (var i = 0, iLen = emapic.filters.length; i<iLen; i++) {
+            if (typeof emapic.filters[i].applyFilter === 'function' && !emapic.filters[i].applyFilter(feature)) {
+                return false;
+            }
+        }
         return true;
     };
 
+    emapic.addFilter = function(filter) {
+        if ($.inArray(filter, emapic.filters) === -1) {
+            emapic.filters.push(filter);
+        }
+    };
+
+    emapic.removeFilter = function(filter) {
+        var idx = $.inArray(filter, emapic.filters);
+        if (idx !== -1) {
+            emapic.filters.splice(idx, 1);
+        }
+    };
+
+    emapic.removeAllFilters = function() {
+        emapic.filters = [];
+    };
+
     emapic.clearFilters = function() {
+        for (var i = 0, iLen = emapic.filters.length; i<iLen; i++) {
+            if (typeof emapic.filters[i].clearFilter === 'function') {
+                emapic.filters[i].clearFilter();
+            }
+        }
     };
 
     emapic.addIndivVotesLayer = function() {
@@ -590,7 +619,7 @@ var emapic = emapic || {};
     };
 
     emapic.getIndivVotesLayerLeafletLayers = function () {
-      return emapic.indivVotesLayer.getLayers();
+        return emapic.indivVotesLayer.getLayers();
     };
 
 })(emapic);

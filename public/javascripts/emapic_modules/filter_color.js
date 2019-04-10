@@ -12,6 +12,17 @@ var emapic = emapic || {};
     emapic.modules = emapic.modules || {};
     emapic.modules.filterColor = emapic.modules.filterColor || {};
 
+    emapic.modules.filterColor.filter = {
+        applyFilter: function(feature) {
+            return !(filterProperty && (feature.properties[filterProperty[0]] != emapic.legend.color.responses_array[filterProperty[1]].id));
+        },
+        clearFilter: function() {
+            filterProperty = null;
+        }
+    };
+
+    emapic.addFilter(emapic.modules.filterColor.filter);
+
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
         if (emapic.legend && emapic.legend.color) {
             var filterStatusButtonsHtml = getCurrentLegendFilterStatusButtonsHtml();
@@ -56,16 +67,5 @@ var emapic = emapic || {};
     		emapic.activateExclusiveButton($('#filter-control-' + filterProperty[1]));
     	}
     });
-
-    emapic.clearFilters = emapic.utils.overrideFunction(emapic.clearFilters, null, function() {
-        filterProperty = null;
-    });
-
-    emapic.filterFeature = (function(){
-        var originalFilterFeature = emapic.filterFeature;
-        return function(feature, layer) {
-            return (originalFilterFeature(feature, layer) && !(filterProperty && (feature.properties[filterProperty[0]] != emapic.legend.color.responses_array[filterProperty[1]].id)));
-        };
-    })();
 
 })(emapic);

@@ -17,6 +17,24 @@ var emapic = emapic || {};
     emapic.modules = emapic.modules || {};
     emapic.modules.timeSlider = emapic.modules.timeSlider || {};
 
+    emapic.modules.timeSlider.filter = {
+        applyFilter: function(feature) {
+            return !(filterDates && (feature.properties.dateObject > filterDates[1] || feature.properties.dateObject < filterDates[0]));
+        },
+        clearFilter: function() {
+            var slider = $("#time-slider");
+            if (slider !== null && typeof sliderDates[sliderLevel] !== 'undefined' &&
+                sliderDates[sliderLevel][0].length > 0) {
+                $("#time-slider").slider('values', [0, sliderDates[sliderLevel][1].length - 1]);
+                filterDates = [sliderDates[sliderLevel][0][0], sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]];
+                $('.ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
+                $('.ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
+            }
+        }
+    };
+
+    emapic.addFilter(emapic.modules.timeSlider.filter);
+
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
         var timeControl = L.control({position: 'bottomleft'});
         timeControl.onAdd = function (map) {
@@ -233,23 +251,5 @@ var emapic = emapic || {};
         //$('#time-scale').val('1').change();
         return data;
     });
-
-    emapic.clearFilters = emapic.utils.overrideFunction(emapic.clearFilters, null, function() {
-        var slider = $("#time-slider");
-        if (slider !== null && typeof sliderDates[sliderLevel] !== 'undefined' &&
-            sliderDates[sliderLevel][0].length > 0) {
-            $("#time-slider").slider('values', [0, sliderDates[sliderLevel][1].length - 1]);
-            filterDates = [sliderDates[sliderLevel][0][0], sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]];
-            $('.ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
-            $('.ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
-        }
-    });
-
-    emapic.filterFeature = (function(){
-        var originalFilterFeature = emapic.filterFeature;
-        return function(feature, layer) {
-            return (originalFilterFeature(feature, layer) && !(filterDates && (feature.properties.dateObject > filterDates[1] || feature.properties.dateObject < filterDates[0])));
-        };
-    })();
 
 })(emapic);

@@ -29,6 +29,19 @@ var emapic = emapic || {};
 
     emapic.modules.counterStats.orderVotes = false;
 
+    emapic.modules.counterStats.filter = {
+        applyFilter: function(feature) {
+            return !(counterFilterProperty && (counterFilterValues.length > 0) && ($.inArray(feature.properties[counterFilterProperty], counterFilterValues) == -1));
+        },
+        clearFilter: function() {
+            $('.counters-control .filter-btn').removeClass('active');
+            counterFilterProperty = null;
+            counterFilterValues = [];
+        }
+    };
+
+    emapic.addFilter(emapic.modules.counterStats.filter);
+
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
         var countersControl = L.control({position: 'topright'});
         countersControl.onAdd = function (map) {
@@ -45,21 +58,33 @@ var emapic = emapic || {};
 
     emapic.updateIndivVotesLayerControls = emapic.utils.overrideFunction(emapic.updateIndivVotesLayerControls, null, function() {
         var statusNr = {},
-            layers = emapic.indivVotesLayer.getLayers();
+            features = emapic.indivVotesLayerData.features,
+            filteredFeatures = [];
+        // Must filter the features manually without this module's own filter
+        featureLoop:
+            for (var i = 0, iLen = features.length; i<iLen; i++) {
+                var feature = features[i];
+                for (var j = 0, jLen = emapic.filters.length; j<jLen; j++) {
+                    if (emapic.filters[j] !== emapic.modules.counterStats.filter && typeof emapic.filters[j].applyFilter === 'function' && !emapic.filters[j].applyFilter(feature)) {
+                        continue featureLoop;
+                    }
+                }
+                filteredFeatures.push(feature);
+            }
         chartFeatures = [];
         if (emapic.legend && emapic.legend.color) {
             for (var i in emapic.legend.color.responses_array) {
                 statusNr[emapic.legend.color.responses_array[i].id] = {nr: 0, position: i};
             }
             counterFilterProperty = emapic.legend.color.question + '.id';
-            for (i = 0, len = layers.length; i < len; i++) {
-                chartFeatures.push(layers[i].feature);
-                if (layers[i].feature.properties[counterFilterProperty] in statusNr) {
-                    statusNr[layers[i].feature.properties[counterFilterProperty]].nr++;
+            for (i = 0, len = filteredFeatures.length; i < len; i++) {
+                chartFeatures.push(filteredFeatures[i]);
+                if (filteredFeatures[i].properties[counterFilterProperty] in statusNr) {
+                    statusNr[filteredFeatures[i].properties[counterFilterProperty]].nr++;
                 }
             }
         }
-        populateCounter(statusNr, layers.length);
+        populateCounter(statusNr, filteredFeatures.length);
         if (!emapic.map.hasLayer(emapic.indivVotesLayer)) {
             $('#app-total-counter-list li button').prop('disabled', true);
         }
@@ -310,7 +335,9 @@ var emapic = emapic || {};
             }
         }
         for (i in orderedVotes) {
-            specificVotesHtml += '<li><button type="button" class="btn btn-default" aria-pressed="false" autocomplete="off" vote="' + emapic.utils.escapeHtml(orderedVotes[i].position) + '"><div class="circle-container"><div class="filter-btn-circle" style="background-color: ' + emapic.legend.color.responses[orderedVotes[i].id].legend + ';"></div></div><span>' + emapic.utils.escapeHtml(emapic.legend.color.responses[orderedVotes[i].id].value) + ': ' + orderedVotes[i].nr + '</span></button></li>';
+            var btnActive = counterFilterProperty && (counterFilterValues.length > 0) && ($.inArray(emapic.legend.color.responses_array[orderedVotes[i].position].id, counterFilterValues) !== -1);
+            specificVotesHtml += '<li><button type="button" class="btn btn-default filter-btn' + (btnActive ? ' active' : '') + '" aria-pressed="false" autocomplete="off" vote="' +
+                emapic.utils.escapeHtml(orderedVotes[i].position) + '"><div class="circle-container"><div class="filter-btn-circle" style="background-color: ' + emapic.legend.color.responses[orderedVotes[i].id].legend + ';"></div></div><span>' + emapic.utils.escapeHtml(emapic.legend.color.responses[orderedVotes[i].id].value) + ': ' + orderedVotes[i].nr + '</span></button></li>';
         }
         $('#app-total-counter').html("<div id='app-total-counter-header'><h4 class='text-center'><span class='usericon glyphicon glyphicon-user'></span>" + total + " <span class='glyphicon glyphicon-stats'></span></h4></div>\n" +
             "<div id='app-total-counter-body' class='always-show-not-extrasmall collapse'><div id='app-total-counter-list-container'><ul id='app-total-counter-list'>" + specificVotesHtml + "</ul></div></div>");
@@ -362,9 +389,9 @@ var emapic = emapic || {};
 
     emapic.modules.counterStats.clickCounterStatsExpandBtn = function(btn, event) {
         event.stopPropagation();
-        var $btn = $(btn);
-        var $el = $btn.find('.glyphicon .glyphicon');
-        var $target = $($btn.attr('data-target'));
+        var $btn = $(btn),
+            $el = $btn.find('.glyphicon .glyphicon'),
+            $target = $($btn.attr('data-target'));
         if ($target.hasClass('collapse')) {
             if ($target.hasClass('in')) {
                 $el.removeClass('glyphicon-chevron-up');
@@ -379,8 +406,8 @@ var emapic = emapic || {};
     };
 
     function clickCounterStatsFilterBtn(event) {
-        var $btn = $(this);
-        var value = emapic.legend.color.responses_array[parseInt($btn.attr('vote'))].id;
+        var $btn = $(this),
+            value = emapic.legend.color.responses_array[parseInt($btn.attr('vote'))].id;
         if (!counterStatsFilterBtnsFalseClick) {
             var pos = $.inArray(value, counterFilterValues);
             if (pos > -1) {
@@ -393,16 +420,5 @@ var emapic = emapic || {};
             emapic.updateIndivVotesLayer();
         }
     }
-
-    emapic.clearFilters = emapic.utils.overrideFunction(emapic.clearFilters, null, function() {
-        counterFilterValues = [];
-    });
-
-    emapic.filterFeature = (function(){
-        var originalFilterFeature = emapic.filterFeature;
-        return function(feature, layer) {
-            return (originalFilterFeature(feature, layer) && !(counterFilterProperty && (counterFilterValues.length > 0) && ($.inArray(feature.properties[counterFilterProperty], counterFilterValues) == -1)));
-        };
-    })();
 
 })(emapic);
