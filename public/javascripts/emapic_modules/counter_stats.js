@@ -27,6 +27,8 @@ var emapic = emapic || {};
     emapic.modules = emapic.modules || {};
     emapic.modules.counterStats = emapic.modules.counterStats || {};
 
+    emapic.modules.counterStats.orderVotes = false;
+
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
         var countersControl = L.control({position: 'topright'});
         countersControl.onAdd = function (map) {
@@ -289,18 +291,23 @@ var emapic = emapic || {};
     }
 
     function populateCounter(statusNr, total) {
-        var specificVotesHtml = '';
-        var orderedVotes = [], position;
-        // We order the votes in descending order
+        var specificVotesHtml = '',
+            orderedVotes = [], position;
         for (var i in statusNr) {
-            position = orderedVotes.length;
-            for (var j in orderedVotes) {
-                if (orderedVotes[j].nr < parseInt(statusNr[i].nr)) {
-                    position = j;
-                    break;
+            var element = {nr: parseInt(statusNr[i].nr), id: i, position: statusNr[i].position};
+            if (emapic.modules.counterStats.orderVotes) {
+                // We order the votes in descending order
+                position = orderedVotes.length;
+                for (var j in orderedVotes) {
+                    if (orderedVotes[j].nr < element.nr) {
+                        position = j;
+                        break;
+                    }
                 }
+                orderedVotes.splice(position, 0, element);
+            } else {
+                orderedVotes.push(element);
             }
-            orderedVotes.splice(position, 0, {nr: parseInt(statusNr[i].nr), id: i, position: statusNr[i].position});
         }
         for (i in orderedVotes) {
             specificVotesHtml += '<li><button type="button" class="btn btn-default" aria-pressed="false" autocomplete="off" vote="' + emapic.utils.escapeHtml(orderedVotes[i].position) + '"><div class="circle-container"><div class="filter-btn-circle" style="background-color: ' + emapic.legend.color.responses[orderedVotes[i].id].legend + ';"></div></div><span>' + emapic.utils.escapeHtml(emapic.legend.color.responses[orderedVotes[i].id].value) + ': ' + orderedVotes[i].nr + '</span></button></li>';
