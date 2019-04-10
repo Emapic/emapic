@@ -42,13 +42,14 @@ var emapic = emapic || {};
     };
 
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
-        var groupingViewsControl = L.control({position: 'topleft'});
-        groupingViewsControl.onAdd = function (map) {
-            this._div = L.DomUtil.create('div', 'views-control leaflet-bar');
+        var aggregationControl = L.control({position: 'topleft'});
+        aggregationControl.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'aggregation-control views-control leaflet-bar');
             this._div.innerHTML = aggregationButtonsHtml + (emapic.modules.aggregation.showMunicipalities ? "\n" + aggregationMunicipalityButtonHtml : "");
             return this._div;
         };
-        groupingViewsControl.addTo(emapic.map);
+        aggregationControl.addTo(emapic.map);
+        emapic.utils.handleCtrlBtnEvents('.aggregation-control a', aggregationControl);
     });
 
     emapic.updateIndivVotesLayer = emapic.utils.overrideFunction(emapic.updateIndivVotesLayer, function() {

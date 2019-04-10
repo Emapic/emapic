@@ -17,11 +17,12 @@ var emapic = emapic || {};
             var filterStatusButtonsHtml = getCurrentLegendFilterStatusButtonsHtml();
             filterViewsControl = L.control({position: 'topleft'});
             filterViewsControl.onAdd = function (map) {
-                this._div = L.DomUtil.create('div', 'views-control leaflet-bar');
+                this._div = L.DomUtil.create('div', 'filtering-control views-control leaflet-bar');
                 this._div.innerHTML = filterStatusButtonsHtml;
                 return this._div;
             };
             filterViewsControl.addTo(emapic.map);
+            emapic.utils.handleCtrlBtnEvents('.filtering-control a', filterViewsControl);
         }
     });
 

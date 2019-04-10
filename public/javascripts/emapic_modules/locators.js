@@ -104,13 +104,14 @@ var emapic = emapic || {};
     });
 
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
-        var viewsControl = L.control({position: 'topleft'});
-        viewsControl.onAdd = function (map) {
-            this._div = L.DomUtil.create('div', 'views-control leaflet-bar');
+        var locatorsControl = L.control({position: 'topleft'});
+        locatorsControl.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'locators-control views-control leaflet-bar');
             this._div.innerHTML = locatorsButtonsHtml;
             return this._div;
         };
-        viewsControl.addTo(emapic.map);
+        locatorsControl.addTo(emapic.map);
+        emapic.utils.handleCtrlBtnEvents('.locators-control a', locatorsControl);
         emapic.checkGeolocationDependantControls(geolocationDependantBtns);
         populateSidebar();
     });

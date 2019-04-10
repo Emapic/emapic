@@ -339,6 +339,13 @@ if (typeof $.fn.validator !== 'undefined' &&
         }
     };
 
+    emapic.utils.handleCtrlBtnEvents = function(selector, ctrl) {
+        $(selector).each(function() {
+            L.DomEvent.on(this, 'click', L.DomEvent.stop);
+            L.DomEvent.on(this, 'click', ctrl._refocusOnMap, ctrl);
+        });
+    };
+
     emapic.utils.getDistance = function(latLngs) {
         var distance = 0;
         for (var i = 1, len = latLngs.length; i<len; i++) {

@@ -110,13 +110,14 @@ var emapic = emapic || {};
     }
 
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
-        var groupingViewsControl = L.control({position: 'topleft'});
-        groupingViewsControl.onAdd = function (map) {
-            this._div = L.DomUtil.create('div', 'views-control leaflet-bar');
+        var clusteringControl = L.control({position: 'topleft'});
+        clusteringControl.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'clustering-control views-control leaflet-bar');
             this._div.innerHTML = clusteringButtonsHtml;
             return this._div;
         };
-        groupingViewsControl.addTo(emapic.map);
+        clusteringControl.addTo(emapic.map);
+        emapic.utils.handleCtrlBtnEvents('.clustering-control a', clusteringControl);
     });
 
     function resolveToPoint(deg) {
