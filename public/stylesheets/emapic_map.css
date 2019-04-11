@@ -558,6 +558,15 @@ input.form-control[type="radio"] {
     max-height: calc(100vh - 200px);
     overflow-y: auto;
 }
+.question-selector li.divider.dropdown-footer {
+    margin: 2px 0;
+}
+.question-selector li.dropdown-header.dropdown-footer {
+    padding: 0px 15px;
+    line-height: 10px;
+    font-style: italic;
+    text-align: right;
+}
 .question-selector select {
     max-width: 150px;
 }

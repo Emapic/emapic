@@ -44,6 +44,8 @@ var emapic = emapic || {};
     emapic.userLoggedIn = false;
     emapic.logicAlreadyStarted = false;
 
+    emapic.questionSelector;
+
     emapic.getCountriesJsonBboxUrl = function() {
         return "/api/baselayers/countries?geom=bbox&lang=" + emapic.locale;
     };
@@ -369,9 +371,8 @@ var emapic = emapic || {};
     		questions.push(emapic.fullLegend.color[i].text);
     	}
     	if (questions.length > 0) {
-    		L.control.selectQuestion(questions).addTo(emapic.map);
-    		$('#vote-chart-title').text(questions[0]);
-    		$('#vote-chart-title').attr('name', 0);
+            emapic.questionSelector = L.control.selectQuestion(questions);
+            emapic.questionSelector.addTo(emapic.map);
     	}
     };
 
@@ -404,6 +405,7 @@ var emapic = emapic || {};
     };
 
     emapic.updateIndivVotesLayerControls = function() {
+        emapic.questionSelector._update();
     };
 
     emapic.updateIndivVotesLayer = function() {
@@ -472,12 +474,40 @@ var emapic = emapic || {};
         emapic.filters = [];
     };
 
+    emapic.applyFilters = function() {
+        emapic.updateIndivVotesLayer();
+        emapic.updateIndivVotesLayerControls();
+    };
+
     emapic.clearFilters = function() {
+        var filtersCleared = false;
         for (var i = 0, iLen = emapic.filters.length; i<iLen; i++) {
-            if (typeof emapic.filters[i].clearFilter === 'function') {
+            if (emapic.filters[i].isFilterActive()) {
                 emapic.filters[i].clearFilter();
+                filtersCleared = true;
             }
         }
+        return filtersCleared;
+    };
+
+    emapic.getActiveFilters = function() {
+        var filters = [];
+        for (var i = 0, iLen = emapic.filters.length; i<iLen; i++) {
+            if (emapic.filters[i].isFilterActive()) {
+                filters.push(emapic.filters[i]);
+            }
+        }
+        return filters;
+    };
+
+    emapic.getActiveFiltersOnQuestion = function(qstnId) {
+        var filters = [];
+        for (var i = 0, iLen = emapic.filters.length; i<iLen; i++) {
+            if (emapic.filters[i].isFilterActiveOnQuestion(qstnId)) {
+                filters.push(emapic.filters[i]);
+            }
+        }
+        return filters;
     };
 
     emapic.addIndivVotesLayer = function() {
@@ -528,8 +558,11 @@ var emapic = emapic || {};
     	emapic.reloadLegend();
     };
 
+    emapic.getLegendQuestionId = function(type, nr) {
+        return emapic.fullLegend[type][nr].question;
+    };
+
     emapic.reloadLegend = function() {
-    	emapic.clearFilters();
         if (emapic.map.hasLayer(emapic.indivVotesLayer)) {
             emapic.map.removeLayer(emapic.indivVotesLayer);
     		emapic.addIndivVotesLayer();
@@ -554,9 +587,11 @@ var emapic = emapic || {};
     };
 
     emapic.disableIndivLayerExclusiveComponents = function() {
+        $('#clear-filters').prop('disabled', true);
     };
 
     emapic.enableIndivLayerExclusiveComponents = function() {
+        $('#clear-filters').prop('disabled', false);
     };
 
     emapic.getCurrentIconColorForAnswer = function(answer) {
@@ -620,6 +655,32 @@ var emapic = emapic || {};
 
     emapic.getIndivVotesLayerLeafletLayers = function () {
         return emapic.indivVotesLayer.getLayers();
+    };
+
+    emapic.Filter = function(options) {
+
+        this.applyFilter = (typeof options.applyFilter === 'function') ? options.applyFilter : function(feature) {
+            // Return true if the feature fulfills the filter conditions,
+            // false otherwise
+            return true;
+        };
+
+        this.clearFilter = (typeof options.clearFilter === 'function') ? options.clearFilter : function() {
+            // Do whatever is needed to clear the filter
+        };
+
+        this.isFilterActive = (typeof options.isFilterActive === 'function') ? options.isFilterActive : function() {
+            // Return true if the filter is actually doing any kind of feature
+            // filtering, false otherwise
+            return false;
+        };
+
+        this.isFilterActiveOnQuestion = (typeof options.isFilterActiveOnQuestion === 'function') ? options.isFilterActiveOnQuestion : function(qstnId) {
+            // Return true if the filter is actually doing any kind of feature
+            // filtering related to the question with the provided id, false otherwise
+            return false;
+        };
+
     };
 
 })(emapic);

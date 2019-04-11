@@ -112,7 +112,15 @@ var emapic = emapic || {};
 
     emapic.modules.clustering.getButton = function() {
         return $('#' + clusteringButtonId);
-    }
+    };
+
+    emapic.disableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.disableIndivLayerExclusiveComponents, null, function() {
+        emapic.modules.clustering.getButton().prop('disabled', true);
+    });
+
+    emapic.enableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.enableIndivLayerExclusiveComponents, null, function() {
+        emapic.modules.clustering.getButton().prop('disabled', false);
+    });
 
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
         var clusteringControl = L.control({position: 'topleft'});

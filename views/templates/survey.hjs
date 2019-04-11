@@ -171,6 +171,9 @@
     <script type="text/javascript" src="/javascripts/emapic_modules/survey.js"></script>
     {{/results}}
 
+    <!-- Filter clear btn -->
+    <script type="text/javascript" src="/javascripts/emapic_modules/clear_filters.js"></script>
+
     <!-- Add locators -->
     <script type="text/javascript" src="/javascripts/emapic_modules/locators.js"></script>
 

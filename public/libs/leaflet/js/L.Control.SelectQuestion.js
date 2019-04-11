@@ -11,6 +11,7 @@ L.Control.SelectQuestion = L.Control.extend({
 		this._questions = {};
 		this._handlingClick = false;
 		this._questions = questions;
+		this._selectedVal = 0;
 	},
 
 	onAdd: function (map) {
@@ -60,24 +61,38 @@ L.Control.SelectQuestion = L.Control.extend({
 		if (!this._container) {
 			return;
 		}
+		var ctrl = this;
 
+		this._filtersActive = false;
 		this._questionsSelect = L.DomUtil.create('select', 'show-small');
-		this._questionsSelect.onchange = this._onQuestionOptionChange;
-
 		this._questionsList = L.DomUtil.create('ul', 'dropdown-menu dropdown-menu-right option');
 		this._questionsList.setAttribute('role', 'menu');
+		this._questionsSelect.onchange = function(e) {
+			ctrl._onQuestionOptionChange(e);
+		};
 
 		for (i in this._questions) {
 			obj = {
 				text: this._questions[i],
 				value: i
 			};
-			this._addOptionItem(obj);
-			this._addLiItem(obj);
+			var filterActive = emapic.getActiveFiltersOnQuestion(emapic.getLegendQuestionId('color', obj.value)).length > 0;
+			this._filtersActive = this._filtersActive || filterActive;
+			this._addOptionItem(obj, filterActive);
+			this._addLiItem(obj, filterActive);
 		}
 
+		if (this._filtersActive) {
+			var option = L.DomUtil.create('li');
+		    option.setAttribute('class', 'divider dropdown-footer');
+			this._questionsList.appendChild(option);
+			option = L.DomUtil.create('li');
+		    option.setAttribute('class', 'dropdown-header dropdown-footer');
+			option.innerHTML = '* filtro activo';
+			this._questionsList.appendChild(option);
+		}
 
-		this._container.innerHTML += '<button type="button" class="btn btn-default dropdown-toggle hide-small" data-toggle="dropdown" aria-expanded="false"><span id="1" class="selected" style="float: left;">' + this._questions[0] + '</span> <span class="caret"></span></button>';
+		this._container.innerHTML = '<button type="button" class="btn btn-default dropdown-toggle hide-small" data-toggle="dropdown" aria-expanded="false"><span id="' + this._selectedVal + '" class="selected" style="float: left;">' + this._questions[this._selectedVal] + '</span> <span class="caret"></span></button>';
 		this._container.appendChild(this._questionsList);
 		this._container.appendChild(this._questionsSelect);
 
@@ -86,8 +101,7 @@ L.Control.SelectQuestion = L.Control.extend({
   ,_onQuestionOptionChange: function (e) {
 	  var val = e.target.value;
 	  var text = $(e.target).find('option:selected').text();
-	  $('#vote-chart-title').text(text);
-	  $('#vote-chart-title').attr('name', val);
+	  this._selectedVal = val;
 	  $('.leaflet-control.question-selector button span.selected').text(text);
 	  emapic.changeActiveLegend('color', val);
   }
@@ -97,29 +111,32 @@ L.Control.SelectQuestion = L.Control.extend({
       $('.leaflet-control.question-selector select').val(val).change();
   }
 
-  ,_addLiItem: function (obj) {
-    var option = this._createLiElement(obj)
+  ,_addLiItem: function (obj, filterActive) {
+    var option = this._createLiElement(obj, filterActive)
     this._questionsList.appendChild(option);
   }
 
-  ,_createLiElement: function (obj) {
+  ,_createLiElement: function (obj, filterActive) {
     var option = L.DomUtil.create('li');
     option.setAttribute('id', obj.value);
     option.setAttribute('txt', obj.text);
     option.onclick = this._onQuestionLiChange;
-    option.innerHTML = '<a href="#">' + obj.text + '</a>';
+    option.innerHTML = '<a href="#">' + obj.text + (filterActive ? ' *' : '') + '</a>';
     return option
   }
 
-  ,_addOptionItem: function (obj) {
-    var option = this._createOptionElement(obj)
+  ,_addOptionItem: function (obj, filterActive) {
+    var option = this._createOptionElement(obj, filterActive)
     this._questionsSelect.appendChild(option);
   }
 
-  ,_createOptionElement: function (obj) {
+  ,_createOptionElement: function (obj, filterActive) {
     var option = L.DomUtil.create('option');
     option.setAttribute('value', obj.value);
-    option.innerHTML = obj.text;
+    option.innerHTML = obj.text + (filterActive ? ' --filtro activo--' : '');
+	if (this._selectedVal === obj.value) {
+		option.setAttribute('selected', true);
+	}
     return option
   }
 

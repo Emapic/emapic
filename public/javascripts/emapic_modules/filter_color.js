@@ -12,14 +12,17 @@ var emapic = emapic || {};
     emapic.modules = emapic.modules || {};
     emapic.modules.filterColor = emapic.modules.filterColor || {};
 
-    emapic.modules.filterColor.filter = {
+    emapic.modules.filterColor.filter = new emapic.Filter({
         applyFilter: function(feature) {
             return !(filterProperty && (feature.properties[filterProperty[0]] != emapic.legend.color.responses_array[filterProperty[1]].id));
         },
         clearFilter: function() {
             filterProperty = null;
+        },
+        isFilterActive: function() {
+            return !!(filterProperty);
         }
-    };
+    });
 
     emapic.addFilter(emapic.modules.filterColor.filter);
 
@@ -57,7 +60,7 @@ var emapic = emapic || {};
 
     function filterPropertyBtn(property, element) {
         filterProperty = property;
-        emapic.updateIndivVotesLayer();
+        emapic.applyFilters();
     }
 
     emapic.addIndivVotesLayer = emapic.utils.overrideFunction(emapic.addIndivVotesLayer, null, function() {

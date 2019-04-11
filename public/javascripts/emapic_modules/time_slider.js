@@ -10,28 +10,31 @@ var emapic = emapic || {};
         maxDate = null,
         sliderDates = [],
         sliderDatesTooltip = [],
-        sliderLevel,
+        sliderLevel = null,
         sliderDateFormats = [emapic.utils.getI18n('js_full_date_format', 'j/n/Y'), emapic.utils.getI18n('js_week_format', '\\S\\e\\m\\a\\n\\a W (\\d\\e\\l j/n/Y)'), 'F Y', 'Y'],
         filterDates;
 
     emapic.modules = emapic.modules || {};
     emapic.modules.timeSlider = emapic.modules.timeSlider || {};
 
-    emapic.modules.timeSlider.filter = {
+    emapic.modules.timeSlider.filter = new emapic.Filter({
         applyFilter: function(feature) {
             return !(filterDates && (feature.properties.dateObject > filterDates[1] || feature.properties.dateObject < filterDates[0]));
         },
         clearFilter: function() {
             var slider = $("#time-slider");
-            if (slider !== null && typeof sliderDates[sliderLevel] !== 'undefined' &&
+            if ($("#time-slider") !== null && typeof sliderDates[sliderLevel] !== 'undefined' &&
                 sliderDates[sliderLevel][0].length > 0) {
-                $("#time-slider").slider('values', [0, sliderDates[sliderLevel][1].length - 1]);
+                slider.slider('values', [0, sliderDates[sliderLevel][1].length - 1]);
                 filterDates = [sliderDates[sliderLevel][0][0], sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]];
                 $('.ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
                 $('.ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
             }
+        },
+        isFilterActive: function() {
+            return (filterDates && (sliderLevel !== null) && (filterDates[0] !== sliderDates[sliderLevel][0][0] || filterDates[1] !== sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]));
         }
-    };
+    });
 
     emapic.addFilter(emapic.modules.timeSlider.filter);
 
@@ -251,8 +254,7 @@ var emapic = emapic || {};
 
     function changeSliderLevel(level) {
         initSlider(level);
-        emapic.updateIndivVotesLayer();
-        emapic.updateIndivVotesLayerControls();
+        emapic.applyFilters();
     }
 
     function disableTooltipEvents(element) {

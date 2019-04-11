@@ -159,6 +159,7 @@
 	"js_satellite_mapbox_baselayer": "Satellite (Mapbox)",
 	"js_zoom_in": "Zoom in",
 	"js_zoom_out": "Zoom out",
+	"js_clear_all_filters": "Clear all filters",
 	"js_disable_clustering": "Disable clustering",
 	"js_total_votes_municipality": "See total votes per municipality (Spain only)",
 	"js_total_votes_region": "See total votes per region",
