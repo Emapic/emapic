@@ -518,7 +518,7 @@ var EmapicApp = function() {
         self.app.use(httpErrorHandler({
             handlers: {
                 '404': function err404(err, req, res) {
-                    logger.warn('404 request: ' + err);
+                    logger.notice('404 request: ' + req.url);
                     res.status(404);
                     if (req.path.lastIndexOf('/api/', 0) === 0) {
                         return res.json({ error_code: 'invalid_url', error: "requested url doesn't exist." });
