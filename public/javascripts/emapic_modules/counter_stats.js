@@ -363,6 +363,7 @@ var emapic = emapic || {};
                 $('#prev-question-btn').hide();
             }
             if (emapic.legend && emapic.legend.color && chartFeatures.length > 0) {
+                updateQuestionTitle();
                 emapic.modules.counterStats.loadStats(chartFeatures);
             }
         });
