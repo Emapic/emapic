@@ -25,4 +25,12 @@ var emapic = emapic || {};
         emapic.utils.handleCtrlBtnEvents('.clear-filters-control a', clearFilterControl);
     });
 
+    emapic.disableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.disableIndivLayerExclusiveComponents, null, function() {
+        $('.clear-filters-control').addClass('force-disable');
+    });
+
+    emapic.enableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.enableIndivLayerExclusiveComponents, null, function() {
+        $('.clear-filters-control').removeClass('force-disable');
+    });
+
 })(emapic);

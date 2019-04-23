@@ -450,7 +450,7 @@ var emapic = emapic || {};
 
     emapic.filterFeature = function(feature, layer) {
         for (var i = 0, iLen = emapic.filters.length; i<iLen; i++) {
-            if (typeof emapic.filters[i].applyFilter === 'function' && !emapic.filters[i].applyFilter(feature)) {
+            if (emapic.filters[i].isFilterActive() && !emapic.filters[i].applyFilter(feature)) {
                 return false;
             }
         }

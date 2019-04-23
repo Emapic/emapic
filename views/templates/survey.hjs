@@ -171,9 +171,6 @@
     <script type="text/javascript" src="/javascripts/emapic_modules/survey.js"></script>
     {{/results}}
 
-    <!-- Filter clear btn -->
-    <script type="text/javascript" src="/javascripts/emapic_modules/clear_filters.js"></script>
-
     <!-- Add locators -->
     <script type="text/javascript" src="/javascripts/emapic_modules/locators.js"></script>
 
@@ -190,6 +187,14 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js" integrity="sha256-WL6HHfYfbFEkZOFdsJQeY7lJG/E5airjvqbznghUzRw=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet.markercluster.freezable@1.0.0/dist/leaflet.markercluster.freezable.js" integrity="sha256-548rvpeOHcXiFZzxe9WrE2HAw70aDtSlQPnwvSNp7Oc=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/javascripts/emapic_modules/clustering.js"></script>
+
+    <!-- Add vote filtering by polygon -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/5.1.5/turf.min.js" integrity="sha256-V9GWip6STrPGZ47Fl52caWO8LhKidMGdFvZbjFUlRFs=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet-freehandshapes@0.3.4/dist/leaflet-freehandshapes.min.js" integrity="sha256-ua3a55G78ViCTQE+F87MjEYw6/EljDs814q11kDS5HU=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/javascripts/emapic_modules/filter_spatial.js"></script>
+
+    <!-- Filter clear btn -->
+    <script type="text/javascript" src="/javascripts/emapic_modules/clear_filters.js"></script>
 
     <!-- Add answers panel -->
     <script type="text/javascript" src="/javascripts/emapic_modules/panel.js"></script>

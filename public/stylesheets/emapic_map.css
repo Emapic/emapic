@@ -58,7 +58,7 @@ label {
 .leaflet-container {
     font-family: hero,sans-serif !important;
 }
-.force-disable, .leaflet-control-container.force-disable a,
+.leaflet-control-container.force-disable a,
 .leaflet-control-container.force-disable button,
 .leaflet-control-container.force-disable input,
 .leaflet-marker-icon.leaflet-interactive.force-disable,
@@ -69,6 +69,20 @@ label {
 }
 .leaflet-marker-icon.marker-cluster-svg svg {
     overflow: visible;
+}
+.leaflet-control.force-disable,
+.leaflet-control a.force-disable {
+    cursor: not-allowed !important;
+}
+.leaflet-control.force-disable a {
+    pointer-events: none;
+    background-color: #bfbfbf;
+    color: white;
+}
+.leaflet-control a.force-disable {
+    background-color: #bfbfbf;
+    cursor: not-allowed !important;
+    color: white;
 }
 #map.disable-all > div:not(.spinner) {
     opacity: 0.4;
@@ -830,6 +844,9 @@ input.form-control[type="radio"] {
 }
 .time-control .tooltip-inner:hover {
     cursor: default !important;
+}
+.map.mode-drawing {
+    cursor: crosshair;
 }
 .leaflet-popup h4, .leaflet-popup h5, .leaflet-popup p {
     color: #8f999f;
