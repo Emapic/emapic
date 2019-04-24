@@ -848,6 +848,54 @@ input.form-control[type="radio"] {
 .map.mode-drawing {
     cursor: crosshair;
 }
+ul.leaflet-button-actions {
+    position: absolute;
+    left: 10px;
+    list-style: none;
+    white-space: nowrap;
+    padding: 0;
+    display: none;
+}
+.leaflet-touch ul.leaflet-button-actions {
+    left: 30px;
+}
+ul.leaflet-button-actions li {
+    display: inline-block;
+}
+.leaflet-touch .leaflet-bar ul.leaflet-button-actions li a {
+    border-radius: 0px;
+}
+ul.leaflet-button-actions li a,
+ul.leaflet-button-actions li a:hover {
+    box-sizing: content-box;
+    background-color: #919187;
+    border-left: 1px solid #AAA;
+    color: #FFF;
+    font: 11px/28px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    text-decoration: none;
+    padding: 0 10px;
+    height: 28px;
+    display: table-cell;
+    text-align: center;
+    text-decoration: none;
+}
+.leaflet-touch ul.leaflet-button-actions li a {
+    font-size: 12px;
+    line-height: 30px;
+    height: 30px;
+}
+ul.leaflet-button-actions li a:hover {
+    background-color: #A0A098;
+    color: #FFF;
+}
+.leaflet-touch .leaflet-bar ul.leaflet-button-actions li:last-child a,
+ul.leaflet-button-actions li:last-child a {
+    -webkit-border-radius: 0 4px 4px 0;
+    border-radius: 0 4px 4px 0;
+}
+ul.leaflet-button-actions li:first-child a {
+    border-left: none;
+}
 .leaflet-popup h4, .leaflet-popup h5, .leaflet-popup p {
     color: #8f999f;
 }

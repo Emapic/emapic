@@ -59,6 +59,8 @@
     emapic.utils.registerI18n('js_geocoder_country', '{{#__}}js_geocoder_country{{/__}}');
     emapic.utils.registerI18n('js_geocoder_province', '{{#__}}js_geocoder_province{{/__}}');
     emapic.utils.registerI18n('js_accept', '{{#__}}accept{{/__}}');
+    emapic.utils.registerI18n('js_finish', '{{#__}}finish{{/__}}');
+    emapic.utils.registerI18n('js_cancel', '{{#__}}cancel{{/__}}');
     emapic.utils.registerI18n('js_geoposerror_title', '{{#__}}geoposerror_title{{/__}}');
     emapic.utils.registerI18n('js_geoposerror_body', '{{#__}}geoposerrordefault_body{{/__}}');
 </script>
