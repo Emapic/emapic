@@ -2,6 +2,11 @@
 // Clustering code
 //
 
+// Add the element to the body in order to preload the image, and then remove it
+var img = $("<div style='display: none;'><img src='/images/icon-clustering.png'/></div>");
+img.appendTo('content');
+img.remove();
+
 var emapic = emapic || {};
 
 (function(emapic) {

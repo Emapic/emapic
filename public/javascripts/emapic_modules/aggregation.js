@@ -2,6 +2,13 @@
 // Vote aggregation by area code
 //
 
+// Add the element to the body in order to preload the imagse, and then remove it
+var img = $("<div style='display: none;'><img src='/images/icon-agg_municipality.png'/>" +
+    "<img src='/images/icon-agg_country.png'/>" +
+    "<img src='/images/icon-agg_region.png'/></div>");
+img.appendTo('content');
+img.remove();
+
 var emapic = emapic || {};
 
 (function(emapic) {
