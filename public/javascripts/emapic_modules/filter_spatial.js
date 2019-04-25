@@ -16,9 +16,8 @@ var emapic = emapic || {};
         freeDraw,
         filterTurfGeom = null,
         oldFilterTurfGeom,
+        oldLayers,
         drawer,
-        filterLayer,
-        oldFilterLayer,
         defaultPreferences,
         filterStyle = {
             color: 'green',
@@ -38,10 +37,7 @@ var emapic = emapic || {};
         },
         clearFilter: function() {
             filterTurfGeom = null;
-            if (filterLayer) {
-                emapic.map.removeLayer(filterLayer);
-            }
-            filterLayer = null;
+            drawer.clearLayers();
         },
         isFilterActive: function() {
             return filterTurfGeom !== null;
@@ -65,56 +61,64 @@ var emapic = emapic || {};
         });
 
         // Workaround to prevent a freehandshapes bug that results in annoying
-        // null pointer exceptions when the cursor goes outside the map and the
-        // drawing layer isn't displayed
-        drawer._stopDraw = drawer.stopDraw;
-        drawer.stopDraw = function() {
-            if (this._map) {
-                this._stopDraw();
+        // null pointer exceptions and other problems when the cursor goes outside
+        // the map and the drawing layer isn't displayed
+        drawer._mouseUpLeave = drawer.mouseUpLeave;
+        drawer.mouseUpLeave = function() {
+            if (this.mode !== 'view') {
+                this._mouseUpLeave();
             }
         };
 
         drawer.setMode();
+        emapic.map.addLayer(drawer);
     });
 
     emapic.disableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.disableIndivLayerExclusiveComponents, null, function() {
         emapic.modules.filterSpatial.stopSpatialFilterDrawing(true);
-        if (filterLayer) {
-            emapic.map.removeLayer(filterLayer);
+        var layers = drawer.getLayers();
+        for (var i = 0, iLen = layers.length; i<iLen; i++) {
+            layers[i].getElement().style.display = 'none';
         }
         $('#spatial-filter-remove').removeClass('force-disable');
         $('.spatial-filter-control').addClass('force-disable');
     });
 
     emapic.enableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.enableIndivLayerExclusiveComponents, null, function() {
-        if (filterLayer) {
-            emapic.map.addLayer(filterLayer);
-        } else {
+        var layers = drawer.getLayers();
+        for (var i = 0, iLen = layers.length; i<iLen; i++) {
+            layers[i].getElement().style.display = 'inherit';
+        }
+        if (!filterTurfGeom) {
             $('#spatial-filter-remove').addClass('force-disable');
         }
         $('.spatial-filter-control').removeClass('force-disable');
     });
 
     emapic.modules.filterSpatial.startSpatialFilterDrawing = function() {
-        if (!emapic.map.hasLayer(drawer)) {
+        if (drawer.mode !== 'add') {
             oldFilterTurfGeom = filterTurfGeom;
-            oldFilterLayer = filterLayer;
+            oldLayers = drawer.getLayers();
             enableDrawing();
         }
     };
 
     emapic.modules.filterSpatial.stopSpatialFilterDrawing = function(revert) {
-        if (emapic.map.hasLayer(drawer)) {
+        if (drawer.mode === 'add') {
             if (!revert) {
                 processDrawnGeom();
             }
             disableDrawing();
-            if (revert && oldFilterTurfGeom && oldFilterLayer) {
-                filterLayer = oldFilterLayer;
-                filterTurfGeom = oldFilterTurfGeom;
-                emapic.map.addLayer(filterLayer);
+            if (revert) {
+                drawer.clearLayers();
+                if (oldFilterTurfGeom && oldLayers) {
+                    for (var i = 0, iLen = oldLayers.length; i<iLen; i++) {
+                        drawer.addLayer(oldLayers[i]);
+                    }
+                    filterTurfGeom = oldFilterTurfGeom;
+                }
             }
-            if (filterLayer) {
+            if (filterTurfGeom) {
                 $('#spatial-filter-remove').removeClass('force-disable');
             }
             emapic.applyFilters();
@@ -130,8 +134,6 @@ var emapic = emapic || {};
 
     function disableDrawing() {
         drawer.setMode();
-        drawer.clearLayers();
-        emapic.map.removeLayer(drawer);
         try {
             $('#spatial-filter-draw').tooltip('enable');
         } catch (err) {
@@ -139,13 +141,13 @@ var emapic = emapic || {};
         }
         emapic.deactivateButton($('#spatial-filter-draw'));
         $(emapic.map.getContainer()).removeClass('mode-drawing');
-        if (defaultPreferences.dragging && !emapic.map.dragging._enabled) {
+        if (defaultPreferences && defaultPreferences.dragging && !emapic.map.dragging._enabled) {
             emapic.map.dragging.enable();
         }
-        if (defaultPreferences.doubleClickZoom && !emapic.map.doubleClickZoom._enabled) {
+        if (defaultPreferences && defaultPreferences.doubleClickZoom && !emapic.map.doubleClickZoom._enabled) {
             emapic.map.doubleClickZoom.enable();
         }
-        if (defaultPreferences.scrollWheelZoom && !emapic.map.scrollWheelZoom._enabled) {
+        if (defaultPreferences && defaultPreferences.scrollWheelZoom && !emapic.map.scrollWheelZoom._enabled) {
             emapic.map.scrollWheelZoom.enable();
         }
         $('.spatial-filter-control .leaflet-button-actions').hide();
@@ -160,12 +162,10 @@ var emapic = emapic || {};
         };
 
         if (emapic.modules.filterSpatial.filter.isFilterActive()) {
-            emapic.modules.filterSpatial.filter.clearFilter();
+            filterTurfGeom = null;
             emapic.applyFilters();
             $('#spatial-filter-remove').addClass('force-disable');
         }
-        drawer._map = null;
-        emapic.map.addLayer(drawer);
         drawer.setMode('add');
         emapic.activateButton($('#spatial-filter-draw'));
         try {
@@ -199,8 +199,6 @@ var emapic = emapic || {};
                 coords.push([innerCoords]);
             }
             filterTurfGeom = turf.multiPolygon(coords);
-            filterLayer = L.polygon(latLngs, filterStyle);
-            emapic.map.addLayer(filterLayer);
         }
     }
 
