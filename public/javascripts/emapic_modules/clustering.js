@@ -134,12 +134,12 @@ var emapic = emapic || {};
     }
 
     function getSVGPie(colors, total, text) {
-        var htmlStart = '<svg width="' + (pieCenter.x*2) + 'px" height="' + (pieCenter.y*2) + 'px" xmlns="http://www.w3.org/2000/svg" version="1.1" onmouseover="$(this).children(\'circle\').attr(\'stroke-width\', \'2\');" onmouseout="$(this).children(\'circle\').attr(\'stroke-width\', \'0\');">',
+        var htmlStart = '<svg width="' + (pieCenter.x*2) + 'px" height="' + (pieCenter.y*2) + 'px" xmlns="http://www.w3.org/2000/svg" version="1.1" onmouseover="$(this).children(\'circle:first-of-type\').attr(\'stroke-width\', \'2\');" onmouseout="$(this).children(\'circle:first-of-type\').attr(\'stroke-width\', \'0\');">',
             htmlEnd = text + '</svg>',
             html = '',
             previousAngle = 0,
             previousPoint = resolveToPoint(previousAngle);
-        html += '<circle cx="' + pieCenter.x + '" cy="' + pieCenter.y + '" r="' + (pieRadius + 1) + '" stroke="black" stroke-width="1"/>';
+        html += '<circle cx="' + pieCenter.x + '" cy="' + pieCenter.y + '" r="' + (pieRadius + 1) + '" stroke="black" stroke-width="0"/>';
         for (var i = 0, iLen = colors.length; i<iLen; i++) {
             var color = colors[i].color,
                 votes = colors[i].votes;
