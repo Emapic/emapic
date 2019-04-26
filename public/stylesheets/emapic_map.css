@@ -798,12 +798,29 @@ input.form-control[type="radio"] {
 .leaflet-touch .leaflet-bar.time-control {
     border: none;
 }
-.time-control .tooltip-arrow {
-    border-top-color: #004F71 !important;
-}
 .map .tooltip-inner {
     background-color: #004F71;
     min-width: 100px;
+}
+.time-control .tooltip-arrow {
+    border-top-color: #004F71 !important;
+}
+.time-control .tooltip {
+    padding-top: 0;
+}
+.time-control .ui-slider-handle {
+    outline: none;
+}
+.time-control .ui-slider-handle .tooltip {
+    margin-left: 50%;
+    transform: translateX(-50%);
+    left: 0 !important;
+}
+.time-control .tooltip-inner {
+    white-space: nowrap;
+}
+.time-control .tooltip-inner:hover {
+    cursor: default !important;
 }
 .leaflet-popup h4, .leaflet-popup h5, .leaflet-popup p {
     color: #8f999f;

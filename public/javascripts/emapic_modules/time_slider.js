@@ -83,11 +83,11 @@ var emapic = emapic || {};
     });
 
     function sliderFilter(event, ui) {
-        $(ui.handle).tooltip('hide')
-            .attr('data-original-title', sliderDatesTooltip[sliderLevel][ui.value].format(sliderDateFormats[sliderLevel]))
-            .tooltip('fixTitle');
+        $(ui.handle).find('.tooltip-inner').html(sliderDatesTooltip[sliderLevel][ui.value].format(sliderDateFormats[sliderLevel]));
         if (event.originalEvent) {
-            filterDates = [sliderDates[sliderLevel][0][ui.values[0]], sliderDates[sliderLevel][1][ui.values[1]]];
+            var startDate = sliderDates[sliderLevel][0][ui.values[0]],
+                endDate = sliderDates[sliderLevel][1][ui.values[1]];
+            filterDates = [startDate, endDate];
             emapic.updateIndivVotesLayer();
             emapic.updateIndivVotesLayerControls();
         }
@@ -218,7 +218,11 @@ var emapic = emapic || {};
             values: [0, sliderDates[sliderLevel][1].length - 1],
             slide: sliderFilter,
             change: sliderFilter,
-            start: function( event, ui ) {
+            stop: function(event, ui) {
+                $(ui.handle).attr('data-original-title', sliderDatesTooltip[sliderLevel][ui.value].format(sliderDateFormats[sliderLevel]))
+                    .tooltip('fixTitle');
+            },
+            start: function(event, ui) {
                 event.stopPropagation();
             }
         });
@@ -226,15 +230,21 @@ var emapic = emapic || {};
             e.stopPropagation();
         });
         L.DomEvent.disableClickPropagation($('#time-control')[0]);
-        filterDates = [sliderDates[sliderLevel][0], sliderDates[sliderLevel][sliderDates[sliderLevel][1].length - 1]];
-        $('.ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
-        $('.ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
+        filterDates = [sliderDates[sliderLevel][0][0], sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]];
+        $('#time-slider .ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel]))
+            .tooltip({ container: '#time-slider .ui-slider-handle:first'}).tooltip('hide').tooltip('fixTitle').on('shown.bs.tooltip', function() {
+                disableTooltipEvents($('#time-slider .ui-slider-handle:first .tooltip')[0]);
+            });
+        $('#time-slider .ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel]))
+            .tooltip({ container: '#time-slider .ui-slider-handle:last'}).tooltip('hide').tooltip('fixTitle').on('shown.bs.tooltip', function() {
+                disableTooltipEvents($('#time-slider .ui-slider-handle:last .tooltip')[0]);
+            });
         // Looks like bootstrap has some problems with showing the tooltips at this point, so we show them with a small delay
         setTimeout(function(){
             if (sliderDates[sliderLevel][0].length > 1) {
-                $('.ui-slider-handle').tooltip('show');
+                $('#time-slider .ui-slider-handle').tooltip('show');
             } else {
-                $('.ui-slider-handle:last').tooltip('show');
+                $('#time-slider .ui-slider-handle:last').tooltip('show');
             }
         }, 200);
     }
@@ -243,6 +253,20 @@ var emapic = emapic || {};
         initSlider(level);
         emapic.updateIndivVotesLayer();
         emapic.updateIndivVotesLayerControls();
+    }
+
+    function disableTooltipEvents(element) {
+        var stop = L.DomEvent.stopPropagation;
+        L.DomEvent
+            .on(element, 'click', stop)
+            .on(element, 'dblclick', stop)
+            .on(element, 'focus', stop)
+            .on(element, 'focusin', stop)
+            .on(element, 'hover', stop)
+            .on(element, 'mousedown', stop)
+            .on(element, 'mouseover', stop)
+            .disableClickPropagation(element)
+            .disableScrollPropagation(element);
     }
 
     emapic.processMainLayerData = emapic.utils.overrideFunction(emapic.processMainLayerData, function(data) {
