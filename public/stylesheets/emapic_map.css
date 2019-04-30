@@ -1397,11 +1397,14 @@ div.col > #thanks-msg {
     display: inline;
 }
 #sidebarPanel #indivData ul.user-answers-list li:not(:first-child) {
-    margin-top: 5px;
+    margin-top: 15px;
 }
 #sidebarPanel #indivData ul.user-answers-list li span {
     color: black;
     font-size: 12px;
+    text-indent: 11px;
+    text-align: justify;
+    display: inline-block;
 }
 #sidebarPanel #indivData ul.user-answers-list li {
     list-style: disc inside none;

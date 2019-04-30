@@ -255,6 +255,11 @@ if (typeof $.fn.validator !== 'undefined' &&
             tgt = $input.attr('target'),
             $tgt = $(tgt);
         if ($tgt !== null) {
+            if (!mandatory && (val === null || val.trim() === '')) {
+                // Empty and not mandatory
+                $tgt.attr('disabled', false);
+            }
+
             if (mandatory || (val !== null && val.trim() !== '')) {
                 $tgt.attr('disabled', true);
             }

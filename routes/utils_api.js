@@ -114,11 +114,11 @@ module.exports = function(app) {
                         } else {
                             value = results[i]['q' + questions[j].question_order + '.id'];
                         }
-                        msg += "<li><label>" + questions[j].question + ':</label><span>' + value + '</span></li>';
+                        msg += "<li><label>" + questions[j].question + ':<br></label><span>' + value + '</span></li>';
                         break;
                     case 'text-answer':
                         if (results[i]['q' + questions[j].question_order + '.value'] && results[i]['q' + questions[j].question_order + '.value'].trim()){
-                            msg += "<li><label>" + questions[j].question + ':</label><span>' + results[i]['q' + questions[j].question_order + '.value'].trim() + '</span></li>';
+                            msg += "<li><label>" + questions[j].question + ':<br></label><span>' + results[i]['q' + questions[j].question_order + '.value'].trim() + '</span></li>';
                         }
                         break;
                     case 'image-upload':
