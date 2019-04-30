@@ -162,6 +162,7 @@
 	"js_clear_all_filters": "Limpiar todos los filtros",
 	"js_add_spatial_filter": "Dibujar filtro por área",
 	"js_remove_spatial_filter": "Eliminar filtro por área",
+	"js_draw_spatial_filter_tooltip": "Pulsa y arrastra para añadir áreas, luego pulsa en «Terminar»",
 	"js_disable_clustering": "Desactivar clustering",
 	"js_total_votes_municipality": "Ver total de votos por municipio (sólo España)",
 	"js_total_votes_region": "Ver total de votos por región",

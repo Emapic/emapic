@@ -8,6 +8,7 @@
     emapic.utils.registerI18n('js_clear_all_filters', '{{#__}}js_clear_all_filters{{/__}}');
     emapic.utils.registerI18n('js_add_spatial_filter', '{{#__}}js_add_spatial_filter{{/__}}');
     emapic.utils.registerI18n('js_remove_spatial_filter', '{{#__}}js_remove_spatial_filter{{/__}}');
+    emapic.utils.registerI18n('js_draw_spatial_filter_tooltip', '{{#__}}js_draw_spatial_filter_tooltip{{/__}}');
     emapic.utils.registerI18n('js_disable_clustering', '{{#__}}js_disable_clustering{{/__}}');
     emapic.utils.registerI18n('js_total_votes_municipality', '{{#__}}js_total_votes_municipality{{/__}}');
     emapic.utils.registerI18n('js_total_votes_region', '{{#__}}js_total_votes_region{{/__}}');

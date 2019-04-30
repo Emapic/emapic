@@ -26,7 +26,12 @@ var emapic = emapic || {};
             fillOpacity: 0.05,
             interactive: false,
             smoothFactor: 1
-        };
+        },
+        tooltip = L.tooltip({
+          position: 'right',
+          className: 'tooltip draw-tooltip',
+          noWrap: false
+      }).setContent(emapic.utils.getI18n('js_draw_spatial_filter_tooltip', 'Pulsa y arrastra para añadir áreas, luego pulsa en «Terminar»'));
 
     emapic.modules = emapic.modules || {};
     emapic.modules.filterSpatial = emapic.modules.filterSpatial || {};
@@ -141,6 +146,7 @@ var emapic = emapic || {};
         }
         emapic.deactivateButton($('#spatial-filter-draw'));
         $(emapic.map.getContainer()).removeClass('mode-drawing');
+        removeTooltip();
         if (defaultPreferences && defaultPreferences.dragging && !emapic.map.dragging._enabled) {
             emapic.map.dragging.enable();
         }
@@ -174,6 +180,7 @@ var emapic = emapic || {};
         } catch (err) {
             // Ignore it
         }
+        addTooltip();
         $(emapic.map.getContainer()).addClass('mode-drawing');
     }
 
@@ -200,6 +207,26 @@ var emapic = emapic || {};
             }
             filterTurfGeom = turf.multiPolygon(coords);
         }
+    }
+
+    function updateTooltipLocation(evt) {
+        tooltip.updatePosition(evt.layerPoint);
+    }
+
+    function addTooltip() {
+        var bounds = emapic.map.getBounds();
+        // Initialize the tooltip vertically centered, at 25% screen width from left
+        tooltip.setLatLng([(bounds._southWest.lat + bounds._northEast.lat) / 2,
+          bounds._southWest.lng + (bounds._northEast.lng - bounds._southWest.lng) / 4]).addTo(emapic.map);
+
+        emapic.map.on('mousemove', updateTooltipLocation);
+        emapic.map.on('mousedown touchstart', removeTooltip);
+    }
+
+    function removeTooltip() {
+        emapic.map.off('mousemove', updateTooltipLocation);
+
+        tooltip.removeFrom(emapic.map);
     }
 
 })(emapic);

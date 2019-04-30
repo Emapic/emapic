@@ -846,7 +846,11 @@ input.form-control[type="radio"] {
     cursor: default !important;
 }
 .map.mode-drawing {
-    cursor: crosshair;
+    cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAsElEQVQ4jd3RPY5BYRQG4KfWkCimmU4iUbIKq1CNVRA1PQm2oh0aK5jR0QlL8FPc7yY3aL7vTjFxkrc8T84P71Q97DEqC33hilvIOBWqYV6A8kxioT6OaGP5AmzGQFescArgogD9ohIDzbAJzWd0ZCvv8JkK5TmHCeux0NrzjaInmuL730AX2cd+ykDCREM0cCgDCU0DtB7AaCjHbrJ7VbFNhYpY8mrF6j7kIxX6k7oDSChZ4yS1jeYAAAAASUVORK5CYII=") 0 17, auto;
+}
+.draw-tooltip .tooltip-inner {
+    background-color: rgba(0, 0, 0, 0.8);
+    min-width: 200px;
 }
 ul.leaflet-button-actions {
     position: absolute;

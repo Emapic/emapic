@@ -1,4 +1,8 @@
 
+{{#yield-styles}}
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/leaflet-tooltip@1.0.4/dist/tooltip.css" integrity="sha256-ceQJ5Ko8OHhNqJBIMFejb0sQCDYQNIgpCTfzXs3MSgw=" crossorigin="anonymous">
+{{/yield-styles}}
+
     {{#emapicOpinion}}
     {{> map_emapic_opinion_popup}}
     {{/emapicOpinion}}
@@ -191,6 +195,7 @@
     <!-- Add vote filtering by polygon -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/5.1.5/turf.min.js" integrity="sha256-V9GWip6STrPGZ47Fl52caWO8LhKidMGdFvZbjFUlRFs=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet-freehandshapes@0.3.4/dist/leaflet-freehandshapes.min.js" integrity="sha256-ua3a55G78ViCTQE+F87MjEYw6/EljDs814q11kDS5HU=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet-tooltip@1.0.4/dist/L.Tooltip.js" integrity="sha256-8nr7s4fwA+5MrIaPDS+JDpKnOMIxPFtMJqhvUT9ZtgM=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/javascripts/emapic_modules/spatial_filter.js"></script>
 
     <!-- Filter clear btn -->
