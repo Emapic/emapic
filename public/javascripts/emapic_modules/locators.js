@@ -328,7 +328,7 @@ var emapic = emapic || {};
                 	$.each(countriesProvincesData[stat.iso_code], function(i, province) {
         				var specificVotesHtml = '',
                             hasMunicipalities = province.properties.adm_code in provincesMunicipalitiesData && provincesMunicipalitiesData[province.properties.adm_code].length > 0,
-                            municipalitiesShown = $('tr.province-' + province.properties.adm_code + ' i.fa-caret-down').hasClass('fa-caret-up');
+                            municipalitiesShown = $('tr.' + $.escapeSelector('province-' + province.properties.adm_code) + ' i.fa-caret-down').hasClass('fa-caret-up');
                         if (emapic.legend && emapic.legend.color) {
                             var votes;
                             for (i=0, len=emapic.legend.color.responses_array.length; i<len; i++) {
