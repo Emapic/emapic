@@ -405,7 +405,9 @@ var emapic = emapic || {};
     };
 
     emapic.updateIndivVotesLayerControls = function() {
-        emapic.questionSelector._update();
+        if (emapic.questionSelector) {
+            emapic.questionSelector._update();
+        }
     };
 
     emapic.updateIndivVotesLayer = function() {
