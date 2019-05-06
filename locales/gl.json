@@ -91,6 +91,7 @@
 	"next_question": "Seguinte pregunta",
 	"toggle_chart": "Cambiar tipo de gráfica",
 	"download_data_csv": "Descargar datos en .csv",
+	"download_visible_data_csv": "Descargar datos visibles en .csv",
 	"vote_stats_title": "Voto",
 	"survey_thanks": "Moitas grazas por ter participado nesta enquisa.",
 	"survey_thanks_responses": "Agora amosarémosche os seus resultados actuais.",

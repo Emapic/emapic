@@ -359,7 +359,7 @@ module.exports = function(app) {
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
             (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                return Promise.join(survey.getFullResponses(), survey.getQuestions({
+                return Promise.join(survey.getFullResponses(req.query), survey.getQuestions({
                     scope: 'includeAnswers'
                 }), function(responses, questions) {
                     res.attachment(survey.title + '.csv');

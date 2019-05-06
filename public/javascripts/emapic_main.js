@@ -74,6 +74,18 @@ var emapic = emapic || {};
         return "/api/survey/" + emapic.surveyId + "/totals/municipalities?geom=bbox&lang=" + emapic.locale;
     };
 
+    emapic.getExportURL = function() {
+        return "/api/survey/" + emapic.surveyId + "/export";
+    };
+
+    emapic.getExportFilteredURL = function() {
+        var parameters = [];
+        for (var i = 0, len = emapic.filters.length; i<len; i++) {
+            parameters = parameters.concat(emapic.filters[i].getExportParameters());
+        }
+        return emapic.getExportURL() + (parameters.length > 0 ? '?' + parameters.join('&') : '');
+    };
+
     // Methods for loading additional JSON data. If we want to preload them, we
     // can simply call the methods and ignore the returned values.
     emapic.getAllCountriesDataBbox = function() {
@@ -681,6 +693,11 @@ var emapic = emapic || {};
             // Return true if the filter is actually doing any kind of feature
             // filtering related to the question with the provided id, false otherwise
             return false;
+        };
+
+        this.getExportParameters = (typeof options.getExportParameters === 'function') ? options.getExportParameters : function() {
+            // Return an array of GET parameters as strings
+            return [];
         };
 
     };

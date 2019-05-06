@@ -46,6 +46,13 @@ var emapic = emapic || {};
         },
         isFilterActive: function() {
             return filterTurfGeom !== null;
+        },
+        getExportParameters: function() {
+            var params = [];
+            if (filterTurfGeom !== null) {
+                params.push('filter_geom=' + encodeURIComponent(JSON.stringify(filterTurfGeom.geometry)));
+            }
+            return params;
         }
     });
 

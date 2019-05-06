@@ -60,23 +60,75 @@ function getAllFieldsSQL(qstns, type) {
     return qstnsFields;
 }
 
-function getSurveyResponsesSql(survey, type) {
+function getFiltersSQL(getFilters, questions) {
+    var sqls = [],
+        params = {};
+    console.log(getFilters);
+    if (getFilters) {
+        for (var param in getFilters) {
+            switch (param) {
+                case 'filter_tmin':
+                case 'filter_tmax':
+                    if (isNaN(getFilters[param])) {
+                        continue;
+                    }
+                    sqls.push('a.timestamp ' + (param === 'filter_tmin' ? '>=' : '<=' ) + ' TO_TIMESTAMP(:' + param + ") AT TIME ZONE 'UTC'");
+                    params[param] = parseInt(getFilters[param]) / 1000; // Milliseconds to seconds
+                    break;
+                case 'filter_geom':
+                    sqls.push('ST_Contains(ST_SetSRID(ST_GeomFromGeoJSON(:' + param + '), 4326), a.geom)');
+                    params[param] = getFilters[param];
+                    break;
+                default:
+                    console.log(param);
+                    if (param.startsWith('filter_q')) {
+                        var q = parseInt(param.substring(8));
+                        if (isNaN(q)) {
+                            continue;
+                        }
+                        var qstnFound = false;
+                        for (var i = 0, iLen = questions.length; i<iLen; i++) {
+                            if (questions[i].legend_question && questions[i].question_order === q) {
+                                qstnFound = true;
+                                break;
+                            }
+                        }
+                        if (!qstnFound) {
+                            continue;
+                        }
+                        sqls.push('q' + q + ' IN (:' + param + ')');
+                        params[param] = getFilters[param];
+                    }
+            }
+        }
+    }
+    return {
+        sql: sqls.length > 0 ? 'WHERE ' + sqls.join(' AND ') : '',
+        params: params
+    };
+}
+
+function getSurveyResponsesSql(survey, type, getFilters) {
     var id = survey.id;
     return survey.getQuestions({ scope: 'includeSurvey' }).then(function(questions) {
         var fieldsSql = getAllFieldsSQL(questions, sqlType.select),
+            whereData = getFiltersSQL(getFilters, questions),
             sql;
         switch (type) {
             case answersRequestType.normal:
-                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id ORDER BY timestamp";
+                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id " + whereData.sql + " ORDER BY timestamp";
                 break;
             case answersRequestType.full:
-                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_y(a.geom) as lat, st_x(a.geom) as lon, d.name as country, d.iso_code_2 as country_iso, c.name as province, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id LEFT JOIN base_layers.provinces c ON c.gid = a.province_gid LEFT JOIN base_layers.countries d ON c.country_gid = d.gid ORDER BY timestamp";
+                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_y(a.geom) as lat, st_x(a.geom) as lon, d.name as country, d.iso_code_2 as country_iso, c.name as province, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id LEFT JOIN base_layers.provinces c ON c.gid = a.province_gid LEFT JOIN base_layers.countries d ON c.country_gid = d.gid " + whereData.sql + " ORDER BY timestamp";
                 break;
             case answersRequestType.anonymized:
-                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN base_layers.provinces b ON b.gid = a.province_gid LEFT JOIN base_layers.countries c ON b.country_gid = c.gid ORDER BY c.iso_code_2, b.adm1_code, a.timestamp";
+                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN base_layers.provinces b ON b.gid = a.province_gid LEFT JOIN base_layers.countries c ON b.country_gid = c.gid " + whereData.sql + " ORDER BY c.iso_code_2, b.adm1_code, a.timestamp";
                 break;
         }
-        return sql;
+        return {
+            sql: sql,
+            params: whereData.params
+        };
     });
 }
 
@@ -754,27 +806,30 @@ module.exports = function(sequelize, DataTypes) {
         });
     };
 
-    Survey.prototype.getFullResponses = function() {
-        return getSurveyResponsesSql(this, answersRequestType.full).then(function(sql) {
-            return sequelize.query(sql,
-                { type: sequelize.QueryTypes.SELECT }
-            );
+    Survey.prototype.getFullResponses = function(getFilters) {
+        return getSurveyResponsesSql(this, answersRequestType.full, getFilters).then(function(data) {
+            return sequelize.query(data.sql, {
+                replacements: data.params,
+                type: sequelize.QueryTypes.SELECT
+            });
         });
     };
 
-    Survey.prototype.getResponses = function() {
-        return getSurveyResponsesSql(this, answersRequestType.normal).then(function(sql) {
-            return sequelize.query(sql,
-                { type: sequelize.QueryTypes.SELECT }
-            );
+    Survey.prototype.getResponses = function(getFilters) {
+        return getSurveyResponsesSql(this, answersRequestType.normal, getFilters).then(function(data) {
+            return sequelize.query(data.sql, {
+                replacements: data.params,
+                type: sequelize.QueryTypes.SELECT
+            });
         });
     };
 
-    Survey.prototype.getAnonymizedResponses = function() {
-        return getSurveyResponsesSql(this, answersRequestType.anonymized).then(function(sql) {
-            return sequelize.query(sql,
-                { type: sequelize.QueryTypes.SELECT }
-            );
+    Survey.prototype.getAnonymizedResponses = function(getFilters) {
+        return getSurveyResponsesSql(this, answersRequestType.anonymized, getFilters).then(function(data) {
+            return sequelize.query(data.sql, {
+                replacements: data.params,
+                type: sequelize.QueryTypes.SELECT
+            });
         });
     };
 

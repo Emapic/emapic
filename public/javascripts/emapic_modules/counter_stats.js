@@ -52,6 +52,15 @@ var emapic = emapic || {};
         isFilterActiveOnQuestion: function(qstnId) {
             var prop = qstnId + '.id';
             return (prop in counterFilterValues && counterFilterValues[prop].length > 0);
+        },
+        getExportParameters: function() {
+            var params = [];
+            for (var prop in counterFilterValues) {
+                for (var i = 0, len = counterFilterValues[prop].length; i<len; i++) {
+                    params.push('filter_' + prop.replace('.id', '') + '=' + encodeURIComponent(counterFilterValues[prop][i]));
+                }
+            }
+            return params;
         }
     });
 

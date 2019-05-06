@@ -32,7 +32,19 @@ var emapic = emapic || {};
             }
         },
         isFilterActive: function() {
-            return (filterDates && (sliderLevel !== null) && (filterDates[0] !== sliderDates[sliderLevel][0][0] || filterDates[1] !== sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]));
+            return (filterDates && sliderLevel !== null && (filterDates[0] !== sliderDates[sliderLevel][0][0] || filterDates[1] !== sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]));
+        },
+        getExportParameters: function() {
+            var params = [];
+            if (filterDates && sliderLevel !== null) {
+                if (filterDates[0] !== sliderDates[sliderLevel][0][0]) {
+                    params.push('filter_tmin=' + encodeURIComponent(filterDates[0].getTime()));
+                }
+                if (filterDates[1] !== sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]) {
+                    params.push('filter_tmax=' + encodeURIComponent(filterDates[1].getTime()));
+                }
+            }
+            return params;
         }
     });
 
@@ -132,17 +144,17 @@ var emapic = emapic || {};
             sliderDatesTooltip[sliderLevel] = [];
             if (level == 3) { // Year
                 // For the min date we set January 1st 00:00:00
-                d = new Date(minDate.getFullYear(), 0, 1, 0, 0, 0, 0);
+                d = new Date(Date.UTC(minDate.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
                 while (d < maxDate) {
                     aux = new Date(d);
                     sliderDates[sliderLevel][0].push(aux);
-                    d.setFullYear(d.getFullYear() + 1);
+                    d.setUTCFullYear(d.getUTCFullYear() + 1);
                 }
 
                 // For the max date we set December 31st 23:59:59
-                d = new Date(minDate.getFullYear() - 1, 11, 31, 23, 59, 59, 999);
+                d = new Date(Date.UTC(minDate.getUTCFullYear() - 1, 11, 31, 23, 59, 59, 999));
                 do {
-                    d.setFullYear(d.getFullYear() + 1);
+                    d.setUTCFullYear(d.getUTCFullYear() + 1);
                     aux = new Date(d);
                     sliderDates[sliderLevel][1].push(aux);
                     // We also store the tooltip date
@@ -150,63 +162,63 @@ var emapic = emapic || {};
                 } while (d < maxDate);
             } else if (level == 2) { // Month
                 // For the min date we set month's 1st 00:00:00
-                d = new Date(minDate.getFullYear(), minDate.getMonth(), 1, 0, 0, 0, 0);
+                d = new Date(Date.UTC(minDate.getUTCFullYear(), minDate.getUTCMonth(), 1, 0, 0, 0, 0));
                 while (d <= maxDate) {
-                    aux = new Date(d.getFullYear(), d.getMonth(), 1, 0, 0, 0,0);
+                    aux = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1, 0, 0, 0,0));
                     sliderDates[sliderLevel][0].push(aux);
-                    d.setMonth(d.getMonth() + 1);
+                    d.setUTCMonth(d.getUTCMonth() + 1);
                 }
 
-                // For the min date we set month's last day 23:59:59
+                // For the max date we set month's last day 23:59:59
                 // which we'll obtain by sustracting one day from the next
                 // month's 1st
-                d = new Date(minDate.getFullYear(), minDate.getMonth(), 1, 0, 0, 0, 0);
+                d = new Date(Date.UTC(minDate.getUTCFullYear(), minDate.getUTCMonth(), 1, 0, 0, 0, 0));
                 do {
-                    d.setMonth(d.getMonth() + 1);
-                    aux = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 1, 23, 59, 59, 999);
+                    d.setUTCMonth(d.getUTCMonth() + 1);
+                    aux = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - 1, 23, 59, 59, 999));
                     sliderDates[sliderLevel][1].push(aux);
                     // We also store the tooltip date
                     sliderDatesTooltip[sliderLevel].push(aux);
                 } while (d <= maxDate);
             } else if (level == 1) { // Week
                 // For the min date we set week's monday 00:00:00
-                d = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate(), 0, 0, 0, 0);
-                if (d.getDay() === 0) {
-                    d.setDate(d.getDate() - 6);
+                d = new Date(Date.UTC(minDate.getUTCFullYear(), minDate.getUTCMonth(), minDate.getUTCDate(), 0, 0, 0, 0));
+                if (d.getUTCDay() === 0) {
+                    d.setUTCDate(d.getUTCDate() - 6);
                 } else {
-                    d.setDate(d.getDate() + 1 - d.getDay());
+                    d.setUTCDate(d.getUTCDate() + 1 - d.getUTCDay());
                 }
                 while (d < maxDate) {
                     aux = new Date(d);
                     sliderDates[sliderLevel][0].push(aux);
-                    d.setDate(d.getDate() + 7);
+                    d.setUTCDate(d.getUTCDate() + 7);
                     // We also store the tooltip date (week's monday)
                     sliderDatesTooltip[sliderLevel].push(aux);
                 }
 
-                // For the min date we set week's sunday 23:59:59
-                d = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate() - 7, 23, 59, 59, 999);
-                if (d.getDay() !== 0) {
-                    d.setDate(d.getDate() + 7 - d.getDay());
+                // For the max date we set week's sunday 23:59:59
+                d = new Date(Date.UTC(minDate.getUTCFullYear(), minDate.getUTCMonth(), minDate.getUTCDate() - 7, 23, 59, 59, 999));
+                if (d.getUTCDay() !== 0) {
+                    d.setUTCDate(d.getUTCDate() + 7 - d.getUTCDay());
                 }
                 do {
-                    d.setDate(d.getDate() + 7);
+                    d.setUTCDate(d.getUTCDate() + 7);
                     aux = new Date(d);
                     sliderDates[sliderLevel][1].push(aux);
                 } while (d < maxDate);
             } else { // Day
                 // For the min date we set day at 00:00:00
-                d = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate(), 0, 0, 0, 0);
+                d = new Date(Date.UTC(minDate.getUTCFullYear(), minDate.getUTCMonth(), minDate.getUTCDate(), 0, 0, 0, 0));
                 while (d < maxDate) {
                     aux = new Date(d);
                     sliderDates[sliderLevel][0].push(aux);
-                    d.setDate(d.getDate() + 1);
+                    d.setUTCDate(d.getUTCDate() + 1);
                 }
 
-                // For the min date we set day at 23:59:59
-                d = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate() - 1, 23, 59, 59, 999);
+                // For the max date we set day at 23:59:59
+                d = new Date(Date.UTC(minDate.getUTCFullYear(), minDate.getUTCMonth(), minDate.getUTCDate() - 1, 23, 59, 59, 999));
                 do {
-                    d.setDate(d.getDate() + 1);
+                    d.setUTCDate(d.getUTCDate() + 1);
                     aux = new Date(d);
                     sliderDates[sliderLevel][1].push(aux);
                     // We also store the tooltip date

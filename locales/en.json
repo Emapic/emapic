@@ -91,6 +91,7 @@
 	"next_question": "Next question",
 	"toggle_chart": "Toggle chart type",
 	"download_data_csv": "Download data on .csv",
+	"download_visible_data_csv": "Download visible data on .csv",
 	"vote_stats_title": "Vote",
 	"survey_thanks": "Thank you very much for participating in this survey.",
 	"survey_thanks_responses": "Now we'll show you its current results.",
