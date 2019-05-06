@@ -462,7 +462,7 @@ var emapic = emapic || {};
         });
     };
 
-    emapic.filterFeature = function(feature, layer) {
+    emapic.filterFeature = function(feature) {
         for (var i = 0, iLen = emapic.filters.length; i<iLen; i++) {
             if (emapic.filters[i].isFilterActive() && !emapic.filters[i].applyFilter(feature)) {
                 return false;
