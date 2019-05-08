@@ -169,7 +169,9 @@ var emapic = emapic || {};
     emapic.initializeMap = function() {
         emapic.map = L.map('map', {
             attributionControl: false,
-            zoomControl: false
+            zoomControl: false,
+            center: [0, 0],
+            zoom: 3
         });
         emapic.map.addControl(L.control.zoom({
             zoomInTitle: emapic.utils.getI18n('js_zoom_in', 'Zoom más'),
@@ -327,6 +329,10 @@ var emapic = emapic || {};
     emapic.centerView = function(opts) {
         if ( opts.world ) {
             emapic.map.fitWorld();
+            // Zooms lower than 3 usually look bad, with plenty of empty space
+            if (emapic.map.getZoom() < 3) {
+                emapic.map.setZoom(3);
+            }
         } else if ( opts.answers ) {
             emapic.map.fitBounds(emapic.indivVotesLayer.getBounds());
         } else if ( opts.zoom ) {
