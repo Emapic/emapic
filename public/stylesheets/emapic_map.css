@@ -364,6 +364,9 @@ div.alert-danger a {
     margin-bottom: 5px;
     margin-left: 0px;
 }
+#geoposwarn p {
+    text-align: justify;
+}
 #survey-info h4 {
     margin-bottom: 0px;
 }

@@ -4,7 +4,7 @@
           <div class="modal-header">
             <h4 class="modal-title">{{#__}}geoposwarning_title{{/__}}</h4>
           </div>
-          <div class="modal-body">
+          <div class="modal-body large" style="display: none;">
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="headingOne">
                     <h4 class="panel-title">
@@ -52,6 +52,22 @@
 			<div id="browser-loc-howto">
 				<h5 class="text-right"><a href="https://translate.google.com/translate?sl=en&tl=es&js=y&prev=_t&hl=es&ie=UTF-8&u=https%3A%2F%2Fwaziggle.com%2FBrowserAllow.aspx&edit-text=&act=url" target="_blank">{{#__}}geoposwarning_allow_browser_howto{{/__}}</a></h5>
 			</div>
+          </div>
+          <div class="modal-body small">
+            <!-- <p>Con el único objetivo de mostrar las respuestas sobre un mapa, requerimos una localización a asignar a tu respuesta, que puede ser tu posición actual o cualquier otra que desees.</p> -->
+            {{#user}}
+            <p>{{#__}}geoposwarning_summary_logged{{/__}}</p>
+            {{/user}}
+            {{^user}}
+            <p>{{#__}}geoposwarning_summary_non_logged{{/__}}</p>
+            <p>{{#__}}geoposwarning_options_footer_non_logged{{/__}}</p>
+            {{/user}}
+            <div class="text-center">
+                <button type="button" class="btn btn-info" onclick="$(this).closest('.modal-body.small').hide();$(this).closest('.modal-content').find('.modal-body.large').show();$(this).closest('.modal-content').find('.modal-body.large .panel-heading a').click();">Más información</button>
+            </div>
+            <div id="browser-loc-howto">
+                <h5 class="text-right"><a href="https://translate.google.com/translate?sl=en&tl=es&js=y&prev=_t&hl=es&ie=UTF-8&u=https%3A%2F%2Fwaziggle.com%2FBrowserAllow.aspx&edit-text=&act=url" target="_blank">{{#__}}geoposwarning_allow_browser_howto{{/__}}</a></h5>
+            </div>
           </div>
           <div class="modal-footer">
             {{#user}}
