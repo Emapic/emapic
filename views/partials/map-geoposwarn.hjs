@@ -66,7 +66,7 @@
                 <button type="button" class="btn btn-info" onclick="$(this).closest('.modal-body.small').hide();$(this).closest('.modal-content').find('.modal-body.large').show();$(this).closest('.modal-content').find('.modal-body.large .panel-heading a').click();">Más información</button>
             </div>
             <div id="browser-loc-howto">
-                <h5 class="text-right"><a href="https://translate.google.com/translate?sl=en&tl=es&js=y&prev=_t&hl=es&ie=UTF-8&u=https%3A%2F%2Fwaziggle.com%2FBrowserAllow.aspx&edit-text=&act=url" target="_blank">{{#__}}geoposwarning_allow_browser_howto{{/__}}</a></h5>
+                <h5 class="text-right"><a href="#" onclick="var baseURL = 'https://www.lifewire.com/denying-access-to-your-location-4027789';window.open('{{web_locale}}' === 'en' ? baseURL : 'https://translate.google.com/translate?hl=en&sl=auto&tl={{web_locale}}&u=' + encodeURIComponent(baseURL), '_blank')">{{#__}}geoposwarning_allow_browser_howto{{/__}}</a></h5>
             </div>
           </div>
           <div class="modal-footer">
