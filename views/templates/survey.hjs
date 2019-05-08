@@ -231,6 +231,7 @@
         {{/results}}
         {{^results}}
         emapic.surveyResults = false;
+        emapic.modules.survey.positionBeforeSurvey = false;
         emapic.modules.survey.surveyPostFormat = 'multipart';
 
         {{^survey.results_after_vote}}

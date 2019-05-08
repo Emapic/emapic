@@ -33,12 +33,7 @@ var emapic = emapic || {};
     emapic.geoapi.userCountryCode = 'es';
 
     emapic.geoapi.getLocation = function(callApi) {
-        if (emapic.geoapi.useDefaultOverIp || !emapic.geoapi.ipgeolocationAPIKey) {
-            ipLocationFinished = true;
-            ipLocationFail = true;
-        } else {
-            getIpLocation();
-        }
+        emapic.geoapi.getIpLocation();
         $('#geoposwarn').modal("show");
         $('#dismiss-btn').click(function() {
             emapic.geoapi.manualGeolocation = true;
@@ -62,7 +57,18 @@ var emapic = emapic || {};
     emapic.geoapi.processUserCountry = function(code) {
     };
 
-    function getIpLocation() {
+    emapic.geoapi.getIpLocation = function() {
+        if (!ipLocationFinished) {
+            if (emapic.geoapi.useDefaultOverIp || !emapic.geoapi.ipgeolocationAPIKey) {
+                ipLocationFinished = true;
+                ipLocationFail = true;
+            } else {
+                getIpLocationRaw();
+            }
+        }
+    };
+
+    function getIpLocationRaw() {
         var json = $.getJSON("https://api.ipgeolocation.io/ipgeo?apiKey=" + emapic.geoapi.ipgeolocationAPIKey).done(
             function(data) {
                 //~ Country codes as in "ISO 3166-1 alfa-2"

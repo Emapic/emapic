@@ -12,6 +12,7 @@ var emapic = emapic || {};
     emapic.modules = emapic.modules || {};
     emapic.modules.survey = emapic.modules.survey || {};
 
+    emapic.modules.survey.positionBeforeSurvey = true;
     emapic.modules.survey.surveyPostFormat = 'json';
     emapic.modules.survey.marker = null;
     emapic.modules.survey.data = {};
@@ -46,29 +47,32 @@ var emapic = emapic || {};
                 emapic.map.setZoom(17);
                 centerMarker();
             }
+        } else if (emapic.modules.survey.positionBeforeSurvey) {
+            requestUserLocation();
         } else {
-            // If a position must be defined, then we disable map interaction
-            // until we request the user to edit it or finish the process
-            emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
-                emapic.utils.disableMapInteraction();
-            });
-            if (emapic.geoapi.userDefaultPosition !== null) {
-                emapic.geoapi.setPosition(emapic.geoapi.userDefaultPosition);
-            } else {
-                emapic.geoapi.getLocation(emapic.userLoggedIn);
-            }
+            emapic.initializeMap();
+            emapic.geoapi.getIpLocation();
+            showSurvey();
         }
     };
 
     emapic.geoapi.afterGeopos = function() {
-        $('#questions-flex-container').show();
-        $('#questions-wrapper').show();
-        emapic.modules.survey.startSurvey();
+        if (emapic.modules.survey.positionBeforeSurvey) {
+            showSurvey();
+        } else {
+            beforeSubmit();
+        }
     };
 
     emapic.geoapi.processUserCountry = function(countryCode) {
         emapic.centerViewCountryBounds(countryCode);
     };
+
+    function showSurvey() {
+        $('#questions-flex-container').show();
+        $('#questions-wrapper').show();
+        emapic.modules.survey.startSurvey();
+    }
 
     emapic.modules.survey.startSurvey = function() {
     	addBlockButtons($('div.questions-section:visible > div.questions-block').length);
@@ -233,15 +237,42 @@ var emapic = emapic || {};
     }
 
     emapic.modules.survey.surveyFinished = function() {
-    	emapic.modules.survey.updateResponsesMarker();
-    	$('#main-question').hide();
-    	if (($('#opt-question').length === 0) ||
-    		($('#opt-question').children().length === 0)) {
-    		emapic.modules.survey.submitSurvey();
-    	} else {
-    		$('#opt-question').show();
-    	}
+        if (emapic.modules.survey.positionBeforeSurvey) {
+            beforeSubmit();
+        } else {
+            requestUserLocation();
+        }
     };
+
+    function requestUserLocation() {
+        // If a position must be defined, then we disable map interaction
+        // until we request the user to edit it or finish the process
+        if (emapic.map !== null) {
+            emapic.utils.disableMapInteraction();
+        } else {
+            emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
+                emapic.utils.disableMapInteraction();
+            });
+        }
+        if (emapic.geoapi.userDefaultPosition !== null) {
+            emapic.geoapi.setPosition(emapic.geoapi.userDefaultPosition);
+        } else if (emapic.position) {
+            emapic.geoapi.afterGeopos();
+        } else {
+            emapic.geoapi.getLocation(emapic.userLoggedIn);
+        }
+    }
+
+    function beforeSubmit() {
+        emapic.modules.survey.updateResponsesMarker();
+        $('#main-question').hide();
+        if (($('#opt-question').length === 0) ||
+          ($('#opt-question').children().length === 0)) {
+            emapic.modules.survey.submitSurvey();
+        } else {
+            $('#opt-question').show();
+        }
+    }
 
     emapic.modules.survey.submitSurvey = function() {
         $('#survey-resume').hide();
