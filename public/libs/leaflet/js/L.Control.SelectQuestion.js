@@ -88,7 +88,7 @@ L.Control.SelectQuestion = L.Control.extend({
 			this._questionsList.appendChild(option);
 			option = L.DomUtil.create('li');
 		    option.setAttribute('class', 'dropdown-header dropdown-footer');
-			option.innerHTML = '* filtro activo';
+			option.innerHTML = '<span class="asterisk">*</span> filtro activo';
 			this._questionsList.appendChild(option);
 		}
 
@@ -121,7 +121,7 @@ L.Control.SelectQuestion = L.Control.extend({
     option.setAttribute('id', obj.value);
     option.setAttribute('txt', obj.text);
     option.onclick = this._onQuestionLiChange;
-    option.innerHTML = '<a href="#">' + obj.text + (filterActive ? ' *' : '') + '</a>';
+    option.innerHTML = '<a href="#">' + obj.text + (filterActive ? ' <span class="asterisk">*</span>' : '') + '</a>';
     return option
   }
 

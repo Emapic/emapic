@@ -587,6 +587,10 @@ input.form-control[type="radio"] {
 .question-selector select {
     max-width: 150px;
 }
+.question-selector span.asterisk {
+    font-family: serif;
+    color: inherit;
+}
 .counters-control {
     padding: 5px 15px 5px 15px;
     background-color: #004F71;
