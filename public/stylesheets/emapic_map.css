@@ -1256,6 +1256,7 @@ div.col > #thanks-msg {
     background-size: contain;
     width: 75px;
     height: 75px;
+    flex-shrink: 0;
 }
 .listbtns button.survey-answer {
     background-color: #d6d6d6;
