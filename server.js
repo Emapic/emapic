@@ -302,8 +302,12 @@ var EmapicApp = function() {
             var baseLocals = res.locals;
             // Add the i18n function to all rendering contexts
             res.locals.__ = function() {
-                return function(text) {
-                    return req.i18n.__(text);
+                return function(arg) {
+                    var args = arg.split(',');
+                    for (var i = 1, iLen = args.length; i<iLen; i++) {
+                        args[i] = req.i18n.__(args[i]);
+                    }
+                    return req.i18n.__.apply(req.i18n, args);
                 };
             };
 
