@@ -38,6 +38,7 @@ function parseQuestionsfromPost(req, survey) {
                 }
                 break;
             case 'text-answer':
+            case 'long-text-answer':
             case 'image-upload':
             case 'image-url':
                 if (req.body['question_' + i].trim() === '') {
@@ -121,6 +122,7 @@ function parseAnswersFromPost(req, questions, oldAnswers) {
                 }
                 break;
             case 'text-answer':
+            case 'long-text-answer':
             case 'explanatory-text':
             case 'image-upload':
             case 'image-url':
@@ -216,20 +218,38 @@ function generateExclusiveBtnAnswerHtml(answer, layout, question) {
     return html;
 }
 
-function generateTextInputQuestionHtml(question, validator, req) {
+function generateTextInputQuestionHtml(question, validator, maxLength, req) {
     var opt = req.i18n.__('optional_note'),
+        max = req.i18n.__('max_length_note'),
         validator = validator || null,
         mandatory = question.mandatory;
 
     return '<h2>' + escape(question.question) + (mandatory ? '' : '<small><i> (' + opt + ') </i></small>') + '</h2>\n' +
         '<div class="col-xs-12 text-left"><div id="q' + question.question_order + '-other"' +
         ' class="col-xs-12 survey-answer text-answer"><div class="flex-container"><input autocomplete="off" id="q' +
-        question.question_order + '-input" type="text" target="#q' + question.question_order +
+        question.question_order + '-input" type="text" ' + (maxLength ? 'maxlength="' + maxLength + '" ' : '') + 'target="#q' + question.question_order +
         '-ok, #end-survey-btn, #block-nav-btns .edit-question-btn.btn-success ~ .edit-question-btn:not([disabled])" target-ok="#q' +
         question.question_order + '-ok" onkeydown="emapic.utils.inputEnterToClick(event)" ' + (validator !== null ?
         ' onkeyup="' + validator + '(this, ' + mandatory + ')" onchange="' + validator + '(this, ' + mandatory + ')"' : '') + '/><button id="q' + question.question_order +
         '-ok"'  + (mandatory ? ' disabled' : '') + ' autocomplete="off" class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + question.question_order +
-        '\', \'q' + question.question_order + '-input\')">OK</button></div></div></div>';
+        '\', \'q' + question.question_order + '-input\')">OK</button></div>' + (maxLength ? '<label class="footer">' + max.replace('{{length}}', maxLength) + '</label>' : '') + '</div></div>';
+}
+
+function generateTextAreaQuestionHtml(question, validator, maxLength, req) {
+    var opt = req.i18n.__('optional_note'),
+        max = req.i18n.__('max_length_note'),
+        validator = validator || null,
+        mandatory = question.mandatory;
+
+    return '<h2>' + escape(question.question) + (mandatory ? '' : '<small><i> (' + opt + ') </i></small>') + '</h2>\n' +
+        '<div class="col-xs-12 text-left"><div id="q' + question.question_order + '-other"' +
+        ' class="col-xs-12 survey-answer text-answer"><div class="flex-container"><textarea autocomplete="off" id="q' +
+        question.question_order + '-input" type="text" ' + (maxLength ? 'maxlength="' + maxLength + '" ' : '') + 'target="#q' + question.question_order +
+        '-ok, #end-survey-btn, #block-nav-btns .edit-question-btn.btn-success ~ .edit-question-btn:not([disabled])" target-ok="#q' +
+        question.question_order + '-ok" onkeydown="emapic.utils.inputEnterToClick(event)" ' + (validator !== null ?
+        ' onkeyup="' + validator + '(this, ' + mandatory + ')" onchange="' + validator + '(this, ' + mandatory + ')"' : '') + '></textarea><button id="q' + question.question_order +
+        '-ok"'  + (mandatory ? ' disabled' : '') + ' autocomplete="off" class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + question.question_order +
+        '\', \'q' + question.question_order + '-input\')">OK</button></div>' + (maxLength ? '<label class="footer">' + max.replace('{{length}}', maxLength) + '</label>' : '') + '</div></div>';
 }
 
 function generateImageInputQuestionHtml(question, validator, req) {
@@ -286,6 +306,11 @@ module.exports = function(sequelize, DataTypes) {
         tableName: 'questions',
         schema: 'metadata'
     });
+
+    Question.maxLengths = {
+        'text-answer': 150,
+        'long-text-answer': 500
+    };
 
     // Class methods
     Question.getDefaultOrder = function() {
@@ -347,6 +372,7 @@ module.exports = function(sequelize, DataTypes) {
                 return "q" + this.question_order + " text" + (this.mandatory ? " NOT NULL" : "") + ", q" + this.question_order + "_other text";
             case 'list-radio':
             case 'text-answer':
+            case 'long-text-answer':
             case 'image-url':
                 return "q" + this.question_order + " text" + (this.mandatory ? " NOT NULL" : "");
             case 'image-upload':
@@ -365,6 +391,7 @@ module.exports = function(sequelize, DataTypes) {
             case 'list-radio':
                 return 'a.q' + this.question_order + ' AS "q' + this.question_order + '.id"';
             case 'text-answer':
+            case 'long-text-answer':
             case 'image-url':
                 return 'a.q' + this.question_order + ' AS "q' + this.question_order + '.value"';
             case 'image-upload':
@@ -412,6 +439,7 @@ module.exports = function(sequelize, DataTypes) {
                     }
                     break;
                 case 'text-answer':
+                case 'long-text-answer':
                     answer = responses['q' + question.question_order + '.value'];
                     if (!question.mandatory || responses['q' + question.question_order + '.value']) {
                         if (responses['q' + question.question_order + '.value']) {
@@ -496,6 +524,10 @@ module.exports = function(sequelize, DataTypes) {
             case 'list-radio':
                 break;
             case 'text-answer':
+            case 'long-text-answer':
+                var response = responses['q' + this.question_order + '.value'];
+                return ['q' + this.question_order, '?', [response ? response.trim().substring(0, Question.maxLengths[this.type]) : null]];
+                break;
             case 'image-url':
                 respField = 'q' + this.question_order + '.value';
                 break;
@@ -537,6 +569,7 @@ module.exports = function(sequelize, DataTypes) {
             case 'list-radio-other':
             case 'list-radio':
             case 'text-answer':
+            case 'long-text-answer':
             case 'image-url':
             case 'explanatory-text':
                 // Nothing to do
@@ -601,13 +634,16 @@ module.exports = function(sequelize, DataTypes) {
                     }
                 );
             case 'text-answer':
-                html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputNotVoid', req);
+                html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputNotVoid', Question.maxLengths[parent.type], req);
+                break;
+            case 'long-text-answer':
+                html += generateTextAreaQuestionHtml(parent, 'emapic.utils.checkInputNotVoid', Question.maxLengths[parent.type], req);
                 break;
             case 'image-upload':
                 html += generateImageInputQuestionHtml(parent, 'emapic.utils.checkImageNotVoid', req);
                 break;
             case 'image-url':
-                html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputUrlIsImage', req);
+                html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputUrlIsImage', null, req);
                 break;
             case 'explanatory-text':
                 html += '<div class="col-xs-12 text-center"><div id="q' + parent.question_order + '-other"' +

@@ -51,11 +51,33 @@
                       </div>
                       <div id="question-type-text-answer-body" class="question-type-body collapse">
                           <label for="question-type-text-answer">
-                            <p class="question-type-description">{{#__}}question_type_text_answer_description{{/__}}</p>
+                            <p class="question-type-description">{{#__}}question_type_text_answer_description,{{max_lengths.text-answer}}{{/__}}</p>
                             <h4>{{#__}}question_type_legend_title{{/__}}</h4>
                             <p class="question-type-legend">{{#__}}question_type_text_answer_legend{{/__}}</p>
                             <h4>{{#__}}question_type_optional_question_title{{/__}}</h4>
                             <p class="question-type-legend">{{#__}}question_type_text_answer_optional_question{{/__}}</p>
+                          </label>
+                      </div>
+                  </div>
+                </div>
+                <div id="question-type-long-text-answer-group" role="tab" class="input-group">
+                  <span class="input-group-addon">
+                    <input autocomplete="off" id="question-type-long-text-answer" type="radio" name="question-type" value="long-text-answer">
+                  </span>
+                  <div class="form-control question-type-item">
+                      <div>
+                          <label for="question-type-long-text-answer">
+                            <h3>{{#__}}question_type_long_text_answer_title{{/__}}</h3>
+                          </label>
+                          <a data-toggle="collapse" data-target="#question-type-long-text-answer-body" data-parent="#question-type-list" aria-expanded="false" aria-controls="question-type-long-text-answer-body"><span class="glyphicon glyphicon-chevron-down pull-right"></span></a>
+                      </div>
+                      <div id="question-type-long-text-answer-body" class="question-type-body collapse">
+                          <label for="question-type-long-text-answer">
+                            <p class="question-type-description">{{#__}}question_type_long_text_answer_description,{{max_lengths.long-text-answer}}{{/__}}</p>
+                            <h4>{{#__}}question_type_legend_title{{/__}}</h4>
+                            <p class="question-type-legend">{{#__}}question_type_long_text_answer_legend{{/__}}</p>
+                            <h4>{{#__}}question_type_optional_question_title{{/__}}</h4>
+                            <p class="question-type-legend">{{#__}}question_type_long_text_answer_optional_question{{/__}}</p>
                           </label>
                       </div>
                   </div>

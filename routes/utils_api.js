@@ -117,6 +117,7 @@ module.exports = function(app) {
                         msg += "<li><label>" + questions[j].question + ':<br></label><span>' + value + '</span></li>';
                         break;
                     case 'text-answer':
+                    case 'long-text-answer':
                         if (results[i]['q' + questions[j].question_order + '.value'] && results[i]['q' + questions[j].question_order + '.value'].trim()){
                             msg += "<li><label>" + questions[j].question + ':<br></label><span>' + results[i]['q' + questions[j].question_order + '.value'].trim() + '</span></li>';
                         }
@@ -209,6 +210,7 @@ module.exports = function(app) {
                     headers.push(questions[i].question, questions[i].question + ' - ' + otherName);
                     break;
                 case 'text-answer':
+                case 'long-text-answer':
                 case 'image-upload':
                 case 'image-url':
                     headers.push(questions[i].question);
@@ -256,6 +258,7 @@ module.exports = function(app) {
                                 data.push(ans, (ansId === -1) ? result['q' + questions[l].question_order + '.value'] : null);
                                 break;
                             case 'text-answer':
+                            case 'long-text-answer':
                             case 'image-upload':
                             case 'image-url':
                                 data.push(result['q' + questions[l].question_order + '.value']);
@@ -323,6 +326,7 @@ module.exports = function(app) {
                     });
                     break;
                 case 'text-answer':
+                case 'long-text-answer':
                 case 'explanatory-text':
                 case 'image-upload':
                 case 'image-url':
@@ -379,6 +383,7 @@ module.exports = function(app) {
                         answers: answers
                     };
                 case 'text-answer':
+                case 'long-text-answer':
                 case 'image-url':
                 case 'image-upload':
                     return {

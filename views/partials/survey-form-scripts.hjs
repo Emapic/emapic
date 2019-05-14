@@ -185,6 +185,7 @@
                 }
                 break;
             case 'text-answer':
+            case 'long-text-answer':
                 if (!$('#qstn_' + qstn).length) {
                     addNewQuestion(questionMap.type);
                 }
@@ -250,6 +251,7 @@
                 }
                 break;
             case 'text-answer':
+            case 'long-text-answer':
             case 'explanatory-text':
             case 'image-upload':
             case 'image-url':
@@ -485,11 +487,12 @@
                 });
                 break;
             case 'text-answer':
+            case 'long-text-answer':
                 $('#questions').append('\
                     <div class="panel panel-default question-group" id="qstn_' + qstn + '">\
                         <input type="hidden" name="question_type_' + qstn + '" value="' + type + '"/>\
                         <div class="panel-heading" data-toggle="collapse">\
-                            <div class="question-handle glyphicon glyphicon-move"></div><a>{{#__}}question{{/__}} ' + qstn + ' - {{#__}}question_type_text_answer_title{{/__}}<span class="glyphicon glyphicon-chevron-up pull-right"></span></a>\
+                            <div class="question-handle glyphicon glyphicon-move"></div><a>{{#__}}question{{/__}} ' + qstn + ' - ' + ( type === 'text-answer' ? '{{#__}}question_type_text_answer_title{{/__}}' : '{{#__}}question_type_long_text_answer_title{{/__}}') + '<span class="glyphicon glyphicon-chevron-up pull-right"></span></a>\
                         </div>\
                         <div class="panel-body collapse">\
                             <div class="form-group form-group-sm">\

@@ -143,6 +143,7 @@ module.exports = function(app) {
         req.user.isAdmin().then(function(isAdmin) {
             res.render('new-survey', {
                 layout: 'layouts/survey-form',
+                max_lengths: models.Question.maxLengths,
                 is_admin: isAdmin
             });
         });
