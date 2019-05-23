@@ -114,7 +114,7 @@ module.exports = function(app) {
                     return null;
                 }
             }
-            return (encrId) ? bases.fromBase62(encrId, surveyIdEncr.base) / surveyIdEncr.factor : null;
+            return (encrId) ? bases.fromBase(encrId, surveyIdEncr.base) / surveyIdEncr.factor : null;
         },
 
         sendMail: function(mail) {
