@@ -1168,6 +1168,9 @@ div.col > #thanks-msg {
     flex-direction: row;
     padding: 0;
 }
+button.survey-answer > div.flex-container {
+    justify-content: start;
+}
 .other-answer {
     background-color: #d5d1ce;
     cursor: default;
