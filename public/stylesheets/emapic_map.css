@@ -1640,19 +1640,14 @@ button.survey-answer > div.flex-container {
 .dc-chart .axis path, .dc-chart .axis line {
     stroke: white;
 }
-.dc-chart text.pie-slice {
-	stroke-width: 0.7;
-	stroke: #000000;
-	fill: #FFFFFF;
-	font-size: 14px;
-	font-weight: bold;
-}
+.dc-chart text.pie-slice,
 .dc-chart g.row text {
 	stroke-width: 0.7;
 	stroke: #000000;
 	fill: #FFFFFF;
 	font-size: 14px;
 	font-weight: bold;
+	font-family: "Arial Black", Gadget, sans-serif;
 }
 .dc-chart g.row rect {
 	fill-opacity: 1;
