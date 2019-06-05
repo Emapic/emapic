@@ -382,10 +382,15 @@ var emapic = emapic || {};
         setTimeout(emapic.startMapLogic, 5000);
     };
 
+    emapic.modules.survey.saveVoteComplete = function() {
+        emapic.utils.enableMapInteraction();
+    };
+
     emapic.modules.survey.postMood = function(enctype) {
         emapic.modules.survey.prepareSurveyData();
 
         enctype = enctype || 'json';
+        emapic.utils.disableMapInteraction(true);
         switch (enctype) {
             case 'multipart':
                 $.ajax({
@@ -395,7 +400,8 @@ var emapic = emapic || {};
                     processData : false,
                     url : emapic.modules.survey.getPostVoteUrl(),
                     success : emapic.modules.survey.saveVoteSuccess,
-                    error : emapic.modules.survey.saveVoteError
+                    error : emapic.modules.survey.saveVoteError,
+                    complete : emapic.modules.survey.saveVoteComplete
                 });
                 break;
             case 'json':
@@ -405,7 +411,8 @@ var emapic = emapic || {};
                     contentType : 'application/json',
                     url : emapic.modules.survey.getPostVoteUrl(),
                     success : emapic.modules.survey.saveVoteSuccess,
-                    error : emapic.modules.survey.saveVoteError
+                    error : emapic.modules.survey.saveVoteError,
+                    complete : emapic.modules.survey.saveVoteComplete
                 });
                 break;
         }
