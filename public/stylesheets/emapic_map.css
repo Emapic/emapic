@@ -504,6 +504,9 @@ div.alert-danger a {
 .leaflet-control-container .leaflet-top.leaflet-right .leaflet-control {
 	clear: left;
 }
+.leaflet-control-container .leaflet-top.leaflet-right {
+    min-width: 75px;
+}
 div.input-with-clear-btn {
     display: flex;
     align-items: center;
