@@ -365,7 +365,7 @@ var emapic = emapic || {};
                     title: "Accuracy zone",
                     opacity: 0,
                     fillOpacity: 0,
-                    clickable: false
+                    interactive: false
                 });
             areaAprox.addTo(emapic.map);
             emapic.map.fitBounds(areaAprox.getBounds());
@@ -647,7 +647,7 @@ var emapic = emapic || {};
         var clickable = emapic.getPopupHtml(feature.properties) !== null;
         return L.marker(latlng, {
             icon: emapic.getIcon(feature.properties, clickable),
-            clickable: clickable
+            interactive: clickable
         });
     };
 

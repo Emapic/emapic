@@ -432,7 +432,7 @@ var emapic = emapic || {};
             icon: sticon,
             riseOnHover: true,
             zIndexOffset: -10000,
-            clickable: clickable
+            interactive: clickable
         });
         emapic.modules.survey.marker.feature = {
             properties: $.extend({
