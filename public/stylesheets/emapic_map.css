@@ -166,6 +166,9 @@ h2 small {
 body > div.container-fluid {
     height: calc(100% - 85px);
 }
+body > div.container-fluid.no-header {
+    height: 100%;
+}
 body > div.container-fluid > div.row-fluid, body > div.container-fluid > div.row-fluid > div.col {
     height: 100%;
 }
@@ -422,6 +425,9 @@ div.alert-danger a {
 #header {
     height: 85px;
     overflow: hidden;
+}
+#header.no-header {
+    display: none;
 }
 #header .navbar-header,
 #header .navbar-right > * {

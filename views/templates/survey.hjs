@@ -31,7 +31,7 @@
     </div>
 
     <!-- MAIN -------------------------------------------------------->
-    <div class="container" id="header">
+    <div class="container{{#noHeader}} no-header{{/noHeader}}" id="header">
       <div class="navbar-right pull-right">
         {{#results}}
         <button type="button" class="btn btn-responsive btn-primary navbar-btn pull-right" onclick="answerSurvey()"><span class="glyphicon glyphicon-comment"></span> <span class="hide-small">{{#__}}answer_survey{{/__}}</span></button>
@@ -79,7 +79,7 @@
       </div>
     </div>
 
-    <div class="container-fluid">
+    <div class="container-fluid{{#noHeader}} no-header{{/noHeader}}">
       <div class="row-fluid">
         <div class="col">
 
