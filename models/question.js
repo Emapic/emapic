@@ -262,8 +262,10 @@ function generateImageInputQuestionHtml(question, validator, req) {
         '<div class="col-xs-12"><div id="q' + question.question_order + '-other"' +
         ' class="col-xs-12 survey-answer upload-file-answer">' +
         '<div><img class="img-responsive img-thumbnail" id="inputfileimg_' + question.question_order +
-        '-noimage" src=\'data:image/svg+xml;utf8,' + encodeURIComponent(Utils.getLocalizedSelectAnImageSVG(req)) + '\' style="max-width:50%">' +
-        '<img class="img-responsive img-thumbnail" id="inputfileimg_' + question.question_order + '" src=\'\' style="max-width:50%;display:none;"></div>' +
+        '-noimage" src=\'data:image/svg+xml;utf8,' + encodeURIComponent(Utils.getLocalizedSelectAnImageSVG(req)) + '\'' +
+        ' onclick="$(\'input[name=\\\'img_upload_'  + question.question_order + '\\\']\').click()">' +
+        '<img class="img-responsive img-thumbnail" id="inputfileimg_' + question.question_order + '" src=\'\' style="display:none;"' +
+        ' onclick="$(\'input[name=\\\'img_upload_'  + question.question_order + '\\\']\').click()"></div>' +
         '<div class="flex-container"><div><div class="input-with-clear-btn"><input autocomplete="off"' +
         (mandatory ? ' required' : '') + ' type="file" accept="image/*" name="img_upload_'  + question.question_order +
         '"' + ' id="q' + question.question_order + '-input" target="#q' + question.question_order +

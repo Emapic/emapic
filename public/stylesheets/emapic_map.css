@@ -533,6 +533,10 @@ div.upload-file-answer > div.flex-container {
     max-width: 600px;
     margin: auto;
 }
+div.upload-file-answer img.img-thumbnail {
+    max-width: 50%;
+    cursor: pointer;
+}
 div.upload-file-answer input[type="file"] {
     font-size: 15px;
     color: #A2C73A;
