@@ -63,7 +63,6 @@ function getAllFieldsSQL(qstns, type) {
 function getFiltersSQL(getFilters, questions) {
     var sqls = [],
         params = {};
-    console.log(getFilters);
     if (getFilters) {
         for (var param in getFilters) {
             switch (param) {
@@ -80,7 +79,6 @@ function getFiltersSQL(getFilters, questions) {
                     params[param] = getFilters[param];
                     break;
                 default:
-                    console.log(param);
                     if (param.startsWith('filter_q')) {
                         var q = parseInt(param.substring(8));
                         if (isNaN(q)) {
