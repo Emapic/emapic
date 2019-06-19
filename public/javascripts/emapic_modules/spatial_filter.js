@@ -19,6 +19,7 @@ var emapic = emapic || {};
         oldLayers,
         drawer,
         defaultPreferences,
+        baseSimplifyTolerance = 0.00001,
         filterStyle = {
             color: 'green',
             weight: 3,
@@ -69,7 +70,8 @@ var emapic = emapic || {};
         emapic.utils.handleCtrlBtnEvents('.spatial-filter-control a', spatialFilterControl);
         drawer = new L.FreeHandShapes({
             polygon: filterStyle,
-            polyline: filterStyle
+            polyline: filterStyle,
+            simplify_tolerance: baseSimplifyTolerance
         });
 
         // Workaround to prevent a freehandshapes bug that results in annoying
@@ -146,6 +148,7 @@ var emapic = emapic || {};
 
     function disableDrawing() {
         drawer.setMode();
+        emapic.map.off('zoomend', updateSimplifyTolerance);
         try {
             $('#spatial-filter-draw').tooltip('enable');
         } catch (err) {
@@ -166,6 +169,10 @@ var emapic = emapic || {};
         $('.spatial-filter-control .leaflet-button-actions').hide();
     }
 
+    function updateSimplifyTolerance() {
+        drawer.options.simplify_tolerance = baseSimplifyTolerance * Math.pow(2, 18 - emapic.map.getZoom());
+    }
+
     function enableDrawing() {
         $('.spatial-filter-control .leaflet-button-actions').show();
         defaultPreferences = {
@@ -179,6 +186,8 @@ var emapic = emapic || {};
             emapic.applyFilters();
             $('#spatial-filter-remove').addClass('force-disable');
         }
+        updateSimplifyTolerance();
+        emapic.map.on('zoomend', updateSimplifyTolerance);
         drawer.setMode('add');
         emapic.activateButton($('#spatial-filter-draw'));
         try {
