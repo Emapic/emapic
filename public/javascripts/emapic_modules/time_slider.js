@@ -103,8 +103,7 @@ var emapic = emapic || {};
             var startDate = sliderDates[sliderLevel][0][ui.values[0]],
                 endDate = sliderDates[sliderLevel][1][ui.values[1]];
             filterDates = [startDate, endDate];
-            emapic.updateIndivVotesLayer();
-            emapic.updateIndivVotesLayerControls();
+            emapic.filtersUpdated();
         }
     }
 
@@ -266,7 +265,7 @@ var emapic = emapic || {};
 
     function changeSliderLevel(level) {
         initSlider(level);
-        emapic.applyFilters();
+        emapic.filtersUpdated();
     }
 
     function disableTooltipEvents(element) {

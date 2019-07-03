@@ -494,6 +494,10 @@ var emapic = emapic || {};
         emapic.filters = [];
     };
 
+    emapic.filtersUpdated = function() {
+        emapic.applyFilters();
+    };
+
     emapic.applyFilters = function() {
         emapic.updateIndivVotesLayer();
         emapic.updateIndivVotesLayerControls();

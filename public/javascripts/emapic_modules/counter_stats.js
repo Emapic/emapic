@@ -270,7 +270,7 @@ var emapic = emapic || {};
                     counterFilterValues[counterFilterProperty].push(value);
                     $btn.addClass('active');
                 }
-                emapic.applyFilters();
+                emapic.filtersUpdated();
             }
         }
     }

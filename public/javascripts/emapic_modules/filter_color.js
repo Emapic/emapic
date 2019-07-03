@@ -60,7 +60,7 @@ var emapic = emapic || {};
 
     function filterPropertyBtn(property, element) {
         filterProperty = property;
-        emapic.applyFilters();
+        emapic.filtersUpdated();
     }
 
     emapic.addIndivVotesLayer = emapic.utils.overrideFunction(emapic.addIndivVotesLayer, null, function() {

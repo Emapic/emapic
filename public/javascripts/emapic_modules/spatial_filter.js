@@ -135,14 +135,14 @@ var emapic = emapic || {};
             if (filterTurfGeom) {
                 $('#spatial-filter-remove').removeClass('force-disable');
             }
-            emapic.applyFilters();
+            emapic.filtersUpdated();
         }
     };
 
     emapic.modules.filterSpatial.clearFilter = function() {
         if (emapic.modules.filterSpatial.filter.isFilterActive()) {
             emapic.modules.filterSpatial.filter.clearFilter();
-            emapic.applyFilters();
+            emapic.filtersUpdated();
         }
     };
 
@@ -183,7 +183,7 @@ var emapic = emapic || {};
 
         if (emapic.modules.filterSpatial.filter.isFilterActive()) {
             filterTurfGeom = null;
-            emapic.applyFilters();
+            emapic.filtersUpdated();
             $('#spatial-filter-remove').addClass('force-disable');
         }
         updateSimplifyTolerance();
