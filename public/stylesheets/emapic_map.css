@@ -625,6 +625,34 @@ input.form-control[type="radio"] {
     max-width: 200px;
     min-width: 75px;
 }
+#app-total-counter-filter {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: white;
+    border: 1px solid gray;
+    border-bottom-right-radius: 25px;
+    cursor: help;
+}
+#app-total-counter-filter .glyphicon {
+    font-size: 15px;
+    padding: 3px 6px 6px 3px;
+    color: indigo;
+}
+#app-total-counter-filter.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+#active-filters-tooltip {
+    text-align: left;
+}
+#active-filters-tooltip ul {
+    padding-left: 10px;
+    margin-bottom: 0px;
+}
+#active-filters-tooltip ul li {
+    list-style: disc;
+}
 #app-total-counter-list-container {
     max-height: 250px;
     overflow: hidden;

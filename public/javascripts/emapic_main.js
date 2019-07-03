@@ -705,6 +705,11 @@ var emapic = emapic || {};
             return false;
         };
 
+        this.getBriefDescription = (typeof options.getBriefDescription === 'function') ? options.getBriefDescription : function() {
+            // Return a brief string describing the filter's function
+            return null;
+        };
+
         this.getExportParameters = (typeof options.getExportParameters === 'function') ? options.getExportParameters : function() {
             // Return an array of GET parameters as strings
             return [];

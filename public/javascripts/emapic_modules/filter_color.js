@@ -19,6 +19,9 @@ var emapic = emapic || {};
         clearFilter: function() {
             filterProperty = null;
         },
+        getBriefDescription: function() {
+            return emapic.utils.getI18n('js_color_filter_brief_description', 'Filtro simplificado por respuestas');
+        },
         isFilterActive: function() {
             return !!(filterProperty);
         }

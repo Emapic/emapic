@@ -59,6 +59,11 @@
     emapic.utils.registerI18n('js_geocoder_write_select', '{{#__}}js_geocoder_write_select{{/__}}');
     emapic.utils.registerI18n('js_geocoder_country', '{{#__}}js_geocoder_country{{/__}}');
     emapic.utils.registerI18n('js_geocoder_province', '{{#__}}js_geocoder_province{{/__}}');
+    emapic.utils.registerI18n('js_filters_list_tooltip_header', '{{#__}}js_filters_list_tooltip_header{{/__}}');
+    emapic.utils.registerI18n('js_counter_filter_brief_description', '{{#__}}js_counter_filter_brief_description{{/__}}');
+    emapic.utils.registerI18n('js_spatial_filter_brief_description', '{{#__}}js_spatial_filter_brief_description{{/__}}');
+    emapic.utils.registerI18n('js_time_filter_brief_description', '{{#__}}js_time_filter_brief_description{{/__}}');
+    emapic.utils.registerI18n('js_color_filter_brief_description', '{{#__}}js_color_filter_brief_description{{/__}}');
     emapic.utils.registerI18n('js_accept', '{{#__}}accept{{/__}}');
     emapic.utils.registerI18n('js_finish', '{{#__}}finish{{/__}}');
     emapic.utils.registerI18n('js_cancel', '{{#__}}cancel{{/__}}');

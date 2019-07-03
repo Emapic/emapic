@@ -48,6 +48,9 @@ var emapic = emapic || {};
         isFilterActive: function() {
             return filterTurfGeom !== null;
         },
+        getBriefDescription: function() {
+            return emapic.utils.getI18n('js_spatial_filter_brief_description', 'Filtro por localización');
+        },
         getExportParameters: function() {
             var params = [];
             if (filterTurfGeom !== null) {

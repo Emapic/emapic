@@ -34,6 +34,9 @@ var emapic = emapic || {};
         isFilterActive: function() {
             return (filterDates && sliderLevel !== null && (filterDates[0] !== sliderDates[sliderLevel][0][0] || filterDates[1] !== sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]));
         },
+        getBriefDescription: function() {
+            return emapic.utils.getI18n('js_time_filter_brief_description', 'Filtro por fechas');
+        },
         getExportParameters: function() {
             var params = [];
             if (filterDates && sliderLevel !== null) {

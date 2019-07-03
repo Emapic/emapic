@@ -53,6 +53,9 @@ var emapic = emapic || {};
             var prop = qstnId + '.id';
             return (prop in counterFilterValues && counterFilterValues[prop].length > 0);
         },
+        getBriefDescription: function() {
+            return emapic.utils.getI18n('js_counter_filter_brief_description', 'Filtro por respuestas');
+        },
         getExportParameters: function() {
             var params = [];
             for (var prop in counterFilterValues) {
@@ -65,6 +68,40 @@ var emapic = emapic || {};
     });
 
     emapic.addFilter(emapic.modules.counterStats.filter);
+
+    emapic.filtersUpdated = emapic.utils.overrideFunction(emapic.filtersUpdated, null, function() {
+        updateFiltersSign();
+    });
+
+    function updateFiltersSign() {
+        if (emapic.getActiveFilters().length > 0) {
+            var tooltip = getFiltersTooltip();
+            if (tooltip) {
+                $('#app-total-counter-filter').tooltip({
+                    container: 'body',
+                    html: 'true',
+                    placement: 'left',
+                    title: tooltip
+                });
+            }
+            $('#app-total-counter-filter').show();
+        } else {
+            $('#app-total-counter-filter').hide();
+        }
+    }
+
+    function getFiltersTooltip() {
+        var filters = emapic.getActiveFilters(),
+            list = '';
+        for (var i = 0, iLen = filters.length; i<iLen; i++) {
+            var descr = filters[i].getBriefDescription();
+            if (descr) {
+                list += '<li>' + descr + '</li>';
+            }
+        }
+        return list ? '<div id="active-filters-tooltip">' + emapic.utils.getI18n('js_filters_list_tooltip_header', 'Filtros actualmente activos') + ':<ul>' +
+            list + '</ul></div>' : null;
+    }
 
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
         var countersControl = L.control({position: 'topright'});
@@ -132,10 +169,12 @@ var emapic = emapic || {};
 
     emapic.disableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.disableIndivLayerExclusiveComponents, null, function() {
         $('#app-total-counter-list li button').prop('disabled', true);
+        $('#app-total-counter-filter').addClass('disabled');
     });
 
     emapic.enableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.enableIndivLayerExclusiveComponents, null, function() {
         $('#app-total-counter-list li button').prop('disabled', false);
+        $('#app-total-counter-filter').removeClass('disabled');
     });
 
     function updateCounterTotal() {
@@ -175,9 +214,11 @@ var emapic = emapic || {};
             specificVotesHtml += '<li><button type="button" class="btn btn-default filter-btn' + (btnActive ? ' active' : '') + '" aria-pressed="false" autocomplete="off" vote="' +
                 emapic.utils.escapeHtml(orderedVotes[i].position) + '"><div class="circle-container"><div class="filter-btn-circle" style="background-color: ' + emapic.legend.color.responses[orderedVotes[i].id].legend + ';"></div></div><span>' + emapic.utils.escapeHtml(emapic.legend.color.responses[orderedVotes[i].id].value) + ': ' + orderedVotes[i].nr + '</span></button></li>';
         }
-        $('#app-total-counter').html("<div id='app-total-counter-header'><h4 class='text-center'><span class='usericon glyphicon glyphicon-user'></span><span id='app-total-counter-header-nr'></span> <span class='glyphicon glyphicon-stats'></span></h4></div>\n" +
+        $('#app-total-counter').html("<div id='app-total-counter-header'><h4 class='text-center'><span class='usericon glyphicon glyphicon-user'></span><span id='app-total-counter-header-nr'></span> <span class='glyphicon glyphicon-stats'></span></h4></div>" +
+            "<div id='app-total-counter-filter' style='display: none;'><span class='glyphicon glyphicon-filter'></span></div>\n" +
             "<div id='app-total-counter-body' class='always-show-not-extrasmall collapse" + (wasUncollapsed ? ' in' : '') + "'><div id='app-total-counter-list-container'><ul id='app-total-counter-list'>" + specificVotesHtml + "</ul></div></div>");
         updateCounterTotal();
+        updateFiltersSign();
         $('.counters-control').show();
         $('#app-total-counter-header').addClass('clickable');
         if (!(emapic.legend && emapic.legend.color && chartFeatures.length > 0)) {
@@ -477,7 +518,7 @@ var emapic = emapic || {};
             return;
         }
         updateChart(nr);
-    }
+    };
 
     emapic.modules.counterStats.nextQuestionChart = function () {
         var nr = getCurrentQuestionPosition() + 1;
@@ -485,6 +526,6 @@ var emapic = emapic || {};
             return;
         }
         updateChart(nr);
-    }
+    };
 
 })(emapic);
