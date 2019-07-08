@@ -1,5 +1,6 @@
 var Promise = require('bluebird'),
     nconf = require('nconf'),
+    linkifyHtml = require('linkifyjs/html'),
     fsp = require('fs-extra'),
     path = require('path'),
     fs = require('fs'),
@@ -173,6 +174,13 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.VIRTUAL,
             get: function() {
                 return (this.description !== null && this.description.length > 0) ? this.description : this.title;
+            }
+        },
+        description_linkified: {
+            // If the survey has a description, we return it with URLs linkified
+            type: DataTypes.VIRTUAL,
+            get: function() {
+                return (this.description !== null && this.description.length > 0) ? Utils.transformNewlinesToHtml(linkifyHtml(this.description)) : null;
             }
         },
         tags_array: {

@@ -27,7 +27,7 @@
                             {{/already_opened}}
                             {{/active}}
                             {{#description}}
-                            <p><small>{{ description }}</small></p>
+                            <p><small>{{{description_linkified}}}</small></p>
                             {{/description}}
                         </h4>
                         {{#tags}}

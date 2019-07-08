@@ -36,7 +36,7 @@
 								{{/survey.already_opened}}
 								{{/survey.active}}
 								{{#survey.description}}
-								<p><small>{{survey.description}}</small></p>
+								<p><small>{{{survey.description_linkified}}}</small></p>
 								{{/survey.description}}
 							</h4>
 							{{#survey.tags}}

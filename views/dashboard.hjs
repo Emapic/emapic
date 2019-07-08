@@ -37,7 +37,7 @@
                 <a id="survey-title" href="/survey/{{survey.encr_id}}/results">{{survey.title}}</a>
                 <div class="col-xs-12">
                 {{#survey.description}}
-                    <span><small>{{survey.description}}</small></span>
+                    <span><small>{{{survey.description_linkified}}}</small></span>
                 </div>
                 {{/survey.description}}
 			</li>
