@@ -246,7 +246,7 @@ function generateTextAreaQuestionHtml(question, validator, maxLength, req) {
         ' class="col-xs-12 survey-answer text-answer"><div class="flex-container"><textarea autocomplete="off" id="q' +
         question.question_order + '-input" type="text" ' + (maxLength ? 'maxlength="' + maxLength + '" ' : '') + 'target="#q' + question.question_order +
         '-ok, #end-survey-btn, #block-nav-btns .edit-question-btn.btn-success ~ .edit-question-btn:not([disabled])" target-ok="#q' +
-        question.question_order + '-ok" onkeydown="emapic.utils.inputEnterToClick(event)" ' + (validator !== null ?
+        question.question_order + '-ok" ' + (validator !== null ?
         ' onkeyup="' + validator + '(this, ' + mandatory + ')" onchange="' + validator + '(this, ' + mandatory + ')"' : '') + '></textarea><button id="q' + question.question_order +
         '-ok"'  + (mandatory ? ' disabled' : '') + ' autocomplete="off" class="btn btn-primary pull-right" onclick="emapic.modules.survey.addAnswer(\'q' + question.question_order +
         '\', \'q' + question.question_order + '-input\')">OK</button></div>' + (maxLength ? '<label class="footer">' + max.replace('{{length}}', maxLength) + '</label>' : '') + '</div></div>';
