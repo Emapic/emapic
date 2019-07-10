@@ -118,7 +118,7 @@ var emapic = emapic || {};
     });
 
     emapic.updateIndivVotesLayerControls = emapic.utils.overrideFunction(emapic.updateIndivVotesLayerControls, null, function() {
-        var statusNr = {},
+        var statusNr = [],
             features = emapic.indivVotesLayerData.features,
             filteredFeatures = [],
             counterFilterProperty;
@@ -147,15 +147,18 @@ var emapic = emapic || {};
                 filteredFeatures.push(feature);
             }
         chartFeatures = getChartFeatures();
-        var counterFilterProperty;
+        var counterFiltered = {};
         if (emapic.legend && emapic.legend.color) {
             for (var i in emapic.legend.color.responses_array) {
-                statusNr[emapic.legend.color.responses_array[i].id] = {nr: 0, position: i};
+                counterFiltered[emapic.legend.color.responses_array[i].id] = 0;
             }
             for (i = 0, len = filteredFeatures.length; i < len; i++) {
-                if (filteredFeatures[i].properties[counterFilterProperty] in statusNr) {
-                    statusNr[filteredFeatures[i].properties[counterFilterProperty]].nr++;
+                if (filteredFeatures[i].properties[counterFilterProperty] in counterFiltered) {
+                    counterFiltered[filteredFeatures[i].properties[counterFilterProperty]]++;
                 }
+            }
+            for (var i in emapic.legend.color.responses_array) {
+                statusNr.push({id: emapic.legend.color.responses_array[i].id, nr: counterFiltered[emapic.legend.color.responses_array[i].id], position: i});
             }
         }
         populateCounter(statusNr);
@@ -192,8 +195,8 @@ var emapic = emapic || {};
         if (emapic.legend && emapic.legend.color) {
             counterFilterProperty = emapic.legend.color.question + '.id';
         }
-        for (var i in statusNr) {
-            var element = {nr: parseInt(statusNr[i].nr), id: i, position: statusNr[i].position};
+        for (var i = 0, len = statusNr.length; i<len; i++) {
+            var element = {nr: parseInt(statusNr[i].nr), id: statusNr[i].id, position: statusNr[i].position};
             if (emapic.modules.counterStats.orderVotes) {
                 // We order the votes in descending order
                 position = orderedVotes.length;
