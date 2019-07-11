@@ -380,6 +380,10 @@ var emapic = emapic || {};
         emapic.map.setView(marker.getLatLng());
     };
 
+    emapic.getCurrentMarkerToShow = function() {
+        return null;
+    };
+
     emapic.addViewsControls = function() {
     };
 

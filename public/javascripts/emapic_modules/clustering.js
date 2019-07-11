@@ -26,10 +26,10 @@ var emapic = emapic || {};
             var parent = emapic.indivVotesLayer.getVisibleParent(marker);
             if (parent.spiderfy) {
                 parent.spiderfy();
-                currentSpiderfied = parent;
             } else if (currentSpiderfied && currentSpiderfied.getAllChildMarkers().indexOf(marker) === -1) {
-                currentSpiderfied.unspiderfy();
-                currentSpiderfied = null;
+                if (currentSpiderfied._map) {
+                    currentSpiderfied.unspiderfy();
+                }
             }
         }
         return marker;
@@ -48,6 +48,12 @@ var emapic = emapic || {};
             }
         });
         emapic.indivVotesLayer.addLayer(markers);
+        emapic.indivVotesLayer.on('spiderfied', function(ev) {
+            currentSpiderfied = ev.cluster;
+        });
+        emapic.indivVotesLayer.on('unspiderfied', function(ev) {
+            currentSpiderfied = null;
+        });
         emapic.indivVotesLayer.on('add', function(ev) {
             // We remove and later readd the markers in order to avoid the
             // unclustering animation on loading
@@ -86,10 +92,21 @@ var emapic = emapic || {};
         return clusteringActive;
     };
 
+    function showCurrentMarkersOnce() {
+        emapic.indivVotesLayer.off('animationend', showCurrentMarkersOnce);
+        // After clustering / unclustering, check if there is a marker to
+        // show
+        var currentMarkerToShow = emapic.getCurrentMarkerToShow();
+        if (currentMarkerToShow) {
+            emapic.showMarker(currentMarkerToShow);
+        }
+    }
+
     emapic.modules.clustering.toggle = function() {
         clusteringActive = !clusteringActive;
         emapic.toggleButton(emapic.modules.clustering.getButton());
         if (emapic.indivVotesLayer.enableClustering) {
+            emapic.indivVotesLayer.on('animationend', showCurrentMarkersOnce);
             clusteringActive ? emapic.indivVotesLayer.enableClustering() : emapic.indivVotesLayer.disableClustering();
         } else {
             // There are some instances where it's preferrable to handle layer

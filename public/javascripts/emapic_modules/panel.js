@@ -50,6 +50,10 @@ var emapic = emapic || {};
         }
     });
 
+    emapic.getCurrentMarkerToShow = function() {
+        return currentMarker;
+    };
+
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
         sidebarPanel = L.control.sidebar('sidebarPanel', {
             position: 'topright',
