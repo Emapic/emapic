@@ -624,6 +624,7 @@ input.form-control[type="radio"] {
 #app-total-counter {
     max-width: 200px;
     min-width: 75px;
+    padding-bottom: 5px;
 }
 #app-total-counter-filter {
     position: absolute;
@@ -653,15 +654,6 @@ input.form-control[type="radio"] {
 #active-filters-tooltip ul li {
     list-style: disc;
 }
-#app-total-counter-list-container {
-    max-height: 250px;
-    overflow: hidden;
-}
-#app-total-counter-list {
-    padding: 0px;
-    list-style: none inside;
-    overflow-x: hidden;
-}
 #app-total-counter span.usericon {
     padding-right: 5px;
 }
@@ -677,6 +669,17 @@ input.form-control[type="radio"] {
 }
 #app-total-counter span img {
     margin-left: 2px;
+}
+#app-total-counter-list-container {
+    max-height: 250px;
+    overflow: hidden;
+}
+#app-total-counter-list {
+    padding: 0px;
+    list-style: none inside;
+    overflow-x: hidden;
+    height: 100%;
+    margin-bottom: 0;
 }
 #app-total-counter-list li button {
     background: none;
@@ -694,6 +697,7 @@ input.form-control[type="radio"] {
 #app-total-counter-list li:last-child button {
     border-bottom-right-radius: 4px;
     border-bottom-left-radius: 4px;
+    margin-bottom: 2px;
 }
 #app-total-counter-list li:not(:last-child) button {
     border-bottom: none;
@@ -704,6 +708,9 @@ input.form-control[type="radio"] {
 }
 #app-total-counter-list li button.active {
     background-color: #00293B;
+}
+#app-total-counter-list li button .span-container {
+    max-width: 100%;
 }
 #app-total-counter-list li button span {
     color: #d0d0d0;
@@ -721,6 +728,9 @@ input.form-control[type="radio"] {
     height: 8px;
     width: 8px;
     margin-top: -3px;
+}
+#app-total-counter-list-container:not(.after-scrollable) #app-total-counter-list li button.filter-btn .span-container {
+    margin-right: 20px;
 }
 .expand-btn {
     border-radius: 4px;
@@ -1797,6 +1807,7 @@ button.survey-answer > div.flex-container {
     #app-total-counter {
         max-width: 150px;
     }
+    #app-total-counter-body,
     #app-total-counter-list-container {
         max-height: 100px;
     }
@@ -1808,6 +1819,9 @@ button.survey-answer > div.flex-container {
     }
     .show-small {
         display: inherit;
+    }
+    .question-selector {
+        margin-left: 50px;
     }
     .leaflet-popup-content {
         max-width: 200px;

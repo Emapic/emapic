@@ -186,6 +186,18 @@ var emapic = emapic || {};
 
     emapic.updateIndivVotesLayer = emapic.utils.overrideFunction(emapic.updateIndivVotesLayer, null, updateCounterTotal);
 
+    function addScrollBar() {
+        var container = $('#app-total-counter-list-container');
+        container.find('.span-container span').each(function() {
+            var $this = $(this);
+            $this.parents('.span-container').width($this.width());
+        });
+        if (container[0].scrollHeight > container[0].clientHeight) {
+            container.jScrollPane();
+        }
+        container.addClass('after-scrollable');
+    }
+
     function populateCounter(statusNr) {
         var wasUncollapsed = $('#app-total-counter-body').length && $('#app-total-counter-body').hasClass('in'),
             specificVotesHtml = '',
@@ -215,7 +227,9 @@ var emapic = emapic || {};
             var btnActive = counterFilterProperty && counterFilterValues[counterFilterProperty] && counterFilterValues[counterFilterProperty].length > 0 &&
                 ($.inArray(emapic.legend.color.responses_array[orderedVotes[i].position].id, counterFilterValues[counterFilterProperty]) !== -1);
             specificVotesHtml += '<li><button type="button" class="btn btn-default filter-btn' + (btnActive ? ' active' : '') + '" aria-pressed="false" autocomplete="off" vote="' +
-                emapic.utils.escapeHtml(orderedVotes[i].position) + '"><div class="circle-container"><div class="filter-btn-circle" style="background-color: ' + emapic.legend.color.responses[orderedVotes[i].id].legend + ';"></div></div><span>' + emapic.utils.escapeHtml(emapic.legend.color.responses[orderedVotes[i].id].value) + ': ' + orderedVotes[i].nr + '</span></button></li>';
+                emapic.utils.escapeHtml(orderedVotes[i].position) + '"><div class="circle-container"><div class="filter-btn-circle" style="background-color: ' +
+                emapic.legend.color.responses[orderedVotes[i].id].legend + ';"></div></div><div class="span-container"><span>' +
+                emapic.utils.escapeHtml(emapic.legend.color.responses[orderedVotes[i].id].value) + ': ' + orderedVotes[i].nr + '</span></div></button></li>';
         }
         $('#app-total-counter').html("<div id='app-total-counter-header'><h4 class='text-center'><span class='usericon glyphicon glyphicon-user'></span><span id='app-total-counter-header-nr'></span> <span class='glyphicon glyphicon-stats'></span></h4></div>" +
             "<div id='app-total-counter-filter' style='display: none;'><span class='glyphicon glyphicon-filter'></span></div>\n" +
@@ -251,12 +265,12 @@ var emapic = emapic || {};
             }
         });
         if ($('#app-total-counter-body').css('display') != 'none') {
-            $('#app-total-counter-list-container').jScrollPane();
+            addScrollBar();
         } else {
             scrollPanePending = true;
             $('#app-total-counter-body').on('shown.bs.collapse', function() {
                 if (scrollPanePending) {
-                    $('#app-total-counter-list-container').jScrollPane();
+                    addScrollBar();
                     scrollPanePending = false;
                 }
             });
