@@ -9,6 +9,7 @@ var nodemailer = require('nodemailer'),
     bases = require('bases'),
     path = require('path'),
     imageType = require('image-type'),
+    i18n = require('i18n-2'),
     request = require('request'),
     childProcess = Promise.promisifyAll(require('child_process')),
     optipng = require('optipng-bin'),
@@ -29,6 +30,34 @@ try {
     sharp = require('sharp');
 } catch(e) {
     Jimp = require('jimp');
+}
+
+function langToWebLocaleIsoInner(lang) {
+    switch(lang) {
+        case 'en':
+            // We use United Kingdom as reference for english
+            return 'gb';
+        case 'gl':
+            // Galician language iso code is different from the region iso code
+            return 'es-ga';
+        default:
+            return lang;
+    }
+};
+
+var localeFiles = fs.readdirSync('locales'),
+    locales = [],
+    localesWithIsos = [];
+for (var i = 0, len = localeFiles.length; i<len; i++) {
+    var file = localeFiles[i];
+    if (/\.json$/.test(file)) {
+        var lang = file.replace(/\.json$/, "");
+        locales.push(lang);
+        localesWithIsos.push({
+            locale: lang,
+            iso: langToWebLocaleIsoInner(lang)
+        });
+    }
 }
 
 function takeSnapshotRaw(url, imgPath, width, height, wait, minSize, tries) {
@@ -305,16 +334,32 @@ module.exports = function(app) {
         },
 
         langToWebLocaleIso: function(lang) {
-            switch(lang) {
-                case 'en':
-                    // We use United Kingdom as reference for english
-                    return 'gb';
-                case 'gl':
-                    // Galician language iso code is different from the region iso code
-                    return 'es-ga';
-                default:
-                    return lang;
+            return langToWebLocaleIsoInner(lang);
+        },
+
+        getLocales: function() {
+            return localesWithIsos;
+        },
+
+        getI18nConfig: function() {
+            return {
+                // setup some locales - other locales default to en silently
+                locales: locales,
+                defaultLocale: 'en',
+                extension: '.json',
+                // set the cookie name
+                cookieName: 'locale',
+                // i18n-2 debug messages can clutter the output. Disable them explicitly even in development mode.
+                devMode: false
+            };
+        },
+
+        getI18n: function(locale) {
+            var i18nObject = new i18n(Utils.getI18nConfig());
+            if (locale) {
+                i18nObject.setLocale(locale);
             }
+            return i18nObject;
         },
 
         getApplicationBaseURL: function() {

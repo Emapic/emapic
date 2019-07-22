@@ -1,5 +1,7 @@
 var Promise = require('bluebird'),
     csv = Promise.promisifyAll(require('fast-csv')),
+    moment = require('moment'),
+    XLSX = require('excel4node'),
     sequelize = models.sequelize;
 
 module.exports = function(app) {
@@ -191,8 +193,14 @@ module.exports = function(app) {
         return results;
     };
 
-    pgQueryFullResultsToCsv = function(results, questions) {
-        var headers = ['Date/Time', 'Lat', 'Lon', 'Country', 'Country ISO code', 'Province'];
+    pgQueryFullResultsToCsv = function(results, questions, i18n) {
+        i18n = i18n ? i18n : Utils.getI18n();
+        var headers = [i18n.__('export_header_date_time'),
+                i18n.__('export_header_latitude'),
+                i18n.__('export_header_longitude'),
+                i18n.__('export_header_country'),
+                i18n.__('export_header_country_iso_code'),
+                i18n.__('export_header_region')];
         for (var i = 0, iLen = questions.length; i < iLen; i++) {
             switch (questions[i].type) {
                 case 'list-radio':
@@ -233,7 +241,7 @@ module.exports = function(app) {
                         return result;
                     }
                     var data = [];
-                    data.push(new Date(parseInt(result.timestamp, 10)).toISOString(),
+                    data.push(moment.utc(new Date(parseInt(result.timestamp, 10)).toISOString()).format(i18n.__('date_time_format_string')),
                         result.lat, result.lon, result.country, result.country_iso,
                         result.province);
                     for (var l = 0, lLen = questions.length; l < lLen; l++) {
@@ -259,9 +267,11 @@ module.exports = function(app) {
                                 break;
                             case 'text-answer':
                             case 'long-text-answer':
-                            case 'image-upload':
                             case 'image-url':
                                 data.push(result['q' + questions[l].question_order + '.value']);
+                                break;
+                            case 'image-upload':
+                                data.push(result['q' + questions[l].question_order + '.value'] ? Utils.getApplicationBaseURL() + result['q' + questions[l].question_order + '.value'] : null);
                                 break;
                             case 'explanatory-text':
                                 break;
@@ -273,6 +283,165 @@ module.exports = function(app) {
                 }
             }
         );
+    };
+
+    pgQueryFullResultsToXlsx = function(results, questions, i18n) {
+        i18n = i18n ? i18n : Utils.getI18n();
+        var headers = [i18n.__('export_header_date_time'),
+                i18n.__('export_header_latitude'),
+                i18n.__('export_header_longitude'),
+                i18n.__('export_header_country'),
+                i18n.__('export_header_country_iso_code'),
+                i18n.__('export_header_region')],
+            baseHeadersNr = headers.length,
+            finalResults = [],
+            urlColumns = [];
+
+        for (var i = 0, iLen = questions.length; i < iLen; i++) {
+            switch (questions[i].type) {
+                case 'list-radio':
+                    headers.push(questions[i].question);
+                    break;
+                case 'list-radio-other':
+                    var otherAns = null;
+                    for (var j = 0, jLen = questions[i].Answers.length; j < jLen; j++) {
+                        if (questions[i].Answers[j].sortorder === -1) {
+                            otherAns = questions[i].Answers[j];
+                            break;
+                        }
+                    }
+                    var otherName = (otherAns === null) ? 'other value' : otherAns.answer;
+                    headers.push(questions[i].question, questions[i].question + ' - ' + otherName);
+                    break;
+                case 'image-upload':
+                case 'image-url':
+                    urlColumns.push(headers.length + 1);
+                    // fall-through
+                case 'text-answer':
+                case 'long-text-answer':
+                    headers.push(questions[i].question);
+                    break;
+                case 'explanatory-text':
+                    break;
+                default:
+                    return new Error("Question type not contemplated.");
+            }
+        }
+        finalResults.push(headers);
+
+        for (var i = 0, iLen = results.length; i < iLen; i++) {
+            var result = results[i],
+                data = [];
+            data.push(new Date(parseInt(result.timestamp, 10)),
+                result.lat, result.lon, result.country, result.country_iso,
+                result.province);
+            for (var l = 0, lLen = questions.length; l < lLen; l++) {
+                var ansId, ans;
+                switch (questions[l].type) {
+                    case 'list-radio':
+                        ans = ansId = parseInt(result['q' + questions[l].question_order + '.id'], 10);
+                        for (var m = 0, mLen = questions[l].Answers.length; m < mLen; m++) {
+                            if (ansId === questions[l].Answers[m].sortorder) {
+                                ans = questions[l].Answers[m].answer;
+                            }
+                        }
+                        data.push(ans);
+                        break;
+                    case 'list-radio-other':
+                        ans = ansId = parseInt(result['q' + questions[l].question_order + '.id'], 10);
+                        for (var n = 0, nLen = questions[l].Answers.length; n < nLen; n++) {
+                            if (ansId === questions[l].Answers[n].sortorder) {
+                                ans = questions[l].Answers[n].answer;
+                            }
+                        }
+                        data.push(ans, (ansId === -1) ? result['q' + questions[l].question_order + '.value'] : null);
+                        break;
+                    case 'text-answer':
+                    case 'long-text-answer':
+                    case 'image-url':
+                        data.push(result['q' + questions[l].question_order + '.value']);
+                        break;
+                    case 'image-upload':
+                        data.push(result['q' + questions[l].question_order + '.value'] ? Utils.getApplicationBaseURL() + result['q' + questions[l].question_order + '.value'] : null);
+                        break;
+                    case 'explanatory-text':
+                        break;
+                    default:
+                        return new Error("Question type not contemplated.");
+                }
+            }
+            finalResults.push(data);
+        }
+
+        var wb = new XLSX.Workbook(),
+            ws = wb.addWorksheet(i18n.__('export_sheet_answers')),
+            headerStyle = wb.createStyle({
+                font: {
+                    color: '#000000',
+                    size: 11,
+                    bold: true
+                },
+                fill: {
+                    type: 'pattern',
+                    patternType: 'solid',
+                    fgColor: '#a9a9a9'
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center',
+                    wrapText: true
+                }
+            }),
+            dateStyle = wb.createStyle({
+                numberFormat: i18n.__('date_time_format_string')
+            }),
+            border = {
+                style: 'thin',
+                color: '#000000'
+            },
+            borderStyle = wb.createStyle({
+                border: {
+                    left: border,
+                    right: border,
+                    bottom: border,
+                    top: border
+                }
+            });
+
+        ws.cell(1, 1, 1, baseHeadersNr, true).string(i18n.__('export_header_metadata')).style(headerStyle).style(borderStyle);
+        ws.cell(1, baseHeadersNr + 1, 1, finalResults[0].length, true).string(i18n.__('export_header_answers')).style(headerStyle).style(borderStyle);
+
+        ws.row(1).setHeight(25);
+        ws.row(2).setHeight(50).freeze();
+
+        for (var j = 0, jLen = finalResults[0].length; j<jLen; j++) {
+            ws.cell(2, j + 1).string(finalResults[0][j]).style(headerStyle).style(borderStyle);
+        }
+
+        for (var i = 1, iLen = finalResults.length; i<iLen; i++) {
+            ws.cell(i+2, 1).date(finalResults[i][0]).style(dateStyle).style(borderStyle);
+            ws.cell(i+2, 2).number(finalResults[i][1]).style(borderStyle);
+            ws.cell(i+2, 3).number(finalResults[i][2]).style(borderStyle);
+            for (var j = 3, jLen = finalResults[i].length; j<jLen; j++) {
+                var cell = ws.cell(i+2, j + 1).string(finalResults[i][j] !== null ? finalResults[i][j] : '').style(borderStyle);
+                if (urlColumns.indexOf(j + 1) !== -1 && finalResults[i][j] !== null) {
+                    cell.link(finalResults[i][j]);
+                }
+            }
+        }
+
+        var widths = {};
+        for (var i = 0, iLen = finalResults.length; i<iLen; i++) {
+            for (var j = 0, jLen = finalResults[i].length; j<jLen; j++) {
+                widths[j] = Math.max(widths[j] ? widths[j] : 0,
+                    finalResults[i][j] ? finalResults[i][j].toString().length : 0);
+            }
+        }
+        for (var i = 0, iLen = finalResults[0].length; i<iLen; i++) {
+            ws.column(i + 1).setWidth(Math.min(widths[i] + 2, 30));
+        }
+
+        return wb.writeToBuffer();
     };
 
     pgQueryToCsv = function(queryResult) {

@@ -60,7 +60,7 @@ module.exports = function(app) {
             // Survey is active and results are always public
             (survey.active === true && survey.public_results) ||
             // It's a local request from the server itself
-            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+            (req.ip === '127.0.0.1' && (req.hostname === '127.0.0.1' || req.hostname === 'localhost'))) {
                 return Promise.join(survey.getHtml(req), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
                     // If the survey allows multiple answers, then we don't
                     // set an already voted position
@@ -95,7 +95,7 @@ module.exports = function(app) {
             // Survey is active and results are always public or shown after vote
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
-            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+            (req.ip === '127.0.0.1' && (req.hostname === '127.0.0.1' || req.hostname === 'localhost'))) {
                 return Promise.join(survey.getAnonymizedResponses(), survey.getQuestions({
                     scope: 'includeAnswers'
                 }), function(responses, questions) {
@@ -176,7 +176,7 @@ module.exports = function(app) {
             // Survey is active and results are always public or shown after vote
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
-            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+            (req.ip === '127.0.0.1' && (req.hostname === '127.0.0.1' || req.hostname === 'localhost'))) {
                 return survey.getFullDescription().then(function(response) {
                     res.json(response);
                 });
@@ -215,7 +215,7 @@ module.exports = function(app) {
             // Survey is active and results are always public or shown after vote
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
-            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+            (req.ip === '127.0.0.1' && (req.hostname === '127.0.0.1' || req.hostname === 'localhost'))) {
                 return survey.getTotals().then(function(response) {
                     res.json(response);
                 });
@@ -237,7 +237,7 @@ module.exports = function(app) {
             // Survey is active and results are always public or shown after vote
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
-            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+            (req.ip === '127.0.0.1' && (req.hostname === '127.0.0.1' || req.hostname === 'localhost'))) {
                 var layer = req.params.layer,
                     params = req.query,
                     promise;
@@ -294,7 +294,7 @@ module.exports = function(app) {
             // Survey is active and results are always public or shown after vote
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
-            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
+            (req.ip === '127.0.0.1' && (req.hostname === '127.0.0.1' || req.hostname === 'localhost'))) {
                 return survey.getLegend().then(function(legend) {
                     res.json(legend);
                 });
@@ -349,6 +349,8 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:id/export', function(req, res) {
+        var format = req.query.format ? req.query.format : 'xlsx',
+            i18n = req.query.lang ? Utils.getI18n(req.query.lang) : req.i18n;
         models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
@@ -360,14 +362,23 @@ module.exports = function(app) {
             // Survey is active and results are always public or shown after vote
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
-            (req.ip === '127.0.0.1' && (req.host === '127.0.0.1' || req.host === 'localhost'))) {
-                return Promise.join(survey.getFullResponses(req.query), survey.getQuestions({
+            (req.ip === '127.0.0.1' && (req.hostname === '127.0.0.1' || req.hostname === 'localhost'))) {
+                return Promise.join(survey.getFullResponses(req.query, i18n.getLocale()), survey.getQuestions({
                     scope: 'includeAnswers'
                 }), function(responses, questions) {
-                    res.attachment(survey.title + '.csv');
-                    pgQueryFullResultsToCsv(responses, questions).then(function(csv) {
-                        res.send(csv);
-                    });
+                    switch (format) {
+                        case 'csv':
+                            res.attachment(survey.title + '.csv');
+                            pgQueryFullResultsToCsv(responses, questions, i18n).then(function(csv) {
+                                res.send(csv);
+                            });
+                            break;
+                        default:
+                            res.attachment(survey.title + '.xlsx');
+                            pgQueryFullResultsToXlsx(responses, questions, i18n).then(function(xlsx) {
+                                res.send(xlsx);
+                            });
+                    }
                 });
             } else {
                 res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });

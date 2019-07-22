@@ -157,7 +157,7 @@
             </div>
           </div>
           <div class="modal-footer">
-			<a class="btn btn-primary" type="button" onclick="window.open(emapic.getExportFilteredURL(), '_blank');">{{#__}}download_visible_data_csv{{/__}}</a>
+			<a class="btn btn-primary" type="button" onclick="window.open(emapic.getExportFilteredURL(), '_blank');">{{#__}}download_visible_data_xlsx{{/__}}</a>
 		  </div>
         </div>
       </div>

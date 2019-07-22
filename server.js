@@ -261,29 +261,7 @@ var EmapicApp = function() {
         utils(self.app);
 
         self.app.use(cookieParser(serverConfig.secrets.cookie));
-        var localeFiles = fs.readdirSync('locales'),
-            locales = [],
-            localesWithIsos = [];
-        for (var i = 0, len = localeFiles.length; i<len; i++) {
-            var file = localeFiles[i];
-            if (/\.json$/.test(file)) {
-                var lang = file.replace(/\.json$/, "");
-                locales.push(lang);
-                localesWithIsos.push({
-                    locale: lang,
-                    iso: Utils.langToWebLocaleIso(lang)
-                });
-            }
-        }
-        i18n.expressBind(self.app, {
-          // setup some locales - other locales default to en silently
-          locales: locales,
-          extension: '.json',
-          // set the cookie name
-          cookieName: 'locale',
-          // i18n-2 debug messages can clutter the output. Disable them explicitly even in development mode.
-          devMode: false
-        });
+        i18n.expressBind(self.app, Utils.getI18nConfig());
         // Redirect from www-urls to non www-urls
         self.app.use(function(req, res, next) {
             if (req.headers && req.headers.host && req.headers.host.match(/^www/) !== null ) {
@@ -296,7 +274,7 @@ var EmapicApp = function() {
             req.i18n.setLocale(req.i18n.preferredLocale());
             req.i18n.setLocaleFromCookie();
             // req.i18n.setLocaleFromQuery();
-            res.locals.web_all_locales_with_isos = localesWithIsos;
+            res.locals.web_all_locales_with_isos = Utils.getLocales();
             res.locals.web_locale = req.i18n.getLocale();
             res.locals.web_locale_iso = Utils.langToWebLocaleIso(res.locals.web_locale);
             var baseLocals = res.locals;
