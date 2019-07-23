@@ -200,7 +200,10 @@ module.exports = function(app) {
                 i18n.__('export_header_longitude'),
                 i18n.__('export_header_country'),
                 i18n.__('export_header_country_iso_code'),
-                i18n.__('export_header_region')];
+                i18n.__('export_header_region'),
+                i18n.__('export_header_region_code'),
+                i18n.__('export_header_municipality'),
+                i18n.__('export_header_municipality_code')];
         for (var i = 0, iLen = questions.length; i < iLen; i++) {
             switch (questions[i].type) {
                 case 'list-radio':
@@ -243,7 +246,8 @@ module.exports = function(app) {
                     var data = [];
                     data.push(moment.utc(new Date(parseInt(result.timestamp, 10)).toISOString()).format(i18n.__('date_time_format_string')),
                         result.lat, result.lon, result.country, result.country_iso,
-                        result.province);
+                        result.province, result.province_code, result.municipality,
+                        result.municipality_code);
                     for (var l = 0, lLen = questions.length; l < lLen; l++) {
                         var ansId, ans;
                         switch (questions[l].type) {
@@ -292,7 +296,10 @@ module.exports = function(app) {
                 i18n.__('export_header_longitude'),
                 i18n.__('export_header_country'),
                 i18n.__('export_header_country_iso_code'),
-                i18n.__('export_header_region')],
+                i18n.__('export_header_region'),
+                i18n.__('export_header_region_code'),
+                i18n.__('export_header_municipality'),
+                i18n.__('export_header_municipality_code')],
             baseHeadersNr = headers.length,
             finalResults = [],
             urlColumns = [];
@@ -334,7 +341,8 @@ module.exports = function(app) {
                 data = [];
             data.push(new Date(parseInt(result.timestamp, 10)),
                 result.lat, result.lon, result.country, result.country_iso,
-                result.province);
+                result.province, result.province_code, result.municipality,
+                result.municipality_code);
             for (var l = 0, lLen = questions.length; l < lLen; l++) {
                 var ansId, ans;
                 switch (questions[l].type) {
@@ -419,11 +427,11 @@ module.exports = function(app) {
         }
 
         for (var i = 1, iLen = finalResults.length; i<iLen; i++) {
-            ws.cell(i+2, 1).date(finalResults[i][0]).style(dateStyle).style(borderStyle);
-            ws.cell(i+2, 2).number(finalResults[i][1]).style(borderStyle);
-            ws.cell(i+2, 3).number(finalResults[i][2]).style(borderStyle);
+            ws.cell(i + 2, 1).date(finalResults[i][0]).style(dateStyle).style(borderStyle);
+            ws.cell(i + 2, 2).number(finalResults[i][1]).style(borderStyle);
+            ws.cell(i + 2, 3).number(finalResults[i][2]).style(borderStyle);
             for (var j = 3, jLen = finalResults[i].length; j<jLen; j++) {
-                var cell = ws.cell(i+2, j + 1).string(finalResults[i][j] !== null ? finalResults[i][j] : '').style(borderStyle);
+                var cell = ws.cell(i + 2, j + 1).string(finalResults[i][j] !== null ? finalResults[i][j] : '').style(borderStyle);
                 if (urlColumns.indexOf(j + 1) !== -1 && finalResults[i][j] !== null) {
                     cell.link(finalResults[i][j]);
                 }
