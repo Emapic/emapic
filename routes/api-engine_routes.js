@@ -375,7 +375,7 @@ module.exports = function(app) {
                             break;
                         default:
                             res.attachment(survey.title + '.xlsx');
-                            pgQueryFullResultsToXlsx(responses, questions, i18n).then(function(xlsx) {
+                            pgQueryFullResultsToXlsx(responses, questions, i18n, true).then(function(xlsx) {
                                 res.send(xlsx);
                             });
                     }

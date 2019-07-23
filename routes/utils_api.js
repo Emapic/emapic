@@ -35,6 +35,244 @@ module.exports = function(app) {
         return orderedVotes;
     }
 
+    function addResultsXlsxSheet(wb, finalResults, baseHeadersNr, urlColumns, i18n) {
+        var ws = wb.addWorksheet(i18n.__('export_sheet_answers')),
+            headerStyle = wb.createStyle({
+                font: {
+                    color: '#000000',
+                    size: 11,
+                    bold: true
+                },
+                fill: {
+                    type: 'pattern',
+                    patternType: 'solid',
+                    fgColor: '#a9a9a9'
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center',
+                    wrapText: true
+                }
+            }),
+            border = {
+                style: 'thin',
+                color: '#000000'
+            },
+            borderStyle = wb.createStyle({
+                border: {
+                    left: border,
+                    right: border,
+                    bottom: border,
+                    top: border
+                }
+            });
+
+        ws.cell(1, 1, 1, baseHeadersNr, true).string(i18n.__('export_header_metadata')).style(headerStyle).style(borderStyle);
+        ws.cell(1, baseHeadersNr + 1, 1, finalResults[0].length, true).string(i18n.__('export_header_answers')).style(headerStyle).style(borderStyle);
+
+        ws.row(1).setHeight(25);
+        ws.row(2).setHeight(50).freeze();
+
+        for (var j = 0, jLen = finalResults[0].length; j<jLen; j++) {
+            ws.cell(2, j + 1).string(finalResults[0][j]).style(headerStyle).style(borderStyle);
+        }
+
+        for (var i = 1, iLen = finalResults.length; i<iLen; i++) {
+            ws.cell(i + 2, 1).date(finalResults[i][0]).style(borderStyle);
+            ws.cell(i + 2, 2).number(finalResults[i][1]).style(borderStyle);
+            ws.cell(i + 2, 3).number(finalResults[i][2]).style(borderStyle);
+            for (var j = 3, jLen = finalResults[i].length; j<jLen; j++) {
+                var cell = ws.cell(i + 2, j + 1).string(finalResults[i][j] !== null ? finalResults[i][j] : '').style(borderStyle);
+                if (urlColumns.indexOf(j + 1) !== -1 && finalResults[i][j] !== null) {
+                    cell.link(finalResults[i][j]);
+                }
+            }
+        }
+
+        var widths = {};
+        for (var i = 0, iLen = finalResults.length; i<iLen; i++) {
+            for (var j = 0, jLen = finalResults[i].length; j<jLen; j++) {
+                widths[j] = Math.max(widths[j] ? widths[j] : 0,
+                    finalResults[i][j] ? finalResults[i][j].toString().length : 0);
+            }
+        }
+        for (var i = 0, iLen = finalResults[0].length; i<iLen; i++) {
+            ws.column(i + 1).setWidth(Math.min(widths[i] + 2, 30));
+        }
+    }
+
+    function addLocationStatsXlsxSheet(wb, results, i18n) {
+        var ws = wb.addWorksheet(i18n.__('export_sheet_location_stats')),
+            headerStyle = wb.createStyle({
+                font: {
+                    color: '#000000',
+                    size: 11,
+                    bold: true
+                },
+                fill: {
+                    type: 'pattern',
+                    patternType: 'solid',
+                    fgColor: '#a9a9a9'
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center',
+                    wrapText: true
+                }
+            }),
+            boldStyle = wb.createStyle({
+                font: {
+                    bold: true
+                }
+            }),
+            italicStyle = wb.createStyle({
+                font: {
+                    italics: true
+                }
+            }),
+            border = {
+                style: 'thin',
+                color: '#000000'
+            },
+            borderStyle = wb.createStyle({
+                border: {
+                    left: border,
+                    right: border,
+                    bottom: border,
+                    top: border
+                }
+            }),
+            countries = {},
+            provinces = {},
+            municipalities = {};
+
+        for (var i = 0, iLen = results.length; i < iLen; i++) {
+            var result = results[i];
+            if (result.country_iso) {
+                if (!(countries[result.country_iso])) {
+                    countries[result.country_iso] = {
+                        name: result.country,
+                        nr: 0
+                    };
+                }
+                countries[result.country_iso].nr++;
+            }
+            if (result.province_code) {
+                if (!(provinces[result.province_code])) {
+                    provinces[result.province_code] = {
+                        name: result.province,
+                        nr: 0,
+                        country: result.country_iso
+                    };
+                }
+                provinces[result.province_code].nr++;
+            }
+            if (result.municipality_code) {
+                if (!(municipalities[result.municipality_code])) {
+                    municipalities[result.municipality_code] = {
+                        name: result.municipality,
+                        nr: 0,
+                        province: result.province_code
+                    };
+                }
+                municipalities[result.municipality_code].nr++;
+            }
+        }
+
+        var row = 1,
+            countriesCodes = Object.keys(countries),
+            provincesCodes = Object.keys(provinces),
+            municipalitiesCodes = Object.keys(municipalities);
+
+        countriesCodes.sort();
+        provincesCodes.sort();
+        municipalitiesCodes.sort();
+
+        ws.cell(row, 1, row, 6, true).string(i18n.__('export_header_countries_with_answers')).style(headerStyle).style(borderStyle);
+        ws.cell(row, 7).number(countriesCodes.length).style(headerStyle).style(borderStyle);
+
+        if (countriesCodes.length > 0) {
+            row += 2;
+            ws.cell(row, 5).string(i18n.__('export_header_country')).style(boldStyle).style(borderStyle);
+            ws.cell(row, 6).string(i18n.__('export_header_country_iso_code')).style(boldStyle).style(borderStyle);
+            ws.cell(row++, 7).string(i18n.__('export_header_nr_answers')).style(boldStyle).style(borderStyle);
+            var firstRow = row;
+            for (var i = 0, iLen = countriesCodes.length; i < iLen; i++) {
+                var code = countriesCodes[i],
+                    country = countries[code];
+                ws.cell(row, 5).string(country.name).style(borderStyle);
+                ws.cell(row, 6).string(code).style(borderStyle);
+                ws.cell(row++, 7).number(country.nr).style(boldStyle).style(borderStyle);
+            }
+            ws.cell(row, 5, row, 6, true).string(i18n.__('export_header_total')).style(italicStyle).style(borderStyle);
+            ws.cell(row, 7).formula('sum(G' + firstRow + ':G' + (row++ - 1) + ')').style(boldStyle).style(italicStyle).style(borderStyle);
+        }
+
+        row += 2;
+
+        ws.cell(row, 1, row, 6, true).string(i18n.__('export_header_provinces_with_answers')).style(headerStyle).style(borderStyle);
+        ws.cell(row, 7).number(provincesCodes.length).style(headerStyle).style(borderStyle);
+
+        if (provincesCodes.length > 0) {
+            row += 2;
+            ws.cell(row, 3).string(i18n.__('export_header_region')).style(boldStyle).style(borderStyle);
+            ws.cell(row, 4).string(i18n.__('export_header_region_code')).style(boldStyle).style(borderStyle);
+            ws.cell(row, 5).string(i18n.__('export_header_country')).style(boldStyle).style(borderStyle);
+            ws.cell(row, 6).string(i18n.__('export_header_country_iso_code')).style(boldStyle).style(borderStyle);
+            ws.cell(row++, 7).string(i18n.__('export_header_nr_answers')).style(boldStyle).style(borderStyle);
+            var firstRow = row;
+            for (var i = 0, iLen = provincesCodes.length; i < iLen; i++) {
+                var code = provincesCodes[i],
+                    province = provinces[code],
+                    country = countries[province.country];
+                ws.cell(row, 3).string(province.name).style(borderStyle);
+                ws.cell(row, 4).string(code).style(borderStyle);
+                ws.cell(row, 5).string(country.name).style(borderStyle);
+                ws.cell(row, 6).string(province.country).style(borderStyle);
+                ws.cell(row++, 7).number(province.nr).style(boldStyle).style(borderStyle);
+            }
+            ws.cell(row, 3, row, 6, true).string(i18n.__('export_header_total')).style(italicStyle).style(borderStyle);
+            ws.cell(row, 7).formula('sum(G' + firstRow + ':G' + (row++ - 1) + ')').style(boldStyle).style(italicStyle).style(borderStyle);
+        }
+
+        row += 2;
+
+        ws.cell(row, 1, row, 6, true).string(i18n.__('export_header_municipalities_with_answers') + ' ' + i18n.__('export_suffix_spain_only')).style(headerStyle).style(borderStyle);
+        ws.cell(row, 7).number(municipalitiesCodes.length).style(headerStyle).style(borderStyle);
+
+        if (municipalitiesCodes.length > 0) {
+            row += 2;
+            ws.cell(row, 1).string(i18n.__('export_header_municipality')).style(boldStyle).style(borderStyle);
+            ws.cell(row, 2).string(i18n.__('export_header_municipality_code')).style(boldStyle).style(borderStyle);
+            ws.cell(row, 3).string(i18n.__('export_header_region')).style(boldStyle).style(borderStyle);
+            ws.cell(row, 4).string(i18n.__('export_header_region_code')).style(boldStyle).style(borderStyle);
+            ws.cell(row, 5).string(i18n.__('export_header_country')).style(boldStyle).style(borderStyle);
+            ws.cell(row, 6).string(i18n.__('export_header_country_iso_code')).style(boldStyle).style(borderStyle);
+            ws.cell(row++, 7).string(i18n.__('export_header_nr_answers')).style(boldStyle).style(borderStyle);
+            var firstRow = row;
+            for (var i = 0, iLen = municipalitiesCodes.length; i < iLen; i++) {
+                var code = municipalitiesCodes[i],
+                    municipality = municipalities[code],
+                    province = provinces[municipality.province],
+                    country = countries[province.country];
+                ws.cell(row, 1).string(municipality.name).style(borderStyle);
+                ws.cell(row, 2).string(code).style(borderStyle);
+                ws.cell(row, 3).string(province.name).style(borderStyle);
+                ws.cell(row, 4).string(municipality.province).style(borderStyle);
+                ws.cell(row, 5).string(country.name).style(borderStyle);
+                ws.cell(row, 6).string(province.country).style(borderStyle);
+                ws.cell(row++, 7).number(municipality.nr).style(boldStyle).style(borderStyle);
+            }
+            ws.cell(row, 1, row, 6, true).string(i18n.__('export_header_total')).style(italicStyle).style(borderStyle);
+            ws.cell(row, 7).formula('sum(G' + firstRow + ':G' + (row++ - 1) + ')').style(boldStyle).style(italicStyle).style(borderStyle);
+        }
+
+        ws.column(1).setWidth(25);
+        for (var i = 2, iLen = 7; i <= iLen; i++) {
+            ws.column(i).setWidth(20);
+        }
+    }
+
     /*
     *   A function that converts a PostGIS query into a GeoJSON object.
     *   Copyright (C) 2012  Samuel Giles <sam@sam-giles.co.uk>
@@ -289,7 +527,7 @@ module.exports = function(app) {
         );
     };
 
-    pgQueryFullResultsToXlsx = function(results, questions, i18n) {
+    pgQueryFullResultsToXlsx = function(results, questions, i18n, addLocationStats) {
         i18n = i18n ? i18n : Utils.getI18n();
         var headers = [i18n.__('export_header_date_time'),
                 i18n.__('export_header_latitude'),
@@ -298,8 +536,8 @@ module.exports = function(app) {
                 i18n.__('export_header_country_iso_code'),
                 i18n.__('export_header_region'),
                 i18n.__('export_header_region_code'),
-                i18n.__('export_header_municipality'),
-                i18n.__('export_header_municipality_code')],
+                i18n.__('export_header_municipality') + ' ' + i18n.__('export_suffix_spain_only'),
+                i18n.__('export_header_municipality_code') + ' ' + i18n.__('export_suffix_spain_only')],
             baseHeadersNr = headers.length,
             finalResults = [],
             urlColumns = [];
@@ -380,75 +618,14 @@ module.exports = function(app) {
             }
             finalResults.push(data);
         }
-
-        var wb = new XLSX.Workbook(),
-            ws = wb.addWorksheet(i18n.__('export_sheet_answers')),
-            headerStyle = wb.createStyle({
-                font: {
-                    color: '#000000',
-                    size: 11,
-                    bold: true
-                },
-                fill: {
-                    type: 'pattern',
-                    patternType: 'solid',
-                    fgColor: '#a9a9a9'
-                },
-                alignment: {
-                    horizontal: 'center',
-                    vertical: 'center',
-                    wrapText: true
-                }
-            }),
-            dateStyle = wb.createStyle({
-                numberFormat: i18n.__('date_time_format_string')
-            }),
-            border = {
-                style: 'thin',
-                color: '#000000'
-            },
-            borderStyle = wb.createStyle({
-                border: {
-                    left: border,
-                    right: border,
-                    bottom: border,
-                    top: border
-                }
-            });
-
-        ws.cell(1, 1, 1, baseHeadersNr, true).string(i18n.__('export_header_metadata')).style(headerStyle).style(borderStyle);
-        ws.cell(1, baseHeadersNr + 1, 1, finalResults[0].length, true).string(i18n.__('export_header_answers')).style(headerStyle).style(borderStyle);
-
-        ws.row(1).setHeight(25);
-        ws.row(2).setHeight(50).freeze();
-
-        for (var j = 0, jLen = finalResults[0].length; j<jLen; j++) {
-            ws.cell(2, j + 1).string(finalResults[0][j]).style(headerStyle).style(borderStyle);
+        var wb = new XLSX.Workbook({
+            dateFormat: i18n.__('date_time_format_string'),
+            author: 'Emapic'
+        });
+        addResultsXlsxSheet(wb, finalResults, baseHeadersNr, urlColumns, i18n);
+        if (addLocationStats) {
+            addLocationStatsXlsxSheet(wb, results, i18n);
         }
-
-        for (var i = 1, iLen = finalResults.length; i<iLen; i++) {
-            ws.cell(i + 2, 1).date(finalResults[i][0]).style(dateStyle).style(borderStyle);
-            ws.cell(i + 2, 2).number(finalResults[i][1]).style(borderStyle);
-            ws.cell(i + 2, 3).number(finalResults[i][2]).style(borderStyle);
-            for (var j = 3, jLen = finalResults[i].length; j<jLen; j++) {
-                var cell = ws.cell(i + 2, j + 1).string(finalResults[i][j] !== null ? finalResults[i][j] : '').style(borderStyle);
-                if (urlColumns.indexOf(j + 1) !== -1 && finalResults[i][j] !== null) {
-                    cell.link(finalResults[i][j]);
-                }
-            }
-        }
-
-        var widths = {};
-        for (var i = 0, iLen = finalResults.length; i<iLen; i++) {
-            for (var j = 0, jLen = finalResults[i].length; j<jLen; j++) {
-                widths[j] = Math.max(widths[j] ? widths[j] : 0,
-                    finalResults[i][j] ? finalResults[i][j].toString().length : 0);
-            }
-        }
-        for (var i = 0, iLen = finalResults[0].length; i<iLen; i++) {
-            ws.column(i + 1).setWidth(Math.min(widths[i] + 2, 30));
-        }
-
         return wb.writeToBuffer();
     };
 
