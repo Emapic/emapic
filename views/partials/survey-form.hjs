@@ -1,11 +1,11 @@
     {{#yield-styles}}
     <link rel="stylesheet" href="/libs/spectrum/spectrum.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.css" integrity="sha256-iVhQxXOykHeL03K08zkxBGxDCLCuzRGGiTYf2FL6mLY=" crossorigin="anonymous" />
     <!-- WYSIWYG tui-editor: https://github.com/nhnent/tui.editor#-usage -->
-    <link rel="stylesheet" href="https://uicdn.toast.com/tui-editor/v1.4.3/tui-editor.min.css"></link>
-    <link rel="stylesheet" href="https://uicdn.toast.com/tui-editor/v1.4.3/tui-editor-contents.min.css"></link>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.33.0/codemirror.css"></link>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"></link>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tui-editor/1.4.5/tui-editor.min.css" integrity="sha256-JkWLab3XN2oSV+m4HVw8OZzRaRhngzN9UD71XsNhc7k=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tui-editor/1.4.5/tui-editor-contents.min.css" integrity="sha256-ioNeZOpTr0DlWYO/c5eaguTfpymZk6aYN0McONF/gzM=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.33.0/codemirror.min.css" integrity="sha256-I8NyGs4wjbMuBSUE40o55W6k6P7tu/7G28/JGUUYCIs=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" integrity="sha256-3YM6A3pH4QFCl9WbSU8oXF5N6W/2ylvW0o2g+Z6TmLQ=" crossorigin="anonymous" />
     {{/yield-styles}}
 
     <div class="container content">
@@ -251,5 +251,6 @@
 
             </form>
         </div>
+        <div class="modal-background"></div>
 
     </div> <!-- /content -->

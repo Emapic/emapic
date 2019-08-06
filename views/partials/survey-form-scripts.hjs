@@ -1,5 +1,5 @@
 {{#yield-scripts}}
-<script type="text/javascript" src="https://uicdn.toast.com/tui-editor/v1.4.3/tui-editor-Editor-full.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tui-editor/1.4.5/tui-editor-Editor-full.min.js" integrity="sha256-41BurqxAmLJ1/+HAeHXL08VSWc2o+mIic1+UR9DhklQ=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.js" integrity="sha256-WpfqoE3LHoVHNieOvGSqQPlSvh7it+cE5Urm01ZJPyE=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.4.4/randomColor.min.js" integrity="sha256-adAIPeaY+E7djbbAif2yaAJHMWebIfQhsxmAGiyzIhA=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="/libs/spectrum/spectrum.js"></script>
@@ -86,6 +86,14 @@
         $(el).find('.question-handle').removeClass('grabbing');
         renameQuestions($('.question-group'));
     });
+    for (var i = 0, len = tuiEditor._ui._popups.length; i<len; i++) {
+        tuiEditor._ui._popups[i].on('shown', function() {
+            $('.modal-background').show();
+        });
+        tuiEditor._ui._popups[i].on('hidden', function() {
+            $('.modal-background').hide();
+        });
+    }
     $('#survey-form').validator();
     $(document).on('click', 'div.panel-heading[data-toggle="collapse"]', function(e){
         $(this).parent().find('.panel-body').toggleClass('collapse');
