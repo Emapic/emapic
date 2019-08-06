@@ -165,7 +165,7 @@
 
                 <div class="col-xs-12" id="inputs-container">
                     <h3>{{#__}}survey{{/__}}</h3>
-                    <div class="form-group form-group-sm">
+                    <div class="form-group">
                         <label class="col-md-4 control-label" for="survey_title">{{#__}}title{{/__}}:</label>
                         <div class="col-md-4">
                             <input spellcheck="true" class="form-control" required maxlength="150" type="text" name="survey_title" data-error="{{#__}}type_a_title{{/__}}" value="{{survey.title}}">
@@ -175,7 +175,7 @@
                             <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_title{{/__}}"></span>
                         </div>
                     </div>
-                    <div class="form-group form-group-sm">
+                    <div class="form-group">
                         <label class="col-md-4 control-label" for="survey_description">{{#__}}description{{/__}}:</label>
                         <div class="col-md-4">
                             <textarea class="form-control" maxlength="500" type="text" name="survey_description">{{survey.description}}</textarea>
@@ -184,7 +184,7 @@
                             <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_new_survey_description{{/__}}"></span>
                         </div>
                     </div>
-                    <div class="form-group form-group-sm">
+                    <div class="form-group">
                         <label class="col-md-4 control-label" for="survey_tags">{{#__}}tags{{/__}}:</label>
                         <div class="col-md-4">
                             <input spellcheck="true" class="form-control" maxlength="150" type="text" name="survey_tags" placeholder="{{#__}}placeholder_new_survey_tags{{/__}}" value="{{survey.tags_string}}">

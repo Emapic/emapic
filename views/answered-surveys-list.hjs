@@ -27,9 +27,9 @@
                         <a href="/survey/{{survey.encr_id}}">
                             <img class="hide-small survey-list-thumbnail" src="/thumbnails/survey/small/{{survey.encr_id}}"></img>
                         </a>
-						<div id="survey-descrip">
+						<div class="survey-descrip">
 							<h4>
-								<a id="survey-title" href="/survey/{{survey.encr_id}}">{{survey.title}}</a>
+								<a class="survey-title" href="/survey/{{survey.encr_id}}">{{survey.title}}</a>
 								{{^survey.active}}
 								{{#survey.already_opened}}
 								<span class="badge status">{{#__}}closed{{/__}}</span>

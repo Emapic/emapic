@@ -42,9 +42,9 @@
                             <img class="hide-small survey-list-thumbnail" src="/thumbnails/survey/small/{{encr_id}}"></img>
                         </a>
                         {{/already_opened}}
-						<div class="col-xs-12 col-sm-8" id="survey-descrip">
+						<div class="col-xs-12 col-sm-8 survey-descrip">
 							<h4>
-								<a id="survey-title" href="/survey/{{encr_id}}">{{title}}</a>
+								<a class="survey-title" href="/survey/{{encr_id}}">{{title}}</a>
 								{{^active}}
 								{{#already_opened}}
 								<span class="badge status">{{#__}}closed{{/__}}</span>

@@ -226,6 +226,10 @@ input.form-control[type="checkbox"] {
     color: #A94442;
 }
 
+.help-block.with-errors:empty {
+    display: none;
+}
+
 div.alert, div.alert a {
     font-family: Helvetica, Arial, sans-serif;
 }
@@ -260,7 +264,6 @@ ul.circle li {
 form#survey-form input[type="text"],
 form#survey-form textarea {
     margin-bottom: 0px;
-    margin-top: 10px;
 }
 form#survey-form #questions-section input,
 form#survey-form #questions-section textarea {
@@ -935,11 +938,11 @@ span.user-inline {
     vertical-align: top;
 }
 
-#survey-descrip p {
+.survey-descrip p {
     text-align: justify;
 }
 
-#survey-title {
+.survey-title {
 	margin: 5px 10px 5px 0px;
 }
 
@@ -1303,9 +1306,19 @@ div.input-with-clear-btn a.clear-input.disabled {
 	border-color: #A2C73A;
 }
 
-#dashboard-recent-list hr {
-    margin-top: 5px;
-    margin-bottom: 10px;
+#dashboard-recent-list ul.answered-surveys-list {
+    border-top: solid 1px #FAFAFA;
+    padding-top: 10px;
+}
+
+#dashboard-recent-list ul.answered-surveys-list li {
+    border-bottom: solid 1px #FAFAFA;
+    padding-bottom: 10px;
+}
+
+#dashboard-recent-list ul.answered-surveys-list li p {
+    padding-left: 15px;
+    margin: 0;
 }
 
 

@@ -28,20 +28,16 @@
 		</div>
 	</div>
 
-	<div class="col-xs-12 col-sm-7 col-md-8 dashboard-content" id="dashboard-recent-list">
+	<div id="dashboard-recent-list" class="col-xs-12 col-sm-7 col-md-8 dashboard-content">
         <h4>{{#__}}answered_recent{{/__}}:</h4>
-        <hr>
 		<ul class="surveys-list answered-surveys-list">
 			{{#answered}}
 			<li>
-                <a id="survey-title" href="/survey/{{survey.encr_id}}/results">{{survey.title}}</a>
-                <div class="col-xs-12">
+                <a class="survey-title" href="/survey/{{survey.encr_id}}/results">{{survey.title}}</a>
                 {{#survey.description}}
-                    <span><small>{{{survey.description_linkified}}}</small></span>
-                </div>
+                <p><small>{{{survey.description_linkified}}}</small></p>
                 {{/survey.description}}
 			</li>
-            <hr class="col-xs-12">
 			{{/answered}}
 		</ul>
         <h6><a href="/surveys/answered">{{#__}}see_all{{/__}}</a></h6>
