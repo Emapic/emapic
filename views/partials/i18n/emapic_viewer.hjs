@@ -36,6 +36,10 @@
     emapic.utils.registerI18n('js_totals_regions', '{{#__}}js_totals_regions{{/__}}');
     emapic.utils.registerI18n('js_%_positive_votes', '{{#__}}js_%_positive_votes{{/__}}');
     emapic.utils.registerI18n('js_full_date_format', '{{#__}}js_full_date_format{{/__}}');
+    emapic.utils.registerI18n('js_time_filter_title', '{{#__}}js_time_filter_title{{/__}}');
+    emapic.utils.registerI18n('js_time_filter_scale', '{{#__}}js_time_filter_scale{{/__}}');
+    emapic.utils.registerI18n('js_time_filter_from', '{{#__}}js_time_filter_from{{/__}}');
+    emapic.utils.registerI18n('js_time_filter_to', '{{#__}}js_time_filter_to{{/__}}');
     emapic.utils.registerI18n('js_week_format', '{{#__}}js_week_format{{/__}}');
     emapic.utils.registerI18n('js_day', '{{#__}}js_day{{/__}}');
     emapic.utils.registerI18n('js_week', '{{#__}}js_week{{/__}}');
@@ -48,7 +52,6 @@
     emapic.utils.registerI18n('js_error_loading_data', "{{#__}}js_error_loading_data{{/__}}");
     emapic.utils.registerI18n('js_error_saving_vote', "{{#__}}js_error_saving_vote{{/__}}");
     emapic.utils.registerI18n('js_see_answers', '{{#__}}js_see_answers{{/__}}');
-    emapic.utils.registerI18n('js_close_panel', '{{#__}}js_close_panel{{/__}}');
     emapic.utils.registerI18n('js_go_first', '{{#__}}js_go_first{{/__}}');
     emapic.utils.registerI18n('js_go_previous', '{{#__}}js_go_previous{{/__}}');
     emapic.utils.registerI18n('js_go_next', '{{#__}}js_go_next{{/__}}');
@@ -67,6 +70,7 @@
     emapic.utils.registerI18n('js_accept', '{{#__}}accept{{/__}}');
     emapic.utils.registerI18n('js_finish', '{{#__}}finish{{/__}}');
     emapic.utils.registerI18n('js_cancel', '{{#__}}cancel{{/__}}');
+    emapic.utils.registerI18n('js_close', '{{#__}}close{{/__}}');
     emapic.utils.registerI18n('js_geoposerror_title', '{{#__}}geoposerror_title{{/__}}');
     emapic.utils.registerI18n('js_geoposerror_body', '{{#__}}geoposerrordefault_body{{/__}}');
 </script>

@@ -342,15 +342,16 @@ div.alert-danger a {
     line-height: 22px;
     vertical-align: middle;
 }
-#geoposwarn .modal-content, #geoposwarn .panel, #geoposwarn .panel-default > .panel-heading, #geoposresult .modal-content, #geolocatecurrentfailed .modal-content, #stats-modal .modal-content, #survey-resume .modal-content, #survey-info .modal-content {
+#geoposwarn .modal-content, #geoposwarn .panel, #geoposwarn .panel-default > .panel-heading, #geoposresult .modal-content,
+#geolocatecurrentfailed .modal-content, #stats-modal .modal-content, #time-filter-modal .modal-content, #survey-resume .modal-content, #survey-info .modal-content {
     background-color: #004F71;
 }
-#geoposwarn .modal-content a:hover, #geoposresult .modal-content a:hover, #stats-modal .modal-content a:hover, #survey-resume .modal-content a:hover, #survey-info .modal-content a:hover,
-#geoposwarn .modal-content a:focus, #geoposresult .modal-content a:focus, #stats-modal .modal-content a:focus, #survey-resume .modal-content a:focus, #survey-info .modal-content a:focus,
+#geoposwarn .modal-content a:hover, #geoposresult .modal-content a:hover, #stats-modal .modal-content a:hover, #time-filter-modal .modal-content a:hover, #survey-resume .modal-content a:hover, #survey-info .modal-content a:hover,
+#geoposwarn .modal-content a:focus, #geoposresult .modal-content a:focus, #stats-modal .modal-content a:focus, #time-filter-modal .modal-content a:hover, #survey-resume .modal-content a:focus, #survey-info .modal-content a:focus,
 #geolocatecurrentfailed .modal-content a:hover, #geolocatecurrentfailed .modal-content a:focus {
     color: #ADD8E6;
 }
-#geoposwarn .modal-header button, #geoposresult .modal-header button, #geolocatecurrentfailed .modal-header button, #stats-modal .modal-header button, #survey-resume .modal-header button {
+#geoposwarn .modal-header button, #geoposresult .modal-header button, #geolocatecurrentfailed .modal-header button, #stats-modal .modal-header button, #time-filter-modal .modal-header button, #survey-resume .modal-header button {
     color: white;
 }
 #geoposwarn .modal-body {
@@ -363,7 +364,7 @@ div.alert-danger a {
 #geoposwarn .modal-body li p, #geoposwarn .modal-body li p a {
     font-size: 13px;
 }
-#geoposwarn .modal-footer button, #geoposresult .modal-footer button, #geolocatecurrentfailed .modal-footer button, #stats-modal .modal-footer button, #survey-resume .modal-footer button {
+#geoposwarn .modal-footer button, #geoposresult .modal-footer button, #geolocatecurrentfailed .modal-footer button, #stats-modal .modal-footer button, #time-filter-modal .modal-footer button, #survey-resume .modal-footer button {
     margin-bottom: 5px;
     margin-left: 0px;
 }
@@ -1690,6 +1691,12 @@ button.survey-answer > div.flex-container {
 }
 #stats-modal .modal-dialog {
     max-width: 350px;
+}
+#time-filter-modal .modal-dialog {
+    max-width: 450px;
+}
+#time-filter-modal .modal-dialog .form-group label {
+    margin-right: 5px;
 }
 .dc-chart g.axis text {
     fill: white;
