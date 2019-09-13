@@ -313,8 +313,13 @@ var emapic = emapic || {};
 
     emapic.addTooltips = function() {
         $('.leaflet-bar > a').data('bs.tooltip', false);
-        $('.leaflet-bar > a').tooltip({
-            placement: 'right'
+        $('.leaflet-bar > a').each(function() {
+            var $this = $(this),
+                placement = $this.attr('data-placement');
+            $this.tooltip({
+                placement: placement ? placement : 'right',
+                container: '#map'
+            });
         });
     };
 

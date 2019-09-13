@@ -873,8 +873,17 @@ input.form-control[type="radio"] {
     border-radius: 5px;
 }
 
-.leaflet-bar:not(.time-control) .tooltip-arrow {
+.map .tooltip.right .tooltip-arrow {
     border-right-color: #004F71 !important;
+}
+.map .tooltip.left .tooltip-arrow {
+    border-left-color: #004F71 !important;
+}
+.map .tooltip.top .tooltip-arrow {
+    border-top-color: #004F71 !important;
+}
+.map .tooltip.bottom .tooltip-arrow {
+    border-bottom-color: #004F71 !important;
 }
 .leaflet-touch .leaflet-bar.time-control {
     border: none;
@@ -882,9 +891,6 @@ input.form-control[type="radio"] {
 .map .tooltip-inner {
     background-color: #004F71;
     min-width: 100px;
-}
-.time-control .tooltip-arrow {
-    border-top-color: #004F71 !important;
 }
 .time-control .tooltip {
     padding-top: 0;
