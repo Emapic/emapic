@@ -27,8 +27,8 @@ var emapic = emapic || {};
                 sliderDates[sliderLevel][0].length > 0) {
                 slider.slider('values', [0, sliderDates[sliderLevel][1].length - 1]);
                 filterDates = [sliderDates[sliderLevel][0][0], sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]];
-                $('.ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
-                $('.ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel])).tooltip().tooltip('hide').tooltip('fixTitle');
+                $('.ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel], emapic.locale)).tooltip().tooltip('hide').tooltip('fixTitle');
+                $('.ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel], emapic.locale)).tooltip().tooltip('hide').tooltip('fixTitle');
             }
         },
         isFilterActive: function() {
@@ -101,7 +101,7 @@ var emapic = emapic || {};
     });
 
     function sliderFilter(event, ui) {
-        $(ui.handle).find('.tooltip-inner').html(sliderDatesTooltip[sliderLevel][ui.value].format(sliderDateFormats[sliderLevel]));
+        $(ui.handle).find('.tooltip-inner').html(sliderDatesTooltip[sliderLevel][ui.value].format(sliderDateFormats[sliderLevel], emapic.locale));
         if (event.originalEvent) {
             var startDate = sliderDates[sliderLevel][0][ui.values[0]],
                 endDate = sliderDates[sliderLevel][1][ui.values[1]];
@@ -236,7 +236,7 @@ var emapic = emapic || {};
             slide: sliderFilter,
             change: sliderFilter,
             stop: function(event, ui) {
-                $(ui.handle).attr('data-original-title', sliderDatesTooltip[sliderLevel][ui.value].format(sliderDateFormats[sliderLevel]))
+                $(ui.handle).attr('data-original-title', sliderDatesTooltip[sliderLevel][ui.value].format(sliderDateFormats[sliderLevel], emapic.locale))
                     .tooltip('fixTitle');
             },
             start: function(event, ui) {
@@ -248,11 +248,11 @@ var emapic = emapic || {};
         });
         L.DomEvent.disableClickPropagation($('#time-control')[0]);
         filterDates = [sliderDates[sliderLevel][0][0], sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]];
-        $('#time-slider .ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel]))
+        $('#time-slider .ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel], emapic.locale))
             .tooltip({ container: '#time-slider .ui-slider-handle:first'}).tooltip('hide').tooltip('fixTitle').on('shown.bs.tooltip', function() {
                 disableTooltipEvents($('#time-slider .ui-slider-handle:first .tooltip')[0]);
             });
-        $('#time-slider .ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel]))
+        $('#time-slider .ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel], emapic.locale))
             .tooltip({ container: '#time-slider .ui-slider-handle:last'}).tooltip('hide').tooltip('fixTitle').on('shown.bs.tooltip', function() {
                 disableTooltipEvents($('#time-slider .ui-slider-handle:last .tooltip')[0]);
             });

@@ -19,12 +19,16 @@
 // THE SOFTWARE.
 
 (function() {
-    
+
     Date.shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    Date.longMonths = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    Date.longMonths = {
+        'es': ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+        'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        'gl': ['Xaneiro', 'Febreiro', 'Marzo', 'Abril', 'Maio', 'Xuño', 'Xullo', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Decembro']
+    };
     Date.shortDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     Date.longDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    
+
     // defining patterns
     var replaceChars = {
         // Day
@@ -37,7 +41,7 @@
         w: function() { return this.getDay(); },
         z: function() { var d = new Date(this.getFullYear(),0,1); return Math.ceil((this - d) / 86400000); }, // Fixed now
         // Week
-        W: function() { 
+        W: function() {
             var target = new Date(this.valueOf());
             var dayNr = (this.getDay() + 6) % 7;
             target.setDate(target.getDate() - dayNr + 3);
@@ -49,7 +53,7 @@
             return 1 + Math.ceil((firstThursday - target) / 604800000);
         },
         // Month
-        F: function() { return Date.longMonths[this.getMonth()]; },
+        F: function(lang) { return Date.longMonths[lang][this.getMonth()]; },
         m: function() { return (this.getMonth() < 9 ? '0' : '') + (this.getMonth() + 1); },
         M: function() { return Date.shortMonths[this.getMonth()]; },
         n: function() { return this.getMonth() + 1; },
@@ -78,7 +82,7 @@
                 for (var i = 0; i < 12; ++i) {
                         var d = new Date(this.getFullYear(), i, 1);
                         var offset = d.getTimezoneOffset();
-    
+
                         if (DST === null) DST = offset;
                         else if (offset < DST) { DST = offset; break; }                     else if (offset > DST) break;
                 }
@@ -95,10 +99,10 @@
     };
 
     // Simulates PHP's date function
-    Date.prototype.format = function(format) {
+    Date.prototype.format = function(format, lang) {
         var date = this;
         return format.replace(/(\\?)(.)/g, function(_, esc, chr) {
-            return (esc === '' && replaceChars[chr]) ? replaceChars[chr].call(date) : chr;
+            return (esc === '' && replaceChars[chr]) ? replaceChars[chr].call(date, lang in Date.longMonths ? lang : 'en') : chr;
         });
     };
 
