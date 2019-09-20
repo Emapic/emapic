@@ -263,7 +263,6 @@ var emapic = emapic || {};
                 }
             });
         });
-        control = emapic.addLayerSelector(baseMaps, null);
         emapic.map.addLayer(osmBW);
         emapic.map.on('baselayerchange', function(layer) {
             if (emapic.currentBaseLayer !== layer.layer) {
@@ -271,6 +270,7 @@ var emapic = emapic || {};
                 emapic.currentBaseLayer = layer;
             }
         });
+        control = emapic.addLayerSelector(baseMaps, null);
     };
 
     emapic.addLayerSelector = function(baselayers, overlays) {
