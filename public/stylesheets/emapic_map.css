@@ -874,16 +874,20 @@ input.form-control[type="radio"] {
     border-radius: 5px;
 }
 
-.map .tooltip.right .tooltip-arrow {
+.map > .tooltip.right .tooltip-arrow,
+.map :not(.leaflet-popup-pane) > .tooltip.right .tooltip-arrow {
     border-right-color: #004F71 !important;
 }
-.map .tooltip.left .tooltip-arrow {
+.map > .tooltip.left .tooltip-arrow,
+.map :not(.leaflet-popup-pane) > .tooltip.left .tooltip-arrow {
     border-left-color: #004F71 !important;
 }
-.map .tooltip.top .tooltip-arrow {
+.map > .tooltip.top .tooltip-arrow,
+.map :not(.leaflet-popup-pane) > .tooltip.top .tooltip-arrow {
     border-top-color: #004F71 !important;
 }
-.map .tooltip.bottom .tooltip-arrow {
+.map > .tooltip.bottom .tooltip-arrow,
+.map :not(.leaflet-popup-pane) > .tooltip.bottom .tooltip-arrow {
     border-bottom-color: #004F71 !important;
 }
 .leaflet-touch .leaflet-bar.time-control {
