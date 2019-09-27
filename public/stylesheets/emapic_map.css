@@ -58,9 +58,12 @@ label {
 .leaflet-container {
     font-family: hero,sans-serif !important;
 }
+:not(.leaflet-control-container):not(.leaflet-control).force-disable,
 .leaflet-control-container.force-disable a,
 .leaflet-control-container.force-disable button,
 .leaflet-control-container.force-disable input,
+.leaflet-control-container.force-disable .leaflet-control-layers,
+.leaflet-control-container.force-disable .leaflet-control-geocoder,
 .leaflet-marker-icon.leaflet-interactive.force-disable,
 .leaflet-image-layer.leaflet-interactive.force-disable,
 .leaflet-pane > svg path.leaflet-interactive.force-disable {
