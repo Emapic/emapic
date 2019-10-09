@@ -190,7 +190,7 @@ var emapic = emapic || {};
         var container = $('#app-total-counter-list-container');
         container.find('.span-container span').each(function() {
             var $this = $(this);
-            $this.parents('.span-container').width($this.width());
+            $this.parents('.span-container').width($this.width() + 1);
         });
         if (container[0].scrollHeight > container[0].clientHeight) {
             container.jScrollPane();
