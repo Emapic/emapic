@@ -306,7 +306,7 @@ module.exports = function(app) {
             }
 
             ws.cell(row, 1, row, 3, true).string(i18n.__('export_header_total')).style(italicStyle).style(borderStyle);
-            ws.cell(row, 4).formula('sum(D' + (row - answerIds.length) + ':D' + (row - 1)).style(italicStyle).style(boldStyle).style(borderStyle);
+            ws.cell(row, 4).formula('sum(D' + (row - answerIds.length) + ':D' + (row - 1) + ')').style(italicStyle).style(boldStyle).style(borderStyle);
 
             row += 3;
         }
