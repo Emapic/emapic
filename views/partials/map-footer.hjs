@@ -33,6 +33,12 @@
                 var date = new Date(el.attr('date'));
                 el.html(date.format('{{#__}}js_full_date_format{{/__}}'));
             });
+            $('[placeholder-i18ntext]').each(function() {
+                var textId = $(this).attr('placeholder-i18ntext');
+                if (textId) {
+                    $(this).attr('placeholder', emapic.utils.getI18n('js_' + textId + '_placeholder'));
+                }
+            });
         });
     </script>
 

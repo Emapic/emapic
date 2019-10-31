@@ -67,6 +67,8 @@
     emapic.utils.registerI18n('js_spatial_filter_brief_description', '{{#__}}js_spatial_filter_brief_description{{/__}}');
     emapic.utils.registerI18n('js_time_filter_brief_description', '{{#__}}js_time_filter_brief_description{{/__}}');
     emapic.utils.registerI18n('js_color_filter_brief_description', '{{#__}}js_color_filter_brief_description{{/__}}');
+    emapic.utils.registerI18n('js_type_answer_placeholder', '{{#__}}type_answer_placeholder{{/__}}');
+    emapic.utils.registerI18n('js_type_image_url_placeholder', '{{#__}}type_image_url_placeholder{{/__}}');
     emapic.utils.registerI18n('js_accept', '{{#__}}accept{{/__}}');
     emapic.utils.registerI18n('js_finish', '{{#__}}finish{{/__}}');
     emapic.utils.registerI18n('js_cancel', '{{#__}}cancel{{/__}}');

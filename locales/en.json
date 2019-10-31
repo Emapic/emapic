@@ -419,6 +419,8 @@
 	"identification": "Identification",
 	"optional_note": "optional",
 	"max_length_note": "{{length}} chars max",
+	"type_answer_placeholder": "Type your answer",
+	"type_image_url_placeholder": "Type the URL address of an image",
 	"show_your_image_subtitle": "Show your image",
 	"locate_subtitle": "Locate yourself",
 	"preferences_subtitle": "Tell us your preferences",

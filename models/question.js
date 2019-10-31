@@ -218,7 +218,7 @@ function generateExclusiveBtnAnswerHtml(answer, layout, question) {
     return html;
 }
 
-function generateTextInputQuestionHtml(question, validator, maxLength, req) {
+function generateTextInputQuestionHtml(question, validator, maxLength, placeholderText, req) {
     var opt = req.i18n.__('optional_note'),
         max = req.i18n.__('max_length_note'),
         validator = validator || null,
@@ -227,7 +227,8 @@ function generateTextInputQuestionHtml(question, validator, maxLength, req) {
     return '<h2>' + escape(question.question) + (mandatory ? '' : '<small><i> (' + opt + ') </i></small>') + '</h2>\n' +
         '<div class="col-xs-12 text-left"><div id="q' + question.question_order + '-other"' +
         ' class="col-xs-12 survey-answer text-answer"><div class="flex-container"><input autocomplete="off" id="q' +
-        question.question_order + '-input" type="text" ' + (maxLength ? 'maxlength="' + maxLength + '" ' : '') + 'target="#q' + question.question_order +
+        question.question_order + '-input" type="text" ' + (placeholderText !== null ? 'placeholder-i18ntext="' + placeholderText + '" ' : '') +
+        (maxLength ? 'maxlength="' + maxLength + '" ' : '') + 'target="#q' + question.question_order +
         '-ok, #end-survey-btn, #block-nav-btns .edit-question-btn.btn-success ~ .edit-question-btn:not([disabled])" target-ok="#q' +
         question.question_order + '-ok" onkeydown="emapic.utils.inputEnterToClick(event)" ' + (validator !== null ?
         ' onkeyup="' + validator + '(this, ' + mandatory + ')" onchange="' + validator + '(this, ' + mandatory + ')"' : '') + '/><button id="q' + question.question_order +
@@ -235,7 +236,7 @@ function generateTextInputQuestionHtml(question, validator, maxLength, req) {
         '\', \'q' + question.question_order + '-input\')">OK</button></div>' + (maxLength ? '<label class="footer">' + max.replace('{{length}}', maxLength) + '</label>' : '') + '</div></div>';
 }
 
-function generateTextAreaQuestionHtml(question, validator, maxLength, req) {
+function generateTextAreaQuestionHtml(question, validator, maxLength, placeholderText, req) {
     var opt = req.i18n.__('optional_note'),
         max = req.i18n.__('max_length_note'),
         validator = validator || null,
@@ -244,7 +245,8 @@ function generateTextAreaQuestionHtml(question, validator, maxLength, req) {
     return '<h2>' + escape(question.question) + (mandatory ? '' : '<small><i> (' + opt + ') </i></small>') + '</h2>\n' +
         '<div class="col-xs-12 text-left"><div id="q' + question.question_order + '-other"' +
         ' class="col-xs-12 survey-answer text-answer"><div class="flex-container"><textarea autocomplete="off" id="q' +
-        question.question_order + '-input" type="text" ' + (maxLength ? 'maxlength="' + maxLength + '" ' : '') + 'target="#q' + question.question_order +
+        question.question_order + '-input" type="text" ' + (placeholderText !== null ? 'placeholder-i18ntext="' + placeholderText + '" ' : '') +
+        (maxLength ? 'maxlength="' + maxLength + '" ' : '') + 'target="#q' + question.question_order +
         '-ok, #end-survey-btn, #block-nav-btns .edit-question-btn.btn-success ~ .edit-question-btn:not([disabled])" target-ok="#q' +
         question.question_order + '-ok" ' + (validator !== null ?
         ' onkeyup="' + validator + '(this, ' + mandatory + ')" onchange="' + validator + '(this, ' + mandatory + ')"' : '') + '></textarea><button id="q' + question.question_order +
@@ -636,16 +638,16 @@ module.exports = function(sequelize, DataTypes) {
                     }
                 );
             case 'text-answer':
-                html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputNotVoid', Question.maxLengths[parent.type], req);
+                html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputNotVoid', Question.maxLengths[parent.type], 'type_answer', req);
                 break;
             case 'long-text-answer':
-                html += generateTextAreaQuestionHtml(parent, 'emapic.utils.checkInputNotVoid', Question.maxLengths[parent.type], req);
+                html += generateTextAreaQuestionHtml(parent, 'emapic.utils.checkInputNotVoid', Question.maxLengths[parent.type], 'type_answer', req);
                 break;
             case 'image-upload':
                 html += generateImageInputQuestionHtml(parent, 'emapic.utils.checkImageNotVoid', req);
                 break;
             case 'image-url':
-                html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputUrlIsImage', null, req);
+                html += generateTextInputQuestionHtml(parent, 'emapic.utils.checkInputUrlIsImage', null, 'type_image_url', req);
                 break;
             case 'explanatory-text':
                 html += '<div class="col-xs-12 text-center"><div id="q' + parent.question_order + '-other"' +
