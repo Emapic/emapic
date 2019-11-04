@@ -813,6 +813,14 @@ div.preferences-block input[type="checkbox"] {
     margin-bottom: 20px;
 }
 
+.create-search-div {
+    text-align: right;
+}
+
+.create-search-div > a {
+    display: inline-block;
+}
+
 .search-div {
     text-align: right;
     display: flex;

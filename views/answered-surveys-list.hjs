@@ -3,7 +3,21 @@
 <div class="container content">
 
 	<div class="col-xs-12 list-complex-header">
-		<h2 class="col-xs-12">{{#__}}answered_surveys{{/__}} <small>/ {{user.display_name}}</small></h2>
+		<h2 class="col-xs-12 col-md-6">{{#__}}answered_surveys{{/__}} <small>/ {{user.display_name}}</small></h2>
+        <div class="col-xs-12 col-md-6 search-div">
+            <input class="form-control" id="search-surveys" type="text" value="{{query}}" onkeypress="searchInputKeyPressed(event)"></input>
+            <button class="btn btn-default" onclick="searchSurveys()">{{#__}}search{{/__}}</button>
+        </div>
+        <div class="col-xs-12 text-right order-div">
+            <label>{{#__}}order_by{{/__}}</label>
+            <select name="order" style="visibility: hidden;">
+                {{#query}}<option value="default">{{#__}}order_relevance{{/__}}</option>{{/query}}
+                <option value="answer">{{#__}}order_answer_date{{/__}}</option>
+                <option value="dates">{{#__}}order_creation_date{{/__}}</option>
+                <option value="votes">{{#__}}order_nr_votes{{/__}}</option>
+                <option value="popular">{{#__}}order_popularity{{/__}}</option>
+            </select>
+        </div>
 	</div>
 
 	<div class="col-xs-12">
@@ -12,106 +26,106 @@
 			<li>
 				<div class="panel panel-default">
                     <div class="survey-panel-header">
-                        {{#survey.date_opened}}
-                            <span class="badge survey-active-dates {{^survey.active}}survey-closed {{/survey.active}}pull-left" data-toggle="tooltip" data-placement="right" title="{{#survey.active}}{{#__}}tooltip_survey_opened_date{{/__}}{{/survey.active}}{{^survey.active}}{{#__}}tooltip_survey_closed_date{{/__}}{{/survey.active}}">
-                                <span class="opened-date date-to-locale"  date="{{survey.date_opened}}"></span>
-                            {{#survey.date_closed}}
+                        {{#Survey.date_opened}}
+                            <span class="badge survey-active-dates {{^Survey.active}}survey-closed {{/Survey.active}}pull-left" data-toggle="tooltip" data-placement="right" title="{{#Survey.active}}{{#__}}tooltip_survey_opened_date{{/__}}{{/Survey.active}}{{^Survey.active}}{{#__}}tooltip_survey_closed_date{{/__}}{{/Survey.active}}">
+                                <span class="opened-date date-to-locale"  date="{{Survey.date_opened}}"></span>
+                            {{#Survey.date_closed}}
                                 <span> - </span>
-                                <span class="closed-date date-to-locale" date="{{survey.date_closed}}"></span>
-                            {{/survey.date_closed}}
+                                <span class="closed-date date-to-locale" date="{{Survey.date_closed}}"></span>
+                            {{/Survey.date_closed}}
                             </span>
-                        {{/survey.date_opened}}
-                        <span class="badge answered-date date-to-locale pull-right" date="{{dates.0}}" data-toggle="tooltip" data-placement="left" title="{{#__}}tooltip_survey_answered_date{{/__}}"></span>
+                        {{/Survey.date_opened}}
+                        <span class="badge answered-date date-to-locale pull-right" date="{{vote_date}}" data-toggle="tooltip" data-placement="left" title="{{#__}}tooltip_survey_answered_date{{/__}}"></span>
                     </div>
 					<div class="panel-body">
-                        <a href="/survey/{{survey.encr_id}}">
-                            <img class="hide-small survey-list-thumbnail" src="/thumbnails/survey/small/{{survey.encr_id}}"></img>
+                        <a href="/survey/{{Survey.encr_id}}">
+                            <img class="hide-small survey-list-thumbnail" src="/thumbnails/survey/small/{{Survey.encr_id}}"></img>
                         </a>
 						<div class="survey-descrip">
 							<h4>
-								<a class="survey-title" href="/survey/{{survey.encr_id}}">{{survey.title}}</a>
-								{{^survey.active}}
-								{{#survey.already_opened}}
+								<a class="survey-title" href="/survey/{{Survey.encr_id}}">{{Survey.title}}</a>
+								{{^Survey.active}}
+								{{#Survey.already_opened}}
 								<span class="badge status">{{#__}}closed{{/__}}</span>
-								{{/survey.already_opened}}
-								{{/survey.active}}
-								{{#survey.description}}
-								<p><small>{{{survey.description_markdown_to_html}}}</small></p>
-								{{/survey.description}}
+								{{/Survey.already_opened}}
+								{{/Survey.active}}
+								{{#Survey.description}}
+								<p><small>{{{Survey.description_markdown_to_html}}}</small></p>
+								{{/Survey.description}}
 							</h4>
-							{{#survey.tags}}
+							{{#Survey.tags}}
 							<div class="glyphicon glyphicon-tag"></div>
-							{{#survey.tags_array}}
+							{{#Survey.tags_array}}
 							<a href="/surveys/tag/{{ . }}" class="badge tag">{{ . }}</a>
-							{{/survey.tags_array}}
-							{{/survey.tags}}
+							{{/Survey.tags_array}}
+							{{/Survey.tags}}
 						</div>
 					</div>
                     <div class="panel-footer-with-author">
                         <div class="survey-list-author">
                             <div class="avatar pull-left">
                                 <span></span>
-                                <a href="/surveys/user/{{survey.owner.login}}">
-                                    <img src="/avatar/{{survey.owner.login}}"></img>
+                                <a href="/surveys/user/{{Survey.owner.login}}">
+                                    <img src="/avatar/{{Survey.owner.login}}"></img>
                                 </a>
                             </div>
-                            <a href="/surveys/user/{{survey.owner.login}}">
-                                <span class="login">{{survey.owner.display_name}}</span>
+                            <a href="/surveys/user/{{Survey.owner.login}}">
+                                <span class="login">{{Survey.owner.display_name}}</span>
                             </a>
                         </div>
                         <div class="panel-footer">
-                            {{#survey.active}}
+                            {{#Survey.active}}
                             <div class="pull-left">
-                                <a href="/survey/{{survey.encr_id}}">
+                                <a href="/survey/{{Survey.encr_id}}">
                                     <button class="btn btn-default btn-md" id="view-survey-btn" data-toggle="tooltip" data-placement="bottom" title="{{#__}}survey{{/__}}">
                                         <span class="glyphicon glyphicon-play"></span>
                                     </button>
                                 </a>
                             </div>
 
-                            {{#survey.public_results}}
+                            {{#Survey.public_results}}
                             <div class="pull-left">
-                                <a href="/survey/{{survey.encr_id}}/results">
+                                <a href="/survey/{{Survey.encr_id}}/results">
                                     <button class="btn btn-default btn-md" id="results-btn" data-toggle="tooltip" data-placement="bottom" title="{{#__}}results{{/__}}">
                                         <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
                                     </button>
                                 </a>
                             </div>
-                            {{/survey.public_results}}
-                            {{/survey.active}}
-                            {{^survey.active}}
+                            {{/Survey.public_results}}
+                            {{/Survey.active}}
+                            {{^Survey.active}}
                             <div class="pull-left">
-                                <a href="/survey/{{survey.encr_id}}/results">
+                                <a href="/survey/{{Survey.encr_id}}/results">
                                     <button class="btn btn-default btn-md" id="results-btn" data-toggle="tooltip" data-placement="bottom" title="{{#__}}results{{/__}}">
                                         <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
                                     </button>
                                 </a>
                             </div>
-                            {{/survey.active}}
+                            {{/Survey.active}}
                             <div class="dropdown pull-left share-dropdown">
-                                <button class="btn btn-default btn-md dropdown-toggle bs-tooltip" type="button" id="share-url-btn" survey-id="{{survey.encr_id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-placement="right" title="{{#__}}share{{/__}}">
+                                <button class="btn btn-default btn-md dropdown-toggle bs-tooltip" type="button" id="share-url-btn" survey-id="{{Survey.encr_id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-placement="right" title="{{#__}}share{{/__}}">
                                     <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
                                 </button>
 								<ul class="dropdown-menu share-url{{#addThisId}} addThis{{/addThisId}}" aria-labelledby="share-url-btn">
-                                    <input class="share-url-box" readonly onclick="this.select();" value="{{web_host}}/survey/{{survey.encr_id}}">
+                                    <input class="share-url-box" readonly onclick="this.select();" value="{{web_host}}/survey/{{Survey.encr_id}}">
 	                                {{#addThisId}}
 	                                <!-- Go to www.addthis.com/dashboard to customize your tools -->
-	                                <div class="addthis_inline_share_toolbox" data-url="{{web_host}}/survey/{{survey.encr_id}}" data-title="{{survey.title}}"></div>
+	                                <div class="addthis_inline_share_toolbox" data-url="{{web_host}}/survey/{{Survey.encr_id}}" data-title="{{Survey.title}}"></div>
 	                                {{/addThisId}}
                                     <div class="social-btns">
-                                        <a href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u={{#encodeURIComponent}}{{web_host}}/survey/{{survey.encr_id}}{{/encodeURIComponent}}&display=popup&src=share_button" target="_blank">
+                                        <a href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u={{#encodeURIComponent}}{{web_host}}/survey/{{Survey.encr_id}}{{/encodeURIComponent}}&display=popup&src=share_button" target="_blank">
                                             <span class="share-sq fab fa-facebook">
                                             </span>
                                         </a>
-                                        <a href="https://twitter.com/intent/tweet?text={{#encodeURIComponent}}{{survey.title}}{{/encodeURIComponent}}&tw_p=tweetbutton&url={{#encodeURIComponent}}{{web_host}}/survey/{{survey.encr_id}}{{/encodeURIComponent}}{{#twitterVia}}&via={{twitterVia}}{{/twitterVia}}" target="_blank">
+                                        <a href="https://twitter.com/intent/tweet?text={{#encodeURIComponent}}{{Survey.title}}{{/encodeURIComponent}}&tw_p=tweetbutton&url={{#encodeURIComponent}}{{web_host}}/survey/{{Survey.encr_id}}{{/encodeURIComponent}}{{#twitterVia}}&via={{twitterVia}}{{/twitterVia}}" target="_blank">
                                             <span class="share-sq fab fa-twitter">
                                             </span>
                                         </a>
-                                        <a href="https://plus.google.com/share?url={{#encodeURIComponent}}{{web_host}}/survey/{{survey.encr_id}}{{/encodeURIComponent}}" target="_blank">
+                                        <a href="https://plus.google.com/share?url={{#encodeURIComponent}}{{web_host}}/survey/{{Survey.encr_id}}{{/encodeURIComponent}}" target="_blank">
                                             <span class="share-sq fab fa-google-plus-g">
                                             </span>
                                         </a>
-                                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{#encodeURIComponent}}{{web_host}}/survey/{{survey.encr_id}}{{/encodeURIComponent}}" target="_blank">
+                                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{#encodeURIComponent}}{{web_host}}/survey/{{Survey.encr_id}}{{/encodeURIComponent}}" target="_blank">
                                             <span class="share-sq fab fa-linkedin-in">
                                             </span>
                                         </a>
@@ -121,7 +135,7 @@
                             </div>
 
                             <div class="pull-right">
-                                <label class="badge counter">{{survey.nr_votes}}<span class="hide-small"> {{#__}}survey_answers_footer{{/__}}</span><span class="show-small hide-extrasmall"> {{#__}}survey_answers_footer_abb{{/__}}</span></label>
+                                <label class="badge counter">{{Survey.nr_votes}}<span class="hide-small"> {{#__}}survey_answers_footer{{/__}}</span><span class="show-small hide-extrasmall"> {{#__}}survey_answers_footer_abb{{/__}}</span></label>
                             </div>
                         </div>
                     </div>
@@ -145,8 +159,10 @@
 {{#addThisId}}
 <!-- Go to www.addthis.com/dashboard to customize your tools -->
 <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={{addThisId}}"></script>
-{{#twitterVia}}
+{{/addThisId}}
 <script type="text/javascript">
+{{#addThisId}}
+{{#twitterVia}}
 	var addthis_share = addthis_share || {};
 	addthis_share = {
 		passthrough : {
@@ -155,7 +171,36 @@
 			}
 		}
 	};
-</script>
 {{/twitterVia}}
 {{/addThisId}}
+function searchInputKeyPressed(e) {
+	if (!e) e = window.event;
+	var keyCode = e.keyCode || e.which;
+	if (keyCode == '13'){
+	  searchSurveys();
+	  return false;
+	}
+}
+
+function searchSurveys() {
+	var terms = $('#search-surveys').val();
+	window.location = window.location.pathname + ((terms.trim() !== '') ? ('?q=' + encodeURIComponent(terms)) : (''));
+}
+
+$(function() {
+	var order = emapic.utils.getURLParameter('order');
+	if (order) {
+		$('select[name="order"]').val(order);
+	}
+	$('select[name="order"]').show();
+	$('select[name="order"]').selectmenu({
+		classes: {
+			'ui-selectmenu-menu': 'order-selectmenu-menu'
+		},
+		change: function() {
+			window.location = emapic.utils.changeURLParameter('order', $('select[name="order"]').val());
+		}
+	});
+});
+</script>
 {{/yield-scripts}}

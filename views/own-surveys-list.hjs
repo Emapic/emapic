@@ -4,13 +4,18 @@
 
 	<div class="col-xs-12 list-complex-header">
 		<h2 class="col-xs-12 col-md-6">{{#__}}own_surveys{{/__}} <small>/ {{user.login}}</small></h2>
-        <div class="col-xs-12 col-md-6">
+        <div class="col-xs-12 col-md-6 create-search-div">
             <a href="/surveys/new"><button class="btn btn-primary pull-right"><span class="glyphicon glyphicon-plus"></span> {{#__}}create_new_survey{{/__}}</button></a>
+	        <div class="search-div">
+	            <input class="form-control" id="search-surveys" type="text" value="{{query}}" onkeypress="searchInputKeyPressed(event)"></input>
+	            <button class="btn btn-default" onclick="searchSurveys()">{{#__}}search{{/__}}</button>
+	        </div>
         </div>
         <div class="col-xs-12 text-right order-div">
             <label>{{#__}}order_by{{/__}}</label>
             <select name="order" style="visibility: hidden;">
-                <option value="default">{{#__}}order_state_creation_date{{/__}}</option>
+				<option value="default">{{#query}}{{#__}}order_relevance{{/__}}{{/query}}{{^query}}{{#__}}order_creation_date{{/__}}{{/query}}</option>
+                {{#query}}<option value="dates">{{#__}}order_creation_date{{/__}}</option>{{/query}}
                 <option value="votes">{{#__}}order_nr_votes{{/__}}</option>
                 <option value="popular">{{#__}}order_popularity{{/__}}</option>
             </select>
@@ -184,6 +189,20 @@
 	};
 	{{/twitterVia}}
 	{{/addThisId}}
+    function searchInputKeyPressed(e) {
+        if (!e) e = window.event;
+        var keyCode = e.keyCode || e.which;
+        if (keyCode == '13'){
+          searchSurveys();
+          return false;
+        }
+    }
+
+    function searchSurveys() {
+        var terms = $('#search-surveys').val();
+        window.location = window.location.pathname + ((terms.trim() !== '') ? ('?q=' + encodeURIComponent(terms)) : (''));
+    }
+
     function closeSurvey(id) {
         if (confirm('{{#__}}close_survey_confirmation{{/__}}')) {
             window.location = '/survey/' + id + '/close';

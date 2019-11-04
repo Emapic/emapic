@@ -1,5 +1,7 @@
 var Promise = require('bluebird'),
-    logger = require('../utils/logger');
+    nconf = require('nconf'),
+    logger = require('../utils/logger'),
+    defaultPageSize = nconf.get('app').defaultPageSize;
 
 module.exports = function(sequelize, DataTypes) {
     var User = sequelize.define('User', {
@@ -67,7 +69,7 @@ module.exports = function(sequelize, DataTypes) {
     };
 
     // Instance methods
-    User.prototype.getAnsweredSurveys = function() {
+    User.prototype.getAnsweredSurveysWithAllDates = function() {
         var userId = this.id;
         return Promise.reduce(this.getVotes({
                 include: [
@@ -116,6 +118,44 @@ module.exports = function(sequelize, DataTypes) {
         });
     };
 
+    User.prototype.getAnsweredSurveys = function(query, order, pageSize, pageNr) {
+        var userId = this.id,
+            orders;
+        if (order === 'answer') {
+            orders = [[sequelize.fn('max', sequelize.col('vote_date')), 'DESC'], [models.Survey, 'id', 'DESC']];
+        } else {
+            orders = models.Survey.getOrder(order);
+            // Must set the proper model for each ordering parameter
+            for (var i = 0, iLen = orders.length; i<iLen; i++) {
+                orders[i].unshift(models.Survey);
+            }
+        }
+        var params = {
+                attributes: [[sequelize.fn('max', sequelize.col('vote_date')), 'vote_date']],
+                include: [{
+                    model: models.Survey.scope(models.Survey.getScopes(null, null, null, query, null, null))
+                }],
+                where: {user_id: userId},
+                group: ['Survey.id', 'Survey->owner.id'],
+                order: orders
+            },
+            pageSize = (pageSize === null || isNaN(pageSize)) ? defaultPageSize : pageSize;
+        if (pageSize !== null) {
+            params.limit = pageSize;
+            if (pageNr !== null && !isNaN(pageNr)) {
+                params.offset = (pageNr - 1) * pageSize;
+            }
+        }
+        return models.Vote.findAndCountAll(params).then(function(results) {
+            // Workaround for a sequelize bug that causes counting for each
+            // grouped element instead of the total
+            if (isNaN(results.count)) {
+                results.count = results.count.length;
+            }
+            return results;
+        });
+    };
+
     User.prototype.isAdmin = function() {
         return this.isRole('admin');
     };
@@ -127,18 +167,6 @@ module.exports = function(sequelize, DataTypes) {
             }
         }).then(function(roles) {
             return roles.length > 0;
-        });
-    };
-
-    User.prototype.getAnsweredSurveysAndCount = function(options) {
-        return this.getAnsweredSurveys().then(function(rows) {
-            var total = rows.length,
-                offset = (options && options.offset && !isNaN(options.offset)) ? parseInt(options.offset, 10) : 0,
-                limit = (options && options.limit && !isNaN(options.limit)) ? offset + parseInt(options.limit, 10) : total;
-            return {
-                count: total,
-                rows: rows.slice(offset, limit)
-            };
         });
     };
 

@@ -27,9 +27,7 @@ module.exports = function(app) {
     });
 
     app.get('/dashboard', requireRole(null), function(req, res){
-        Promise.join(req.user.getAnsweredSurveysAndCount({
-                limit: 5
-            }),
+        Promise.join(req.user.getAnsweredSurveys(null, null, 5, null),
             req.user.getSurveys({
                 where: {
                     active: {
@@ -61,15 +59,15 @@ module.exports = function(app) {
     });
 
     app.get('/surveys/answered', requireRole(null), function(req, res){
-        var pageNr = isNaN(req.query.page) ? 1 : req.query.page,
+        var query = req.query.q && req.query.q.trim() !== '' ? req.query.q : null,
+            order = req.query.order && req.query.order.trim() !== '' ? req.query.order : null,
+            pageNr = isNaN(req.query.page) ? 1 : req.query.page,
             pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
-        req.user.getAnsweredSurveysAndCount({
-            limit: pageSize,
-            offset: (pageNr - 1) * pageSize
-        }).then(function(results) {
+        req.user.getAnsweredSurveys(query, order, pageSize, pageNr).then(function(results) {
             res.render('answered-surveys-list', {
                 answered: results.rows,
                 pagination: Utils.getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
+                query: query,
                 layout: 'layouts/main'
             });
         });
@@ -127,13 +125,15 @@ module.exports = function(app) {
     });
 
     app.get('/surveys/own', requireRole(null), function(req, res) {
-        var order = req.query.order && req.query.order.trim() !== '' ? req.query.order : null,
+        var query = req.query.q && req.query.q.trim() !== '' ? req.query.q : null,
+            order = req.query.order && req.query.order.trim() !== '' ? req.query.order : null,
             pageNr = isNaN(req.query.page) ? 1 : req.query.page,
             pageSize = isNaN(req.query.size) ? defaultPageSize : req.query.size;
-        models.Survey.findSurveys(req.user.id, false, null, null, null, order, pageSize, pageNr).then(function(results) {
+        models.Survey.findSurveys(req.user.id, false, null, query, null, order, pageSize, pageNr).then(function(results) {
             res.render('own-surveys-list', {
                 surveys: results.rows,
                 pagination: Utils.getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
+                query: query,
                 layout: 'layouts/main'
             });
         });

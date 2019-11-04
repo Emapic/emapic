@@ -392,14 +392,14 @@ module.exports = function(sequelize, DataTypes) {
     Survey.getVotesOrder = function() {
         var order = models.Survey.getDefaultOrder();
         // First make sure draft surveys are shown the last
-        order.unshift([sequelize.literal('CASE WHEN active IS NULL THEN 1 ELSE 0 END'), 'ASC'], ['nr_votes', 'DESC']);
+        order.unshift([sequelize.literal('active IS NULL'), 'ASC'], ['nr_votes', 'DESC']);
         return order;
     };
 
     Survey.getPopularityOrder = function() {
         var order = models.Survey.getDefaultOrder();
         // First make sure draft surveys are shown the last
-        order.unshift([sequelize.literal('CASE WHEN active IS NULL THEN 1 ELSE 0 END'), 'ASC'], [sequelize.literal('nr_votes / extract(epoch from (now() - date_opened)) ^ 1.5'), 'DESC']);
+        order.unshift([sequelize.literal('active IS NULL'), 'ASC'], [sequelize.literal('nr_votes / extract(epoch from (now() - date_opened)) ^ 1.5'), 'DESC']);
         return order;
     };
 
@@ -455,21 +455,13 @@ module.exports = function(sequelize, DataTypes) {
         });
     };
 
-    Survey.findSurveys = function(userId, onlyPublic, status, query, tag, order, pageSize, pageNr) {
-        var params = {},
-            scopes = ['includeAuthor'];
+    Survey.getScopes = function(userId, onlyPublic, status, query, tag, order) {
+        var scopes = ['includeAuthor'];
         if (onlyPublic === true) {
             scopes.unshift('public');
         }
         if (status !== null && status in Survey.options.scopes) {
             scopes.unshift(status);
-        }
-        pageSize = pageSize === null || isNaN(pageSize) ? defaultPageSize : pageSize;
-        if (pageSize !== null) {
-            params.limit = pageSize;
-            if (pageNr !== null) {
-                params.offset = (pageNr - 1) * pageSize;
-            }
         }
         if (userId !== null) {
             scopes.unshift({ method: ['filterByOwner', userId] });
@@ -482,7 +474,20 @@ module.exports = function(sequelize, DataTypes) {
         } else {
             scopes.unshift({ method: ['ordering', order] });
         }
-        return Survey.scope(scopes).findAndCountAll(params);
+        return scopes;
+
+    };
+
+    Survey.findSurveys = function(userId, onlyPublic, status, query, tag, order, pageSize, pageNr) {
+        var params = {};
+        pageSize = (pageSize === null || isNaN(pageSize)) ? defaultPageSize : pageSize;
+        if (pageSize !== null) {
+            params.limit = pageSize;
+            if (pageNr !== null && !isNaN(pageNr)) {
+                params.offset = (pageNr - 1) * pageSize;
+            }
+        }
+        return Survey.scope(Survey.getScopes(userId, onlyPublic, status, query, tag, order)).findAndCountAll(params);
     };
 
     Survey.findPublicSurveys = function(userId, status, query, tag, order, pageSize, pageNr) {
