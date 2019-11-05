@@ -2,34 +2,33 @@
 // Emapic panel
 //
 
-$('html body').append("<!-- sidebarPanel ----------------------------------------------------->\n" +
-"<div id='sidebarPanel'>\n"+
-"<div id='titlesidebarPanel'></div>" +
-"<div id='indivData'></div>\n" +
-"<div id='navContainer'></div>\n" +
-"<div id='closesidebarPanel'></div>\n" +
-"</div>");
-
 var emapic = emapic || {};
 
 (function(emapic) {
 
-    var titlesidebarPanel = $('#titlesidebarPanel'),
-    closesidebarPanel = $('#closesidebarPanel'),
-    navContainer = $('#navContainer'),
-    sidebarPanel,
-    closesidebarPanelHtml = "<button type='button' title='" + emapic.utils.getI18n('js_close', 'Cerrar') + "' onclick='emapic.sidebarPanelClose();'><span class='glyphicon glyphicon-chevron-right'></span></button>",
-    navHtml = "<button id='FirstButton' title='" + emapic.utils.getI18n('js_go_first', 'Ir al primero') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToFirst();'><span class='glyphicon glyphicon-fast-backward'></span></button>\n" +
-    "<button id='PrevButton' title='" + emapic.utils.getI18n('js_go_previous', 'Ir al anterior') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToPrevious();'><span class='glyphicon glyphicon-step-backward'></span></button>\n" +
-    "<input type='text' id='CurrentFeatureNumber' maxlength='7'></input><label>/</label><label id='TotalFeatures'></label>\n" +
-    "<button id='NextButton' title='" + emapic.utils.getI18n('js_go_next', 'Ir al siguiente') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToNext();'><span class='glyphicon glyphicon-step-forward'></span></button>\n" +
-    "<button id='LastButton' title='" + emapic.utils.getI18n('js_go_last', 'Ir al último') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToLast();'><span class='glyphicon glyphicon-fast-forward'></span></button>\n",
-    currentFeature = null,
-    oldIcon = null,
-    currentMarker = null,
-    nrLayers,
-    selectedLayerNr,
-    layers;
+    var sidebarHtml = "<!-- sidebarPanel ----------------------------------------------------->\n" +
+            "<div id='sidebarPanel'>\n"+
+            "<div id='titlesidebarPanel'></div>" +
+            "<div id='indivData'></div>\n" +
+            "<div id='navContainer'></div>\n" +
+            "<div id='closesidebarPanel'></div>\n" +
+            "</div>",
+        titlesidebarPanel,
+        closesidebarPanel,
+        navContainer,
+        sidebarPanel,
+        closesidebarPanelHtml = "<button type='button' title='" + emapic.utils.getI18n('js_close', 'Cerrar') + "' onclick='emapic.sidebarPanelClose();'><span class='glyphicon glyphicon-chevron-right'></span></button>",
+        navHtml = "<button id='FirstButton' title='" + emapic.utils.getI18n('js_go_first', 'Ir al primero') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToFirst();'><span class='glyphicon glyphicon-fast-backward'></span></button>\n" +
+            "<button id='PrevButton' title='" + emapic.utils.getI18n('js_go_previous', 'Ir al anterior') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToPrevious();'><span class='glyphicon glyphicon-step-backward'></span></button>\n" +
+            "<input type='text' id='CurrentFeatureNumber' maxlength='7'></input><label>/</label><label id='TotalFeatures'></label>\n" +
+            "<button id='NextButton' title='" + emapic.utils.getI18n('js_go_next', 'Ir al siguiente') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToNext();'><span class='glyphicon glyphicon-step-forward'></span></button>\n" +
+            "<button id='LastButton' title='" + emapic.utils.getI18n('js_go_last', 'Ir al último') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToLast();'><span class='glyphicon glyphicon-fast-forward'></span></button>\n",
+        currentFeature = null,
+        oldIcon = null,
+        currentMarker = null,
+        nrLayers,
+        selectedLayerNr,
+        layers;
 
     emapic.modules = emapic.modules || {};
     emapic.modules.panel = emapic.modules.panel || {};
@@ -55,13 +54,17 @@ var emapic = emapic || {};
     };
 
     emapic.initializeMap = emapic.utils.overrideFunction(emapic.initializeMap, null, function() {
+        $('html body').append(sidebarHtml);
         sidebarPanel = L.control.sidebar('sidebarPanel', {
             position: 'topright',
             autoPan: false,
             closeButton: false
         });
-        bodysidebarPanel();
         emapic.map.addControl(sidebarPanel);
+        titlesidebarPanel = $('#titlesidebarPanel');
+        closesidebarPanel = $('#closesidebarPanel');
+        navContainer = $('#navContainer');
+        bodysidebarPanel();
         $('#CurrentFeatureNumber').keydown(featureNumberKeydown);
     });
 
