@@ -1,6 +1,7 @@
 var Promise = require('bluebird'),
     nconf = require('nconf'),
     htmlToText = require('html-to-text'),
+    linkifyHtml = require('linkifyjs/html'),
     fsp = require('fs-extra'),
     path = require('path'),
     fs = require('fs'),
@@ -210,7 +211,7 @@ module.exports = function(sequelize, DataTypes) {
         },
         description_markdown_to_html: {
             // 'Translate' description written in markdown to html
-            // Plaintext descriptions are also linkified during this process
+            // Plain URLs are also linkified during this process
             type: DataTypes.VIRTUAL,
             get: function() {
                 // TUI editor raw value needs to be modified because it includes both newlines
@@ -218,7 +219,7 @@ module.exports = function(sequelize, DataTypes) {
                 // Can't modify it when saving because the editor itself expects that strange
                 // format when editing the previous value.
                 // See ticket #299: https://github.com/nhn/tui.editor/issues/299
-                return (this.description !== null && this.description.length > 0) ? md.renderInline(this.description.replace(/<br>[\n\r]/g , '')) : '';
+                return (this.description !== null && this.description.length > 0) ? linkifyHtml(md.renderInline(this.description.replace(/<br>[\n\r]/g , ''))) : '';
             }
         },
         tags_array: {
