@@ -27,6 +27,9 @@ var emapic = emapic || {};
     emapic.modules.counterStats = emapic.modules.counterStats || {};
 
     emapic.modules.counterStats.orderVotes = false;
+    emapic.modules.counterStats.pieChartWidth = 180;
+    emapic.modules.counterStats.pieChartRadius = 81;
+    emapic.modules.counterStats.rowChartWidth = 330;
 
     emapic.modules.counterStats.filter = new emapic.Filter({
         applyFilter: function(feature) {
@@ -338,8 +341,9 @@ var emapic = emapic || {};
 
         var legendHeight = 18,
             maxLen = 0,
-            width = 180,
             chartType = $('#chart-type-btn').attr('name'),
+            radius = emapic.modules.counterStats.pieChartRadius,
+            width = (chartType === 'pie') ? emapic.modules.counterStats.pieChartWidth : emapic.modules.counterStats.rowChartWidth,
             votesById = {},
             votes = [],
             maxDataLen = 0;
@@ -391,9 +395,10 @@ var emapic = emapic || {};
                 maxLen = el.responses_array.length;
             }
         });
-        legendHeight = legendHeight * maxLen + width;
+        legendHeight = legendHeight * maxLen + (radius * 2.2);
 
-        (chartType == 'pie') ? configPieChart(currentVoteChart, width, legendHeight, voteDimension, voteDimensionGroup, all) : configRowChart(currentVoteChart, legendHeight, voteDimension, voteDimensionGroup, all, maxDataLen);
+        (chartType == 'pie') ? configPieChart(currentVoteChart, width, radius, legendHeight, voteDimension, voteDimensionGroup, all) :
+            configRowChart(currentVoteChart, width, legendHeight, voteDimension, voteDimensionGroup, all, maxDataLen);
 
         //simply call renderAll() to render all charts on the page
         dc.renderAll();
@@ -424,16 +429,17 @@ var emapic = emapic || {};
         emapic.modules.counterStats.loadStats(chartFeatures); // update chart
     };
 
-    function configPieChart(voteChart, width, legendHeight, voteDimension, voteDimensionGroup, all) {
+    function configPieChart(voteChart, width, radius, legendHeight, voteDimension, voteDimensionGroup, all) {
         voteChart
             .width(width) // (optional) define chart width, :default = 200
             .height(legendHeight) // (optional) define chart height, :default = 200
-            .radius(0.45 * width) // define pie radius
+            .cy(radius * 1.1)
+            .radius(radius) // define pie radius
             .dimension(voteDimension) // set dimension
             .group(voteDimensionGroup) // set group
             .legend(dc.legend().legendText(function(d) {
                 return currentChartsLegend.color.responses[d.name].value + ': ' + d.data;
-            }).y(width))
+            }).y(radius * 2.2))
             .title(function(d) {
                 var id = ('data' in d) ? d.data.key : d.key;
                 return currentChartsLegend.color.responses[id].value + ": " + d.value;
@@ -452,9 +458,9 @@ var emapic = emapic || {};
         return voteChart;
     };
 
-    function configRowChart(voteChart, legendHeight, voteDimension, voteDimensionGroup, all, maxDataLen) {
+    function configRowChart(voteChart, width, legendHeight, voteDimension, voteDimensionGroup, all, maxDataLen) {
         voteChart
-            .width(330) // (optional) define chart width, :default = 200
+            .width(width) // (optional) define chart width, :default = 200
             .height(legendHeight) // (optional) define chart height, :default = 200
             .dimension(voteDimension) // set dimension
             .group(voteDimensionGroup) // set group
