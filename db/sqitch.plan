@@ -31,3 +31,4 @@ link_answers_and_municipalities [base_layers emapic_tables] 2019-04-09T12:31:41Z
 fix_votes_relationship [emapic_tables] 2019-04-25T12:24:09Z Jorge López Fernández <jlopez@emapic.es> # Votes table entries should revert to a null user when it's deleted
 add_long_text_question [add_image_upload_question] 2019-05-13T17:41:43Z Jorge López Fernández <jlopez@emapic.es> # Add new question type: long text
 fix_assign_municipality [link_answers_and_municipalities] 2019-07-09T16:36:43Z Jorge López Fernández <jlopez@emapic.es> # Fix a mistake in assign municipality function
+add_custom_single_marker [emapic_tables] 2019-12-09T19:14:23Z Jorge López Fernández <jlopez@emapic.es> # Add column for custom single marker in surveys

@@ -151,27 +151,38 @@ module.exports = function(app) {
 
     app.post('/surveys/new', requireRole(null), function(req, res){
         req.user.isAdmin().then(function(isAdmin) {
-            // Max survey images' file size is 1 MB
-            for (var file in req.files) {
-                if (req.files[file].size > 1000000) {
-                    req.session.error = 'survey_answer_image_file_too_big_msg';
-                    Utils.copyBodyToLocals(req, res);
-                    questionsMap = JSON.stringify(extractQuestionsMapFromRequest(req));
-                    return res.render('new-survey', {
-                        is_admin: isAdmin,
-                        layout: 'layouts/survey-form',
-                        questionsMap: questionsMap
-                    });
-                }
-            }
-            models.Survey.createFromPost(req).then(function(survey) {
+            models.Survey.checkValidPost(req).then(function() {
+                return models.Survey.createFromPost(req);
+            }).then(function(survey) {
                 req.session.success = 'survey_created_success_msg';
                 logger.info('Survey with id ' + survey.id + ' has been created successfully.');
                 res.redirect('/surveys/own');
             }).catch(function(err) {
-                req.session.error = 'survey_created_error_msg';
                 logger.error('Error while creating new survey: ' + err);
-                res.redirect('/surveys/new');
+                req.session.error = 'survey_created_error_msg';
+                if (err && err.code) {
+                    switch (err.code) {
+                        case "answer_img_invalid":
+                            req.session.error = 'survey_answer_image_file_invalid_msg';
+                            break;
+                        case "answer_img_too_big":
+                            req.session.error = 'survey_answer_image_file_too_big_msg';
+                            break;
+                        case "custom_single_marker_img_invalid":
+                            req.session.error = 'survey_custom_single_marker_image_file_invalid_msg';
+                            break;
+                        case "custom_single_marker_img_too_big":
+                            req.session.error = 'survey_custom_single_marker_image_file_too_big_msg';
+                            break;
+                    }
+                }
+                Utils.copyBodyToLocals(req, res);
+                questionsMap = JSON.stringify(extractQuestionsMapFromRequest(req));
+                return res.render('new-survey', {
+                    is_admin: isAdmin,
+                    layout: 'layouts/survey-form',
+                    questionsMap: questionsMap
+                });
             });
         });
     });

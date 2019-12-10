@@ -172,6 +172,7 @@ module.exports = function(sequelize, DataTypes) {
         results_after_vote: DataTypes.BOOLEAN,
         public_results: DataTypes.BOOLEAN,
         dont_list: DataTypes.BOOLEAN,
+        custom_single_marker_file_id: DataTypes.BIGINT,
         multiple_answer: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
         anonymized: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
         language: DataTypes.STRING,
@@ -246,6 +247,17 @@ module.exports = function(sequelize, DataTypes) {
                 // We remove the starting and ending commas and put a
                 // space after the rest
                 return this.tags.replace(/^,/, '').replace(/,$/, '').replace(/,/g, ', ');
+            }
+        },
+        custom_single_marker_url: {
+            // Virtual commodity field for retrieving the actual URL for
+            // the custom marker image
+            type: DataTypes.VIRTUAL,
+            get: function() {
+                if (!this.custom_single_marker_file_id) {
+                    return null;
+                }
+                return '/api/survey/' + this.encr_id + '/marker/single';
             }
         }
     }, {
@@ -374,7 +386,7 @@ module.exports = function(sequelize, DataTypes) {
         },
         hooks: {
             beforeDestroy: function(survey) {
-                return Promise.join(survey.dropTable(), survey.deleteThumbnails());
+                return Promise.join(survey.dropTable(), survey.deleteThumbnails(), survey.dropAllSurveyFiles());
             }
         },
         tableName: 'surveys',
@@ -429,6 +441,24 @@ module.exports = function(sequelize, DataTypes) {
         models.User.hasMany(Survey, {foreignKey: 'owner_id'});
     };
 
+    Survey.checkValidPost = function(req) {
+        if ('custom_single_marker' in req.body && 'custom_single_marker_img' in req.files && req.files.custom_single_marker_img.size) {
+            if (!(Utils.isImage(fs.readFileSync(req.files.custom_single_marker_img.path)))) {
+                return Promise.reject({
+                    message: "invalid image for custom single marker : selected file is not an image.",
+                    code: 'custom_single_marker_img_invalid'
+                });
+            }
+            if (req.files.custom_single_marker_img.size > 1000000) {
+                return Promise.reject({
+                    message: "invalid image for custom single marker : image file exceeds the 1MB max size.",
+                    code: 'custom_single_marker_img_too_big'
+                });
+            }
+        }
+        return models.Question.checkValidPost(req);
+    };
+
     Survey.createFromPost = function(req) {
         var survey;
         return Survey.create({
@@ -445,8 +475,22 @@ module.exports = function(sequelize, DataTypes) {
             active : ('open_now' in req.body) ? true : null
         }).then(function(surv) {
             survey = surv;
-            // We create the survey questions + answers
-            return models.Question.createFromPost(req, survey);
+            var markerPromise = Promise.resolve();
+            // We create and assign the custom marker if we have one
+            if ('custom_single_marker' in req.body && 'custom_single_marker_img' in req.files && req.files.custom_single_marker_img.size) {
+                markerPromise = survey.deleteCustomSingleMarker().then(function() {
+                    return FileHelper.saveFileFromPath(req.files.custom_single_marker_img.path,
+                        'images/survey/' + survey.id + '/marker/custom_single_marker' + path.extname(req.files.custom_single_marker_img.name),
+                        req.files.custom_single_marker_img.name);
+                }).then(function(markerFileId) {
+                    survey.custom_single_marker_file_id = markerFileId;
+                    return survey.save();
+                });
+            }
+            return markerPromise;
+        }).then(function() {
+                // We create the survey questions + answers
+                return models.Question.createFromPost(req, survey);
         }).then(function(questions) {
             // We create the survey specific table and triggers
             return survey.createTable();
@@ -511,6 +555,20 @@ module.exports = function(sequelize, DataTypes) {
         var survey;
         return Survey.findByPk(req.body.survey_id).then(function(surv) {
             survey = surv;
+            var markerPromise = Promise.resolve(survey.custom_single_marker_file_id);
+            if ('custom_single_marker' in req.body && 'custom_single_marker_img' in req.files && req.files.custom_single_marker_img.size) {
+                markerPromise = survey.deleteCustomSingleMarker().then(function() {
+                    return FileHelper.saveFileFromPath(req.files.custom_single_marker_img.path,
+                        'images/survey/' + survey.id + '/marker/custom_single_marker' + path.extname(req.files.custom_single_marker_img.name),
+                        req.files.custom_single_marker_img.name);
+                });
+            } else if (!('custom_single_marker' in req.body)) {
+                markerPromise = survey.deleteCustomSingleMarker().then(function() {
+                    return null;
+                });
+            }
+            return markerPromise;
+        }).then(function(markerFileId) {
             survey.title = trimSubstringField(req.body.survey_title, 150);
             survey.description = trimSubstringField(req.body.survey_description, 500);
             survey.tags = parseTagsFromPost(req);
@@ -519,6 +577,7 @@ module.exports = function(sequelize, DataTypes) {
             survey.dont_list = ('dont_list' in req.body);
             survey.results_after_vote = true;
             survey.active = ('open_now' in req.body) ? true : null;
+            survey.custom_single_marker_file_id = markerFileId;
             return survey.save();
         }).then(function(survey) {
             return models.Question.updateFromPost(req, survey);
@@ -590,12 +649,20 @@ module.exports = function(sequelize, DataTypes) {
             props = Utils.extractProperties(originalSurvey, ['id', 'nr_votes', 'date_created', 'date_opened', 'date_closed', 'active']);
             props.owner_id = userid;
             props.title = props.title + ' (copy)';
-        return Promise.join(Survey.create(props), originalSurvey.getQuestions({
-            scope: 'includeAnswers'
-        }), function(survey, questions) {
+        return Promise.join(Survey.create(props), originalSurvey.getCustomSingleMarkerImageData(), function(survey, markerData) {
             newSurvey = survey;
-            return Promise.map(questions, function(question) {
-                return question.clone(newSurvey.id);
+            var markerPromise = markerData !== null ? FileHelper.saveFileFromPath(markerData.path,
+                'images/survey/' + newSurvey.id + '/marker/custom_single_marker' + path.extname(markerData.path),
+                markerData.original_filename).then(function(markerFileId) {
+                    survey.custom_single_marker_file_id = markerFileId;
+                    return survey.save();
+                }) : Promise.resolve();
+            return Promise.join(originalSurvey.getQuestions({
+                scope: 'includeAnswers'
+            }), markerPromise, function(questions) {
+                return Promise.map(questions, function(question) {
+                    return question.clone(newSurvey.id);
+                });
             });
         }).then(function(questions) {
             // We create the survey specific table and triggers
@@ -620,9 +687,13 @@ module.exports = function(sequelize, DataTypes) {
 
     Survey.prototype.dropTable = function() {
         var survey = this;
-        return this.dropAllSurveyFiles().then(function() {
+        return this.dropAllSurveyAnswerFiles().then(function() {
             return sequelize.query('DROP TABLE IF EXISTS opinions.survey_' + survey.id + ';');
         });
+    };
+
+    Survey.prototype.dropAllSurveyAnswerFiles = function() {
+        return FileHelper.deleteAllFilesFromFolder('images/survey/' + this.id + '/answer');
     };
 
     Survey.prototype.dropAllSurveyFiles = function() {
@@ -680,6 +751,12 @@ module.exports = function(sequelize, DataTypes) {
                 }
             });
         });
+    };
+
+    Survey.prototype.deleteCustomSingleMarker = function() {
+        return this.custom_single_marker_file_id !== null ?
+            FileHelper.deleteFileFromId(this.custom_single_marker_file_id) :
+            Promise.resolve();
     };
 
     Survey.prototype.getSubTitle = function() {
@@ -847,12 +924,33 @@ module.exports = function(sequelize, DataTypes) {
         });
     };
 
-    Survey.prototype.getAnswerImagePath = function(questionId, answerId) {
-        return sequelize.query('SELECT b.path, b.mime_type FROM opinions.survey_' + this.id + ' a JOIN metadata.files b ON a.q' + questionId + ' = b.id WHERE a.gid = ?;', {
+    Survey.prototype.getCustomSingleMarkerImageData = function() {
+        return this.custom_single_marker_file_id ? sequelize.query('SELECT * FROM metadata.files WHERE id = ?;', {
+            replacements: [this.custom_single_marker_file_id],
+            type: sequelize.QueryTypes.SELECT
+        }).then(function(data) {
+            return (data.length === 0) ? null : data[0];
+        }) : Promise.resolve(null);
+    };
+
+    Survey.prototype.getCustomSingleMarkerImagePath = function() {
+        return this.getCustomSingleMarkerImageData().then(function(data) {
+            return data ? data.path : null;
+        });
+    };
+
+    Survey.prototype.getAnswerImageData = function(questionId, answerId) {
+        return sequelize.query('SELECT b.* FROM opinions.survey_' + this.id + ' a JOIN metadata.files b ON a.q' + questionId + ' = b.id WHERE a.gid = ?;', {
             replacements: [answerId],
             type: sequelize.QueryTypes.SELECT
         }).then(function(data) {
-            return (data.length === 0) ? null : data[0].path;
+            return (data.length === 0) ? null : data[0];
+        });
+    };
+
+    Survey.prototype.getAnswerImagePath = function(questionId, answerId) {
+        return this.getAnswerImageData(questionId, answerId).then(function(data) {
+            return data ? data.path : null;
         });
     };
 
@@ -1016,6 +1114,7 @@ module.exports = function(sequelize, DataTypes) {
     };
 
     Survey.prototype.getLegend = function() {
+        var survey = this;
         return this.getQuestions({
             scope: 'includeAnswers'
         }).then(function(questions) {
@@ -1039,6 +1138,9 @@ module.exports = function(sequelize, DataTypes) {
                                 legend: question.Answers[j].legend,
                                 value: question.Answers[j].answer
                             };
+                            if (survey.custom_single_marker_url) {
+                                sublegend.responses[question.Answers[j].sortorder.toString()].icon = survey.custom_single_marker_url;
+                            }
                         }
                     }
 
@@ -1057,6 +1159,11 @@ module.exports = function(sequelize, DataTypes) {
                         }
                     }
                     sublegend.responses_array = sublegend.responses_array.concat(lastAnswers);
+                    if (survey.custom_single_marker_url) {
+                        for (var l = 0, lLen = sublegend.responses_array.length; l<lLen; l++) {
+                            sublegend.responses_array[l].icon = survey.custom_single_marker_url;
+                        }
+                    }
                     legend[question.legend_question].push(sublegend);
                 }
             }

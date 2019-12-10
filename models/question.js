@@ -60,7 +60,7 @@ function parseQuestionsfromPost(req, survey) {
         }
         if (type !== null) {
             questions.push({
-                survey_id : survey.id,
+                survey_id : survey ? survey.id : null,
                 type : type,
                 question : (req.body['question_' + i] ? req.body['question_' + i].substring(0, textLimit).trim() : null),
                 mandatory: mandatory,
@@ -70,6 +70,56 @@ function parseQuestionsfromPost(req, survey) {
         }
     }
     return questions;
+}
+
+function checkValidAnswersFromPost(req, questions) {
+    var answers = [];
+    for (var i = 1, iLen = questions.length; i<=iLen; i++) {
+        var question = questions[i-1];
+        switch(question.type) {
+            case 'list-radio':
+            case 'list-radio-other':
+                for (var j = 1;; j++) {
+                    // If there are no more numbered options, we look for option 'other'
+                    if (!(('option_' + i + '_' + j) in req.body) || req.body['option_' + i + '_' + j].trim() === '') {
+                        if (!(('option_' + i + '_other') in req.body) || req.body['option_' + i + '_other'].trim() === '') {
+                            break;
+                        }
+                        j = 'other';
+                    }
+                    if (req.files['img_' + i + '_' + j]) {
+                        if (!(Utils.isImage(fs.readFileSync(req.files['img_' + i + '_' + j])))) {
+                            return Promise.reject({
+                                message: "invalid image for question nr " + i + " answer nr " + j + ": selected file is not an image.",
+                                code: 'answer_img_invalid'
+                            });
+                        }
+                        if (req.files['img_' + i + '_' + j].size > 1000000) {
+                            return Promise.reject({
+                                message: "invalid image for question nr " + i + " answer nr " + j + ": image file exceeds the 1MB max size.",
+                                code: 'answer_img_too_big'
+                            });
+                        }
+                    }
+                    // Other option is always the last iteration, and it's not a number, so we break before everything explodes!
+                    if (j === 'other') {
+                        break;
+                    }
+                }
+                break;
+            case 'text-answer':
+            case 'long-text-answer':
+            case 'explanatory-text':
+            case 'image-upload':
+            case 'image-url':
+                // These question types have no special checks
+                break;
+            default:
+                return new Error("Question type not contemplated.");
+        }
+    }
+    return Promise.resolve();
+
 }
 
 function parseAnswersFromPost(req, questions, oldAnswers) {
@@ -332,6 +382,10 @@ module.exports = function(sequelize, DataTypes) {
         });
         Question.belongsTo(models.Survey, {foreignKey: 'survey_id'});
         models.Survey.hasMany(Question.scope('defaultOrdering'), {foreignKey: 'survey_id'});
+    };
+
+    Question.checkValidPost = function(req) {
+        return checkValidAnswersFromPost(req, parseQuestionsfromPost(req));
     };
 
     Question.createFromPost = function(req, survey) {

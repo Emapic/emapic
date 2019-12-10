@@ -235,6 +235,38 @@
                                     <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="{{#__}}help_tooltip_new_survey_dont_list{{/__}}"></span>
                                 </div>
                             </div>
+                            <div class="form-checkbox-line">
+                                <div class="col-xs-2 col-md-1 col-sm-offset-1 col-md-offset-3">
+                                    <input id="custom_single_marker" class="form-control pull-right" type="checkbox" name="custom_single_marker" onchange="customSingleMarkerChanged(this)" {{#survey.custom_single_marker_url}}checked{{/survey.custom_single_marker_url}}>
+                                </div>
+                                <div class="col-xs-8 col-sm-5 col-md-4 col-lg-3">
+                                    <label class="control-label adi-opts-label text-left" for="custom_single_marker">{{#__}}custom_single_marker{{/__}}</label>
+                                </div>
+                                <div class="col-xs-2 col-md-2">
+                                    <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="{{#__}}help_tooltip_new_survey_custom_single_marker{{/__}}"></span>
+                                </div>
+                            </div>
+                            <div id="custom-single-marker-group" class="form-group"{{^survey.custom_single_marker_url}} style="display: none;"{{/survey.custom_single_marker_url}}>
+                                <div class="col-xs-12 col-sm-3 col-md-2 col-md-offset-1">
+                                    <div class="marker-img-container"{{^survey.custom_single_marker_url}} style="display: none;"{{/survey.custom_single_marker_url}}>
+                                        <div id="custom-single-marker-img" class="marker-img pull-left update-id">
+                                            <div id="markerimg-old" class="markerimg"></div>
+                                            <div id="markerimg" class="markerimg" style="display: none;"></div>
+                                        </div>
+                                        <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_custom_single_marker_image{{/__}}"></span>
+                                    </div>
+                                </div>
+                                <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>
+                                <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">
+                                    <div class="input-with-clear-btn">
+                                        <input class="form-control"{{^survey.custom_single_marker_url}} disabled required{{/survey.custom_single_marker_url}} type="file" accept="image/*" onchange="customSingleMarkerImageInputChanged(this)" data-maxfilesize="1000000" name="custom_single_marker_img" data-error="{{#__}}type_an_option{{/__}}" />
+                                        <a class="clear-input disabled" onclick="deleteInputImage(this)">
+                                            <i class="fas fa-times-circle"></i>
+                                        </a>
+                                    </div>
+                                    <div class="help-block">{{#__}}maximum_custom_single_marker_image_size{{/__}}</div>
+                                </div>
+                            </div>
                         </div>
                 </div>
 

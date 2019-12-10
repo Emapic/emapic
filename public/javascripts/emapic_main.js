@@ -665,10 +665,26 @@ var emapic = emapic || {};
     };
 
     emapic.getIcon = function(properties, clickable) {
-        return L.divIcon({
-            className: 'circle-icon',
-            html: emapic.getIconHtml(properties, clickable)
-        });
+        var imageUrl;
+        if (emapic.legend && emapic.legend.color) {
+            var question = emapic.legend.color.question;
+            if (question && (question + '.id') in properties) {
+                imageUrl = emapic.legend.color.responses[properties[(question + '.id')]].icon;
+            }
+        }
+
+        if (imageUrl) {
+            return L.divIcon({
+                className: 'svg-marker',
+                html: emapic.utils.getIconImageHtml(imageUrl, emapic.getIconColor(properties)),
+                iconAnchor: [16.5, 45]
+            });
+        } else {
+            return L.divIcon({
+                className: 'circle-icon',
+                html: emapic.getIconHtml(properties, clickable)
+            });
+        }
     };
 
     emapic.getIconHtml = function(properties, clickable) {

@@ -1465,7 +1465,8 @@ label.adi-opts-label {
     padding: 0;
 }
 
-.answer-group .answer-img {
+.answer-group .answer-img,
+.marker-img {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: auto 100%;
@@ -1476,12 +1477,19 @@ label.adi-opts-label {
     display: flex;
 }
 
-.answer-group .answer-img .img-thumbnail {
-    max-height: 100%;
-    border: none;
+.marker-img {
+    border-radius: 50%;
+    background-color: #e0ffff;
 }
 
-.answerimg {
+.answer-group .answer-img .img-thumbnail,
+.marker-img .img-thumbnail {
+    max-height: 100%;
+    border: none;
+    padding: 2px;
+}
+
+.answerimg, .markerimg {
     margin: auto;
 }
 
@@ -1512,10 +1520,6 @@ label.adi-opts-label {
 
 .duplicate-survey-question {
     margin-right: 2%;
-}
-
-.img-id {
-    display: none;
 }
 
 .question-group .question-handle.grabbing,
@@ -1748,6 +1752,37 @@ div.legal-text ol > li {
 
 #menu-navbar {
     float: right;
+}
+
+/* --- Styles for custom marker previews --- */
+
+.markerimg svg {
+    overflow: visible;
+    width: 36px;
+}
+
+.image-marker-icon {
+    text-align: center;
+}
+
+.image-marker-icon img, .image-marker-icon span.inline-helper {
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.image-marker-icon span.inline-helper {
+    height: 100%;
+}
+
+.image-marker-icon img {
+    height: 20px;
+    width: 20px;
+    border-radius: 7px;
+}
+
+.image-marker-icon img, .image-marker-icon span.inline-helper {
+    vertical-align: middle;
+    display: inline-block;
 }
 
 /* --- Styles for small screen devices --- */

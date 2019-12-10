@@ -42,6 +42,7 @@
                 }
             }
         }),
+        customSingleMarkerUrl = null,
         questionsMap
         {{#questionsMap}}
         = {{{questionsMap}}}
@@ -94,6 +95,10 @@
             $('.modal-background').hide();
         });
     }
+    {{#survey.custom_single_marker_url}}customSingleMarkerUrl = '{{{survey.custom_single_marker_url}}}';{{/survey.custom_single_marker_url}}
+    if (customSingleMarkerUrl) {
+        $('#custom-single-marker-img #markerimg-old').html(emapic.utils.getIconImageHtml(customSingleMarkerUrl));
+    }
     $('#survey-form').validator();
     $(document).on('click', 'div.panel-heading[data-toggle="collapse"]', function(e){
         $(this).parent().find('.panel-body').toggleClass('collapse');
@@ -136,6 +141,16 @@
         $(el).find('.panel-body').addClass('collapse');
         $(el).find('span.glyphicon-chevron-up').addClass('glyphicon-chevron-down').removeClass('glyphicon-chevron-up');
     }
+    function customSingleMarkerChanged(input) {
+        var $this = $(input);
+        if ($this.is(':checked')) {
+            $('#custom-single-marker-group input').prop('disabled', false);
+            $('#custom-single-marker-group').show();
+        } else {
+            $('#custom-single-marker-group').hide();
+            $('#custom-single-marker-group input').prop('disabled', true);
+        }
+    }
     function responsesImgChanged(input) {
         var $this = $(input),
             $parent = $this.parent().parent().parent().parent();
@@ -170,7 +185,39 @@
             }
         }
     }
-    function imageInputChanged(input) {
+    function customSingleMarkerImageInputChanged(input) {
+        var $this = $(input),
+            $el = $('#custom-single-marker-img #markerimg');
+
+        emapic.utils.checkClearInput(input);
+
+        if ($this.val() === '') {
+            $('#custom-single-marker-img #markerimg').hide();
+            $('#custom-single-marker-img #markerimg-old').show();
+            $('#custom-single-marker-group .marker-img-container span.help-tooltip').show();
+            if (customSingleMarkerUrl) {
+                $('#custom-single-marker-img #markerimg-old').html(emapic.utils.getIconImageHtml(customSingleMarkerUrl))
+                $('#custom-single-marker-group .marker-img-container').show();
+            } else {
+                $('#custom-single-marker-group .marker-img-container').hide();
+            }
+            $('#custom-single-marker-img #markerimg').html(null);
+        } else {
+            $('#custom-single-marker-img #markerimg').show();
+            $('#custom-single-marker-img #markerimg-old').hide();
+            $('#custom-single-marker-img #markerimg-old').html(null);
+            $('#custom-single-marker-group .marker-img-container span.help-tooltip').hide();
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#custom-single-marker-img #markerimg').html(emapic.utils.getIconImageHtml(e.target.result));
+                $('#custom-single-marker-img #markerimg').show();
+                $('#custom-single-marker-group .marker-img-container').show();
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    function answerImageInputChanged(input) {
         var $this = $(input),
             name = $this.attr('name'),
             $answ = $('#answer_' + name.split('_')[1] + '_' + name.split('_')[2]);
@@ -180,11 +227,11 @@
         if ($this.val() === '') {
             $answ.find('img[name="answerimg"]').hide();
             $answ.find('img[name="answerimg-old"]').show();
-            $answ.find('span.help-tooltip').show();
+            $answ.find('.answer-img-container span.help-tooltip').show();
         } else {
             $answ.find('img[name="answerimg"]').show();
             $answ.find('img[name="answerimg-old"]').hide();
-            $answ.find('span.help-tooltip').hide();
+            $answ.find('.answer-img-container span.help-tooltip').hide();
         }
 
         if ($this.val() === '' && $answ.find('img[name="answerimg-old"]').attr('src') === '') {
@@ -278,8 +325,7 @@
                         $('input[name="option_' + qstn + '_' + ansr + '_color"]').spectrum("set", answerMap.legend);
                         if (answerMap.imageUrl != null) {
                             $('input[type="checkbox"][name="responses_img_' + qstn + '"]').prop("checked",true).trigger("change");
-                            var $img = $('#answer_' + qstn + '_' + ansr + ' .answer-img').find('img');
-                            $img.attr('src', answerMap.imageUrl);
+                            $('#answer_' + qstn + '_' + ansr + ' .answer-img img[name="answerimg-old"]').attr('src', answerMap.imageUrl);
                             $('input[type="file"][name="img_' + qstn + '_' + ansr + '"]').removeAttr('required');
                             $('#answer_' + qstn + '_' + ansr + ' .answer-img-container').show();
                         }
@@ -291,8 +337,7 @@
                     $('input[name="option_' + qstn + '_other_color"]').spectrum("set", answerMap.legend);
                     if (answerMap.imageUrl != null) {
                         $('input[type="checkbox"][name="responses_img_' + qstn + '"]').prop("checked",true).trigger("change");
-                        var $img = $('#answer_' + qstn + '_other .answer-img').find('img');
-                        $img.attr('src', answerMap.imageUrl);
+                        $('#answer_' + qstn + '_other .answer-img img[name="answerimg-old"]').attr('src', answerMap.imageUrl);
                         $('input[type="file"][name="img_' + qstn + '_other"]').removeAttr('required');
                         $('#answer_' + qstn + '_other .answer-img-container').show();
                     }
@@ -396,7 +441,7 @@
                                                 </div>\
                                             </label>\
                                             <div class="col-xs-12 col-sm-6 form-group-sm">\
-                                                <input class="img-id" name="option_' + qstn + '_1_img_id" type="text">\
+                                                <input class="img-id" name="option_' + qstn + '_1_img_id" type="hidden">\
                                                 <input spellcheck="true" class="form-control" required type="text" required maxlength="150" name="option_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" >\
                                                 <div class="help-block with-errors"></div>\
                                             </div>\
@@ -408,8 +453,8 @@
                                             <div class="col-xs-12 col-sm-3 col-md-2 col-md-offset-1">\
                                                 <div class="answer-img-container" style="display: none;">\
                                                     <div id="answer_img_' + qstn + '_1" class="answer-img pull-left update-id">\
-                                                        <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="" style="display: none;">\
-                                                        <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="">\
+                                                        <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="">\
+                                                        <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="" style="display: none;">\
                                                     </div>\
                                                     <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span>\
                                                 </div>\
@@ -417,7 +462,7 @@
                                             <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
                                             <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
                                                 <div class="input-with-clear-btn">\
-                                                    <input class="form-control" required disabled type="file" accept="image/*" onchange="imageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" />\
+                                                    <input class="form-control" required disabled type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" />\
                                                     <a class="clear-input disabled" onclick="deleteInputImage(this)">\
                                                         <i class="fas fa-times-circle"></i>\
                                                     </a>\
@@ -439,7 +484,7 @@
                                                 </div>\
                                             </label>\
                                             <div class="col-xs-12 col-sm-6 form-group-sm">\
-                                                <input class="img-id" name="option_' + qstn + '_2_img_id" type="text">\
+                                                <input class="img-id" name="option_' + qstn + '_2_img_id" type="hidden">\
                                                 <input spellcheck="true" class="form-control" required type="text" required maxlength="150" name="option_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" >\
                                                 <div class="help-block with-errors"></div>\
                                             </div>\
@@ -451,8 +496,8 @@
                                             <div class="col-xs-12 col-sm-3 col-md-2 col-md-offset-1">\
                                                 <div class="answer-img-container" style="display: none;">\
                                                     <div id="answer_img_' + qstn + '_2" class="answer-img pull-left update-id">\
-                                                        <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="" style="display: none;">\
-                                                        <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="">\
+                                                        <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="">\
+                                                        <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="" style="display: none;">\
                                                     </div>\
                                                     <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span>\
                                                 </div>\
@@ -460,7 +505,7 @@
                                             <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
                                             <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
                                                 <div class="input-with-clear-btn">\
-                                                    <input class="form-control" required disabled type="file" accept="image/*" onchange="imageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" />\
+                                                    <input class="form-control" required disabled type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" />\
                                                     <a class="clear-input disabled" onclick="deleteInputImage(this)">\
                                                         <i class="fas fa-times-circle"></i>\
                                                     </a>\
@@ -487,7 +532,7 @@
                                             <span>{{#__}}option_other{{/__}}:</span>\
                                         </label>\
                                         <div class="col-xs-12 col-sm-6 form-group-sm">\
-                                            <input class="img-id" name="option_' + qstn + '_other_img_id" type="text">\
+                                            <input class="img-id" name="option_' + qstn + '_other_img_id" type="hidden">\
                                             <input spellcheck="true" class="form-control" required maxlength="150" disabled type="text" value="{{#__}}option_other_default_value{{/__}}" name="option_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}">\
                                             <div class="help-block with-errors"></div>\
                                         </div>\
@@ -499,8 +544,8 @@
                                         <div class="col-xs-12 col-sm-3 col-md-2 col-md-offset-1">\
                                             <div class="answer-img-container" style="display: none;">\
                                                 <div id="answer_img_' + qstn + '_other" class="answer-img pull-left update-id">\
-                                                    <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="" style="display: none;">\
-                                                    <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="">\
+                                                    <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="">\
+                                                    <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="" style="display: none;">\
                                                 </div>\
                                                 <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span>\
                                             </div>\
@@ -508,7 +553,7 @@
                                         <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
                                         <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
                                             <div class="input-with-clear-btn">\
-                                                <input class="form-control" required disabled type="file" accept="image/*" onchange="imageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}" />\
+                                                <input class="form-control" required disabled type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}" />\
                                                 <a class="clear-input disabled" onclick="deleteInputImage(this)">\
                                                     <i class="fas fa-times-circle"></i>\
                                                 </a>\
@@ -698,7 +743,7 @@
                         </div>\
                     </label>\
                     <div class="col-xs-12 col-sm-6 form-group-sm">\
-                        <input class="img-id" name="option_' + qstn + '_' + answ + '_img_id" type="text">\
+                        <input class="img-id" name="option_' + qstn + '_' + answ + '_img_id" type="hidden">\
                         <input spellcheck="true" class="form-control" type="text" required maxlength="150" name="option_' + qstn + '_' + answ + '" data-error="{{#__}}type_an_option{{/__}}" value="' + value + '">\
                         <div class="help-block with-errors"></div>\
                     </div>\
@@ -710,8 +755,8 @@
                     <div class="col-xs-12 col-sm-3 col-md-2 col-md-offset-1">\
                         <div class="answer-img-container" style="display: ' + (imageUrl != null ? 'block;' : 'none;') + '">\
                             <div id="answer_img_' + qstn + '_' + answ + '" class="answer-img pull-left update-id">\
-                                <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="' + (imageUrl != null ? imageUrl : '') + '" style="display: none;">\
-                                <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="' + (imageUrl != null ? imageUrl : '') + '">\
+                                <img name="answerimg-old" class="img-responsive img-thumbnail answerimg" src="' + (imageUrl != null ? imageUrl : '') + '">\
+                                <img name="answerimg" class="img-responsive img-thumbnail answerimg" src="' + (imageUrl != null ? imageUrl : '') + '" style="display: none;">\
                             </div>\
                             <span class="glyphicon glyphicon-question-sign form-field-help help-tooltip pull-right" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="{{#__}}help_tooltip_saved_answer_image{{/__}}"></span>\
                         </div>\
@@ -719,7 +764,7 @@
                     <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
                     <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
                         <div class="input-with-clear-btn">\
-                            <input class="form-control" ' + (imageUrl ? '' : 'required ' ) + (responses_img ? '' : 'disabled ' ) + 'type="file" accept="image/*" onchange="imageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_' + answ + '" />\
+                            <input class="form-control" ' + (imageUrl ? '' : 'required ' ) + (responses_img ? '' : 'disabled ' ) + 'type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_' + answ + '" />\
                             <a class="clear-input disabled" onclick="deleteInputImage(this)">\
                                 <i class="fas fa-times-circle"></i>\
                             </a>\

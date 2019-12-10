@@ -164,8 +164,8 @@ module.exports = function(app) {
         }).catch(handleInternalError(req, res));
     });
 
-    app.get('/api/survey/:id/description', function(req, res) {
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+    app.get('/api/survey/:surveyId/description', function(req, res) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -186,6 +186,32 @@ module.exports = function(app) {
         }).catch(handleInternalError(req, res));
     });
 
+    app.get('/api/survey/:surveyId/marker/single', function(req, res) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
+            if (survey === null) {
+                return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
+            }
+            // Survey is closed
+            if ((survey.active === false) ||
+            // Data required by the owner
+            (req.user && survey.owner.id === req.user.id) ||
+            // Survey is active and results are always public or shown after vote
+            (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
+            // It's a local request from the server itself
+            (req.ip === '127.0.0.1' && (req.hostname === '127.0.0.1' || req.hostname === 'localhost'))) {
+                return survey.getCustomSingleMarkerImagePath().then(function(path) {
+                    if (path === null) {
+                        return res.send(404);   // HTTP status 404: NotFound
+                    }
+                    res.contentType(Utils.getFileMimeType(path, 'image/png'));
+                    fs.createReadStream(path).pipe(res);
+                });
+            } else {
+                res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
+            }
+        }).catch(handleInternalError(req, res));
+    });
+
     app.get('/api/survey/:surveyId/result/:answrId/image/:qstnId', function(req, res) {
         var answrId = parseInt(req.params.answrId, 10),
             qstnId = parseInt(req.params.qstnId, 10);
@@ -193,18 +219,32 @@ module.exports = function(app) {
             return res.send(404);   // HTTP status 404: NotFound
         }
         models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
-            return survey.getAnswerImagePath(qstnId, answrId);
-        }).then(function(path) {
-            if (path === null) {
-                return res.send(404);   // HTTP status 404: NotFound
+            if (survey === null) {
+                return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
-            res.contentType(Utils.getFileMimeType(path, 'image/png'));
-            fs.createReadStream(path).pipe(res);
+            // Survey is closed
+            if ((survey.active === false) ||
+            // Data required by the owner
+            (req.user && survey.owner.id === req.user.id) ||
+            // Survey is active and results are always public or shown after vote
+            (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
+            // It's a local request from the server itself
+            (req.ip === '127.0.0.1' && (req.hostname === '127.0.0.1' || req.hostname === 'localhost'))) {
+                return survey.getAnswerImagePath(qstnId, answrId).then(function(path) {
+                    if (path === null) {
+                        return res.send(404);   // HTTP status 404: NotFound
+                    }
+                    res.contentType(Utils.getFileMimeType(path, 'image/png'));
+                    fs.createReadStream(path).pipe(res);
+                });
+            } else {
+                res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
+            }
         }).catch(handleInternalError(req, res));
     });
 
-    app.get('/api/survey/:id/totals', function(req, res) {
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+    app.get('/api/survey/:surveyId/totals', function(req, res) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -225,8 +265,8 @@ module.exports = function(app) {
         }).catch(handleInternalError(req, res));
     });
 
-    app.get('/api/survey/:id/totals/:layer', function(req, res) {
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+    app.get('/api/survey/:surveyId/totals/:layer', function(req, res) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -282,8 +322,8 @@ module.exports = function(app) {
         }).catch(handleInternalError(req, res));
     });
 
-    app.get('/api/survey/:id/legend', function(req, res) {
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+    app.get('/api/survey/:surveyId/legend', function(req, res) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -304,8 +344,8 @@ module.exports = function(app) {
         }).catch(handleInternalError(req, res));
     });
 
-    app.post('/api/survey/:id/results', function(req, res) {
-        models.Survey.findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+    app.post('/api/survey/:surveyId/results', function(req, res) {
+        models.Survey.findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -348,10 +388,10 @@ module.exports = function(app) {
         }).catch(handleInternalError(req, res));
     });
 
-    app.get('/api/survey/:id/export', function(req, res) {
+    app.get('/api/survey/:surveyId/export', function(req, res) {
         var format = req.query.format ? req.query.format : 'xlsx',
             i18n = req.query.lang ? Utils.getI18n(req.query.lang) : req.i18n;
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
