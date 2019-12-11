@@ -20,7 +20,6 @@ var emapic = emapic || {};
             "</span>\n" +
             "</span>\n" +
             "</div>",
-        currentChartsLegend,
         currentVoteChart;
 
     emapic.modules = emapic.modules || {};
@@ -30,6 +29,7 @@ var emapic = emapic || {};
     emapic.modules.counterStats.pieChartWidth = 180;
     emapic.modules.counterStats.pieChartRadius = 81;
     emapic.modules.counterStats.rowChartWidth = 330;
+    emapic.modules.counterStats.currentChartsLegend = null;
 
     emapic.modules.counterStats.filter = new emapic.Filter({
         applyFilter: function(feature) {
@@ -247,7 +247,7 @@ var emapic = emapic || {};
             $('#stats-modal div.modal-body').show();
         }
         $('#app-total-counter-header').click(function() {
-            currentChartsLegend = setcurrentChartsLegend(emapic.legend.color);
+            emapic.modules.counterStats.currentChartsLegend = setcurrentChartsLegend(emapic.legend.color);
             $('#stats-modal').modal('show');
             $('#vote-chart-clear').hide();
             // check if buttons should be disabled or not
@@ -352,18 +352,18 @@ var emapic = emapic || {};
 
         // Count the votes for each option
         for (var i = 0, iLen = data.length; i<iLen; i++) {
-            if (data[i].properties[currentChartsLegend.color.question + '.id'] in votesById) {
-                votesById[data[i].properties[currentChartsLegend.color.question + '.id']]++;
+            if (data[i].properties[emapic.modules.counterStats.currentChartsLegend.color.question + '.id'] in votesById) {
+                votesById[data[i].properties[emapic.modules.counterStats.currentChartsLegend.color.question + '.id']]++;
             } else {
-                votesById[data[i].properties[currentChartsLegend.color.question + '.id']] = 1;
+                votesById[data[i].properties[emapic.modules.counterStats.currentChartsLegend.color.question + '.id']] = 1;
             }
         }
 
         // Add a row for each option with its nr of votes
-        for (var j = 0, jLen = currentChartsLegend.color.responses_array.length; j<jLen; j++) {
+        for (var j = 0, jLen = emapic.modules.counterStats.currentChartsLegend.color.responses_array.length; j<jLen; j++) {
             votes.push({
-                value: currentChartsLegend.color.responses_array[j].id,
-                nr: votesById[currentChartsLegend.color.responses_array[j].id] ? votesById[currentChartsLegend.color.responses_array[j].id] : 0
+                value: emapic.modules.counterStats.currentChartsLegend.color.responses_array[j].id,
+                nr: votesById[emapic.modules.counterStats.currentChartsLegend.color.responses_array[j].id] ? votesById[emapic.modules.counterStats.currentChartsLegend.color.responses_array[j].id] : 0
             });
             if (votes[j].nr > maxDataLen) {
                 maxDataLen = votes[j].nr;
@@ -411,7 +411,7 @@ var emapic = emapic || {};
 
         $('#vote-chart-clear').hide();
 
-        if (currentChartsLegend && currentChartsLegend.color) {
+        if (emapic.modules.counterStats.currentChartsLegend && emapic.modules.counterStats.currentChartsLegend.color) {
             chartFeatures = getChartFeatures();
         }
 
@@ -438,11 +438,11 @@ var emapic = emapic || {};
             .dimension(voteDimension) // set dimension
             .group(voteDimensionGroup) // set group
             .legend(dc.legend().legendText(function(d) {
-                return currentChartsLegend.color.responses[d.name].value + ': ' + d.data;
+                return emapic.modules.counterStats.currentChartsLegend.color.responses[d.name].value + ': ' + d.data;
             }).y(radius * 2.2))
             .title(function(d) {
                 var id = ('data' in d) ? d.data.key : d.key;
-                return currentChartsLegend.color.responses[id].value + ": " + d.value;
+                return emapic.modules.counterStats.currentChartsLegend.color.responses[id].value + ": " + d.value;
             }).label(function (d) {
                 var label = '';
                 if (voteChart.hasFilter() && !voteChart.hasFilter(d.key)) {
@@ -453,7 +453,7 @@ var emapic = emapic || {};
                 }
                 return label;
             })
-            .colors(function(d){ return (d && currentChartsLegend && currentChartsLegend.color) ? currentChartsLegend.color.responses[d].legend : 'grey';}); // set colors function
+            .colors(function(d){ return (d && emapic.modules.counterStats.currentChartsLegend && emapic.modules.counterStats.currentChartsLegend.color) ? emapic.modules.counterStats.currentChartsLegend.color.responses[d].legend : 'grey';}); // set colors function
 
         return voteChart;
     };
@@ -466,9 +466,9 @@ var emapic = emapic || {};
             .group(voteDimensionGroup) // set group
             .title(function(d) {
                 var id = ('data' in d) ? d.data.key : d.key;
-                return currentChartsLegend.color.responses[id].value + ": " + d.value;
+                return emapic.modules.counterStats.currentChartsLegend.color.responses[id].value + ": " + d.value;
             }).label(function (d) {
-                var label = currentChartsLegend.color.responses[d.key].value;
+                var label = emapic.modules.counterStats.currentChartsLegend.color.responses[d.key].value;
                 if (voteChart.hasFilter() && !voteChart.hasFilter(d.key)) {
                     return label + ' (0%)';
                 }
@@ -477,7 +477,7 @@ var emapic = emapic || {};
                 }
                 return label;
             })
-            .colors(function(d){ return (d && currentChartsLegend && currentChartsLegend.color) ? currentChartsLegend.color.responses[d].legend : 'grey';}); // set colors function
+            .colors(function(d){ return (d && emapic.modules.counterStats.currentChartsLegend && emapic.modules.counterStats.currentChartsLegend.color) ? emapic.modules.counterStats.currentChartsLegend.color.responses[d].legend : 'grey';}); // set colors function
             // if there are more than 3 answers in the most answered question, 4 ticks
             (maxDataLen > 3) ? voteChart.xAxis().ticks(4) : voteChart.xAxis().ticks(maxDataLen);
 
@@ -490,12 +490,12 @@ var emapic = emapic || {};
     }
 
     function getCurrentQuestionNr() {
-        return parseInt(currentChartsLegend.color.question.split('q')[1]);
+        return parseInt(emapic.modules.counterStats.currentChartsLegend.color.question.split('q')[1]);
     }
 
     function getCurrentQuestionPosition() {
         for (i = 0, len = emapic.fullLegend.color.length; i < len; i++) {
-            if (emapic.fullLegend.color[i].question === currentChartsLegend.color.question) {
+            if (emapic.fullLegend.color[i].question === emapic.modules.counterStats.currentChartsLegend.color.question) {
                 return i;
             }
         }
@@ -503,13 +503,13 @@ var emapic = emapic || {};
     }
 
     function updateQuestionTitle() {
-        $('#vote-chart-title').text(currentChartsLegend.color.text);
+        $('#vote-chart-title').text(emapic.modules.counterStats.currentChartsLegend.color.text);
         $('#vote-chart-title').attr('name', getCurrentQuestionNr());
     }
 
     function setcurrentChartsLegend(legendColor) {
         if (legendColor !== undefined) { // there are question list in survey
-            return currentChartsLegend = {
+            return {
                 color : {
                     question : legendColor.question,
                     responses : legendColor.responses,
@@ -522,25 +522,25 @@ var emapic = emapic || {};
         }
     }
 
-    function updateChart(n) {
-        currentChartsLegend = setcurrentChartsLegend(emapic.fullLegend.color[n]);
+    emapic.modules.counterStats.updateChart = function(n) {
+        emapic.modules.counterStats.currentChartsLegend = setcurrentChartsLegend(emapic.fullLegend.color[n]);
         chartFeatures = [];
         $('#vote-chart-clear').hide();
         $('#prev-question-btn').attr('disabled', n === 0);
         $('#next-question-btn').attr('disabled', n === getQuestionsLen());
-        if (currentChartsLegend && currentChartsLegend.color) {
+        if (emapic.modules.counterStats.currentChartsLegend && emapic.modules.counterStats.currentChartsLegend.color) {
             chartFeatures = getChartFeatures();
         }
         updateQuestionTitle();
         emapic.modules.counterStats.loadStats(chartFeatures); // update chart
-    }
+    };
 
     emapic.modules.counterStats.prevQuestionChart = function () {
         var nr = getCurrentQuestionPosition() - 1;
         if (nr < 0) {
             return;
         }
-        updateChart(nr);
+        emapic.modules.counterStats.updateChart(nr);
     };
 
     emapic.modules.counterStats.nextQuestionChart = function () {
@@ -548,7 +548,7 @@ var emapic = emapic || {};
         if (nr > getQuestionsLen()) {
             return;
         }
-        updateChart(nr);
+        emapic.modules.counterStats.updateChart(nr);
     };
 
 })(emapic);
