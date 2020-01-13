@@ -199,12 +199,12 @@ module.exports = function(app) {
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
             (req.ip === '127.0.0.1' && (req.hostname === '127.0.0.1' || req.hostname === 'localhost'))) {
-                return survey.getCustomSingleMarkerImagePath().then(function(path) {
-                    if (path === null) {
+                return survey.getCustomSingleMarkerImageData().then(function(data) {
+                    if (data === null || data.path === null || data.mime_type === null) {
                         return res.send(404);   // HTTP status 404: NotFound
                     }
-                    res.contentType(Utils.getFileMimeType(path, 'image/png'));
-                    fs.createReadStream(path).pipe(res);
+                    res.contentType(data.mime_type);
+                    fs.createReadStream(data.path).pipe(res);
                 });
             } else {
                 res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
@@ -230,12 +230,12 @@ module.exports = function(app) {
             (survey.active === true && (survey.public_results || survey.results_after_vote)) ||
             // It's a local request from the server itself
             (req.ip === '127.0.0.1' && (req.hostname === '127.0.0.1' || req.hostname === 'localhost'))) {
-                return survey.getAnswerImagePath(qstnId, answrId).then(function(path) {
-                    if (path === null) {
+                return survey.getAnswerImageData(qstnId, answrId).then(function(data) {
+                    if (data === null || data.path === null || data.mime_type === null) {
                         return res.send(404);   // HTTP status 404: NotFound
                     }
-                    res.contentType(Utils.getFileMimeType(path, 'image/png'));
-                    fs.createReadStream(path).pipe(res);
+                    res.contentType(data.mime_type);
+                    fs.createReadStream(data.path).pipe(res);
                 });
             } else {
                 res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });

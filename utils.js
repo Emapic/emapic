@@ -9,6 +9,7 @@ var nodemailer = require('nodemailer'),
     bases = require('bases'),
     path = require('path'),
     imageType = require('image-type'),
+    isSvg = require('is-svg'),
     i18n = require('i18n-2'),
     request = require('request'),
     childProcess = Promise.promisifyAll(require('child_process')),
@@ -309,22 +310,23 @@ module.exports = function(app) {
             return new Promise(function(resolve, reject) {
                 request({
                     url: url,
-                    timeout: 4000
-                }).on('response', function(res) {
-                    res.on('data', function(chunk) {
-                        res.destroy();
-                        if (imageType(chunk) !== null) {
-                            resolve();
-                        } else {
-                            reject();
+                    timeout: 4000,
+                    encoding: null
+                }, function(err, res, body) {
+                    if (err) {
+                        if (err.code === 'ETIMEDOUT') {
+                            logger.warn('Couldn\'t check whether the URL "' + url + '" is actually an image due to connection timeout. Will accept it as one.');
+                            return resolve()
                         }
-                    });
-                }).on('error', function(err) {
-                    if (err.code === 'ETIMEDOUT') {
-                        logger.warn('Couldn\'t check whether the URL "' + url + '" is actually an image due to connection timeout. Will accept it as one.');
-                        return resolve()
+                        return reject(err);
                     }
-                    reject(err);
+                    if (imageType(body) !== null || isSvg(body)) {
+                        resolve();
+                    } else {
+                        reject({
+                            message: 'invalid image file.'
+                        });
+                    }
                 });
             });
         },
@@ -367,7 +369,11 @@ module.exports = function(app) {
         },
 
         getFileMetadata: function(input) {
-            return fileType(Buffer.isBuffer(input) ? input : readChunk.sync(input, 0, fileType.minimumBytes));
+            var metadata = fileType(Buffer.isBuffer(input) ? input : readChunk.sync(input, 0, fileType.minimumBytes));
+            if (metadata.mime === 'application/xml' && isSvg(Buffer.isBuffer(input) ? input : fs.readFileSync(input))) {
+                metadata.mime = 'image/svg+xml';
+            }
+            return metadata;
         },
 
         getFileMimeType: function(input, defaultMime) {
