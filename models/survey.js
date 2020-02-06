@@ -1138,9 +1138,6 @@ module.exports = function(sequelize, DataTypes) {
                                 legend: question.Answers[j].legend,
                                 value: question.Answers[j].answer
                             };
-                            if (survey.custom_single_marker_url) {
-                                sublegend.responses[question.Answers[j].sortorder.toString()].icon = survey.custom_single_marker_url;
-                            }
                         }
                     }
 
@@ -1159,13 +1156,11 @@ module.exports = function(sequelize, DataTypes) {
                         }
                     }
                     sublegend.responses_array = sublegend.responses_array.concat(lastAnswers);
-                    if (survey.custom_single_marker_url) {
-                        for (var l = 0, lLen = sublegend.responses_array.length; l<lLen; l++) {
-                            sublegend.responses_array[l].icon = survey.custom_single_marker_url;
-                        }
-                    }
                     legend[question.legend_question].push(sublegend);
                 }
+            }
+            if (survey.custom_single_marker_url) {
+                legend.singleicon = survey.custom_single_marker_url;
             }
             return legend;
         });

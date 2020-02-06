@@ -666,11 +666,8 @@ var emapic = emapic || {};
 
     emapic.getIcon = function(properties, clickable) {
         var imageUrl;
-        if (emapic.legend && emapic.legend.color) {
-            var question = emapic.legend.color.question;
-            if (question && (question + '.id') in properties) {
-                imageUrl = emapic.legend.color.responses[properties[(question + '.id')]].icon;
-            }
+        if (emapic.fullLegend && emapic.fullLegend.singleicon) {
+            imageUrl = emapic.fullLegend.singleicon;
         }
 
         if (imageUrl) {
