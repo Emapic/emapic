@@ -32,3 +32,4 @@ fix_votes_relationship [emapic_tables] 2019-04-25T12:24:09Z Jorge López Fernán
 add_long_text_question [add_image_upload_question] 2019-05-13T17:41:43Z Jorge López Fernández <jlopez@emapic.es> # Add new question type: long text
 fix_assign_municipality [link_answers_and_municipalities] 2019-07-09T16:36:43Z Jorge López Fernández <jlopez@emapic.es> # Fix a mistake in assign municipality function
 add_custom_single_marker [emapic_tables] 2019-12-09T19:14:23Z Jorge López Fernández <jlopez@emapic.es> # Add column for custom single marker in surveys
+add_cerdedo_cotobade_munic_code [base_layers] 2020-02-11T16:15:08Z Jorge López Fernández <jlopez@emapic.es> # Add Cerdedo-Cotobade municipality code.
