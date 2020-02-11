@@ -88,7 +88,7 @@ function checkValidAnswersFromPost(req, questions) {
                         j = 'other';
                     }
                     if (req.files['img_' + i + '_' + j]) {
-                        if (!(Utils.isImage(fs.readFileSync(req.files['img_' + i + '_' + j])))) {
+                        if (!(Utils.isImage(fs.readFileSync(req.files['img_' + i + '_' + j].path)))) {
                             return Promise.reject({
                                 message: "invalid image for question nr " + i + " answer nr " + j + ": selected file is not an image.",
                                 code: 'answer_img_invalid'

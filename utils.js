@@ -370,7 +370,10 @@ module.exports = function(app) {
 
         getFileMetadata: function(input) {
             var metadata = fileType(Buffer.isBuffer(input) ? input : readChunk.sync(input, 0, fileType.minimumBytes));
-            if (metadata.mime === 'application/xml' && isSvg(Buffer.isBuffer(input) ? input : fs.readFileSync(input))) {
+            if (isSvg(Buffer.isBuffer(input) ? input : fs.readFileSync(input))) {
+                if (metadata === null) {
+                    metadata = { ext: 'svg' };
+                }
                 metadata.mime = 'image/svg+xml';
             }
             return metadata;
@@ -398,7 +401,7 @@ module.exports = function(app) {
         deleteTmpFilesFromRequest: function(req) {
             var paths = [];
             for (var name in req.files) {
-                if ({}.hasOwnProperty.call(req.files, name)) {
+                if ({}.hasOwnProperty.call(req.files, name) && fs.existsSync(req.files[name].path)) {
                     paths.push(req.files[name].path);
                 }
             }
