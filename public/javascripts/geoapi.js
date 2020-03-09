@@ -18,7 +18,8 @@ var emapic = emapic || {};
         coords: {
             latitude: 40.416763,
             longitude: -3.703403,
-            accuracy: 0
+            accuracy: 0,
+            zoom: 16
         }
     };
 

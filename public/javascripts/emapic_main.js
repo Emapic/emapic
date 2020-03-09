@@ -356,11 +356,15 @@ var emapic = emapic || {};
         });
     };
 
-    emapic.centerOnGeolocation = function(lat, long, accuracy) {
+    emapic.centerOnGeolocation = function(lat, long, accuracy, zoom) {
         emapic.precision = typeof accuracy !== 'undefined' ? accuracy : 50;
         emapic.position = [lat, long];
 
-        emapic.map.setView(emapic.position, 16);
+        if (!zoom && zoom !== 0) {
+            zoom = 16;
+        }
+
+        emapic.map.setView(emapic.position, zoom);
         if (typeof accuracy !== 'undefined') {
             var radius = accuracy * 0.5,
                 areaAprox = L.circle([lat, long], {

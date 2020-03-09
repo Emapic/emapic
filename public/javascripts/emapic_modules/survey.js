@@ -84,7 +84,7 @@ var emapic = emapic || {};
     };
 
     emapic.geoapi.setPosition = emapic.utils.overrideFunction(emapic.geoapi.setPosition, null, function(dumb, pos) {
-        emapic.centerOnGeolocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+        emapic.centerOnGeolocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.zoom);
     });
 
     emapic.addIndivVotesLayer = emapic.utils.overrideFunction(emapic.addIndivVotesLayer, function() {
