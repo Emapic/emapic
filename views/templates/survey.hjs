@@ -146,9 +146,9 @@
                         <button id="next-question-btn" type="button" class="btn btn-primary" onclick="emapic.modules.counterStats.nextQuestionChart()" title="{{#__}}next_question{{/__}}" style="padding: 3px 6px 1px;">
                             <span class="glyphicon glyphicon-chevron-right"></span>
                         </button>
-                        <button id="chart-type-btn" type="button" class="btn btn-primary" onclick="emapic.modules.counterStats.chartTypeChanged(this)" title="{{#__}}toggle_chart{{/__}}" name="pie" style="padding: 3px 6px 1px;">
-                            <span id="row-icon" class="glyphicon glyphicon-align-left"></span>
-                            <span id="pie-icon" class="fas fa-chart-pie" style="display: none;"></span>
+                        <button id="chart-type-btn" type="button" class="btn btn-primary" onclick="emapic.modules.counterStats.chartTypeChanged(this)" title="{{#__}}toggle_chart{{/__}}" name="row" style="padding: 3px 6px 1px;">
+                            <span id="row-icon" class="glyphicon glyphicon-align-left" style="display: none;"></span>
+                            <span id="pie-icon" class="fas fa-chart-pie"></span>
                         </button>
                         <a id="vote-chart-clear" class="reset" href="#" style="display: none;"><span class="glyphicon glyphicon-repeat"></span></a>
                         <div class="clearfix"></div>
