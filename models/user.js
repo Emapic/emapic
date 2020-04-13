@@ -149,7 +149,7 @@ module.exports = function(sequelize, DataTypes) {
         return models.Vote.findAndCountAll(params).then(function(results) {
             // Workaround for a sequelize bug that causes counting for each
             // grouped element instead of the total
-            if (isNaN(results.count)) {
+            if (isNaN(parseInt(results.count))) {
                 results.count = results.count.length;
             }
             return results;
