@@ -1787,21 +1787,20 @@ button.survey-answer > div.flex-container {
 .image-marker-icon {
     text-align: center;
 }
+.image-marker-icon {
+    line-height: 33px;
+}
 .svg-marker-icon .glyphicon {
     font-size: 16px;
 }
-.image-marker-icon img {
-    height: 20px;
-    width: 20px;
+.leaflet-container .leaflet-marker-pane .image-marker-icon img {
     border-radius: 7px;
-}
-.image-marker-icon span.inline-helper {
-    height: 100%;
-}
-.image-marker-icon img,
-.image-marker-icon span.inline-helper {
+    display: inline;
     vertical-align: middle;
-    display: inline-block;
+    max-width: 20px !important;
+    max-height: 20px !important;
+    width: 100%;
+    height: 100%;
 }
 .filter-btn-circle {
     width: 1em;
