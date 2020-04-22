@@ -201,7 +201,7 @@ var emapic = emapic || {};
     emapic.addBaseLayers = function(tryGrayScale) {
         var control,
             osmAttrib = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-            mapboxAttrib = "<a href='https://www.mapbox.com/about/maps/' target='_blank'>&copy; Mapbox &copy; OpenStreetMap</a> <a class='mapbox-improve-map' href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a>",
+            mapboxAttrib = '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
             osmBW;
 
         if (tryGrayScale && L.TileLayer.Grayscale) {
@@ -242,10 +242,13 @@ var emapic = emapic || {};
         baseMaps[emapic.utils.getI18n('js_color_osm_baselayer')] = osmMapnik;
 
         if (emapic.mapboxToken !== null) {
-            var mapboxSatellite = new L.TileLayer('https://{s}.tiles.mapbox.com/v4/mapbox.streets-satellite/{z}/{x}/{y}.png?access_token=' + emapic.mapboxToken, {
-                minZoom : 1,
-                maxZoom : 18,
-                attribution : mapboxAttrib
+            var mapboxSatellite = new L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                attribution: mapboxAttrib,
+                tileSize: 512,
+                maxZoom: 18,
+                zoomOffset: -1,
+                id: 'mapbox/satellite-streets-v11',
+                accessToken: emapic.mapboxToken
             });
             baseMaps[emapic.utils.getI18n('js_satellite_mapbox_baselayer')] = mapboxSatellite;
         }
