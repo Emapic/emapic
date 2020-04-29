@@ -18,6 +18,7 @@ var emapic = emapic || {};
     emapic.modules.survey.data = {};
     emapic.modules.survey.responses = {};
     emapic.modules.survey.thksMsgTimeOut = 6000;
+    emapic.modules.survey.showGeocoderOnPositionEditing = false;
     emapic.modules.survey.statusMarkerIconHtml = "<svg width='51' height='46'>" +
         "<defs>\n" +
         "<pattern id='image' x='0' y='0' patternUnits='userSpaceOnUse' height='46' width='51'>\n" +
@@ -326,6 +327,9 @@ var emapic = emapic || {};
     emapic.modules.survey.editPosition = function() {
         $('#check-loc').hide();
         $('#check-edit-loc').show();
+        if (emapic.modules.survey.showGeocoderOnPositionEditing && emapic.modules.geocoder) {
+            emapic.modules.geocoder.loadGeocoder();
+        }
         editMarkerPos();
     };
 
@@ -459,6 +463,9 @@ var emapic = emapic || {};
         null, emapic.modules.survey.updateResponsesMarker);
 
     emapic.modules.survey.endEditMarkerPos = function(change) {
+        if (emapic.modules.survey.showGeocoderOnPositionEditing && emapic.modules.geocoder) {
+            emapic.modules.geocoder.removeGeocoder();
+        }
         emapic.utils.disableMapInteraction();
         if ( change ) {
             markerpos = emapic.modules.survey.marker.getLatLng();

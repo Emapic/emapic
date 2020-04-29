@@ -1,6 +1,7 @@
 
 {{#yield-styles}}
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/leaflet-tooltip@1.0.4/dist/tooltip.css" integrity="sha256-ceQJ5Ko8OHhNqJBIMFejb0sQCDYQNIgpCTfzXs3MSgw=" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/css/selectize.bootstrap3.min.css" integrity="sha256-xaHB15TZbLhew82A2NzY8rvCCp/REcOA/kSpWWO7TlE=" crossorigin="anonymous" />
 {{/yield-styles}}
 
     {{#emapicOpinion}}
@@ -198,6 +199,11 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet-tooltip@1.0.4/dist/L.Tooltip.js" integrity="sha256-8nr7s4fwA+5MrIaPDS+JDpKnOMIxPFtMJqhvUT9ZtgM=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/javascripts/emapic_modules/spatial_filter.js"></script>
 
+    <!-- Add geocoder -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js" integrity="sha256-HyBiZFJAMvxOhZoWOc5LWIWaN1gcFi8LjS75BZF4afg=" crossorigin="anonymous"></script>
+    <script src="/libs/leaflet/js/L.Control.Geocoder.js"></script>
+    <script src="/javascripts/emapic_modules/geocoder.js"></script>
+
     <!-- Filter clear btn -->
     <script type="text/javascript" src="/javascripts/emapic_modules/clear_filters.js"></script>
 
@@ -219,6 +225,9 @@
         emapic.oldResponses = {{{ responses }}};
 
         emapic.position = {{{ position }}};
+
+        emapic.modules.geocoder.addOnLoad = false;
+        emapic.modules.survey.showGeocoderOnPositionEditing = true;
 
         {{#results}}
         emapic.surveyResults = true;

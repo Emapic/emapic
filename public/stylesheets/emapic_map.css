@@ -1816,6 +1816,12 @@ button.survey-answer > div.flex-container {
 }
 
 @media screen and (max-width: 599px), screen and (max-height: 639px) {
+    #questions-wrapper, #thanks-msg {
+        padding: 0em 1em;
+    }
+    .leaflet-control-geocoder {
+        display: none;
+    }
     .navbar-brand {
         padding: 5px;
         height: 35px;
@@ -1891,6 +1897,9 @@ button.survey-answer > div.flex-container {
 }
 
 @media screen and (max-width: 360px), screen and (max-height: 550px) {
+    #questions-wrapper, #thanks-msg {
+        padding: 0em 0.5em;
+    }
     #header {
         height: 60px;
     }
