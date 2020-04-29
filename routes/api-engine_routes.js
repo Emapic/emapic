@@ -491,6 +491,43 @@ module.exports = function(app) {
             namePromise = Promise.resolve('a.name');
         }
         namePromise.then(function(nameCol) {
+            if ('nameSearch' in params) {
+                var searchType;
+                switch (params.nameSearchType) {
+                    case 'equals':
+                    case 'EQUALS':
+                        searchType = '=';
+                        replacements.nameSearch = params.nameSearch;
+                        break;
+                    default:
+                        searchType = 'like';
+                        replacements.nameSearch = '%' + params.nameSearch + '%';
+                }
+                return (('nameSearchLang' in params && params.nameSearchLang !== params.lang) ?
+                    checkColumnExists('name_' + params.nameSearchLang, layer, 'base_layers').then(function(result) {
+                    if (result[0].exists) {
+                        return 'a.name_' + params.nameSearchLang;
+                    } else {
+                        return namePromise;
+                    }
+                }) : namePromise).then(function(searchNameCol) {
+                    where.push('lower(' + searchNameCol + ') ' + searchType + ' lower(:nameSearch)');
+                    return nameCol;
+                });
+            } else {
+                return Promise.resolve(nameCol);
+            }
+        }).then(function(nameCol) {
+            var order;
+            if ('order' in params) {
+                switch (params.order) {
+                    case 'name':
+                        order = nameCol;
+                        break;
+                    default:
+                        order = null;
+                }
+            }
             switch (layer) {
                 case 'municipalities':
                     if ('prov' in params && !(isNaN(params.prov))) {
@@ -500,7 +537,7 @@ module.exports = function(app) {
                         where.push('a.cod_ccaa = :ccaa');
                         replacements.ccaa = params.ccaa;
                     }
-                    sql = 'SELECT a.codigo AS adm_code, ' + nameCol + ' AS name, a.cod_prov, a.provincia, a.cod_ccaa, a.comautonom, a.pobmun15_p AS pobumn15, a.pobmun15_h, a.pobmun15_m, b.adm1_code as province_adm_code, lower(b.iso_a2) AS country_iso_code' + geom + ' FROM base_layers.municipalities a JOIN base_layers.provinces b ON a.province_gid = b.gid' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY adm_code;';
+                    sql = 'SELECT a.gid id, a.codigo AS adm_code, ' + nameCol + ' AS name, a.cod_prov, a.provincia, a.cod_ccaa, a.comautonom, b.adm1_code as province_adm_code, lower(b.iso_a2) AS country_iso_code' + geom + ' FROM base_layers.municipalities a JOIN base_layers.provinces b ON a.province_gid = b.gid' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY ' + (order ? order : 'cod_ccaa, cod_prov, adm_code');
                     break;
                 case 'provinces':
                     if (!('includeMinor' in params && params.includeMinor.toLowerCase() === 'true')) {
@@ -510,15 +547,25 @@ module.exports = function(app) {
                         where.push('lower(a.iso_a2) = lower(:country)');
                         replacements.country = params.country;
                     }
-                    sql = 'SELECT a.diss_me AS province_id, a.iso_3166_2 AS iso_code, a.adm1_code AS adm_code, ' + nameCol + ' AS name, a.type_en AS type, lower(a.iso_a2) AS country_iso_code' + geom + ' FROM base_layers.provinces a' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY adm_code;';
+                    sql = 'SELECT a.gid id, a.diss_me AS province_id, a.iso_3166_2 AS iso_code, a.adm1_code AS adm_code, ' + nameCol + ' AS name, a.type_en AS type, lower(a.iso_a2) AS country_iso_code' + geom + ' FROM base_layers.provinces a' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY ' + (order ? order : 'adm_code');
                     break;
                 case 'countries':
+                    if ('country' in params) {
+                        where.push('lower(a.iso_code_2) = lower(:country)');
+                        replacements.country = params.country;
+                    }
                     where.push('iso_code_2 IS NOT NULL');
-                    sql = 'SELECT lower(a.iso_code_2) AS iso_code, ' + nameCol + ' AS name' + geom + ' FROM base_layers.countries a' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY iso_code;';
+                    sql = 'SELECT a.gid id, lower(a.iso_code_2) AS iso_code, ' + nameCol + ' AS name' + geom + ' FROM base_layers.countries a' + (where.length > 0 ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY ' + (order ? order : 'iso_code');
                     break;
                 default:
                     logger.info("Requested base layer '" + layer + "' doesn't exist.");
                     return res.status(404).json({ error_code: 'invalid_resource', error: "requested layer doesn't exist." });
+            }
+            if (params.limit && !isNaN(parseInt(params.limit))) {
+                sql += ' LIMIT ' + params.limit;
+            }
+            if (params.offset && !isNaN(parseInt(params.offset))) {
+                sql += ' OFFSET ' + params.offset;
             }
             return sequelize.query(sql, {
                 replacements: replacements,
