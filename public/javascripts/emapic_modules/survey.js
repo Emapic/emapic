@@ -7,7 +7,8 @@ var emapic = emapic || {};
 (function(emapic) {
 
     var originalInitEmapic = emapic.initEmapic,
-        questionId;
+        questionId,
+        realClick = false;
 
     emapic.modules = emapic.modules || {};
     emapic.modules.survey = emapic.modules.survey || {};
@@ -473,11 +474,33 @@ var emapic = emapic || {};
         } else {
             emapic.modules.survey.marker.setLatLng(emapic.position);
         }
+        emapic.map.off('mousedown', setRealClick);
         emapic.map.off('click', setResponseMarkerPosition);
+        emapic.map.off('mousemove', unsetRealClick);
+        emapic.map.off('mouseout', unsetRealClick);
+        realClick = false;
         if ('dragging' in emapic.modules.survey.marker) {
             emapic.modules.survey.marker.dragging.disable();
         }
         centerMarker();
+    }
+
+    /**
+    *   Dirty hack for preventing a strange Leaflet issue when a click event
+    *   is triggered when clicking onto some control elements and then releasing
+    *   the mouse onto the map. This is troublesome when clicking onto elements
+    *   that disappear after being clicked (e.g. geocoder result items).
+    */
+    function setRealClick() {
+        realClick = true;
+        emapic.map.on('mousemove', unsetRealClick);
+        emapic.map.on('mouseout', unsetRealClick);
+    }
+
+    function unsetRealClick() {
+        realClick = false;
+        emapic.map.off('mousemove', unsetRealClick);
+        emapic.map.off('mouseout', unsetRealClick);
     }
 
     function centerMarker() {
@@ -491,11 +514,15 @@ var emapic = emapic || {};
         if (emapic.modules.survey.marker !== null && 'dragging' in emapic.modules.survey.marker) {
             emapic.modules.survey.marker.dragging.enable();
         }
+        emapic.map.on('mousedown', setRealClick);
         emapic.map.on('click', setResponseMarkerPosition);
     }
 
     function setResponseMarkerPosition(e) {
-        emapic.modules.survey.marker.setLatLng(e.latlng);
+        if (realClick) {
+            emapic.modules.survey.marker.setLatLng(e.latlng);
+            unsetRealClick();
+        }
     }
 
 })(emapic);
