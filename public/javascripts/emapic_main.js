@@ -74,6 +74,10 @@ var emapic = emapic || {};
         return "/api/survey/" + emapic.surveyId + "/totals/municipalities?geom=bbox&lang=" + emapic.locale;
     };
 
+    emapic.getReverseGeocodingUrl = function(lat, lon) {
+        return "/api/geocoding/reverse?lat=" + lat + "&lon=" + lon + "&lang=" + emapic.locale;
+    };
+
     emapic.getExportURL = function() {
         return "/api/survey/" + emapic.surveyId + "/export";
     };

@@ -816,10 +816,12 @@ input.form-control[type="radio"] {
     -ms-flex: 1;
     flex-grow: 1;
 }
+.selectize-control .flag-item .flag-container {
+    display: inline-block
+}
 .selectize-control .flag-item,
-.selectize-control .flag-item .flag-container,
 .selectize-control .flag-item .selectize-label {
-    display: inline-block;
+    display: inline;
 }
 
 .leaflet-control-geocoder,
@@ -828,10 +830,10 @@ input.form-control[type="radio"] {
     font-size: 15px;
     font-family: hero,sans-serif;
 }
-.selectize-control.single .selectize-input::after {
+.leaflet-control-geocoder-select.selectize-control.single .selectize-input::after {
     border-color: #ffffff transparent transparent transparent;
 }
-.selectize-control.single .selectize-input.dropdown-active::after {
+.leaflet-control-geocoder-select.selectize-control.single .selectize-input.dropdown-active::after {
     border-color: transparent transparent #ffffff transparent;
 }
 

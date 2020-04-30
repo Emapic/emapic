@@ -228,6 +228,7 @@
 
         emapic.modules.geocoder.addOnLoad = false;
         emapic.modules.survey.showGeocoderOnPositionEditing = true;
+        emapic.modules.geocoder.autoUpdateWithResponseMarker = true;
 
         {{#results}}
         emapic.surveyResults = true;

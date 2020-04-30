@@ -445,7 +445,19 @@ var emapic = emapic || {};
             }, emapic.modules.survey.responses)
         };
         emapic.modules.survey.marker.feature.properties.dateObject = new Date(parseInt(emapic.modules.survey.marker.feature.properties.timestamp));
+        emapic.modules.survey.marker.on('move', emapic.modules.survey.responseMarkerMoved);
+        emapic.modules.survey.marker.on('dragstart', function() {
+            emapic.modules.survey.marker.off('move', emapic.modules.survey.responseMarkerMoved);
+        });
+        emapic.modules.survey.marker.on('dragend', function(data) {
+            emapic.modules.survey.responseMarkerMoved(data);
+            emapic.modules.survey.marker.on('move', emapic.modules.survey.responseMarkerMoved);
+        });
     }
+
+    emapic.modules.survey.responseMarkerMoved = function(data) {
+        // Nothing to do by default
+    };
 
     emapic.modules.survey.updateResponsesMarker = function(clickable) {
         clickable = typeof clickable !== 'undefined' ? clickable : true;

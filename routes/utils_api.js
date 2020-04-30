@@ -906,4 +906,10 @@ module.exports = function(app) {
             }
         });
     };
+
+    checkColumnExistsRevertToDefault = function(column, table, schema, defaultCol) {
+        return checkColumnExists(column, table, schema).then(function(result) {
+            return result[0].exists ? column : defaultCol;
+        });
+    };
 };

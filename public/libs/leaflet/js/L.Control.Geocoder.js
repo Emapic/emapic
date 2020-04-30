@@ -14,7 +14,7 @@ module.exports = {
 			errorMessage: 'Nothing found.',
 			suggestMinLength: 3,
 			suggestTimeout: 250,
-			defaultMarkGeocode: true,
+			defaultMarkGeocode: false,
 			selectizePlaceholder: 'Write and select',
 			countryLabel: 'Country',
 			provinceLabel: 'Province',
@@ -117,6 +117,7 @@ module.exports = {
 						countries.push(data.properties);
 					});
 					countrySelectize.addOption(countries);
+					map.fire('markgeocodecountryloaded', countries);
 		        });
 				provinceLabelTd = L.DomUtil.create('td', null, provinceTr);
 				provinceLabel = L.DomUtil.create('label', null, provinceLabelTd);
@@ -212,6 +213,39 @@ module.exports = {
 			}
 
 			return container;
+		},
+
+		hasCountry: function(isoCode) {
+			if (isoCode in this._countrySelectize.options) {
+				return true;
+			}
+			return false;
+		},
+
+		setCountry: function(isoCode, silent, triggerProvincesLoadedEvent) {
+			if (this._countrySelectize.getValue() !== isoCode) {
+				this._countrySelectize.setValue(isoCode, silent);
+			} else {
+				this._map.fire('markgeocodecountry', {bbox: emapic.allCountriesData[isoCode].bbox, val: isoCode});
+				if (triggerProvincesLoadedEvent === true) {
+					this._map.fire('markgeocodeprovinceloaded', this._provinceSelectize.options);
+				}
+			}
+		},
+
+		hasProvince: function(provinceId) {
+			if (provinceId in this._provinceSelectize.options) {
+				return true;
+			}
+			return false;
+		},
+
+		setProvince: function(provinceId, silent) {
+			if (this._provinceSelectize.getValue() !== provinceId) {
+				this._provinceSelectize.setValue(provinceId, silent);
+			} else {
+				this._map.fire('markgeocodeprovince', {bbox: this._provincesData[provinceId].bbox, val: provinceId});
+			}
 		},
 
 		_geocodeResult: function (results, suggest) {
@@ -404,8 +438,9 @@ module.exports = {
 			if (val in emapic.allCountriesData) {
 				this._context._provincesData = {};
 				var provinceSelectize = this._context._provinceSelectize,
-					provincesData = this._context._provincesData;
-				this._context._map.fitBounds(emapic.allCountriesData[val].bbox);
+					provincesData = this._context._provincesData,
+					map = this._context._map;
+				this._context._map.fire('markgeocodecountry', {bbox: emapic.allCountriesData[val].bbox, val: val});
 				provinceSelectize.clearOptions();
 				emapic.utils.getJsonAlertError(
 					emapic.getCountryProvincesJsonBboxUrl(val)
@@ -421,6 +456,7 @@ module.exports = {
 	                });
 					provinceSelectize.addOption(provinces);
 					provinceSelectize.enable();
+					map.fire('markgeocodeprovinceloaded', provinces);
 	            });
 				document.activeElement.blur();
 			}
@@ -428,7 +464,7 @@ module.exports = {
 
 		_provinceChange: function(val) {
 			if (val in this._context._provincesData) {
-				this._context._map.fitBounds(this._context._provincesData[val].bbox);
+				this._context._map.fire('markgeocodeprovince', {bbox: this._context._provincesData[val].bbox, val: val});
 				document.activeElement.blur();
 			}
 		}

@@ -67,9 +67,12 @@
 	width: calc(100% - 30px);
 }
 
+.leaflet-control-geocoder .selectize-control.single .selectize-input {
+    padding-right: 30px;
+}
+
 .leaflet-control-geocoder .leaflet-control-geocoder-selectors-table .selectize-input > input[placeholder] {
-  width: 100% !important;
-  padding-right: 18px !important;
+    width: 100% !important;
 }
 
 .leaflet-control-geocoder-icon {
