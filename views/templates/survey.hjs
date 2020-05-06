@@ -174,6 +174,11 @@
     {{^results}}
     <!-- Add survey -->
     <script type="text/javascript" src="/javascripts/emapic_modules/survey.js"></script>
+
+    <!-- Add geocoder -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js" integrity="sha256-HyBiZFJAMvxOhZoWOc5LWIWaN1gcFi8LjS75BZF4afg=" crossorigin="anonymous"></script>
+    <script src="/libs/leaflet/js/L.Control.Geocoder.js"></script>
+    <script src="/javascripts/emapic_modules/geocoder.js"></script>
     {{/results}}
 
     <!-- Add locators -->
@@ -199,11 +204,6 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/leaflet-tooltip@1.0.4/dist/L.Tooltip.js" integrity="sha256-8nr7s4fwA+5MrIaPDS+JDpKnOMIxPFtMJqhvUT9ZtgM=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/javascripts/emapic_modules/spatial_filter.js"></script>
 
-    <!-- Add geocoder -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js" integrity="sha256-HyBiZFJAMvxOhZoWOc5LWIWaN1gcFi8LjS75BZF4afg=" crossorigin="anonymous"></script>
-    <script src="/libs/leaflet/js/L.Control.Geocoder.js"></script>
-    <script src="/javascripts/emapic_modules/geocoder.js"></script>
-
     <!-- Filter clear btn -->
     <script type="text/javascript" src="/javascripts/emapic_modules/clear_filters.js"></script>
 
@@ -226,10 +226,6 @@
 
         emapic.position = {{{ position }}};
 
-        emapic.modules.geocoder.addOnLoad = false;
-        emapic.modules.survey.showGeocoderOnPositionEditing = true;
-        emapic.modules.geocoder.autoUpdateWithResponseMarker = true;
-
         {{#results}}
         emapic.surveyResults = true;
         {{#survey.already_opened}}
@@ -243,6 +239,10 @@
         emapic.surveyResults = false;
         emapic.modules.survey.positionBeforeSurvey = false;
         emapic.modules.survey.surveyPostFormat = 'multipart';
+
+        emapic.modules.geocoder.addOnLoad = false;
+        emapic.modules.survey.showGeocoderOnPositionEditing = true;
+        emapic.modules.geocoder.autoUpdateWithResponseMarker = true;
 
         {{^survey.results_after_vote}}
         emapic.modules.survey.thksMsgTimeOut = 3000;
