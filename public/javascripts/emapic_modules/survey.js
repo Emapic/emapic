@@ -432,19 +432,22 @@ var emapic = emapic || {};
     }
 
     function createResponsesMarker(clickable) {
-        var sticon = getStatusIcon(emapic.modules.survey.responses);
-        emapic.modules.survey.marker = L.marker(emapic.position, {
-            icon: sticon,
-            riseOnHover: true,
-            zIndexOffset: -10000,
-            interactive: clickable
-        });
+        emapic.modules.survey.createBaseMarker(emapic.position, clickable, getStatusIcon(emapic.modules.survey.responses));
         emapic.modules.survey.marker.feature = {
             properties: $.extend({
                 timestamp: Date.now()
             }, emapic.modules.survey.responses)
         };
         emapic.modules.survey.marker.feature.properties.dateObject = new Date(parseInt(emapic.modules.survey.marker.feature.properties.timestamp));
+    }
+
+    emapic.modules.survey.createBaseMarker = function(position, clickable, icon) {
+        emapic.modules.survey.marker = L.marker(position, {
+            icon: icon,
+            riseOnHover: true,
+            zIndexOffset: -10000,
+            interactive: clickable
+        });
         emapic.modules.survey.marker.on('move', emapic.modules.survey.responseMarkerMoved);
         emapic.modules.survey.marker.on('dragstart', function() {
             emapic.modules.survey.marker.off('move', emapic.modules.survey.responseMarkerMoved);
@@ -453,7 +456,7 @@ var emapic = emapic || {};
             emapic.modules.survey.responseMarkerMoved(data);
             emapic.modules.survey.marker.on('move', emapic.modules.survey.responseMarkerMoved);
         });
-    }
+    };
 
     emapic.modules.survey.responseMarkerMoved = function(data) {
         // Nothing to do by default
