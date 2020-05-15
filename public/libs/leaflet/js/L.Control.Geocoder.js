@@ -1096,7 +1096,7 @@ module.exports = {
 			var bounds = context._map.getBounds();
 			Util.jsonp(this.options.serviceUrl + 'search', L.extend({
 				q: query,
-				limit: 5,
+				limit: 3,
 				format: 'json',
 				addressdetails: 1,
 				viewbox: bounds.getWest() + ',' + bounds.getNorth() + ',' + bounds.getEast() + ',' + bounds.getSouth(),
