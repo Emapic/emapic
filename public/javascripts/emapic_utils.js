@@ -104,13 +104,16 @@ if (typeof $.fn.validator !== 'undefined' &&
             .on(element, 'click', L.DomEvent.preventDefault);
     };
 
-    emapic.utils.disableMapInteraction = function(spinner) {
+    emapic.utils.disableMapInteraction = function(spinner, hideControls) {
         if (emapic.map !== null) {
             if (spinner) {
                 emapic.map.spin(true, {
                     zIndex: 10
                 });
-                $('#map').addClass('disable-all');
+                $(emapic.map.getContainer()).addClass('disable-all');
+            }
+            if (hideControls) {
+                $(emapic.map.getContainer()).addClass('hide-controls')
             }
             emapic.map.dragging.disable();
             $('.leaflet-container').addClass('force-disable');
@@ -134,6 +137,7 @@ if (typeof $.fn.validator !== 'undefined' &&
 
     emapic.utils.enableMapInteraction = function() {
         if (emapic.map !== null) {
+            $(emapic.map.getContainer()).removeClass('hide-controls')
             emapic.map.dragging.enable();
             emapic.map.touchZoom.enable();
             emapic.map.doubleClickZoom.enable();

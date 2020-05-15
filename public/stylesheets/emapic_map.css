@@ -879,6 +879,10 @@ input.form-control[type="radio"] {
     border-radius: 5px;
 }
 
+.map.hide-controls .leaflet-control:not(.leaflet-control-attribution) {
+    display: none;
+}
+
 .map > .tooltip.right .tooltip-arrow,
 .map :not(.leaflet-popup-pane) > .tooltip.right .tooltip-arrow {
     border-right-color: #004F71 !important;
