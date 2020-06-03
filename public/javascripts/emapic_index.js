@@ -64,6 +64,8 @@ $(document).ready(function() {
     for (i in notifications) {
         $.notify({
             message: notifications[i]
+        }, {
+            delay: 15000
         });
     }
 });
