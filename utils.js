@@ -33,6 +33,23 @@ try {
     Jimp = require('jimp');
 }
 
+// Add "allSettled" for Bluebird, like "all" but waits for all promises to finish
+// before throwing any error (first one found is thrown)
+Promise.allSettled = function(promises) {
+    return Promise.all(promises.map(function(promise) {
+        return promise.reflect();
+    })).then(function(inspections) {
+        var results = [];
+        for (let i = 0, iLen = inspections.length; i<iLen; i++) {
+            if (!inspections[i].isFulfilled()) {
+                throw inspections[i].reason();
+            }
+            results.push(inspections[i].value());
+        }
+        return results;
+    });
+};
+
 function langToWebLocaleIsoInner(lang) {
     switch(lang) {
         case 'en':
