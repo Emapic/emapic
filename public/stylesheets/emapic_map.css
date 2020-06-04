@@ -55,41 +55,6 @@ label {
 .cc_banner-wrapper p {
     color: #4d4d4d;
 }
-.leaflet-container {
-    font-family: hero,sans-serif !important;
-}
-:not(.leaflet-control-container):not(.leaflet-control).force-disable,
-.leaflet-control-container.force-disable a,
-.leaflet-control-container.force-disable button,
-.leaflet-control-container.force-disable input,
-.leaflet-control-container.force-disable .leaflet-control-layers,
-.leaflet-control-container.force-disable .leaflet-control-geocoder,
-.leaflet-marker-icon.leaflet-interactive.force-disable,
-.leaflet-image-layer.leaflet-interactive.force-disable,
-.leaflet-pane > svg path.leaflet-interactive.force-disable {
-    cursor: default !important;
-    pointer-events: none;
-}
-.leaflet-marker-icon.marker-cluster-svg svg {
-    overflow: visible;
-}
-.leaflet-control.force-disable,
-.leaflet-control a.force-disable {
-    cursor: not-allowed !important;
-}
-.leaflet-control.force-disable a {
-    pointer-events: none;
-    background-color: #bfbfbf;
-    color: white;
-}
-.leaflet-control a.force-disable {
-    background-color: #bfbfbf;
-    cursor: not-allowed !important;
-    color: white;
-}
-#map.disable-all > div:not(.spinner) {
-    opacity: 0.4;
-}
 #header a:link,
 #questions-wrapper a:link {
 	text-decoration: none;
@@ -516,6 +481,41 @@ div.alert-danger a {
 }
 .leaflet-control-container .leaflet-top.leaflet-right {
     min-width: 75px;
+}
+.leaflet-container {
+    font-family: hero,sans-serif !important;
+}
+#map.disable-all > div:not(.spinner) {
+    opacity: 0.4;
+}
+:not(.leaflet-control-container):not(.leaflet-control).force-disable,
+.leaflet-control-container.force-disable a,
+.leaflet-control-container.force-disable button,
+.leaflet-control-container.force-disable input,
+.leaflet-control-container.force-disable .leaflet-control-layers,
+.leaflet-control-container.force-disable .leaflet-control-geocoder,
+.leaflet-marker-icon.leaflet-interactive.force-disable,
+.leaflet-image-layer.leaflet-interactive.force-disable,
+.leaflet-pane > svg path.leaflet-interactive.force-disable {
+    cursor: default !important;
+    pointer-events: none;
+}
+.leaflet-marker-icon.marker-cluster-svg svg {
+    overflow: visible;
+}
+.leaflet-control.force-disable,
+.leaflet-control a.force-disable {
+    cursor: not-allowed !important;
+}
+.leaflet-control.force-disable a {
+    pointer-events: none;
+    background-color: #bfbfbf;
+    color: white;
+}
+.leaflet-control a.force-disable {
+    background-color: #bfbfbf;
+    cursor: not-allowed !important;
+    color: white;
 }
 div.input-with-clear-btn {
     display: flex;
