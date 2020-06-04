@@ -12,6 +12,7 @@ var emapic = emapic || {};
         votedMunicipalitiesDataBboxDfd = null;
 
     emapic.map = null;
+    emapic.layerControl = null;
     emapic.mapboxToken = null;
     emapic.currentBaseLayer = null;
     emapic.position = null;
@@ -277,7 +278,7 @@ var emapic = emapic || {};
                 emapic.currentBaseLayer = layer;
             }
         });
-        control = emapic.addLayerSelector(baseMaps, null);
+        emapic.layerControl = emapic.addLayerSelector(baseMaps, null);
     };
 
     emapic.addLayerSelector = function(baselayers, overlays) {
@@ -631,11 +632,9 @@ var emapic = emapic || {};
     };
 
     emapic.disableIndivLayerExclusiveComponents = function() {
-        $('#clear-filters').prop('disabled', true);
     };
 
     emapic.enableIndivLayerExclusiveComponents = function() {
-        $('#clear-filters').prop('disabled', false);
     };
 
     emapic.getCurrentIconColorForAnswer = function(answer) {

@@ -34,11 +34,11 @@ var emapic = emapic || {};
     emapic.modules.panel = emapic.modules.panel || {};
 
     emapic.disableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.disableIndivLayerExclusiveComponents, null, function() {
-        oldIcon = null;
-        currentMarker = null;
         if (currentFeature !== null) {
             emapic.sidebarPanelClose();
         }
+        oldIcon = null;
+        currentMarker = null;
     });
 
     emapic.enableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.enableIndivLayerExclusiveComponents, null, function() {

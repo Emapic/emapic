@@ -132,11 +132,11 @@ var emapic = emapic || {};
     };
 
     emapic.disableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.disableIndivLayerExclusiveComponents, null, function() {
-        emapic.modules.clustering.getButton().prop('disabled', true);
+        $('.leaflet-control.clustering-control').addClass('force-disable');
     });
 
     emapic.enableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.enableIndivLayerExclusiveComponents, null, function() {
-        emapic.modules.clustering.getButton().prop('disabled', false);
+        $('.leaflet-control.clustering-control').removeClass('force-disable');
     });
 
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
