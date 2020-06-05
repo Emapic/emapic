@@ -20,6 +20,7 @@ var emapic = emapic || {};
 
     emapic.modules = emapic.modules || {};
     emapic.modules.clustering = emapic.modules.clustering || {};
+    emapic.modules.clustering.maxClusterRadius = 80;
 
     emapic.showMarker = emapic.utils.overrideFunction(emapic.showMarker, null, function(dumb, marker) {
         if (clusteringActive) {
@@ -40,6 +41,7 @@ var emapic = emapic || {};
             return markers;
         }
         emapic.indivVotesLayer = new L.MarkerClusterGroup({
+            maxClusterRadius: emapic.modules.clustering.maxClusterRadius,
             iconCreateFunction: function(cluster) {
                 var markers = cluster.getAllChildMarkers();
                 return new L.DivIcon({ className: 'marker-cluster-svg', iconSize: L.point(pieCenter.x * 2, pieCenter.y * 2),

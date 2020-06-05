@@ -119,7 +119,7 @@ var emapic = emapic || {};
     emapic.modules.panel.getSelectedIcon = function(properties) {
         return L.divIcon({
             className: 'svg-marker',
-            html: emapic.utils.getGlyphiconMarkerIconHtml(null, emapic.getIconColor(properties), 0.5, 7),
+            html: emapic.utils.getGlyphiconMarkerIconHtml(null, emapic.getIconColor(properties)),
             iconAnchor: [16.5, 45]
         });
     };
@@ -157,8 +157,7 @@ var emapic = emapic || {};
         return currentFeature !== null ? layers[currentFeature] : null;
     };
 
-    emapic.indivVotesLayerOnEachFeature = emapic.utils.overrideFunction(emapic.indivVotesLayerOnEachFeature, null, function(data) {
-        data.layer.unbindPopup();
+    emapic.indivVotesLayerOnEachFeature = function(data) {
         data.layer.on('click', function(e) {
             layers = emapic.getIndivVotesLayerLeafletLayers();
             nrLayers = layers.length;
@@ -179,7 +178,8 @@ var emapic = emapic || {};
             emapic.modules.panel.goToRegister(selectedLayerNr);
             sidebarPanel.show();
         });
-    });
+        return data;
+    };
 
     function featureNumberKeydown(e) {
         if (emapic.utils.filterKeydownOnlyDigits(e)) {

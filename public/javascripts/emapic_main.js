@@ -469,7 +469,7 @@ var emapic = emapic || {};
             data.layer.bindPopup(
                 popupHtml,
                 {
-                    className: 'popup-responses popup-status-' + data.feature.properties.status
+                    className: 'popup-responses' + ('status' in data.feature.properties ? ' popup-status-' + data.feature.properties.status : '')
                 }
             );
         }
