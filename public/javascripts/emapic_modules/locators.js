@@ -50,8 +50,8 @@ var emapic = emapic || {};
             "<div class='row'>\n" +
             "<div class='col-md-6'>\n" +
             "<div class='btn-group'>\n" +
-            "<button type='button' class='btn btn-sm' onclick='emapic.modules.locators.showSidebarVotedCountries();'>" + emapic.utils.getI18n('js_most_voted', '+ votados') + "</button>\n" +
-            "<button type='button' class='btn btn-sm active'>" + emapic.utils.getI18n('js_all', 'todos') + "</button>\n" +
+            "<button type='button' class='btn btn-sm btn-success' onclick='emapic.modules.locators.showSidebarVotedCountries();'>" + emapic.utils.getI18n('js_most_voted', '+ votados') + "</button>\n" +
+            "<button type='button' class='btn btn-sm btn-success active'>" + emapic.utils.getI18n('js_all', 'todos') + "</button>\n" +
             "</div>\n" +
             "</div>\n" +
             "<div class='col-md-6'>\n" +
@@ -66,8 +66,8 @@ var emapic = emapic || {};
             "<div class='row'>\n" +
             "<div class='col-md-6'>\n" +
             "<div class='btn-group'>\n" +
-            "<button type='button' class='btn btn-sm active'>" + emapic.utils.getI18n('js_most_voted', '+ votados') + "</button>\n" +
-            "<button type='button' class='btn btn-sm' onclick='emapic.modules.locators.showSidebarAllCountries();'>" + emapic.utils.getI18n('js_all', 'todos') + "</button>\n" +
+            "<button type='button' class='btn btn-sm btn-success active'>" + emapic.utils.getI18n('js_most_voted', '+ votados') + "</button>\n" +
+            "<button type='button' class='btn btn-sm btn-success' onclick='emapic.modules.locators.showSidebarAllCountries();'>" + emapic.utils.getI18n('js_all', 'todos') + "</button>\n" +
             "</div>\n" +
             "</div>\n" +
             "<div class='col-md-6'>\n" +

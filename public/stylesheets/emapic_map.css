@@ -1446,7 +1446,7 @@ button.survey-answer > div.flex-container {
 .leaflet-sidebar > .leaflet-control {
 	background-color: #FAFAFA !important;
 }
-.leaflet-sidebar .btn-group button {
+.leaflet-sidebar .btn-group button.btn-success {
 	background-color: #A2C73A;
     color: white;
 }
