@@ -20,7 +20,7 @@ var emapic = emapic || {};
 
     emapic.modules = emapic.modules || {};
     emapic.modules.clustering = emapic.modules.clustering || {};
-    emapic.modules.clustering.maxClusterRadius = 80;
+    emapic.modules.clustering.markerClusterOptions = {};
 
     emapic.showMarker = emapic.utils.overrideFunction(emapic.showMarker, null, function(dumb, marker) {
         if (clusteringActive) {
@@ -40,15 +40,14 @@ var emapic = emapic || {};
         if (!clusteringActive && !emapic.indivVotesLayer.enableClustering) {
             return markers;
         }
-        emapic.indivVotesLayer = new L.MarkerClusterGroup({
-            maxClusterRadius: emapic.modules.clustering.maxClusterRadius,
+        emapic.indivVotesLayer = new L.MarkerClusterGroup($.extend({
             iconCreateFunction: function(cluster) {
                 var markers = cluster.getAllChildMarkers();
                 return new L.DivIcon({ className: 'marker-cluster-svg', iconSize: L.point(pieCenter.x * 2, pieCenter.y * 2),
                     html: getClusterIcon(emapic.modules.clustering.getClusterColors(markers), markers.length)
                 });
             }
-        });
+        }, emapic.modules.clustering.markerClusterOptions));
         emapic.indivVotesLayer.addLayer(markers);
         emapic.indivVotesLayer.on('spiderfied', function(ev) {
             currentSpiderfied = ev.cluster;
