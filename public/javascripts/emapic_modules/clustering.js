@@ -25,7 +25,7 @@ var emapic = emapic || {};
     emapic.showMarker = emapic.utils.overrideFunction(emapic.showMarker, null, function(dumb, marker) {
         if (clusteringActive) {
             var parent = emapic.indivVotesLayer.getVisibleParent(marker);
-            if (parent.spiderfy) {
+            if (parent && parent.spiderfy) {
                 parent.spiderfy();
             } else if (currentSpiderfied && currentSpiderfied.getAllChildMarkers().indexOf(marker) === -1) {
                 if (currentSpiderfied._map) {
