@@ -30,6 +30,7 @@ var emapic = emapic || {};
     emapic.modules.counterStats.pieChartRadius = 81;
     emapic.modules.counterStats.rowChartWidth = 330;
     emapic.modules.counterStats.currentChartsLegend = null;
+    emapic.modules.counterStats.counterIcon = "<span class='usericon glyphicon glyphicon-user'></span>";
 
     emapic.modules.counterStats.filter = new emapic.Filter({
         applyFilter: function(feature) {
@@ -234,7 +235,7 @@ var emapic = emapic || {};
                 emapic.legend.color.responses[orderedVotes[i].id].legend + ';"></div></div><div class="span-container"><span>' +
                 emapic.utils.escapeHtml(emapic.legend.color.responses[orderedVotes[i].id].value) + ': ' + orderedVotes[i].nr + '</span></div></button></li>';
         }
-        $('#app-total-counter').html("<div id='app-total-counter-header'><h4 class='text-center'><span class='usericon glyphicon glyphicon-user'></span><span id='app-total-counter-header-nr'></span> <span class='glyphicon glyphicon-stats'></span></h4></div>" +
+        $('#app-total-counter').html("<div id='app-total-counter-header'><h4 class='text-center'>" + emapic.modules.counterStats.counterIcon + "<span id='app-total-counter-header-nr'></span> <span class='glyphicon glyphicon-stats'></span></h4></div>" +
             "<div id='app-total-counter-filter' style='display: none;'><span class='glyphicon glyphicon-filter'></span></div>\n" +
             "<div id='app-total-counter-body' class='always-show-not-extrasmall collapse" + (wasUncollapsed ? ' in' : '') + "'><div id='app-total-counter-list-container'><ul id='app-total-counter-list'>" + specificVotesHtml + "</ul></div></div>");
         updateCounterTotal();
