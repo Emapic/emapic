@@ -363,48 +363,54 @@ if (typeof $.fn.validator !== 'undefined' &&
         return distance;
     };
 
-    emapic.utils.getGlyphiconMarkerIconHtml = function(icon, backgroundColor, x, y, fontSize) {
+    emapic.utils.getGlyphiconMarkerIconHtml = function(icon, backgroundColor, x, y, fontSize, iconBackgroundColor) {
         if (typeof icon == 'undefined') {
             return null;
         }
-        if (typeof backgroundColor == 'undefined') {
+        if (typeof backgroundColor == 'undefined' || backgroundColor === null) {
             backgroundColor = '#95c11f';
         }
-        if (typeof x == 'undefined') {
+        if (typeof x == 'undefined' || x === null) {
             x = 0;
         }
-        if (typeof y == 'undefined') {
+        if (typeof y == 'undefined' || y === null) {
             y = 7;
         }
-        if (typeof fontSize == 'undefined') {
+        if (typeof fontSize == 'undefined' || fontSize === null) {
             fontSize = 16;
+        }
+        if (typeof iconBackgroundColor == 'undefined' || iconBackgroundColor === null) {
+            iconBackgroundColor = '#ffffff';
         }
         var markerContent = '';
         if (icon !== null) {
-            markerContent = '<ellipse ry="13.192183" rx="13.02163" cy="16.567797" cx="16.64089" style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.02665293;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /><foreignObject class="svg-marker-icon" height="20" width="32" y="{y}" x="{x}"><i class="glyphicon glyphicon-{icon}" style="padding-top: 1px; font-size: ' + fontSize + 'px;"></i></foreignObject>';
+            markerContent = '<ellipse ry="13.192183" rx="13.02163" cy="16.567797" cx="16.64089" style="opacity:1;fill:' + iconBackgroundColor + ';fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.02665293;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /><foreignObject class="svg-marker-icon" height="20" width="32" y="{y}" x="{x}"><i class="glyphicon glyphicon-{icon}" style="padding-top: 1px; font-size: ' + fontSize + 'px;"></i></foreignObject>';
         }
         return ('<svg width="51" height="46"><defs><pattern id="image" x="0" y="0" patternUnits="userSpaceOnUse" height="46" width="51"><image x="10" y="7" xlink:href="/images/marker-shadow.png" width="41" height="41"></image></pattern></defs><rect width="51" height="46" fill="url(#image)" /><path style="fill:{color};stroke:#000000;stroke-width:0.99133736;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" d="M 27.997745,5.1426005 C 24.789271,2.026619 20.952126,0.47068128 16.484158,0.50959524 12.016191,0.5487035 8.2054436,2.1713216 5.091418,5.3424462 1.9378926,8.514353 0.38039059,12.350325 0.45880339,16.856033 c 0.0258144,2.991029 0.76848471,5.673295 2.18949741,8.083562 0.077632,0.11361 0.1918277,0.263983 0.3064164,0.452682 0,0 12.4091738,18.816149 13.0214198,19.71936 0.611464,0.904777 1.199853,0.01446 1.199853,0.01446 L 30.668667,24.885429 C 32.123902,22.41122 32.857383,19.640568 32.830791,16.573472 32.791683,12.06757 31.168283,8.2591689 27.997745,5.1426005 z" />' + markerContent + '</svg>').replace(/\{color\}/g, backgroundColor).replace(/\{icon\}/g, icon).replace(/\{x\}/g, x).replace(/\{y\}/g, y);
     };
 
-    emapic.utils.getFontAwesomeMarkerIconHtml = function(icon, backgroundColor, x, y, fontSize) {
+    emapic.utils.getFontAwesomeMarkerIconHtml = function(icon, backgroundColor, x, y, fontSize, iconBackgroundColor) {
         if (typeof icon == 'undefined') {
             return null;
         }
-        if (typeof backgroundColor == 'undefined') {
+        if (typeof backgroundColor == 'undefined' || backgroundColor === null) {
             backgroundColor = '#95c11f';
         }
-        if (typeof x == 'undefined') {
+        if (typeof x == 'undefined' || x === null) {
             x = 0;
         }
-        if (typeof y == 'undefined') {
+        if (typeof y == 'undefined' || y === null) {
             y = 7;
         }
-        if (typeof fontSize == 'undefined') {
+        if (typeof fontSize == 'undefined' || fontSize === null) {
             fontSize = 18;
+        }
+        if (typeof iconBackgroundColor == 'undefined' || iconBackgroundColor === null) {
+            iconBackgroundColor = '#ffffff';
         }
         var markerContent = '';
         if (icon !== null) {
-            markerContent = '<ellipse ry="13.192183" rx="13.02163" cy="16.567797" cx="16.64089" style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.02665293;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /><foreignObject class="svg-marker-icon" height="20" width="32" y="{y}" x="{x}"><i class="fa fa-{icon}" style="padding-top: 1px; font-size: ' + fontSize + 'px;"></i></foreignObject>';
+            markerContent = '<ellipse ry="13.192183" rx="13.02163" cy="16.567797" cx="16.64089" style="opacity:1;fill:' + iconBackgroundColor + ';fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.02665293;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" /><foreignObject class="svg-marker-icon" height="20" width="32" y="{y}" x="{x}"><i class="fa fa-{icon}" style="padding-top: 1px; font-size: ' + fontSize + 'px;"></i></foreignObject>';
         }
         return ('<svg width="51" height="46"><defs><pattern id="image" x="0" y="0" patternUnits="userSpaceOnUse" height="46" width="51"><image x="10" y="7" xlink:href="/images/marker-shadow.png" width="41" height="41"></image></pattern></defs><rect width="51" height="46" fill="url(#image)" /><path style="fill:{color};stroke:#000000;stroke-width:0.99133736;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" d="M 27.997745,5.1426005 C 24.789271,2.026619 20.952126,0.47068128 16.484158,0.50959524 12.016191,0.5487035 8.2054436,2.1713216 5.091418,5.3424462 1.9378926,8.514353 0.38039059,12.350325 0.45880339,16.856033 c 0.0258144,2.991029 0.76848471,5.673295 2.18949741,8.083562 0.077632,0.11361 0.1918277,0.263983 0.3064164,0.452682 0,0 12.4091738,18.816149 13.0214198,19.71936 0.611464,0.904777 1.199853,0.01446 1.199853,0.01446 L 30.668667,24.885429 C 32.123902,22.41122 32.857383,19.640568 32.830791,16.573472 32.791683,12.06757 31.168283,8.2591689 27.997745,5.1426005 z" />' + markerContent + '</svg>').replace(/\{color\}/g, backgroundColor).replace(/\{icon\}/g, icon).replace(/\{x\}/g, x).replace(/\{y\}/g, y);
     };
