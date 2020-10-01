@@ -1,3 +1,8 @@
+// Fix a bug related to timestamp without time zone and UTC in pg package
+require('pg').types.setTypeParser(1114, function(stringValue) {
+    return new Date(stringValue.substring(0, 10) + 'T' + stringValue.substring(11) + 'Z');
+});
+
 var Sequelize = require('sequelize'),
     fs = require("fs"),
     path = require("path"),
