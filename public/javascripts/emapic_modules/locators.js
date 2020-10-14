@@ -373,7 +373,7 @@ var emapic = emapic || {};
             var totalsHtml = "";
             if (emapic.legend && emapic.legend.color) {
                 for (var j=0, leng=emapic.legend.color.responses_array.length; j<leng; j++) {
-                    totalsHtml += "<td><small>" + totals[j] + "</small></td>\n";
+                    totalsHtml += "<td><small>" + (j in totals ? totals[j] : 0) + "</small></td>\n";
                 }
             }
             var votedProvincesNr = Object.keys(emapic.votedProvincesData).length;
