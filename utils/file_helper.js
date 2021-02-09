@@ -24,6 +24,28 @@ function deleteFile(filePath) {
     })
 }
 
+function moveFile(oldFilePath, newFilePath) {
+    return new Promise(function(resolve, reject) {
+        mkdirp(path.dirname(newFilePath), function (err) {
+            if (err)  {
+                return reject(err)
+            }
+            resolve();
+        });
+    }).then(function () {
+        return fs.renameAsync(oldFilePath, newFilePath).then(function() {
+            return sequelize.query('UPDATE metadata.files SET path = ? WHERE path = ? RETURNING id;', {
+                replacements: [newFilePath, oldFilePath]
+            }).spread(function(rows, metadata) {
+                if (rows.length === 0) {
+                    return null;
+                }
+                return rows[0].id;
+            });
+        });
+    });
+}
+
 module.exports = function(app) {
     FileHelper = {
 
@@ -152,10 +174,42 @@ module.exports = function(app) {
                 filePath = rows[0].path;
                 return deleteFile(filePath);
             }).tap(function(id) {
-                logger.debug('Deleted file with path "' + filePath + '" and id ' + id);
+                logger.debug('Deleted file with path "' + filePath + '" and id "' + id + '"');
             }).catch(function(err) {
                 logger.error('Error while deleting file with id "' + fileId + '": ' + err.message);
                 throw err;
+            });
+        },
+
+        moveFileFromPath: function(oldFilePath, newFilePath) {
+            var fullNewFilePath = newFilePath;
+            while(fullNewFilePath.charAt(0) === path.sep) {
+                fullNewFilePath = fullNewFilePath.substr(1);
+            }
+            fullNewFilePath = uploadedFilesFolder + fullNewFilePath;
+            var fullOldFilePath = oldFilePath;
+            while(fullOldFilePath.charAt(0) === path.sep) {
+                fullOldFilePath = fullOldFilePath.substr(1);
+            }
+            if (!fullOldFilePath.startsWith(uploadedFilesFolder)) {
+                fullOldFilePath = uploadedFilesFolder + fullOldFilePath;
+            }
+            return moveFile(fullOldFilePath, fullNewFilePath).tap(function(id) {
+                logger.debug('Moved file with path "' + fullOldFilePath + '" and id "' + id + '" to new path "' + fullNewFilePath + '"');
+            }).catch(function(err) {
+                logger.error('Error while moving file with path "' + fullOldFilePath + '" to new path "' + fullNewFilePath + '": ' + err.message);
+                throw err;
+            });
+        },
+
+        moveFileFromId: function(fileId, newFilePath) {
+            return sequelize.query('SELECT path FROM metadata.files WHERE id = ?;', {
+                replacements: [fileId]
+            }).spread(function(rows, metadata) {
+                if (rows.length === 0 || !rows[0].path) {
+                    throw new Error('Requested file id doesn\'t exist: ' + fileId);
+                }
+                return FileHelper.moveFileFromPath(rows[0].path, newFilePath);
             });
         },
 
