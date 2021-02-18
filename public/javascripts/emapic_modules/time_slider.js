@@ -379,14 +379,17 @@ var emapic = emapic || {};
         });
         L.DomEvent.disableClickPropagation($('#time-control')[0]);
         filterDates = [sliderDates[sliderLevel][0][0], sliderDates[sliderLevel][1][sliderDates[sliderLevel][1].length - 1]];
-        $('#time-slider .ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel], emapic.locale))
-            .tooltip({ container: '#time-slider .ui-slider-handle:first'}).tooltip('hide').tooltip('fixTitle').on('shown.bs.tooltip', function() {
-                disableTooltipEvents($('#time-slider .ui-slider-handle:first .tooltip')[0]);
-            });
-        $('#time-slider .ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel], emapic.locale))
-            .tooltip({ container: '#time-slider .ui-slider-handle:last'}).tooltip('hide').tooltip('fixTitle').on('shown.bs.tooltip', function() {
-                disableTooltipEvents($('#time-slider .ui-slider-handle:last .tooltip')[0]);
-            });
+        if ($("#time-slider") !== null && typeof sliderDates[sliderLevel] !== 'undefined' &&
+            sliderDates[sliderLevel][0].length > 0) {
+            $('#time-slider .ui-slider-handle:first').attr('title', sliderDatesTooltip[sliderLevel][0].format(sliderDateFormats[sliderLevel], emapic.locale))
+                .tooltip({ container: '#time-slider .ui-slider-handle:first'}).tooltip('hide').tooltip('fixTitle').on('shown.bs.tooltip', function() {
+                    disableTooltipEvents($('#time-slider .ui-slider-handle:first .tooltip')[0]);
+                });
+            $('#time-slider .ui-slider-handle:last').attr('title', sliderDatesTooltip[sliderLevel][sliderDatesTooltip[sliderLevel].length - 1].format(sliderDateFormats[sliderLevel], emapic.locale))
+                .tooltip({ container: '#time-slider .ui-slider-handle:last'}).tooltip('hide').tooltip('fixTitle').on('shown.bs.tooltip', function() {
+                    disableTooltipEvents($('#time-slider .ui-slider-handle:last .tooltip')[0]);
+                });
+        }
         // Looks like bootstrap has some problems with showing the tooltips at this point, so we show them with a small delay
         setTimeout(function(){
             if (sliderDates[sliderLevel][0].length > 1) {
