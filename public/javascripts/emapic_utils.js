@@ -228,7 +228,7 @@ if (typeof $.fn.validator !== 'undefined' &&
     emapic.utils.i18n = emapic.utils.i18n || {};
 
     emapic.utils.registerI18n = function(i18nStr, translation) {
-        emapic.utils.i18n[i18nStr] = (typeof emapic.utils.i18n[i18nStr] === 'undefined') ? translation : emapic.utils.i18n[i18nStr];
+        emapic.utils.i18n[i18nStr] = translation;
     };
 
     emapic.utils.getI18n = function(i18nStr, defaultTranslation) {
