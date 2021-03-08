@@ -44,7 +44,7 @@ else:
     output = os.path.splitext(os.path.basename(sys.argv[1]))[0] + '.csv'
 
 # open a file for writing
-o = open(output, 'w')
+o = open(output, 'w', encoding='utf-8')
 
 # create the csv writer object
 csvwriter = csv.writer(o, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
