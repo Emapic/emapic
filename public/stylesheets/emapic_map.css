@@ -797,16 +797,17 @@ input.form-control[type="radio"] {
     color: #f0f0f0;
 }
 .selectize-dropdown .flag-item {
-    display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-    display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-    display: -ms-flexbox;      /* TWEENER - IE 10 */
-    display: -webkit-flex;     /* NEW - Chrome */
-    display: flex;
+    display: -webkit-box !important;      /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box !important;         /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox !important;      /* TWEENER - IE 10 */
+    display: -webkit-flex !important;     /* NEW - Chrome */
+    display: flex !important;
 }
-.selectize-dropdown .flag-item .flag-container{
+.selectize-dropdown .flag-item .flag-container {
     margin-right: 10px;
+    flex: 0 0 auto;
 }
-.selectize-control .flag-item .flag-container {
+.selectize-control .selectize-input .flag-item .flag-container {
     margin: 0px 10px -2px 0;
 }
 .selectize-dropdown .flag-item .selectize-label {
@@ -817,11 +818,17 @@ input.form-control[type="radio"] {
     flex-grow: 1;
 }
 .selectize-control .flag-item .flag-container {
-    display: inline-block
+    display: inline-block;
 }
 .selectize-control .flag-item,
 .selectize-control .flag-item .selectize-label {
     display: inline;
+}
+.selectize-dropdown .flag-item .flag-container,
+.selectize-control .flag-item .flag-container,
+.selectize-control .flag-item .selectize-label,
+.selectize-dropdown .flag-item .selectize-label {
+    padding: 0 !important;
 }
 
 .leaflet-control-geocoder,
