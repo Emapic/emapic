@@ -1842,8 +1842,8 @@ button.survey-answer > div.flex-container {
 }
 
 @media screen and (max-width: 599px), screen and (max-height: 639px) {
-    #questions-wrapper, #thanks-msg {
-        padding: 0em 1em;
+    #questions-flex-container > #questions-wrapper, #questions-wrapper, #thanks-msg {
+        padding: 0 2em;
     }
     .navbar-brand {
         padding: 5px;
@@ -2048,6 +2048,10 @@ button.survey-answer > div.flex-container {
 }
 
 @media screen and (max-width: 767px) {
+    #questions-wrapper .row .col-xs-12.text-right,
+    #questions-wrapper .row .col-xs-12.text-left {
+        text-align: center;
+    }
     .hidden-xs-down {
         display: none;
     }
