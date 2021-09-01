@@ -329,6 +329,9 @@ div.alert-danger a {
     padding-top: 10px;
     padding-bottom: 0px;
 }
+#geoposwarn .modal-body ul {
+    padding-left: 0px;
+}
 #geoposwarn .modal-body li p, #geoposwarn .modal-body li p a {
     font-size: 13px;
 }

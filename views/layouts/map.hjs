@@ -1,6 +1,10 @@
 {{> map_header}}
 <!-- MODALS ------------------------------------------------------>
+{{^custom_geoposwarn}}
 {{> map_geoposwarn}}
+{{/custom_geoposwarn}}
+{{^custom_geoposresult}}
 {{> map_geoposresult}}
+{{/custom_geoposresult}}
 {{{yield}}}
 {{> map_footer}}

@@ -525,7 +525,9 @@ var emapic = emapic || {};
 
     function editMarkerPos() {
         emapic.utils.enableMapInteraction();
-        emapic.map.setView(emapic.position);
+        if (emapic.position) {
+            emapic.map.setView(emapic.position);
+        }
         if (emapic.modules.survey.marker !== null && 'dragging' in emapic.modules.survey.marker) {
             emapic.modules.survey.marker.dragging.enable();
         }
@@ -535,7 +537,14 @@ var emapic = emapic || {};
 
     function setResponseMarkerPosition(e) {
         if (realClick) {
-            emapic.modules.survey.marker.setLatLng(e.latlng);
+            if (emapic.modules.survey.marker !== null) {
+                emapic.modules.survey.marker.setLatLng(e.latlng);
+            } else {
+                emapic.position = e.latlng;
+                emapic.modules.survey.updateResponsesMarker(true);
+                emapic.modules.survey.marker.dragging.enable();
+                $('#check-edit-loc .btn-success').attr('disabled', false);
+            }
             unsetRealClick();
         }
     }
