@@ -158,7 +158,16 @@
             </div>
           </div>
           <div class="modal-footer">
-			<a class="btn btn-primary" type="button" onclick="window.open(emapic.getExportFilteredURL(), '_blank');">{{#__}}download_visible_data_xlsx{{/__}}</a>
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{#__}}download_visible_data{{/__}} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                  <li><a href="javascript:void(0);" onclick="window.open(emapic.getExportFilteredURL('xlsx'), '_blank');">{{#__}}xlsx{{/__}}</a></li>
+                  <li><a href="javascript:void(0);" onclick="window.open(emapic.getExportFilteredURL('csv'), '_blank');">{{#__}}csv{{/__}}</a></li>
+                  <li><a href="javascript:void(0);" onclick="window.open(emapic.getExportFilteredURL('geojson'), '_blank');">{{#__}}geojson{{/__}}</a></li>
+                </ul>
+              </div>
 		  </div>
         </div>
       </div>

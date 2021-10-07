@@ -83,10 +83,13 @@ var emapic = emapic || {};
         return "/api/survey/" + emapic.surveyId + "/export";
     };
 
-    emapic.getExportFilteredURL = function() {
+    emapic.getExportFilteredURL = function(format) {
         var parameters = [];
         for (var i = 0, len = emapic.filters.length; i<len; i++) {
             parameters = parameters.concat(emapic.filters[i].getExportParameters());
+        }
+        if (format) {
+            parameters.push('format=' + format);
         }
         return emapic.getExportURL() + (parameters.length > 0 ? '?' + parameters.join('&') : '');
     };

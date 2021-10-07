@@ -413,6 +413,10 @@ module.exports = function(app) {
                                 res.send(csv);
                             });
                             break;
+                        case 'geojson':
+                            res.attachment(survey.title + '.geojson');
+                            res.send(JSON.stringify(pgQueryFullResultsToGeoJson(responses, questions, i18n)));
+                            break;
                         default:
                             res.attachment(survey.title + '.xlsx');
                             pgQueryFullResultsToXlsx(responses, questions, i18n, true, true).then(function(xlsx) {

@@ -752,6 +752,78 @@ module.exports = function(app) {
         );
     };
 
+    pgQueryFullResultsToGeoJson = function(results, questions, i18n) {
+        i18n = i18n ? i18n : Utils.getI18n();
+        var headers = [i18n.__('export_header_date_time'),
+                i18n.__('export_header_country'),
+                i18n.__('export_header_country_iso_code'),
+                i18n.__('export_header_region'),
+                i18n.__('export_header_region_code'),
+                i18n.__('export_header_municipality'),
+                i18n.__('export_header_municipality_code')];
+        var features = [];
+        for (let i = 0, iLen = results.length; i < iLen; i++) {
+            let feature = {
+                geojson: '{"type": "Point", "coordinates": [' + results[i].lon + ',' + results[i].lat + ']}'
+            };
+            feature[headers[0]] = moment.utc(new Date(parseInt(results[i].timestamp, 10)).toISOString()).format(i18n.__('date_time_format_string'));
+            feature[headers[1]] = results[i].country;
+            feature[headers[2]] = results[i].country_iso;
+            feature[headers[3]] = results[i].province;
+            feature[headers[4]] = results[i].province_code;
+            feature[headers[5]] = results[i].municipality;
+            feature[headers[6]] = results[i].municipality_code;
+            for (let j = 0, jLen = questions.length; j < jLen; j++) {
+                var ansId, ans;
+                switch (questions[j].type) {
+                    case 'list-radio':
+                        ans = ansId = parseInt(results[i]['q' + questions[j].question_order + '.id'], 10);
+                        for (let l = 0, lLen = questions[j].Answers.length; l < lLen; l++) {
+                            if (ansId === questions[j].Answers[l].sortorder) {
+                                ans = questions[j].Answers[l].answer;
+                                break;
+                            }
+                        }
+                        feature[questions[j].question] = ans;
+                        break;
+                    case 'list-radio-other':
+                        var otherAns = null;
+                        for (let l = 0, lLen = questions[i].Answers.length; l < lLen; l++) {
+                            if (questions[i].Answers[l].sortorder === -1) {
+                                otherAns = questions[i].Answers[l];
+                                break;
+                            }
+                        }
+                        var otherName = (otherAns === null) ? 'other value' : otherAns.answer;
+
+                        ans = ansId = parseInt(results[i]['q' + questions[j].question_order + '.id'], 10);
+                        for (let l = 0, lLen = questions[j].Answers.length; l < lLen; l++) {
+                            if (ansId === questions[j].Answers[l].sortorder) {
+                                ans = questions[j].Answers[l].answer;
+                            }
+                        }
+                        feature[questions[j].question] = ans;
+                        feature[questions[j].question + ' - ' + otherName] = (ansId === -1) ? results[i]['q' + questions[j].question_order + '.value'] : null;
+                        break;
+                    case 'text-answer':
+                    case 'long-text-answer':
+                    case 'image-url':
+                        feature[questions[j].question] = results[i]['q' + questions[j].question_order + '.value'];
+                        break;
+                    case 'image-upload':
+                        feature[questions[j].question] = results[i]['q' + questions[j].question_order + '.value'] ? Utils.getApplicationBaseURL() + result['q' + questions[j].question_order + '.value'] : null;
+                        break;
+                    case 'explanatory-text':
+                        break;
+                    default:
+                        return new Error("Question type not contemplated.");
+                }
+            }
+            features.push(feature);
+        }
+        return postGISQueryToFeatureCollection(features);
+    };
+
     pgQueryFullResultsToXlsx = function(results, questions, i18n, addQuestionStats, addLocationStats) {
         i18n = i18n ? i18n : Utils.getI18n();
         var wb = new XLSX.Workbook({

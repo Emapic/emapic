@@ -314,8 +314,8 @@ div.alert-danger a {
 #geolocatecurrentfailed .modal-content, #stats-modal .modal-content, #time-filter-modal .modal-content, #survey-resume .modal-content, #survey-info .modal-content {
     background-color: #004F71;
 }
-#geoposwarn .modal-content a:hover, #geoposresult .modal-content a:hover, #stats-modal .modal-content a:hover, #time-filter-modal .modal-content a:hover, #survey-resume .modal-content a:hover, #survey-info .modal-content a:hover,
-#geoposwarn .modal-content a:focus, #geoposresult .modal-content a:focus, #stats-modal .modal-content a:focus, #time-filter-modal .modal-content a:hover, #survey-resume .modal-content a:focus, #survey-info .modal-content a:focus,
+#geoposwarn .modal-content a:hover, #geoposresult .modal-content a:hover, #stats-modal .modal-body a:hover, #time-filter-modal .modal-content a:hover, #survey-resume .modal-content a:hover, #survey-info .modal-content a:hover,
+#geoposwarn .modal-content a:focus, #geoposresult .modal-content a:focus, #stats-modal .modal-body a:focus, #time-filter-modal .modal-content a:hover, #survey-resume .modal-content a:focus, #survey-info .modal-content a:focus,
 #geolocatecurrentfailed .modal-content a:hover, #geolocatecurrentfailed .modal-content a:focus {
     color: #ADD8E6;
 }
