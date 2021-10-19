@@ -526,8 +526,11 @@ if (typeof $.fn.validator !== 'undefined' &&
     };
 
     emapic.utils.confirmLeavingPageSafely = function() {
-        leavingPageSafely = true;
-        return true;
+        return leavingPageSafely = true;
+    };
+
+    emapic.utils.resetLeavingPageSafely = function() {
+        return leavingPageSafely = false;
     };
 
     emapic.utils.getJsonAlertError = function(url, errorMsg) {
