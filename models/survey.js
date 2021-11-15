@@ -774,11 +774,19 @@ module.exports = function(sequelize, DataTypes) {
     };
 
     Survey.prototype.getHtml = function(req) {
+        var description = this.description_markdown_to_html,
+            title = this.title;
         return Promise.map(this.getQuestions({
             scope: 'includeAnswers'
         }), function(question) {
             return question.getHtml(req);
         }).then(function(results){
+            if (description !== '') {
+                results.unshift('<div class="col-xs-12 text-center"><div id="qd-other"' +
+                    '  class="col-xs-12 col-md-6 col-md-offset-3 survey-answer explanatory-text">' +
+                    '<h2>' + title + '</h2><p id="qd">' + description + '</p><br/><button id="qd-ok" class="btn btn-primary"' +
+                    ' onclick="emapic.modules.survey.advanceSurvey()">OK</button></div></div>');
+            }
             if (results.length === 1) {
                 return results[0];
             }
