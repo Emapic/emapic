@@ -356,8 +356,8 @@ div.alert-danger a {
 #geoposwarn .modal-header button, #geoposresult .modal-header button, #geolocatecurrentfailed .modal-header button, #stats-modal .modal-header button, #time-filter-modal .modal-header button, #survey-resume .modal-header button {
     color: white;
 }
-#geoposwarn .modal-body {
-    padding-bottom: 0px;
+#geoposwarn .modal-body > * > *:last-child {
+    margin-bottom: 0;
 }
 #geoposwarn .modal-body .panel-body {
     padding-top: 10px;
@@ -400,7 +400,11 @@ div.alert-danger a {
     text-decoration: none;
 }
 #browser-loc-howto {
-	margin-bottom: 15px;
+	margin-bottom: 0px;
+    display: inline-block;
+}
+#browser-loc-howto h5 {
+    margin: 8px 0 0 0;
 }
 #geoposresult p, #geoposresult h4 {
     display: none;
