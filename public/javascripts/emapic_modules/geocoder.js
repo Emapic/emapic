@@ -16,7 +16,8 @@ var emapic = emapic || {};
 
     var dontZoomToCountryOnce = false,
         dontZoomToProvinceOnce = false,
-        geocoderParams = {};
+        geocoderParams = {},
+        geocoderModalControl = null;
 
     if (emapic.utils.nominatimEmail !== null) {
         geocoderParams.email = emapic.utils.nominatimEmail;
@@ -35,6 +36,43 @@ var emapic = emapic || {};
                 emapic.map.flyToBounds(bbox, {duration: 1.5});
             }
         }
+    }
+
+    function showModal() {
+        switch(emapic.modules.geocoder.control.options.position) {
+            case 'topleft':
+                controlLocation = '.leaflet-top.leaflet-left';
+                break;
+            case 'bottomleft':
+                controlLocation = '.leaflet-bottom.leaflet-left';
+                break;
+            case 'bottomright':
+                controlLocation = '.leaflet-bottom.leaflet-right';
+                break;
+            default:
+                controlLocation = '.leaflet-top.leaflet-right';
+                break;
+        }
+        $('.leaflet-control-container > ' + controlLocation).addClass('geocoder-modal-shown');
+        $('.leaflet-control-geocoder-container').addClass('leaflet-control-geocoder-container-modal');
+    }
+
+    function hideModal() {
+        switch(emapic.modules.geocoder.control.options.position) {
+            case 'topleft':
+                controlLocation = '.leaflet-top.leaflet-left';
+                break;
+            case 'bottomleft':
+                controlLocation = '.leaflet-bottom.leaflet-left';
+                break;
+            case 'bottomright':
+                controlLocation = '.leaflet-bottom.leaflet-right';
+                break;
+            default:
+                controlLocation = '.leaflet-top.leaflet-right';
+        }
+        $('.leaflet-control-container > ' + controlLocation).removeClass('geocoder-modal-shown');
+        $('.leaflet-control-geocoder-container.leaflet-control-geocoder-container-modal').removeClass('leaflet-control-geocoder-container-modal');
     }
 
     emapic.modules.geocoder.zoomToCountry = function(data) {
@@ -66,8 +104,10 @@ var emapic = emapic || {};
 
     emapic.modules.geocoder.addGeocoder = function(params) {
         emapic.modules.geocoder.removeGeocoder();
+        removeGeocoderModalBtn();
         var baseParams = $.extend({
             collapsed: false,
+            showModalSmall: true,
             defaultMarkGeocode: false,
             title: emapic.utils.getI18n('js_geocoder_title'),
             placeholder: emapic.utils.getI18n('js_geocoder_placeholder'),
@@ -87,8 +127,14 @@ var emapic = emapic || {};
         var control = emapic.modules.geocoder.control = L.Control.geocoder(baseParams);
         control.addTo(emapic.map);
 
+        var hideModalBtn = L.DomUtil.create('button', 'close', emapic.modules.geocoder.control._innerContainer);
+        $(emapic.modules.geocoder.control._innerContainer).find('button.close').append('<span aria-hidden="true">×</span>');
+        L.DomEvent.addListener(hideModalBtn, 'click', hideModal, this);
+        L.DomEvent.addListener(emapic.modules.geocoder.control._container, 'click', hideModal, this);
+
         emapic.map.on('markgeocode', function(result) {
             emapic.modules.geocoder.processGeocodingResult(result);
+            hideModal();
             return this;
         }, control);
 
@@ -103,7 +149,36 @@ var emapic = emapic || {};
         }, control);
 
         emapic.utils.disableAllEventsPropagation($('.leaflet-control-geocoder')[0]);
+        if (baseParams.showModalSmall) {
+            $(control._container).addClass('hide-small');
+            addGeocoderModalBtn();
+        }
     };
+
+    function addGeocoderModalBtn() {
+        geocoderModalControl = L.control({position: emapic.modules.geocoder.control.options.position});
+        geocoderModalControl.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'leaflet-bar show-small');
+            this._div.innerHTML = "<a id='control-geocoder-modal' data-placement='left' title='" + emapic.utils.getI18n('js_geocoder_title', 'Buscar en la vista actual') +
+                "' href='javascript:void(0)'><span class='glyphicon glyphicon-search'></span></a>";
+            return this._div;
+        };
+        geocoderModalControl.addTo(emapic.map);
+        $('#control-geocoder-modal').on('click', showModal);
+        emapic.addTooltips();
+    }
+
+    function removeGeocoderModalBtn() {
+        if (isGeocoderModalBtnLoaded()) {
+            geocoderModalControl.remove();
+        }
+    }
+
+    function isGeocoderModalBtnLoaded() {
+        return geocoderModalControl !== null &&
+            '_map' in geocoderModalControl &&
+            geocoderModalControl._map !== null;
+    }
 
     emapic.modules.geocoder.isGeocoderLoaded = function() {
         return emapic.modules.geocoder.control !== null &&

@@ -816,6 +816,36 @@ input.form-control[type="radio"] {
 .leaflet-control-geocoder {
     padding: 5px 15px 5px 15px;
 }
+.leaflet-control-container > .geocoder-modal-shown {
+	z-index: 1000000;
+}
+.leaflet-control-container > .geocoder-modal-shown .leaflet-control:not(.leaflet-control-geocoder-container) {
+    z-index: 0;
+}
+.leaflet-control-geocoder-container {
+	background-color: rgba(70,70,70,0.7);
+}
+.leaflet-control-geocoder button.close {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+    color: white;
+}
+.leaflet-control-geocoder-container:not(.leaflet-control-geocoder-container-modal) button.close {
+	display: none;
+}
+.leaflet-control-geocoder-container.leaflet-control-geocoder-container-modal {
+	margin: 0;
+	position: fixed;
+	height: 100vh;
+	width: 100vw;
+	top: 0;
+	left: 0;
+	border-width: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
 .leaflet-control-geocoder,
 .leaflet-control-geocoder-form input,
 .leaflet-control-geocoder .selectize-control.single .selectize-input,
@@ -836,6 +866,9 @@ input.form-control[type="radio"] {
 .leaflet-control-geocoder-select .selectize-dropdown-content {
     background-color: #004F71;
     color: #f0f0f0;
+}
+.selectize-dropdown.leaflet-control-geocoder-select {
+    z-index: 1000001;
 }
 .selectize-dropdown .flag-item {
     display: -webkit-box !important;      /* OLD - iOS 6-, Safari 3.1-6 */
@@ -1941,12 +1974,6 @@ button.survey-answer > div.flex-container {
     }
     .listbtns .survey-answer .answer-img {
         margin-right: 10px;
-    }
-}
-
-@media screen and (max-width: 599px), screen and (max-height: 540px) {
-    .leaflet-control-geocoder {
-        display: none;
     }
 }
 

@@ -38,7 +38,8 @@ module.exports = {
 
 		onAdd: function (map) {
 			var className = 'leaflet-control-geocoder',
-			    container = L.DomUtil.create('div', className + ' leaflet-bar');
+			    controlContainer = L.DomUtil.create('div', className + '-container leaflet-bar'),
+			    container = L.DomUtil.create('div', className, controlContainer);
 				if (this.options.displayTitle) {
 					$(container).append('<div class="title-container"><h4>' + this.options.title + '</h4><hr/></div>');
 				}
@@ -47,7 +48,7 @@ module.exports = {
 				}
 
 			this._map = map;
-			this._container = container;
+			this._innerContainer = container;
 
 			if (this.options.displaySelectors) {
 				var selectorsTable = L.DomUtil.create('table', className + '-selectors-table', container),
@@ -200,19 +201,19 @@ module.exports = {
 			}
 
 			this._map.on('startgeocode', function() {
-				L.DomUtil.addClass(this._container, 'leaflet-control-geocoder-throbber');
+				L.DomUtil.addClass(this._innerContainer, 'leaflet-control-geocoder-throbber');
 			}, this);
 			this._map.on('finishgeocode', function() {
-				L.DomUtil.removeClass(this._container, 'leaflet-control-geocoder-throbber');
+				L.DomUtil.removeClass(this._innerContainer, 'leaflet-control-geocoder-throbber');
 			}, this);
 
-			L.DomEvent.disableClickPropagation(container);
+			L.DomEvent.disableClickPropagation(controlContainer);
 
 			if (this.options.appendHtml !== null) {
 				$(container).append(this.options.appendHtml);
 			}
 
-			return container;
+			return controlContainer;
 		},
 
 		hasCountry: function(isoCode) {
@@ -308,7 +309,7 @@ module.exports = {
 		},
 
 		_toggle: function() {
-			if (this._container.className.indexOf('leaflet-control-geocoder-expanded') >= 0) {
+			if (this._innerContainer.className.indexOf('leaflet-control-geocoder-expanded') >= 0) {
 				this._collapse();
 			} else {
 				this._expand();
@@ -316,13 +317,13 @@ module.exports = {
 		},
 
 		_expand: function () {
-			L.DomUtil.addClass(this._container, 'leaflet-control-geocoder-expanded');
+			L.DomUtil.addClass(this._innerContainer, 'leaflet-control-geocoder-expanded');
 			this._input.select();
 			this._map.fire('expandgeocoder');
 		},
 
 		_collapse: function () {
-			this._container.className = this._container.className.replace(' leaflet-control-geocoder-expanded', '');
+			this._innerContainer.className = this._innerContainer.className.replace(' leaflet-control-geocoder-expanded', '');
 			L.DomUtil.addClass(this._alts, 'leaflet-control-geocoder-alternatives-minimized');
 			L.DomUtil.removeClass(this._errorElement, 'leaflet-control-geocoder-error');
 			this._map.fire('collapsegeocoder');
