@@ -206,11 +206,11 @@ var emapic = emapic || {};
         });
     };
 
-    emapic.addBaseLayers = function(tryGrayScale) {
-        var control,
-            osmAttrib = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+    emapic.getBaseLayers = function(tryGrayScale) {
+        var osmAttrib = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
             mapboxAttrib = '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
-            osmBW;
+            osmBW,
+            baseMaps = [];
 
         if (tryGrayScale && L.TileLayer.Grayscale) {
             osmBW = new L.TileLayer.Grayscale('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -239,42 +239,60 @@ var emapic = emapic || {};
             });
         }
 
-        var osmMapnik = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            minZoom : 1,
-            maxZoom : 18,
-            attribution : osmAttrib
+        baseMaps.push({
+            label: emapic.utils.getI18n('js_grayscale_osm_baselayer'),
+            value: osmBW
         });
 
-        var baseMaps = {};
-        baseMaps[emapic.utils.getI18n('js_grayscale_osm_baselayer')] = osmBW;
-        baseMaps[emapic.utils.getI18n('js_color_osm_baselayer')] = osmMapnik;
+        baseMaps.push({
+            label: emapic.utils.getI18n('js_color_osm_baselayer'),
+            value: new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                minZoom : 1,
+                maxZoom : 18,
+                attribution : osmAttrib
+            })
+        });
 
         if (emapic.mapboxToken !== null) {
-            var mapboxSatellite = new L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-                attribution: mapboxAttrib,
-                tileSize: 512,
-                maxZoom: 18,
-                zoomOffset: -1,
-                id: 'mapbox/satellite-streets-v11',
-                accessToken: emapic.mapboxToken
+            baseMaps.push({
+                label: emapic.utils.getI18n('js_satellite_mapbox_baselayer'),
+                value:  new L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                    attribution: mapboxAttrib,
+                    tileSize: 512,
+                    maxZoom: 18,
+                    zoomOffset: -1,
+                    id: 'mapbox/satellite-streets-v11',
+                    accessToken: emapic.mapboxToken
+                })
             });
-            baseMaps[emapic.utils.getI18n('js_satellite_mapbox_baselayer')] = mapboxSatellite;
         }
-        emapic.currentBaseLayer = osmBW;
 
-        $.each(baseMaps, function(index, value) {
-            value.on('loading', function() {
+        return baseMaps;
+    }
+
+    emapic.addBaseLayers = function(tryGrayScale) {
+        var control,
+            baseMaps = {},
+            baseMapsArray = emapic.getBaseLayers(tryGrayScale);
+
+        emapic.currentBaseLayer = baseMapsArray[0].value;
+
+        $.each(baseMapsArray, function(index, item) {
+            baseMaps[item.label] = item.value;
+            item.value.on('loading', function() {
                 if (emapic.baseLayerLoadedPromise === null) {
                     emapic.baseLayerLoadedPromise = $.Deferred();
                 }
             });
-            value.on('load', function() {
+            item.value.on('load', function() {
                 if (emapic.baseLayerLoadedPromise !== null) {
                     emapic.baseLayerLoadedPromise.resolve();
                 }
             });
         });
-        emapic.map.addLayer(osmBW);
+
+        emapic.map.addLayer(emapic.currentBaseLayer);
+
         emapic.map.on('baselayerchange', function(layer) {
             if (emapic.currentBaseLayer !== layer.layer) {
                 emapic.baseLayerLoadedPromise = null;
