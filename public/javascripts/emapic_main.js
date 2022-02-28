@@ -9,7 +9,8 @@ var emapic = emapic || {};
     var allCountriesDataBboxDfd = null,
         votedCountriesDataNoGeomDfd = null,
         votedProvincesDataBboxDfd = null,
-        votedMunicipalitiesDataBboxDfd = null;
+        votedMunicipalitiesDataBboxDfd = null,
+        urlAnswerIdParam = 'answer';
 
     emapic.map = null;
     emapic.layerControl = null;
@@ -22,6 +23,8 @@ var emapic = emapic || {};
     emapic.surveyId = null;
     emapic.surveyResults = null;
     emapic.resultsAfterVote = true;
+    emapic.updateUrlWithAnswerId = false;
+    emapic.answerIdField = 'id';
     emapic.redirectUrl = "/";
     emapic.legend = {};
     emapic.fullLegend = null;
@@ -268,7 +271,7 @@ var emapic = emapic || {};
         }
 
         return baseMaps;
-    }
+    };
 
     emapic.addBaseLayers = function(tryGrayScale) {
         var control,
@@ -306,7 +309,7 @@ var emapic = emapic || {};
         var control = L.control.layers(baselayers, overlays, {position: 'bottomright'});
         control.addTo(emapic.map);
         return control;
-    }
+    };
 
     emapic.startMapLogic = function() {
         // We use this flag in order to prevent a strange problem where
@@ -493,21 +496,52 @@ var emapic = emapic || {};
                     className: 'popup-responses' + ('status' in data.feature.properties ? ' popup-status-' + data.feature.properties.status : '')
                 }
             );
+            data.layer.on('popupopen', function(e) {
+                emapic.indivVotesLayerFeatureSelected(data.feature);
+            });
+            data.layer.on('popupclose', function(e) {
+                emapic.indivVotesLayerFeatureUnselected(data.feature);
+            });
         }
         return data;
     };
 
     emapic.loadIndivVotesLayer = function() {
+        var answerToShowId = parseInt(emapic.utils.getURLParameter(urlAnswerIdParam));
         return L.geoJson(emapic.indivVotesLayerData, {
             onEachFeature : function(feature, layer) {
                 emapic.indivVotesLayerOnEachFeature({
                     feature: feature,
                     layer: layer
-                })
+                });
+                if (emapic.updateUrlWithAnswerId && !isNaN(answerToShowId) &&
+                  answerToShowId == feature.properties[emapic.answerIdField]) {
+                    emapic.allLayersLoadedPromise.done(function() {
+                        setTimeout(function() {
+                            emapic.showMarker(layer);
+                            layer.fireEvent('click');
+                        }, 500);
+                    });
+                }
             },
             pointToLayer: emapic.getIconMarker,
             filter: emapic.filterFeature
         });
+    };
+
+    emapic.indivVotesLayerFeatureSelected = function(feature) {
+        if (emapic.updateUrlWithAnswerId && window.history.pushState) {
+            var newUrl = emapic.utils.changeURLParameter(urlAnswerIdParam, feature.properties[emapic.answerIdField]);
+            window.history.pushState({path: newUrl}, '', newUrl);
+        }
+    };
+
+    emapic.indivVotesLayerFeatureUnselected = function(feature) {
+        if (emapic.updateUrlWithAnswerId && window.history.pushState &&
+          parseInt(emapic.utils.getURLParameter(urlAnswerIdParam)) === feature.properties[emapic.answerIdField]) {
+            var newUrl = emapic.utils.changeURLParameter(urlAnswerIdParam, null);
+            window.history.pushState({path: newUrl}, '', newUrl);
+        }
     };
 
     emapic.filterFeature = function(feature) {

@@ -42,6 +42,7 @@ if (typeof $.fn.validator !== 'undefined' &&
 
     emapic.utils.changeURLParameter = function(sParam, value) {
         var baseUrl = window.location.href.split('?')[0];
+        var hashUrl = window.location.href.indexOf('#') === -1 ? '' : window.location.href.split('#')[1];
         var sPageURL = window.location.search.substring(1);
         var sURLParams = [];
         if (sPageURL) {
@@ -54,8 +55,10 @@ if (typeof $.fn.validator !== 'undefined' &&
                 sURLParams.push(sParameterSplit[0] + '=' + sParameterSplit[1]);
             }
         }
-        sURLParams.push(sParam + '=' + value);
-        return baseUrl + '?' + sURLParams.join('&');
+        if (value !== null) {
+            sURLParams.push(sParam + '=' + encodeURIComponent(value));
+        }
+        return baseUrl + (sURLParams.length > 0 ? '?' + sURLParams.join('&') : '') + (hashUrl.length > 0 ? '#' + hashUrl : '');
     };
 
     emapic.utils.loadInputImage = function(input, id) {

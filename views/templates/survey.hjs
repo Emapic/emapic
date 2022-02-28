@@ -235,6 +235,8 @@
 
         emapic.position = {{{ position }}};
 
+        emapic.updateUrlWithAnswerId = true;
+
         {{#results}}
         emapic.surveyResults = true;
         {{#survey.already_opened}}

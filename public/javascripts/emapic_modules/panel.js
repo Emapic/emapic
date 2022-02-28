@@ -106,11 +106,13 @@ var emapic = emapic || {};
     emapic.modules.panel.getColorPanelSelect = function(number) {
         oldIcon = layers[number].options.icon;
         layers[number].setIcon(emapic.modules.panel.getSelectedIcon(layers[number].feature.properties));
+        emapic.indivVotesLayerFeatureSelected(layers[number].feature);
     };
 
     emapic.modules.panel.getColorPanelUnselect = function() {
         if (currentMarker !== null && oldIcon !== null) {
             currentMarker.setIcon(oldIcon);
+            emapic.indivVotesLayerFeatureUnselected(currentMarker.feature);
         }
         currentMarker = null;
         oldIcon = null;

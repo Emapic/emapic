@@ -141,14 +141,14 @@ function getSurveyResponsesSql(survey, type, getFilters, lang) {
             sql;
         switch (type) {
             case answersRequestType.normal:
-                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id " + whereData.sql + " ORDER BY timestamp";
+                sql = "SELECT a.gid as id, (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id " + whereData.sql + " ORDER BY timestamp";
                 break;
             case answersRequestType.full:
-                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_y(a.geom) as lat, st_x(a.geom) as lon, d." + countryName + " as country, d.iso_code_2 as country_iso, c." + provinceName + " as province, c.adm1_code as province_code, e." + municipalityName + " as municipality, e.codigo as municipality_code, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" +
+                sql = "SELECT a.gid as id, (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_y(a.geom) as lat, st_x(a.geom) as lon, d." + countryName + " as country, d.iso_code_2 as country_iso, c." + provinceName + " as province, c.adm1_code as province_code, e." + municipalityName + " as municipality, e.codigo as municipality_code, st_asgeojson(a.geom) as geojson, a.usr_id, b.login" +
                     fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN users b ON a.usr_id = b.id LEFT JOIN base_layers.provinces c ON c.gid = a.province_gid LEFT JOIN base_layers.countries d ON c.country_gid = d.gid LEFT JOIN base_layers.municipalities e ON e.gid = a.municipality_gid " + whereData.sql + " ORDER BY timestamp";
                 break;
             case answersRequestType.anonymized:
-                sql = "SELECT (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN base_layers.provinces b ON b.gid = a.province_gid LEFT JOIN base_layers.countries c ON b.country_gid = c.gid " + whereData.sql + " LEFT JOIN base_layers.municipalities d ON d.gid = a.municipality_gid ORDER BY c.iso_code_2, b.adm1_code, d.codigo, a.timestamp";
+                sql = "SELECT a.gid as id, (extract(epoch from a.timestamp) * 1000)::bigint as timestamp, st_asgeojson(a.geom) as geojson" + fieldsSql + " FROM opinions.survey_" + id + " a LEFT JOIN base_layers.provinces b ON b.gid = a.province_gid LEFT JOIN base_layers.countries c ON b.country_gid = c.gid " + whereData.sql + " LEFT JOIN base_layers.municipalities d ON d.gid = a.municipality_gid ORDER BY c.iso_code_2, b.adm1_code, d.codigo, a.timestamp";
                 break;
         }
         return {
