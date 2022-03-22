@@ -47,7 +47,7 @@ page.open(url, function(status) {
             // Extend the map to the whole page
             $('<style>body > div.container-fluid { height: 100% !important; }</style>').appendTo('head');
             // Remove the cookie warning
-            $('<style>.cc_banner-wrapper { display: none !important; }</style>').appendTo('head');
+            $('<style>.cc-window { display: none !important; }</style>').appendTo('head');
             // Remove the login message
             $('<style>.alert { display: none !important; }</style>').appendTo('head');
             // Remove the controls
