@@ -239,8 +239,8 @@ if (typeof $.fn.validator !== 'undefined' &&
     };
 
     emapic.utils.setLocale = function(value) {
-        Cookies.set('locale', value, { expires: 30, path: '/' });
-        location.reload();
+        Cookies.set('locale', value, { expires: 30, path: '/', samesite: 'none', secure: 'true' });
+        location.reload(true);
     };
 
     emapic.utils.checkInputNotVoid = function(input, mandatory) {
