@@ -320,7 +320,7 @@ var emapic = emapic || {};
         emapic.logicAlreadyStarted = true;
         if (emapic.resultsAfterVote || emapic.surveyResults) {
             emapic.loadData();
-        } else {
+        } else if (emapic.redirectUrl !== null) {
             window.location.href = emapic.redirectUrl;
         }
         return true;
