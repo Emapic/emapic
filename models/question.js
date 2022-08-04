@@ -94,9 +94,9 @@ function checkValidAnswersFromPost(req, questions) {
                                 code: 'answer_img_invalid'
                             });
                         }
-                        if (req.files['img_' + i + '_' + j].size > 1000000) {
+                        if (req.files['img_' + i + '_' + j].size > 2000000) {
                             return Promise.reject({
-                                message: "invalid image for question nr " + i + " answer nr " + j + ": image file exceeds the 1MB max size.",
+                                message: "invalid image for question nr " + i + " answer nr " + j + ": image file exceeds the 2MB max size.",
                                 code: 'answer_img_too_big'
                             });
                         }
@@ -322,7 +322,7 @@ function generateImageInputQuestionHtml(question, validator, req) {
         (mandatory ? ' required' : '') + ' type="file" accept="image/*" name="img_upload_'  + question.question_order +
         '"' + ' id="q' + question.question_order + '-input" target="#q' + question.question_order +
         '-ok, #end-survey-btn, #block-nav-btns .edit-question-btn.btn-success ~ .edit-question-btn:not([disabled])" target-ok="#q' +
-        question.question_order + '-ok" target-help="help-block_'+ question.question_order + '" data-maxfilesize="4000000"' +
+        question.question_order + '-ok" target-help="help-block_'+ question.question_order + '" data-maxfilesize="10000000"' +
         (validator !== null ? ' onchange="emapic.utils.checkClearInput(this);emapic.utils.loadInputImage(this,\'inputfileimg_' +
         question.question_order + '\'); ' + validator + '(this, ' + mandatory + ')"' : '') +
         ' /><a class="clear-input disabled" onclick="emapic.utils.clearInput(\'img_upload_'  + question.question_order + '\')">' +
@@ -529,9 +529,9 @@ module.exports = function(sequelize, DataTypes) {
                                     code: 'invalid_request'
                                 });
                             }
-                            if (responses['q' + question.question_order + '.value'].size > 4000000) {
+                            if (responses['q' + question.question_order + '.value'].size > 10000000) {
                                 return Promise.reject({
-                                    message: "invalid answer for question nr " + question.question_order + " : image file exceeds the 4MB max size.",
+                                    message: "invalid answer for question nr " + question.question_order + " : image file exceeds the 10MB max size.",
                                     status: 400,
                                     code: 'invalid_request'
                                 });

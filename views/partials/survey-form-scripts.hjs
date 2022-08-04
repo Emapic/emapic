@@ -462,7 +462,7 @@
                                             <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
                                             <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
                                                 <div class="input-with-clear-btn">\
-                                                    <input class="form-control" required disabled type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" />\
+                                                    <input class="form-control" required disabled type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="2000000" name="img_' + qstn + '_1" data-error="{{#__}}type_an_option{{/__}}" />\
                                                     <a class="clear-input disabled" onclick="deleteInputImage(this)">\
                                                         <i class="fas fa-times-circle"></i>\
                                                     </a>\
@@ -505,7 +505,7 @@
                                             <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
                                             <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
                                                 <div class="input-with-clear-btn">\
-                                                    <input class="form-control" required disabled type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" />\
+                                                    <input class="form-control" required disabled type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="2000000" name="img_' + qstn + '_2" data-error="{{#__}}type_an_option{{/__}}" />\
                                                     <a class="clear-input disabled" onclick="deleteInputImage(this)">\
                                                         <i class="fas fa-times-circle"></i>\
                                                     </a>\
@@ -553,7 +553,7 @@
                                         <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
                                         <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
                                             <div class="input-with-clear-btn">\
-                                                <input class="form-control" required disabled type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}" />\
+                                                <input class="form-control" required disabled type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="2000000" name="img_' + qstn + '_other" data-error="{{#__}}type_an_option{{/__}}" />\
                                                 <a class="clear-input disabled" onclick="deleteInputImage(this)">\
                                                     <i class="fas fa-times-circle"></i>\
                                                 </a>\
@@ -764,7 +764,7 @@
                     <label class="col-xs-12 col-sm-2 control-label">{{#__}}image{{/__}}:</label>\
                     <div class="col-xs-12 col-sm-7 col-md-6 col-lg-5">\
                         <div class="input-with-clear-btn">\
-                            <input class="form-control" ' + (imageUrl ? '' : 'required ' ) + (responses_img ? '' : 'disabled ' ) + 'type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="1000000" name="img_' + qstn + '_' + answ + '" />\
+                            <input class="form-control" ' + (imageUrl ? '' : 'required ' ) + (responses_img ? '' : 'disabled ' ) + 'type="file" accept="image/*" onchange="answerImageInputChanged(this)" data-maxfilesize="2000000" name="img_' + qstn + '_' + answ + '" />\
                             <a class="clear-input disabled" onclick="deleteInputImage(this)">\
                                 <i class="fas fa-times-circle"></i>\
                             </a>\
