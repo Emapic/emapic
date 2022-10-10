@@ -788,9 +788,9 @@ module.exports = function(app) {
                         break;
                     case 'list-radio-other':
                         var otherAns = null;
-                        for (let l = 0, lLen = questions[i].Answers.length; l < lLen; l++) {
-                            if (questions[i].Answers[l].sortorder === -1) {
-                                otherAns = questions[i].Answers[l];
+                        for (let l = 0, lLen = questions[j].Answers.length; l < lLen; l++) {
+                            if (questions[j].Answers[l].sortorder === -1) {
+                                otherAns = questions[j].Answers[l];
                                 break;
                             }
                         }
