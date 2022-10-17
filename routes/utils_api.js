@@ -811,7 +811,7 @@ module.exports = function(app) {
                         feature[questions[j].question] = results[i]['q' + questions[j].question_order + '.value'];
                         break;
                     case 'image-upload':
-                        feature[questions[j].question] = results[i]['q' + questions[j].question_order + '.value'] ? Utils.getApplicationBaseURL() + result['q' + questions[j].question_order + '.value'] : null;
+                        feature[questions[j].question] = results[i]['q' + questions[j].question_order + '.value'] ? Utils.getApplicationBaseURL() + results[i]['q' + questions[j].question_order + '.value'] : null;
                         break;
                     case 'explanatory-text':
                         break;
