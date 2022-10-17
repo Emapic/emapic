@@ -104,7 +104,6 @@ var emapic = emapic || {};
 
     emapic.modules.geocoder.addGeocoder = function(params) {
         emapic.modules.geocoder.removeGeocoder();
-        removeGeocoderModalBtn();
         var baseParams = $.extend({
             collapsed: false,
             showModalSmall: true,
@@ -204,6 +203,7 @@ var emapic = emapic || {};
         if (emapic.modules.geocoder.isGeocoderLoaded()) {
             emapic.modules.geocoder.control.remove();
         }
+        removeGeocoderModalBtn();
     };
 
     emapic.modules.geocoder.setCountry = function(isoCode, silent) {
