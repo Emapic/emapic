@@ -101,7 +101,7 @@
     "sharp": "0.22.0"
   },
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=6.0.0 <14"
   },
   "private": false
 }
