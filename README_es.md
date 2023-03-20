@@ -86,7 +86,7 @@ cd db
 En esta carpeta se encuentra el fichero _sqitch.conf_, que contiene la configuración para la restauración de la base de datos. Los campos que deberemos revisar son:
 
 
-* «uri» dentro de «[target "emapic"]»: aquí se especifica la cadena de conexión a la base de datos. Por defecto se intentará conectar con el usuario «postgres», contraseña «postgres» al servidor local en el puerto por defecto (5432).  
+* «uri» dentro de «[target "emapic"]»: aquí se especifica la cadena de conexión a la base de datos. Por defecto se intentará conectar con el usuario «postgres», contraseña «postgres» a la base de datos «emapic» en el servidor local en el puerto por defecto (5432).  
 Si alguno de estos datos no es correcto, deberás retocar la cadena de conexión con el siguiente formato (sustituir las cadenas de texto rodeadas por llaves por los valores correspondientes):  
 
         db:pg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}

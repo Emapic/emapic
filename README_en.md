@@ -88,7 +88,7 @@ cd db
 Inside this folder we can find file _sqitch.conf_, which contains the configuration parameters for the database restoration. The fields we should check are:
 
 
-* 'uri' inside '[target "emapic"]': here we specify the database connection string. By default it will try to connect with user "postgres", password "postgres" the local PostgreSQL server through default port (5432).  
+* 'uri' inside '[target "emapic"]': here we specify the database connection string. By default it will try to connect with user "postgres", password "postgres" to the database "emapic" in the local PostgreSQL server through the default port (5432).  
 If any of these values is wrong, you must modify the connection string using the following format (replace the text strings surrounded by curly brackets with their respective values):
 
         db:pg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}
@@ -96,7 +96,7 @@ If any of these values is wrong, you must modify the connection string using the
 * 'emapic_db_user' inside '[deploy "variables"]', '[verify "variables"]' and '[revert "variables"]': the name of the database user Emapic will use to connect to the database.  
 By default, with the value "emapic". If you want to use a different name, you can simply edit this file and change its value, or add the parameter "-s emapic_db_user={emapic_db_user}" to all Sqitch executions, replacing the string surrounded by curly brackets with the desired user name.
 * 'emapic_db_user_pass' inside '[deploy "variables"]': the password of the database user Emapic will use to connect to the database.  
-By default, with the value "emapic".You should replace it with a more secure password. In order to change it, you can simply edit this file and change its value, or add the parameter "-s emapic_db_user_pass={emapic_db_user_pass}" to the deploy Sqitch execution, replacing the string surrounded by curly brackets with the desired user name.
+By default, with the value "emapic". You should replace it with a more secure password. In order to change it, you can simply edit this file and change its value, or add the parameter "-s emapic_db_user_pass={emapic_db_user_pass}" to the deploy Sqitch execution, replacing the string surrounded by curly brackets with the desired user name.
 
 Once the Sqitch configuration is complete, we execute:
 
