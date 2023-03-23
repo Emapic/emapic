@@ -282,7 +282,7 @@ That id can be found after configuring our widget, in the page which shows us th
 
         <!-- Go to www.addthis.com/dashboard to customize your tools -->
         <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={id-addThis}"></script>
-This is a completely optional parameter and if we don't want to use [AddThis](http://www.addthis.com) we can simply leave it empty and instead of their widget we'll have four standard buttons for sharing through [Facebook](https://www.facebook.com), [Twitter](https://twitter.com), [Google+](https://plus.google.com) and [LinkedIn](https://www.linkedin.com).
+This is a completely optional parameter and if we don't want to use [AddThis](http://www.addthis.com) we can simply leave it empty and instead of their widget we'll have three standard buttons for sharing through [Facebook](https://www.facebook.com), [Twitter](https://twitter.com) and [LinkedIn](https://www.linkedin.com).
 
 * ##### Configuration of [Twitter](https://twitter.com)'s _via_ parameter (_twitterVia_)
 Here we can specify an optional [Twitter](https://twitter.com) account name in order to link it everytime any content is shared through that social network. If we leave it empty, the parameter will simply be ignored.

@@ -121,10 +121,6 @@
                                             <span class="share-sq fab fa-twitter">
                                             </span>
                                         </a>
-                                        <a href="https://plus.google.com/share?url={{#encodeURIComponent}}{{web_host}}/survey/{{Survey.encr_id}}{{/encodeURIComponent}}" target="_blank">
-                                            <span class="share-sq fab fa-google-plus-g">
-                                            </span>
-                                        </a>
                                         <a href="https://www.linkedin.com/shareArticle?mini=true&url={{#encodeURIComponent}}{{web_host}}/survey/{{Survey.encr_id}}{{/encodeURIComponent}}" target="_blank">
                                             <span class="share-sq fab fa-linkedin-in">
                                             </span>

@@ -279,7 +279,7 @@ Dicho identificador lo podemos encontrar tras configurar nuestro widget, en la p
 
         <!-- Go to www.addthis.com/dashboard to customize your tools -->
         <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={id-addThis}"></script>
-Este parámetro es totalmente opcional y en caso de no querer usar [AddThis](http://www.addthis.com), podemos simplemente dejarlo en blanco y en lugar del widget propio del servicio tendremos cuatro botones estándar para compartir en [Facebook](https://www.facebook.com), [Twitter](https://twitter.com), [Google+](https://plus.google.com) y [LinkedIn](https://www.linkedin.com).
+Este parámetro es totalmente opcional y en caso de no querer usar [AddThis](http://www.addthis.com), podemos simplemente dejarlo en blanco y en lugar del widget propio del servicio tendremos tres botones estándar para compartir en [Facebook](https://www.facebook.com), [Twitter](https://twitter.com) y [LinkedIn](https://www.linkedin.com).
 
 * ##### Configuración del parámetro _via_ al compartir en [Twitter](https://twitter.com) (_twitterVia_)
 Aquí podemos especificar de manera opcional un nombre de cuenta de [Twitter](https://twitter.com) para que se le referencie por defecto siempre que se comparten contenidos de la web por dicha red social. Si lo dejamos en blanco, simplemente no se empleará el parámetro.

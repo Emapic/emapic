@@ -57,7 +57,7 @@
                     {{#hasGoogleId}}
                     <div class="linked-account col-xs-12">
                         <div class="col-xs-12 col-sm-6">
-                            <a href="https://plus.google.com/{{userFormData.google_id}}" target="_blank" class="btn btn-google"><span class="fab fa-google"></span><span>{{#__}}Google{{/__}}</span></a>
+                            <a href="https://myaccount.google.com" target="_blank" class="btn btn-google"><span class="fab fa-google"></span><span>{{#__}}Google{{/__}}</span></a>
                         </div>
                         <div class="col-xs-12 col-sm-6">
                             <form class="form-horizontal unlink-account" role="form" action="/profile/unlink" method="post">
