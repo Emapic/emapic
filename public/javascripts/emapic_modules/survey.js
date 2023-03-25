@@ -384,7 +384,10 @@ var emapic = emapic || {};
             type: 'danger',
             z_index: 12000
         });
-        setTimeout(emapic.startMapLogic, 5000);
+        // Only continue with the survey logic if we have results data to load and show
+        if (emapic.resultsAfterVote) {
+            setTimeout(emapic.startMapLogic, 5000);
+        }
     };
 
     emapic.modules.survey.saveVoteComplete = function() {
