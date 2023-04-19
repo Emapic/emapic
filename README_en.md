@@ -292,6 +292,18 @@ This parameter allows us to define a name for our website when sharing through s
 
 This application includes a list of tags which provide info when sharing through social networks that we consider accurate for any installation of Emapic which doesn't alter its current features. Those tags can be found inside files [_views/partials/base-header.hjs_](views/partials/base-header.hjs) and [_views/partials/map-header.hjs_](views/partials/map-header.hjs).
 
+### Logs
+
+The application currently generates three types of logs with different information, all of them inside the folder _logs_ and by default with file rotation up to a maximum of 10 and with each entry's info in _json_ format. The log files currently generated are:
+
+* _emapic-problems.log_: in this file the application stores all of the warning and error messages it generates. By default the maximum file size is 5MB.
+
+* _emapic-info.log_: here it stores all messages with useful info about the normal functioning of the application, like the e-mails it sends, new user sign-ups, automatic processes done in background, etc. By default the maximum file size is 5MB.
+
+* _emapic-requests.log_: this file contains info about all the web requests made to the application. By default the maximum file size is 50MB.
+
+Additionally, the application prints on console all the messages, including the _debug_ level ones. If we want to change the configuration of any of these parameters, we can do so inside the file _utils/logger.js_ y modifying the desired _transport_, which are easily identified by the log file name each one references.
+
 ## License
 
 Code is published under the GNU AFFERO GPL v3 license (see [LICENSE-AGPLv3.md](LICENSE-AGPLv3.md)).

@@ -289,6 +289,18 @@ Este parámetro nos permitirá definir un nombre para identificar nuestra web al
 
 La aplicación incluye una serie de tags por defecto que proporcionan información al compartir por redes sociales que consideramos correcta para cualquier instalación de Emapic que no varíe su comportamiento actual. Dichos tags se pueden encontrar en los archivos [_views/partials/base-header.hjs_](views/partials/base-header.hjs) y [_views/partials/map-header.hjs_](views/partials/map-header.hjs).
 
+### Logs
+
+La aplicación actualmente genera tres tipos de logs con distinta información, todos dentro de la carpeta _logs_ y por defecto con rotación de archivos hasta un máximo de 10 y con la información de cada entrada en formato _json_. Los archivos de log generados actualmente son:
+
+* _emapic-problems.log_: en este fichero se guardan todos los errores y avisos generados por la aplicación. Por defecto el tamaño máximo de cada fichero es de 5MB.
+
+* _emapic-info.log_: aquí se almacenan todos los mensajes con información útil relativa al funcionamiento normal de la aplicación, como por ejemplo los e-mails enviados, nuevos registros de usuario, operaciones automática realizadas en segundo plano, etc. Por defecto el tamaño máximo de cada fichero es de 5MB.
+
+* _emapic-requests.log_: este fichero contiene información de todas las peticiones web realizadas a la aplicación. Por defecto el tamaño máximo de cada fichero es de 50MB.
+
+De manera adicional la aplicación imprime por consola todos los mensajes, incluyendo los de nivel _debug_. Si queremos cambiar la configuración de cualquiera de estos parámetros, podemos hacerlo dentro del archivo _utils/logger.js_ modificando el _transport_ correspondiente, siendo cada uno fácilmente identificable por el nombre de archivo de log referenciado.
+
 ## Licencia
 
 El código se publica bajo la licencia GNU AFFERO GPL v3 (véase [LICENSE-AGPLv3.md](LICENSE-AGPLv3.md)).
