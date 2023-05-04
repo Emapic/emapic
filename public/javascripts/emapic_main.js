@@ -328,6 +328,7 @@ var emapic = emapic || {};
 
     emapic.loadData = function() {
         emapic.utils.disableMapInteraction(true);
+        emapic.addViewsControls();
         emapic.addAllMarkers().done(function() {
             emapic.allLayersLoadedPromise.resolve();
         }).fail(function() {
@@ -335,7 +336,6 @@ var emapic = emapic || {};
         }).always(function() {
             emapic.utils.enableMapInteraction();
         });
-        emapic.addViewsControls();
         // If we have more than one set of legend, we display a question selector
         if (emapic.fullLegend && emapic.fullLegend.color && emapic.fullLegend.color.length > 1) {
     		emapic.addQuestionSelector();
