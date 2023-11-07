@@ -79,7 +79,13 @@ DB should be operative once the process has finished.
 ##### Sqitch
 
 [Sqitch](http://sqitch.org/) is an application used for database model version management, allowing us to easily deploy or revert changes from different versions.  
-In order to restore the database with Sqitch, first we enter inside the _db_ folder in the repository:
+In this case, we must first manually create an empty database with whatever name we choose (here we will use the default name "siros"). We can do it, for example, with the following _createdb_ command, by replacing text strings surrounded by curly brackets with their respective values (the database admin user will usually be "postgres"):
+
+```
+createdb -h {db_host} -p {db_port} -U {db_admin_user} siros
+```
+
+Once the empty database has been created, in order to restore its tables with Sqitch, first we enter inside the _db_ folder in the repository:
 
 ```
 cd db

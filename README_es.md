@@ -77,7 +77,13 @@ Al terminar el proceso, la BDD ya debería estar operativa.
 ##### Sqitch
 
 [Sqitch](http://sqitch.org/) es una utilidad que nos permite gestionar el versionado del modelo de la base de datos, pudiendo aplicar o revertir los cambios con facilidad entre distintas versiones.  
-Para restaurar la base de datos con Sqitch, primero entramos en la carpeta _db_ dentro del repositorio:
+En este caso tenemos que crear primero a mano una base de datos vacía con el nombre que queramos (aquí emplearemos el nombre por defecto «siros»). Podemos hacerlo, por ejemplo, con el siguiente comando _createdb_, sustituyendo las cadenas de texto rodeadas por llaves por los valores correspondientes (el usuario administrador de base de datos será típicamente el usuario «postgres»):
+
+```
+createdb -h {db_host} -p {db_port} -U {db_admin_user} siros
+```
+
+Una vez que la base de datos vacía ha sido creada, para restaurar sus tablas con Sqitch, primero entramos en la carpeta _db_ dentro del repositorio:
 
 ```
 cd db
