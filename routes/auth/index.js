@@ -741,6 +741,9 @@ module.exports = function(app) {
                                 encoding: null
                             }).then(function (data) {
                                 return Buffer.from(data);
+                            }).catch(function(err) {
+                                logger.error('Error while retrieving Facebook profile picture: ' + err);
+                                return null;
                             });
                         } else {
                             avatarPromise = Promise.resolve(null);
