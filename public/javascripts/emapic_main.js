@@ -213,14 +213,15 @@ var emapic = emapic || {};
         var osmAttrib = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
             mapboxAttrib = '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
             osmBW,
+            backupOsmBW = L.TileLayer.Grayscale ? new L.TileLayer.Grayscale('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    minZoom : 1,
+                    maxZoom : 18,
+                    attribution : osmAttrib
+                }) : null,
             baseMaps = [];
 
-        if (tryGrayScale && L.TileLayer.Grayscale) {
-            osmBW = new L.TileLayer.Grayscale('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                minZoom : 1,
-                maxZoom : 18,
-                attribution : osmAttrib
-            });
+        if (tryGrayScale && backupOsmBW) {
+            osmBW = backupOsmBW;
         } else {
             // Can't use "https://{s}.tiles.wmflabs.org" because their ssl cert is wrong
             osmBW = new L.TileLayer('https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
@@ -230,14 +231,20 @@ var emapic = emapic || {};
             });
 
             osmBW.on('tileerror', function() {
-                var ctrl = control;
-                if (L.TileLayer.Grayscale && control) {
+                if (L.TileLayer.Grayscale && emapic.layerControl) {
                     console.warn("WARNING: BW-Mapnik tile server doesn't seem to work properly. " +
                         "Will try to load OSM tiles and convert them to grayscale instead.");
-                    control = null;
-                    emapic.map.removeControl(ctrl);
-                    emapic.map.removeLayer(osmBW);
-                    emapic.addBaseLayers(true);
+                    for (var i = emapic.layerControl._layers.length - 1; i>=0; i--) {
+                        if (emapic.layerControl._layers[i].layer === osmBW) {
+                            var checked = emapic.layerControl._layerControlInputs[i].checked;
+                            emapic.map.removeLayer(osmBW);
+                            emapic.layerControl._layers[i].layer = backupOsmBW;
+                            emapic.layerControl._layerControlInputs[i].layerId = L.Util.stamp(backupOsmBW);
+                            emapic.map.addLayer(backupOsmBW);
+                            emapic.layerControl._layerControlInputs[i].checked = checked;
+                            break;
+                        }
+                    }
                 }
             });
         }
