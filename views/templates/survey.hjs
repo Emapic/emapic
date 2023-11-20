@@ -42,19 +42,23 @@
             <button class="btn btn-responsive btn-primary navbar-btn dropdown-toggle" type="button" id="share-url-btn" survey-id="{{survey.encr_id}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 <span class="glyphicon glyphicon-share" aria-hidden="true"></span>  <span class="hide-small">{{#__}}share{{/__}}</span>
             </button>
-            <ul class="dropdown-menu share-url{{#addThisId}} addThis{{/addThisId}}" aria-labelledby="share-url-btn">
+            <ul class="dropdown-menu share-url{{#useAddToAny}} addToAny{{/useAddToAny}}" aria-labelledby="share-url-btn">
                 <input class="share-url-box" readonly onclick="this.select();" value="{{web_host}}/survey/{{survey.encr_id}}"/>
-                {{#addThisId}}
-                <!-- Go to www.addthis.com/dashboard to customize your tools -->
-                <div class="addthis_inline_share_toolbox"></div>
-                {{/addThisId}}
+                {{#useAddToAny}}
+                <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+                    <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+                    <a class="a2a_button_facebook"></a>
+                    <a class="a2a_button_x"></a>
+                    <a class="a2a_button_linkedin"></a>
+                </div>
+                {{/useAddToAny}}
                 <div class="social-btns">
                     <a href="https://www.facebook.com/sharer/sharer.php?sdk=joey&u={{#encodeURIComponent}}{{web_host}}/survey/{{survey.encr_id}}{{/encodeURIComponent}}&display=popup&src=share_button" target="_blank">
                         <span class="share-sq fab fa-facebook">
                         </span>
                     </a>
-                    <a href="https://twitter.com/intent/tweet?text={{#encodeURIComponent}}{{survey.title}}{{/encodeURIComponent}}&tw_p=tweetbutton&url={{#encodeURIComponent}}{{web_host}}/survey/{{survey.encr_id}}{{/encodeURIComponent}}{{#twitterVia}}&via={{twitterVia}}{{/twitterVia}}" target="_blank">
-                        <span class="share-sq fab fa-twitter">
+                    <a href="https://twitter.com/intent/tweet?text={{#encodeURIComponent}}{{survey.title}}{{/encodeURIComponent}}&tw_p=tweetbutton&url={{#encodeURIComponent}}{{web_host}}/survey/{{survey.encr_id}}{{/encodeURIComponent}}{{#xVia}}&via={{xVia}}{{/xVia}}" target="_blank">
+                        <span class="share-sq fab fa-x-twitter">
                         </span>
                     </a>
                     <a href="https://www.linkedin.com/shareArticle?mini=true&url={{#encodeURIComponent}}{{web_host}}/survey/{{survey.encr_id}}{{/encodeURIComponent}}" target="_blank">
@@ -62,7 +66,7 @@
                         </span>
                     </a>
                 </div>
-                {{#addThisId}}<div class="more-sharing"><a href="javascript:void(0);" onclick="$('#more-sharing-modal').modal('show')">{{#__}}more_sharing_options{{/__}}</a></div>{{/addThisId}}
+                {{#useAddToAny}}<div class="more-sharing"><a href="javascript:void(0);" onclick="$('#more-sharing-modal').modal('show')">{{#__}}more_sharing_options{{/__}}</a></div>{{/useAddToAny}}
             </ul>
         </div>
         {{/survey.already_opened}}
@@ -170,9 +174,9 @@
     </div>
     <!-- End Stats Modal -------->
 
-    {{#addThisId}}
+    {{#useAddToAny}}
         {{> more_sharing_options_modal}}
-    {{/addThisId}}
+    {{/useAddToAny}}
 
 {{#yield-scripts}}
 
@@ -215,12 +219,9 @@
     <!-- Add answers panel -->
     <script type="text/javascript" src="/javascripts/emapic_modules/panel.js"></script>
 
-    {{#survey.already_opened}}
-    {{#addThisId}}
-    <!-- Go to www.addthis.com/dashboard to customize your tools -->
-    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={{addThisId}}"></script>
-    {{/addThisId}}
-    {{/survey.already_opened}}
+    {{#useAddToAny}}
+    <script async src="https://static.addtoany.com/menu/page.js"></script>
+    {{/useAddToAny}}
 
     <script type="text/javascript">
         emapic.modules.aggregation.showMunicipalities = emapic.modules.locators.showMunicipalities = true;

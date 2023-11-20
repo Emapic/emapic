@@ -60,8 +60,8 @@
         "pass": "dumb"
     },
     "social": {
-        "addThisId": "",
-        "twitterVia": "",
+        "useAddToAny": false,
+        "xVia": "",
         "ogSiteName": ""
     }
 }

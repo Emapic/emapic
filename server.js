@@ -310,11 +310,11 @@ var EmapicApp = function() {
                 };
             };
 
-            res.locals.addThisId = ('addThisId' in socialConfig &&
-                socialConfig.addThisId !== '') ? socialConfig.addThisId : null;
+            res.locals.useAddToAny = ('useAddToAny' in socialConfig &&
+                socialConfig.useAddToAny !== '') ? socialConfig.useAddToAny : null;
 
-            res.locals.twitterVia = ('twitterVia' in socialConfig &&
-                socialConfig.twitterVia !== '') ? socialConfig.twitterVia : null;
+            res.locals.xVia = ('xVia' in socialConfig &&
+                socialConfig.xVia !== '') ? socialConfig.xVia : null;
 
             res.locals.ogSiteName = ('ogSiteName' in socialConfig &&
                 socialConfig.ogSiteName !== '') ? socialConfig.ogSiteName : null;

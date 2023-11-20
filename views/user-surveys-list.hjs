@@ -19,28 +19,24 @@
 
 </div> <!-- /content -->
 
-{{#addThisId}}
+{{#useAddToAny}}
     {{> more_sharing_options_modal}}
-{{/addThisId}}
+{{/useAddToAny}}
 
 {{#yield-scripts}}
-{{#addThisId}}
-<!-- Go to www.addthis.com/dashboard to customize your tools -->
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={{addThisId}}"></script>
-{{#twitterVia}}
+{{#useAddToAny}}
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+{{/useAddToAny}}
+
 <script type="text/javascript">
-	var addthis_share = addthis_share || {};
-	addthis_share = {
-		passthrough : {
-			twitter: {
-				via: "{{twitterVia}}"
-			}
-		}
-	};
-</script>
-{{/twitterVia}}
-{{/addThisId}}
-<script type="text/javascript">
+{{#useAddToAny}}
+{{#xVia}}
+	var a2a_config = a2a_config || {};
+	a2a_config.templates = a2a_config.templates || {};
+	a2a_config.templates.x = a2a_config.templates.x || {};
+	a2a_config.templates.x.via = "{{xVia}}";
+{{/xVia}}
+{{/useAddToAny}}
 	$(function() {
 		var order = emapic.utils.getURLParameter('order');
 		if (order) {

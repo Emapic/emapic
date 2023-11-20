@@ -11,9 +11,9 @@
     <meta property="og:type" content="website">
     <meta property="og:locale" content="es_ES">
     <meta property="og:locale:alternate" content="en_US">
-    {{#twitterVia}}
-    <meta name="twitter:site" content="@{{twitterVia}}">
-    {{/twitterVia}}
+    {{#xVia}}
+    <meta name="twitter:site" content="@{{xVia}}">
+    {{/xVia}}
 
     <!-- Fav and touch icons -->
     <link rel="shortcut icon" href="/images/favicon.png"/>

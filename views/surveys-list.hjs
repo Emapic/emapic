@@ -23,28 +23,23 @@
 
 </div> <!-- /content -->
 
-{{#addThisId}}
+{{#useAddToAny}}
     {{> more_sharing_options_modal}}
-{{/addThisId}}
+{{/useAddToAny}}
 
 {{#yield-scripts}}
-{{#addThisId}}
-<!-- Go to www.addthis.com/dashboard to customize your tools -->
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={{addThisId}}"></script>
-{{/addThisId}}
+{{#useAddToAny}}
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+{{/useAddToAny}}
 <script type="text/javascript">
-	{{#addThisId}}
-	{{#twitterVia}}
-	var addthis_share = addthis_share || {};
-	addthis_share = {
-		passthrough : {
-			twitter: {
-				via: "{{twitterVia}}"
-			}
-		}
-	};
-	{{/twitterVia}}
-	{{/addThisId}}
+{{#useAddToAny}}
+{{#xVia}}
+	var a2a_config = a2a_config || {};
+	a2a_config.templates = a2a_config.templates || {};
+	a2a_config.templates.x = a2a_config.templates.x || {};
+	a2a_config.templates.x.via = "{{xVia}}";
+{{/xVia}}
+{{/useAddToAny}}
     function searchInputKeyPressed(e) {
         if (!e) e = window.event;
         var keyCode = e.keyCode || e.which;

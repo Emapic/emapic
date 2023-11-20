@@ -200,31 +200,32 @@ div.alert-danger a {
     right: 100%;
     top: 7px;
 }
-.dropdown-menu.share-url.addThis {
+.dropdown-menu.share-url.addToAny {
     min-width: 220px;
 }
-.dropdown-menu.share-url.addThis .addthis_inline_share_toolbox:not(:empty) ~ div {
-    display: none;
-}
-.dropdown-menu.share-url.addThis .addthis_inline_share_toolbox:not(:empty) ~ div {
-    display: none;
-}
-.dropdown-menu.share-url.addThis .more-sharing {
+.dropdown-menu.share-url.addToAny .more-sharing {
     background-color: #FFFFFF;
     margin-top: 5px;
     border-radius: 5px;
 }
-#header .dropdown-menu.share-url.addThis .more-sharing a,
-.dropdown-menu.share-url.addThis .more-sharing a {
+#header .dropdown-menu.share-url.addToAny .more-sharing a,
+.dropdown-menu.share-url.addToAny .more-sharing a {
     color: #004F71;
 }
-#header .dropdown-menu.share-url.addThis .more-sharing a:hover,
-#header .dropdown-menu.share-url.addThis .more-sharing a:focus,
-#header .dropdown-menu.share-url.addThis .more-sharing a:active,
-.dropdown-menu.share-url.addThis .more-sharing a:hover,
-.dropdown-menu.share-url.addThis .more-sharing a:focus,
-.dropdown-menu.share-url.addThis .more-sharing a:active {
+#header .dropdown-menu.share-url.addToAny .more-sharing a:hover,
+#header .dropdown-menu.share-url.addToAny .more-sharing a:focus,
+#header .dropdown-menu.share-url.addToAny .more-sharing a:active,
+.dropdown-menu.share-url.addToAny .more-sharing a:hover,
+.dropdown-menu.share-url.addToAny .more-sharing a:focus,
+.dropdown-menu.share-url.addToAny .more-sharing a:active {
     color: #85A330;
+}
+.share-url.addToAny > .a2a_kit[style] ~ .social-btns,
+.share-url.addToAny > .a2a_kit[style] ~ .more-sharing {
+    display: none;
+}
+.share-url.addToAny > .a2a_kit:not([style]) {
+    display: none;
 }
 #more-sharing-modal h3 {
     color: #FFFFFF;
@@ -303,6 +304,14 @@ div.alert-danger a {
 }
 .share-sq.fa-twitter:hover {
     background-color: #48a7e1;
+    color: white;
+}
+.share-sq.fa-x-twitter {
+    background-color: #000000;
+    color: white;
+}
+.share-sq.fa-x-twitter:hover {
+    background-color: #414141;
     color: white;
 }
 .share-sq.fa-linkedin-in {
@@ -2055,7 +2064,7 @@ button.survey-answer > div.flex-container {
     .dropdown-menu.share-url input.share-url-box {
         margin-bottom: 20px;
     }
-    .dropdown-menu.share-url.addThis .more-sharing {
+    .dropdown-menu.share-url.addToAny .more-sharing {
         margin-top: 20px;
     }
     #questions-flex-container > #questions-wrapper, #questions-wrapper, #thanks-msg {

@@ -279,16 +279,12 @@ Debes consultar en tu cuenta de servicio de correo electrónico para activar el 
 
 Parámetros opcionales relacionados con la compartición de contenidos a través de redes sociales:
 
-* ##### Id de widget para compartir en [AddThis](http://www.addthis.com) (_addThisId_)
-Identificador de nuestro widget para compartir configurado en [AddThis](http://www.addthis.com), que nos permitirá integrar su funcionalidad _Inline Share Buttons_ directamente sin necesidad de tocar el código[²](#notas).  
-Dicho identificador lo podemos encontrar tras configurar nuestro widget, en la página en la cual nos muestran el código a insertar en nuestra página, similar al siguiente ejemplo en el cual se indica la posición del identificador con la cadena _{id-addThis}_:  
+* ##### Uso de widget para compartir en [AddToAny](https://www.addtoany.com) (_useAddToAny_)
+Indica si queremos emplear widgets para compartir proporcionados por [AddToAny](https://www.addtoany.com), que nos permitirá emplear sus opciones para compartir de manera universal sin necesidad de modificar el código[²](#notas).
+Este parámetro es totalmente opcional y en caso de no querer usar [AddToAny](https://www.addtoany.com), podemos establecerlo a _false_ y en lugar del widget propio del servicio tendremos tres botones estándar para compartir en [Facebook](https://www.facebook.com), [X (anteriormente Twitter)](https://twitter.com) y [LinkedIn](https://www.linkedin.com).
 
-        <!-- Go to www.addthis.com/dashboard to customize your tools -->
-        <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid={id-addThis}"></script>
-Este parámetro es totalmente opcional y en caso de no querer usar [AddThis](http://www.addthis.com), podemos simplemente dejarlo en blanco y en lugar del widget propio del servicio tendremos tres botones estándar para compartir en [Facebook](https://www.facebook.com), [Twitter](https://twitter.com) y [LinkedIn](https://www.linkedin.com).
-
-* ##### Configuración del parámetro _via_ al compartir en [Twitter](https://twitter.com) (_twitterVia_)
-Aquí podemos especificar de manera opcional un nombre de cuenta de [Twitter](https://twitter.com) para que se le referencie por defecto siempre que se comparten contenidos de la web por dicha red social. Si lo dejamos en blanco, simplemente no se empleará el parámetro.
+* ##### Configuración del parámetro _via_ al compartir en [X (anteriormente Twitter)](https://twitter.com) (_xVia_)
+Aquí podemos especificar de manera opcional un nombre de cuenta de [X (anteriormente Twitter)](https://twitter.com) para que se le referencie por defecto siempre que se comparten contenidos de la web por dicha red social. Si lo dejamos en blanco, simplemente no se empleará el parámetro.
 
 * ##### Configuración del nombre del sitio web al compartir por redes sociales (_ogSiteName_)
 Este parámetro nos permitirá definir un nombre para identificar nuestra web al compartir por redes sociales (tag _meta_ «og:site_name»). Podemos dejarlo en blanco y se ignorará dicho parámetro al compartir.
@@ -329,14 +325,17 @@ A la hora de reportar un error:
 Ante cualquier duda o problema con la aplicación, puedes contactar directamente con nosotros:
 
 * Jorge López Fernández [github](https://github.com/jorgelf)
-* Aida Vidal Balea [github](https://github.com/aidav25)
 * Adrián Eirís Torres [github](https://github.com/aeiris)
 * Alberto Varela García [github](https://github.com/avarela) | [twitter](https://twitter.com/albertouve)
 
 [Twitter de Emapic](https://twitter.com/_emapic) | [info@emapic.es](mailto:info@emapic.es)
 
+También nos gustaría agradecer a los siguientes antiguos miembros del equipo Emapic su contribución a este proyecto:
+
+* Aida Vidal Balea [github](https://github.com/aidav25)
+
 ---
 
 ##### Notas
 ¹: esperamos añadir más adelante una pequeña guía sobre cómo cambiar el idioma profundizando más en el tema.  
-²: si queremos activar esta funcionalidad, es conveniente leer antes los [términos de servicio de AddThis](http://www.addthis.com/privacy/terms-of-service) para asegurarnos de que cumplimos sus requisitos, y su [política de privacidad](http://www.addthis.com/privacy/privacy-policy) para comprender qué datos manejan y con qué fines.
+²: si queremos activar esta funcionalidad, es conveniente leer antes los [términos de servicio de AddToAny](https://www.addtoany.com/terms) para asegurarnos de que cumplimos sus requisitos, y su [política de privacidad](https://www.addtoany.com/privacy) para comprender qué datos manejan y con qué fines.
