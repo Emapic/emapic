@@ -184,7 +184,7 @@ module.exports = function(app) {
             return new Promise(function(resolve, reject) {
                 transporter.sendMail(mail, function(error, info){
                     if (error){
-                        logger.error('SMTP error: ' + error);
+                        logger.error('SMTP error: ' + error.toString());
                         return reject(error);
                     }
                     return resolve();
@@ -302,7 +302,7 @@ module.exports = function(app) {
                 tmpFile.removeCallback();
             }).return(imgPath).catch(function(err) {
                 if (retries) {
-                    logger.debug('Retrying snapshot take for url "' + url + '" after error: ' + err);
+                    logger.debug('Retrying snapshot take for url "' + url + '" after error: ' + err.toString());
                     return Utils.takeSnapshot(url, imgPath, nativeWidth, nativeHeight, wait, minSize, retries - 1, imgWidth, imgHeight);
                 }
                 throw err;

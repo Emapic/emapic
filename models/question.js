@@ -385,7 +385,14 @@ module.exports = function(sequelize, DataTypes) {
     };
 
     Question.checkValidPost = function(req) {
-        return checkValidAnswersFromPost(req, parseQuestionsfromPost(req));
+        var questions = parseQuestionsfromPost(req);
+        if (questions.length === 0) {
+            return Promise.reject({
+                message: "survey without any questions defined.",
+                code: 'empty_survey'
+            });
+        }
+        return checkValidAnswersFromPost(req, questions);
     };
 
     Question.createFromPost = function(req, survey) {

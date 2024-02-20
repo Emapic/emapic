@@ -132,7 +132,7 @@ module.exports = function(app) {
             return app.oauth.token()(req, res, function(err) {
                 if (err) {
                     if (err.name === 'server_error') {
-                        logger.error('Internal server error during API request: ' + err.message);
+                        logger.error('Internal server error during API request: ' + err.toString());
                         return res.status(500).json({ error_code: 'internal_error', error: 'an internal server error has occured.' });
                     }
                     if (err.statusCode !== undefined && err.name !== undefined && err.message !== undefined) {
@@ -245,7 +245,7 @@ module.exports = function(app) {
             if ('id' in user && user.id !== null) {
                 user.destroy().then(function() {
                     req.session.error = 'signup_error_msg';
-                    logger.error('Error while creating user: ' + err);
+                    logger.error('Error while creating user: ' + err.toString());
                     Utils.copyBodyToLocals(req, res);
                     return res.render('signup', {layout: 'layouts/main'});
                 });
@@ -254,15 +254,15 @@ module.exports = function(app) {
                     ((err.errors && err.errors.constructor === Array && err.errors[0].path === 'email') ||
                     (err.message.indexOf('users_email_key') > -1))) {
                     req.session.error = 'email_duplicated_error_msg';
-                    logger.debug('E-mail already exists: ' + err);
+                    logger.debug('E-mail already exists: ' + err.toString());
                 } else if (err && err.name === 'SequelizeUniqueConstraintError' &&
                     ((err.errors && err.errors.constructor === Array && err.errors[0].path === 'login') ||
                     (err.message.indexOf('users_login_key') > -1))) {
                     req.session.error = 'username_duplicated_error_msg';
-                    logger.debug('Login already in use: ' + err);
+                    logger.debug('Login already in use: ' + err.toString());
                 } else {
                     req.session.error = 'signup_error_msg';
-                    logger.error('Error while creating user: ' + err);
+                    logger.error('Error while creating user: ' + err.toString());
                 }
                 Utils.copyBodyToLocals(req, res);
                 return res.render('signup', {layout: 'layouts/main'});
@@ -278,7 +278,7 @@ module.exports = function(app) {
             req.session.success = 'user_activated_msg';
             logger.info("Sucessfully activated user with mail " + user.email + " and id " + user.id);
         }).catch(function (err){
-            logger.error('Error while activating user: ' + err);
+            logger.error('Error while activating user: ' + err.toString());
         }).lastly(function() {
             res.redirect('/login');
         });
@@ -293,7 +293,7 @@ module.exports = function(app) {
             res.redirect('/');
         }).catch(function(err) {
             req.session.error = 'delete_user_error_msg';
-            logger.error('Error while deleting user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
+            logger.error('Error while deleting user with mail ' + user.email + ' and id ' + user.id + ': ' + err.toString());
             res.redirect('/profile');
         });
     });
@@ -326,7 +326,7 @@ module.exports = function(app) {
             logger.info("Sucessfully unlinked service " + req.body.service + " from user account with email " + user.email + " and id " + user.id);
         }).catch(function(err) {
             req.session.success = 'unlink_ext_account_error_msg';
-            logger.error("Error while unlinking service " + req.body.service + " from user account with email " + user.email + " and id " + user.id + ": " + err);
+            logger.error("Error while unlinking service " + req.body.service + " from user account with email " + user.email + " and id " + user.id + ": " + err.toString());
         }).lastly(function() {
             res.redirect('/profile');
         });
@@ -371,7 +371,7 @@ module.exports = function(app) {
                 }
                 return res.redirect('/profile');
             }).catch(function(err) {
-                logger.error('Error while updating password: ' + err);
+                logger.error('Error while updating password: ' + err.toString());
                 req.session.error = 'update_password_error_msg';
                 req.user.reload().then(function() {
                     Utils.copyAttributes({
@@ -473,10 +473,10 @@ module.exports = function(app) {
                     ((err.errors && err.errors.constructor === Array && err.errors[0].path === 'login') ||
                     (err.message.indexOf('users_login_key') > -1))) {
                     req.session.error = 'username_duplicated_error_msg';
-                    logger.debug('Login already in use: ' + err);
+                    logger.debug('Login already in use: ' + err.toString());
                 } else {
                     req.session.error = 'update_user_error_msg';
-                    logger.error('Error while updating user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
+                    logger.error('Error while updating user with mail ' + user.email + ' and id ' + user.id + ': ' + err.toString());
                 }
                 req.user.reload().then(function() {
                     Utils.copyAttributes({
@@ -525,7 +525,7 @@ module.exports = function(app) {
             logger.debug('Requested password reset for invalid user with mail ' + req.body.email);
         }).catch(function (err){
             req.session.error = 'password_reset_error_msg';
-            logger.error('Error while sending reset password confirm mail to user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
+            logger.error('Error while sending reset password confirm mail to user with mail ' + user.email + ' and id ' + user.id + ': ' + err.toString());
         }).lastly(function() {
             res.redirect('/login');
         });
@@ -561,7 +561,7 @@ module.exports = function(app) {
             logger.debug('Requested confirmed password reset for invalid user with hash id ' + req.query.id);
         }).catch(function (err){
             req.session.error = 'password_reset_error_msg';
-            logger.error('Error while reseting password of user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
+            logger.error('Error while reseting password of user with mail ' + user.email + ' and id ' + user.id + ': ' + err.toString());
         }).lastly(function() {
             res.redirect('/login');
         });
@@ -591,7 +591,7 @@ module.exports = function(app) {
             logger.debug('Requested activation mail for already activated user with mail ' + req.body.email);
         }).catch(function (err) {
             req.session.error = 'resend_activation_mail_error_msg';
-            logger.error('Error while resending activation mail to user with mail ' + user.email + ' and id ' + user.id + ': ' + err);
+            logger.error('Error while resending activation mail to user with mail ' + user.email + ' and id ' + user.id + ': ' + err.toString());
         }).lastly(function() {
             res.redirect('/login');
         });
@@ -742,7 +742,7 @@ module.exports = function(app) {
                             }).then(function (data) {
                                 return Buffer.from(data);
                             }).catch(function(err) {
-                                logger.error('Error while retrieving Facebook profile picture: ' + err);
+                                logger.error('Error while retrieving Facebook profile picture: ' + err.toString());
                                 return null;
                             });
                         } else {
@@ -835,7 +835,7 @@ module.exports = function(app) {
                     done(null, user);
                 }
             }).catch(function (err){
-                logger.error('Error while logging in: ' + err);
+                logger.error('Error while logging in: ' + err.toString());
                 req.session.error = 'login_error_msg'; //inform user could not log them in
                 done(null, null);
             });
@@ -857,7 +857,7 @@ module.exports = function(app) {
                     done(null, user);
                 }
             }).catch(function (err){
-                logger.error('Error while logging in with Google: ' + err);
+                logger.error('Error while logging in with Google: ' + err.toString());
                 req.session.error = 'google_login_error_msg'; //inform user could not log them in
                 done(null, null);
             });
@@ -884,7 +884,7 @@ module.exports = function(app) {
                     logger.debug('Facebook did not return an email for user with id: ' + profile.id);
                     req.session.error = 'facebook_no_email_login_error_msg'; //inform user he/she must share the email
                 } else {
-                    logger.error('Error while logging in with Facebook: ' + err);
+                    logger.error('Error while logging in with Facebook: ' + err.toString());
                     req.session.error = 'facebook_login_error_msg'; //inform user could not log them in
                 }
                 done(null, null);

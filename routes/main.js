@@ -8,6 +8,23 @@ var passport = require('passport'),
     defaultPageSize = nconf.get('app').defaultPageSize;
 const Op = sequelize.Op;
 
+function translateErrorCodeToMsg(errorCode) {
+    switch (errorCode) {
+        case "answer_img_invalid":
+            return 'survey_answer_image_file_invalid_msg';
+        case "answer_img_too_big":
+            return 'survey_answer_image_file_too_big_msg';
+        case "custom_single_marker_img_invalid":
+            return 'survey_custom_single_marker_image_file_invalid_msg';
+        case "custom_single_marker_img_too_big":
+            return 'survey_custom_single_marker_image_file_too_big_msg';
+        case "empty_survey":
+            return 'survey_has_no_questions_msg';
+        default:
+            return null;
+    }
+}
+
 module.exports = function(app) {
 
     app.get('/login', function(req, res){
@@ -158,23 +175,17 @@ module.exports = function(app) {
                 logger.info('Survey with id ' + survey.id + ' has been created successfully.');
                 res.redirect('/surveys/own');
             }).catch(function(err) {
-                logger.error('Error while creating new survey: ' + err);
+                logger.error('Error while creating new survey: ' + err.toString());
                 req.session.error = 'survey_created_error_msg';
                 if (err && err.code) {
-                    switch (err.code) {
-                        case "answer_img_invalid":
-                            req.session.error = 'survey_answer_image_file_invalid_msg';
-                            break;
-                        case "answer_img_too_big":
-                            req.session.error = 'survey_answer_image_file_too_big_msg';
-                            break;
-                        case "custom_single_marker_img_invalid":
-                            req.session.error = 'survey_custom_single_marker_image_file_invalid_msg';
-                            break;
-                        case "custom_single_marker_img_too_big":
-                            req.session.error = 'survey_custom_single_marker_image_file_too_big_msg';
-                            break;
-                    }
+                    req.session.error = translateErrorCodeToMsg(err.code);
+                } else {
+                    // Unexpected error
+                    logger.error(err.stack);
+                }
+                if (!req.session.error) {
+                    // Generic message
+                    req.session.error = 'survey_created_error_msg';
                 }
                 Utils.copyBodyToLocals(req, res);
                 questionsMap = JSON.stringify(extractQuestionsMapFromRequest(req));
@@ -217,19 +228,40 @@ module.exports = function(app) {
                     });
                 }).catch(function(err) {
                     req.session.error = 'survey_cloned_error_msg';
-                    logger.error('Error while cloning survey with id ' + req.body.survey_id + ': ' + err);
+                    logger.error('Error while cloning survey with id ' + req.body.survey_id + ': ' + err.toString());
                     res.redirect('/surveys/own');
                 });
             } else if ('survey_title' in req.body) {
                 // Confirm survey edition
-                models.Survey.updateFromPost(req).then(function() {
+                models.Survey.checkValidPost(req).then(function() {
+                    return models.Survey.updateFromPost(req);
+                }).then(function(survey) {
                     req.session.success = 'survey_updated_success_msg';
                     logger.info('Survey with id ' + req.body.survey_id + ' has been updated successfully.');
-                }).catch(function(err) {
-                    req.session.error = 'survey_updated_error_msg';
-                    logger.error('Error while updating survey with id ' + req.body.survey_id + ': ' + err);
-                }).lastly(function() {
                     res.redirect('/surveys/own');
+                }).catch(function(err) {
+                    logger.error('Error while updating survey with id ' + req.body.survey_id + ': ' + err.toString());
+                    if (err && err.code) {
+                        req.session.error = translateErrorCodeToMsg(err.code);
+                    } else {
+                        // Unexpected error
+                        logger.error(err.stack);
+                    }
+                    if (!req.session.error) {
+                        // Generic message
+                        req.session.error = 'survey_updated_error_msg';
+                    }
+                    // Retrieve the survey and refill the data in order to show the form again
+                    return models.Survey.findByPk(req.body.survey_id).then(function(surv) {
+                        Utils.copyBodyToLocals(req, res);
+                        surv.updateDataFromRequest(req);
+                        res.render('edit-survey', {
+                            layout: 'layouts/survey-form',
+                            is_admin: isAdmin,
+                            survey: surv,
+                            questionsMap: JSON.stringify(extractQuestionsMapFromRequest(req))
+                        });
+                    });
                 });
             } else {
                 // Edit survey
@@ -267,7 +299,7 @@ module.exports = function(app) {
             logger.info('Survey with id ' + Utils.decryptSurveyId(req.params.id) + ' has been deleted successfully.');
         }).catch(function(err) {
             req.session.error = 'survey_deleted_error_msg';
-            logger.error('Error while deleting survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err);
+            logger.error('Error while deleting survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err.toString());
         }).lastly(function() {
             res.redirect('/surveys/own');
         });
@@ -293,7 +325,7 @@ module.exports = function(app) {
             logger.info('Survey with id ' + Utils.decryptSurveyId(req.params.id) + ' has been opened successfully.');
         }).catch(function(err) {
             req.session.error = 'survey_open_error_msg';
-            logger.error('Error while opening survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err);
+            logger.error('Error while opening survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err.toString());
         }).lastly(function() {
             res.redirect('/surveys/own');
         });
@@ -316,7 +348,7 @@ module.exports = function(app) {
             logger.info('Survey with id ' + Utils.decryptSurveyId(req.params.id) + ' has been closed successfully.');
         }).catch(function(err) {
             req.session.error = 'survey_close_error_msg';
-            logger.error('Error while closing survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err);
+            logger.error('Error while closing survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err.toString());
         }).lastly(function() {
             res.redirect('/surveys/own');
         });

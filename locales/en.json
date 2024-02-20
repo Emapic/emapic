@@ -396,6 +396,7 @@
 	"image": "Image",
 	"maximum_custom_single_marker_image_size": "Maximum 1MB.",
 	"maximum_answer_image_size": "Maximum 2MB.",
+	"survey_has_no_questions_msg": "The survey must have at least one question.",
 	"survey_custom_single_marker_image_file_invalid_msg": "The custom single marker image uploaded is not an actual valid image file.",
 	"survey_custom_single_marker_image_file_too_big_msg": "The custom single marker image uploaded  is too big.",
 	"survey_answer_image_file_invalid_msg": "At least one of the answer images uploaded is not an actual valid image file.",

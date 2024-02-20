@@ -569,14 +569,7 @@ module.exports = function(sequelize, DataTypes) {
             }
             return markerPromise;
         }).then(function(markerFileId) {
-            survey.title = trimSubstringField(req.body.survey_title, 150);
-            survey.description = trimSubstringField(req.body.survey_description, 500);
-            survey.tags = parseTagsFromPost(req);
-            survey.multiple_answer = ('multiple_answer' in req.body);
-            survey.public_results = ('public_results' in req.body);
-            survey.dont_list = ('dont_list' in req.body);
-            survey.results_after_vote = true;
-            survey.active = ('open_now' in req.body) ? true : null;
+            survey.updateDataFromRequest(req);
             survey.custom_single_marker_file_id = markerFileId;
             return survey.save();
         }).then(function(survey) {
@@ -672,6 +665,17 @@ module.exports = function(sequelize, DataTypes) {
         });
     };
 
+    Survey.prototype.updateDataFromRequest = function(req) {
+        this.title = trimSubstringField(req.body.survey_title, 150);
+        this.description = trimSubstringField(req.body.survey_description, 500);
+        this.tags = parseTagsFromPost(req);
+        this.multiple_answer = ('multiple_answer' in req.body);
+        this.public_results = ('public_results' in req.body);
+        this.dont_list = ('dont_list' in req.body);
+        this.results_after_vote = true;
+        this.active = ('open_now' in req.body) ? true : null;
+    };
+
     Survey.prototype.createTable = function() {
         var survey = this;
         return this.getQuestions().then(function(questions) {
@@ -734,7 +738,7 @@ module.exports = function(sequelize, DataTypes) {
             Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'small' + path.sep + encrId + '.png', 512, 288, 3000, 20000, 5, 256, 144),
             Utils.takeSnapshot(url, thumbnailsFolder + path.sep + 'share' + path.sep + encrId + '.png', 512, 512, 3000, 30000, 5, 400, 400)
         ]).catch(function(err) {
-            logger.error('Could not generate all thumbnails for survey with id ' + id + ' : ' + err);
+            logger.error('Could not generate all thumbnails for survey with id ' + id + ' : ' + err.toString());
         });
     };
 

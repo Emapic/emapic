@@ -431,7 +431,7 @@ var EmapicApp = function() {
                     // scanning and finding suspicious files, so we must check the
                     // error code for the actual ones
                     if (err && err.code === 2) {
-                        logger.error('Error while scanning files: ' + err);
+                        logger.error('Error while scanning files: ' + err.toString());
                         return res.send(500);
                     }
                     if (goodFiles.length > 0) {
@@ -509,7 +509,7 @@ var EmapicApp = function() {
         // development only
         if ('development' === self.app.get('env')) {
             self.app.use(errorhandler({log: function (err, str, req) {
-                logger.error(str + ': ' + err);
+                logger.error(str + ': ' + err.toString());
             }}));
         }
     };
@@ -563,7 +563,7 @@ var EmapicApp = function() {
             models.Survey.updateAllThumbnails().then(function() {
                 logger.info('Survey thumbnails update finished.');
             }).catch(function(err) {
-                logger.error('Some error happened while updating survey thumbnails: ' + err);
+                logger.error('Some error happened while updating survey thumbnails: ' + err.toString());
             });
         });
 

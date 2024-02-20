@@ -95,7 +95,7 @@ module.exports = function(app) {
             }).tap(function(id) {
                 logger.debug('Created new file from buffer to path "' + fullDstPath + '" with id ' + id);
             }).catch(function(err) {
-                logger.error('Error while saving new file from buffer to path "' + fullDstPath + '" : ' + err.message);
+                logger.error('Error while saving new file from buffer to path "' + fullDstPath + '" : ' + err.toString());
                 throw err;
             });
         },
@@ -149,7 +149,7 @@ module.exports = function(app) {
             }).tap(function(id) {
                 logger.debug('Created new file from path "' + srcPath + '" to path "' + fullDstPath + '" with id ' + id);
             }).catch(function(err) {
-                logger.error('Error while saving new file from path "' + srcPath + '" to path "' + fullDstPath + '" : ' + err.message);
+                logger.error('Error while saving new file from path "' + srcPath + '" to path "' + fullDstPath + '" : ' + err.toString());
                 throw err;
             });
         },
@@ -158,7 +158,7 @@ module.exports = function(app) {
             return deleteFile(filePath).tap(function(id) {
                 logger.debug('Deleted file with path "' + filePath + '" and id ' + id);
             }).catch(function(err) {
-                logger.error('Error while deleting file with path "' + filePath + '": ' + err.message);
+                logger.error('Error while deleting file with path "' + filePath + '": ' + err.toString());
                 throw err;
             });
         },
@@ -176,7 +176,7 @@ module.exports = function(app) {
             }).tap(function(id) {
                 logger.debug('Deleted file with path "' + filePath + '" and id "' + id + '"');
             }).catch(function(err) {
-                logger.error('Error while deleting file with id "' + fileId + '": ' + err.message);
+                logger.error('Error while deleting file with id "' + fileId + '": ' + err.toString());
                 throw err;
             });
         },
@@ -197,7 +197,7 @@ module.exports = function(app) {
             return moveFile(fullOldFilePath, fullNewFilePath).tap(function(id) {
                 logger.debug('Moved file with path "' + fullOldFilePath + '" and id "' + id + '" to new path "' + fullNewFilePath + '"');
             }).catch(function(err) {
-                logger.error('Error while moving file with path "' + fullOldFilePath + '" to new path "' + fullNewFilePath + '": ' + err.message);
+                logger.error('Error while moving file with path "' + fullOldFilePath + '" to new path "' + fullNewFilePath + '": ' + err.toString());
                 throw err;
             });
         },
@@ -230,7 +230,7 @@ module.exports = function(app) {
             }).tap(function(id) {
                 logger.debug('Deleted folder "' + fullFolderPath + '" and all of its files.');
             }).catch(function(err) {
-                logger.error('Error while deleting folder "' + fullFolderPath + '": ' + err.message);
+                logger.error('Error while deleting folder "' + fullFolderPath + '": ' + err.toString());
                 throw err;
             });
         }

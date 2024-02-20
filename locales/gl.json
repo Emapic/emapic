@@ -396,6 +396,7 @@
 	"image": "Imaxe",
 	"maximum_custom_single_marker_image_size": "Máximo 1MB.",
 	"maximum_answer_image_size": "Máximo 2MB.",
+	"survey_has_no_questions_msg": "A enquisa debe ter alo menos unha pregunta.",
 	"survey_custom_single_marker_image_file_invalid_msg": "A imaxe para o marcador único personalizado subida non é un arquivo de imaxe válido.",
 	"survey_custom_single_marker_image_file_too_big_msg": "A imaxe para o marcador único personalizado subida é demasiado grande.",
 	"survey_answer_image_file_invalid_msg": "Polo menos unha das imaxes para respostas subidas non é un arquivo de imaxe válido.",
