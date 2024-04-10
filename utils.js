@@ -129,6 +129,10 @@ function transformImageSharp(input, width, height, upscale, format) {
                 fit: 'inside'
             };
 
+        // Workaround to make sure the image is in the proper orientation according to EXIF metadata.
+        // See: https://stackoverflow.com/questions/48716266/sharp-image-library-rotates-image-when-resizing
+        promise = promise.rotate();
+
         if (w || h) {
             // Don't crop the image when resizing it by both dimensions
             if (w && h) {
