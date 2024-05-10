@@ -175,7 +175,7 @@ module.exports = function(app) {
                 logger.info('Survey with id ' + survey.id + ' has been created successfully.');
                 res.redirect('/surveys/own');
             }).catch(function(err) {
-                logger.error('Error while creating new survey: ' + err.toString());
+                logger.error('Error while creating new survey: ' + (err.message ? err.message : err.toString()));
                 req.session.error = 'survey_created_error_msg';
                 if (err && err.code) {
                     req.session.error = translateErrorCodeToMsg(err.code);
@@ -228,7 +228,7 @@ module.exports = function(app) {
                     });
                 }).catch(function(err) {
                     req.session.error = 'survey_cloned_error_msg';
-                    logger.error('Error while cloning survey with id ' + req.body.survey_id + ': ' + err.toString());
+                    logger.error('Error while cloning survey with id ' + req.body.survey_id + ': ' + (err.message ? err.message : err.toString()));
                     res.redirect('/surveys/own');
                 });
             } else if ('survey_title' in req.body) {
@@ -240,7 +240,7 @@ module.exports = function(app) {
                     logger.info('Survey with id ' + req.body.survey_id + ' has been updated successfully.');
                     res.redirect('/surveys/own');
                 }).catch(function(err) {
-                    logger.error('Error while updating survey with id ' + req.body.survey_id + ': ' + err.toString());
+                    logger.error('Error while updating survey with id ' + req.body.survey_id + ': ' + (err.message ? err.message : err.toString()));
                     if (err && err.code) {
                         req.session.error = translateErrorCodeToMsg(err.code);
                     } else {
@@ -299,7 +299,7 @@ module.exports = function(app) {
             logger.info('Survey with id ' + Utils.decryptSurveyId(req.params.id) + ' has been deleted successfully.');
         }).catch(function(err) {
             req.session.error = 'survey_deleted_error_msg';
-            logger.error('Error while deleting survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err.toString());
+            logger.error('Error while deleting survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + (err.message ? err.message : err.toString()));
         }).lastly(function() {
             res.redirect('/surveys/own');
         });
@@ -325,7 +325,7 @@ module.exports = function(app) {
             logger.info('Survey with id ' + Utils.decryptSurveyId(req.params.id) + ' has been opened successfully.');
         }).catch(function(err) {
             req.session.error = 'survey_open_error_msg';
-            logger.error('Error while opening survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err.toString());
+            logger.error('Error while opening survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + (err.message ? err.message : err.toString()));
         }).lastly(function() {
             res.redirect('/surveys/own');
         });
@@ -348,7 +348,7 @@ module.exports = function(app) {
             logger.info('Survey with id ' + Utils.decryptSurveyId(req.params.id) + ' has been closed successfully.');
         }).catch(function(err) {
             req.session.error = 'survey_close_error_msg';
-            logger.error('Error while closing survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + err.toString());
+            logger.error('Error while closing survey with id ' + Utils.decryptSurveyId(req.params.id) + ' : ' + (err.message ? err.message : err.toString()));
         }).lastly(function() {
             res.redirect('/surveys/own');
         });

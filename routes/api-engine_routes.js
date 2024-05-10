@@ -11,7 +11,7 @@ module.exports = function(app) {
 
     function handleInternalError(req, res) {
         return function(err) {
-            logger.error('Internal server error during API request: ' + err.toString());
+            logger.error('Internal server error during API request: ' + (err.message ? err.message : err.toString()));
             res.status(500).json({ error_code: 'internal_error', error: 'an internal server error has occured.' });
         };
     }
@@ -312,7 +312,7 @@ module.exports = function(app) {
                             errorHttpCode = 500;
                             errorCode = 'internal_error';
                             errorMsg = 'an error happened while aggregating the data.';
-                            logger.info("Requested aggregation by geom type '" + params.geom + "' for base layer '" + layer + "' raised error: " + err.toString());
+                            logger.info("Requested aggregation by geom type '" + params.geom + "' for base layer '" + layer + "' raised error: " + (err.message ? err.message : err.toString()));
                     }
                     return res.status(errorHttpCode).json({ error_code: errorCode, error: errorMsg });
                 });
@@ -374,7 +374,7 @@ module.exports = function(app) {
             }).then(function(response) {
                 res.end();
             }).catch(function(err) {
-                logger.error('Error while saving response for survey with id ' + survey.id + ' : ' + err.toString());
+                logger.error('Error while saving response for survey with id ' + survey.id + ' : ' + (err.message ? err.message : err.toString()));
                 var error;
                 if ('status' in err) {
                     res.status(err.status);

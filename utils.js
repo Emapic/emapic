@@ -328,28 +328,33 @@ module.exports = function(app) {
             if (url.lastIndexOf('http', 0) !== 0) {
                 url = 'http://' + url;
             }
-            return new Promise(function(resolve, reject) {
-                request({
-                    url: url,
-                    timeout: 4000,
-                    encoding: null
-                }, function(err, res, body) {
-                    if (err) {
-                        if (err.code === 'ETIMEDOUT') {
-                            logger.warn('Couldn\'t check whether the URL "' + url + '" is actually an image due to connection timeout. Will accept it as one.');
-                            return resolve()
-                        }
-                        return reject(err);
-                    }
-                    if (imageType(body) !== null || isSvg(body)) {
-                        resolve();
-                    } else {
-                        reject({
-                            message: 'invalid image file.'
-                        });
-                    }
-                });
-            });
+            return Promise.resolve();
+            /* TODO: this check is unreliable with the current version of image-type and file-type
+               with some images, so it's better to skip it completely until we can update
+               to a newer version of Node.js. Not a very reliable check in any case since
+               the URL content could change at any time... */
+            // return new Promise(function(resolve, reject) {
+            //     request({
+            //         url: url,
+            //         timeout: 4000,
+            //         encoding: null
+            //     }, function(err, res, body) {
+            //         if (err) {
+            //             if (err.code === 'ETIMEDOUT') {
+            //                 logger.warn('Couldn\'t check whether the URL "' + url + '" is actually an image due to connection timeout. Will accept it as one.');
+            //                 return resolve()
+            //             }
+            //             return reject(err);
+            //         }
+            //         if (imageType(body) !== null || isSvg(body)) {
+            //             resolve();
+            //         } else {
+            //             reject({
+            //                 message: 'invalid image file.'
+            //             });
+            //         }
+            //     });
+            // });
         },
 
         transformNewlinesToHtml: function(text) {
