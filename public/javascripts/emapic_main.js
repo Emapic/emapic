@@ -24,6 +24,7 @@ var emapic = emapic || {};
     emapic.surveyResults = null;
     emapic.resultsAfterVote = true;
     emapic.updateUrlWithAnswerId = false;
+    emapic.selectedFeature = null;
     emapic.answerIdField = 'id';
     emapic.redirectUrl = "/";
     emapic.legend = {};
@@ -541,6 +542,7 @@ var emapic = emapic || {};
             var newUrl = emapic.utils.changeURLParameter(urlAnswerIdParam, feature.properties[emapic.answerIdField]);
             window.history.pushState({path: newUrl}, '', newUrl);
         }
+        emapic.selectedFeature = feature;
     };
 
     emapic.indivVotesLayerFeatureUnselected = function(feature) {
@@ -549,6 +551,7 @@ var emapic = emapic || {};
             var newUrl = emapic.utils.changeURLParameter(urlAnswerIdParam, null);
             window.history.pushState({path: newUrl}, '', newUrl);
         }
+        emapic.selectedFeature = null;
     };
 
     emapic.filterFeature = function(feature) {

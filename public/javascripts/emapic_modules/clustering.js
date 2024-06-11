@@ -22,16 +22,18 @@ var emapic = emapic || {};
     emapic.modules.clustering = emapic.modules.clustering || {};
     emapic.modules.clustering.markerClusterOptions = {};
 
+    function spiderfyParent(marker) {
+        var parent = emapic.indivVotesLayer.getVisibleParent(marker);
+        if (parent && parent.spiderfy) {
+            parent.spiderfy();
+        } else if (currentSpiderfied && currentSpiderfied.getAllChildMarkers().indexOf(marker) === -1 && currentSpiderfied._map) {
+            currentSpiderfied.unspiderfy();
+        }
+    }
+
     emapic.showMarker = emapic.utils.overrideFunction(emapic.showMarker, null, function(dumb, marker) {
         if (clusteringActive) {
-            var parent = emapic.indivVotesLayer.getVisibleParent(marker);
-            if (parent && parent.spiderfy) {
-                parent.spiderfy();
-            } else if (currentSpiderfied && currentSpiderfied.getAllChildMarkers().indexOf(marker) === -1) {
-                if (currentSpiderfied._map) {
-                    currentSpiderfied.unspiderfy();
-                }
-            }
+            spiderfyParent(marker);
         }
         return marker;
     });
@@ -63,6 +65,19 @@ var emapic = emapic || {};
                 emapic.indivVotesLayer.disableClustering();
             }
             emapic.indivVotesLayer.addLayer(markers);
+        });
+        emapic.map.on('zoomend', function() {
+            if (clusteringActive && emapic.selectedFeature) {
+                var indivVotesLayers = emapic.getIndivVotesLayerLeafletLayers();
+                for (var i = 0, iLen = indivVotesLayers.length; i < iLen; i++) {
+                    if (indivVotesLayers[i].feature === emapic.selectedFeature) {
+                        setTimeout(function() {
+                            spiderfyParent(indivVotesLayers[i]);
+                        }, 500);
+                        break;
+                    }
+                }
+            }
         });
         return emapic.indivVotesLayer;
     });
