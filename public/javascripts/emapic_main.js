@@ -658,6 +658,17 @@ var emapic = emapic || {};
     emapic.processLegendData = function(data) {
     	emapic.fullLegend = data;
     	for (var a in emapic.fullLegend) {
+            // If we only received an array with the responses' legend,
+            // create a map for easily accessing them
+            if (Array.isArray(emapic.fullLegend[a][0].responses)) {
+                for (var i = 0, iLen = emapic.fullLegend[a].length; i<iLen; i++) {
+                    emapic.fullLegend[a][i].responses_array = emapic.fullLegend[a][i].responses;
+                    emapic.fullLegend[a][i].responses = {};
+                    for (var j = 0, jLen = emapic.fullLegend[a][i].responses_array.length; j<jLen; j++) {
+                        emapic.fullLegend[a][i].responses[emapic.fullLegend[a][i].responses_array[j].id] = emapic.fullLegend[a][i].responses_array[j];
+                    }
+                }
+            }
     		emapic.legend[a] = emapic.fullLegend[a][0];
     	}
         emapic.initEmapic();

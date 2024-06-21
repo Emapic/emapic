@@ -2,7 +2,8 @@ L.Control.SelectQuestion = L.Control.extend({
 	options: {
 		collapsed: false,
 		position: 'topright',
-		autoZIndex: true
+		autoZIndex: true,
+		filterActiveText: 'filtro activo'
 	},
 
 	initialize: function (questions, options) {
@@ -30,9 +31,7 @@ L.Control.SelectQuestion = L.Control.extend({
     var container = this._container = L.DomUtil.create('div', className)
 
     L.DomEvent.disableClickPropagation(container);
-    if (!L.Browser.touch) {
-      L.DomEvent.on(container, 'mousewheel', L.DomEvent.stopPropagation)
-    }
+    L.DomEvent.on(container, 'mousewheel', L.DomEvent.stopPropagation)
 
     if (this.options.collapsed) {
       var link = this._questionsLink = L.DomUtil.create('a', className + '-toggle', container)
@@ -88,7 +87,7 @@ L.Control.SelectQuestion = L.Control.extend({
 			this._questionsList.appendChild(option);
 			option = L.DomUtil.create('li');
 		    option.setAttribute('class', 'dropdown-header dropdown-footer');
-			option.innerHTML = '<span class="asterisk">*</span> filtro activo';
+			option.innerHTML = '<span class="asterisk">*</span> ' + this.options.filterActiveText;
 			this._questionsList.appendChild(option);
 		}
 
@@ -133,7 +132,7 @@ L.Control.SelectQuestion = L.Control.extend({
   ,_createOptionElement: function (obj, filterActive) {
     var option = L.DomUtil.create('option');
     option.setAttribute('value', obj.value);
-    option.innerHTML = obj.text + (filterActive ? ' --filtro activo--' : '');
+    option.innerHTML = obj.text + (filterActive ? ' --' + this.options.filterActiveText + '--' : '');
 	if (this._selectedVal === obj.value) {
 		option.setAttribute('selected', true);
 	}

@@ -312,7 +312,7 @@ module.exports = function(app) {
                             errorHttpCode = 500;
                             errorCode = 'internal_error';
                             errorMsg = 'an error happened while aggregating the data.';
-                            logger.info("Requested aggregation by geom type '" + params.geom + "' for base layer '" + layer + "' raised error: " + (err.message ? err.message : err.toString()));
+                            logger.error("Requested aggregation by geom type '" + params.geom + "' for base layer '" + layer + "' raised error: " + (err.message ? err.message : err.toString()));
                     }
                     return res.status(errorHttpCode).json({ error_code: errorCode, error: errorMsg });
                 });

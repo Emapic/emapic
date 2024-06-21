@@ -192,6 +192,7 @@
 	"js_satellite_mapbox_baselayer": "Satellite (Mapbox)",
 	"js_zoom_in": "Zoom in",
 	"js_zoom_out": "Zoom out",
+	"js_filter_active": "filter active",
 	"js_clear_all_filters": "Clear all filters",
 	"js_add_spatial_filter": "Draw area filter",
 	"js_remove_spatial_filter": "Remove area filter",
