@@ -1578,38 +1578,51 @@ button.survey-answer > div.flex-container {
 #sidebarPanel #indivData ul.user-answers-list {
     padding-left: 0px;
 }
-#sidebarPanel #indivData ul.user-answers-list li label {
+#sidebarPanel #indivData ul.user-answers-list > li {
+    list-style-type: disc;
+}
+#sidebarPanel #indivData ul.user-answers-list li {
+    color: #000000;
+    list-style-position: inside;
+}
+#sidebarPanel #indivData ul.user-answers-list li > label {
     color: #000000;
     margin-right: 5px;
     margin-bottom: 0px;
+}
+#sidebarPanel #indivData ul.user-answers-list li > label,
+#sidebarPanel #indivData ul.user-answers-list li > span {
+    text-indent: 11px;
+}
+#sidebarPanel #indivData ul.user-answers-list li > label:first-child,
+#sidebarPanel #indivData ul.user-answers-list li > span:first-child {
     display: inline;
 }
-#sidebarPanel #indivData ul.user-answers-list li:not(:first-child) {
+#sidebarPanel #indivData ul.user-answers-list > li:not(:first-child) {
     margin-top: 10px;
 }
-#sidebarPanel #indivData ul.user-answers-list ul li {
-    list-style: circle;
+#sidebarPanel #indivData ul.user-answers-list ul,
+#sidebarPanel #indivData ul.user-answers-list ol {
+    padding-left: 20px;
 }
-#sidebarPanel #indivData ul.user-answers-list ul ul li {
-    list-style: square;
+#sidebarPanel #indivData ul.user-answers-list ul > li {
+    list-style-type: circle;
 }
-#sidebarPanel #indivData ul.user-answers-list ol li {
-    list-style: decimal;
+#sidebarPanel #indivData ul.user-answers-list ul ul > li {
+    list-style-type: square;
 }
-#sidebarPanel #indivData ul.user-answers-list ul li:not(:first-child),
-#sidebarPanel #indivData ul.user-answers-list ol li:not(:first-child) {
+#sidebarPanel #indivData ul.user-answers-list ol > li {
+    list-style-type: decimal;
+}
+#sidebarPanel #indivData ul.user-answers-list ul > li:not(:first-child),
+#sidebarPanel #indivData ul.user-answers-list ol > li:not(:first-child) {
     margin-top: 5px;
 }
 #sidebarPanel #indivData ul.user-answers-list li span {
     color: #000000;
     font-size: 12px;
-    text-indent: 11px;
     text-align: justify;
     display: inline-block;
-}
-#sidebarPanel #indivData ul.user-answers-list li {
-    list-style: disc inside none;
-    color: #000000;
 }
 #sidebarPanel #indivData div.survey-answer-img {
     text-align: center;
