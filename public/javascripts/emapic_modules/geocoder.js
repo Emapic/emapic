@@ -99,7 +99,9 @@ var emapic = emapic || {};
 
     emapic.modules.geocoder.processGeocodingResult = function(result) {
         result = result.geocode || result;
-        emapic.map.fitBounds(result.bbox);
+        if (result) {
+            emapic.map.fitBounds(result.bbox);
+        }
     };
 
     emapic.modules.geocoder.addGeocoder = function(params) {

@@ -8,7 +8,8 @@ var emapic = emapic || {};
 
     var originalInitEmapic = emapic.initEmapic,
         questionId,
-        realClick = false;
+        realClick = false,
+        geocoderUpdateAdded = false;
 
     emapic.modules = emapic.modules || {};
     emapic.modules.survey = emapic.modules.survey || {};
@@ -20,6 +21,7 @@ var emapic = emapic || {};
     emapic.modules.survey.responses = {};
     emapic.modules.survey.thksMsgTimeOut = 6000;
     emapic.modules.survey.showGeocoderOnPositionEditing = false;
+    emapic.modules.survey.updatePositionWithGeocoderResult = true;
     emapic.modules.survey.statusMarkerIconHtml = "<svg width='51' height='46'>" +
         "<defs>\n" +
         "<pattern id='image' x='0' y='0' patternUnits='userSpaceOnUse' height='46' width='51'>\n" +
@@ -330,6 +332,16 @@ var emapic = emapic || {};
         $('#check-edit-loc').show();
         if (emapic.modules.survey.showGeocoderOnPositionEditing && emapic.modules.geocoder) {
             emapic.modules.geocoder.loadGeocoder();
+            if (emapic.modules.survey.updatePositionWithGeocoderResult || !geocoderUpdateAdded) {
+                emapic.modules.geocoder.processGeocodingResult = emapic.utils.overrideFunction(emapic.modules.geocoder.processGeocodingResult, function(result) {
+                    result = result.geocode || result;
+                    if (result) {
+                        emapic.modules.survey.marker.setLatLng(result.center);
+                    }
+                    return result;
+                });
+                geocoderUpdateAdded = true;
+            }
         }
         editMarkerPos();
     };
