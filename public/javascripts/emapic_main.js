@@ -442,7 +442,9 @@ var emapic = emapic || {};
     		questions.push(emapic.fullLegend.color[i].text);
     	}
     	if (questions.length > 0) {
-            emapic.questionSelector = L.control.selectQuestion(questions);
+            emapic.questionSelector = L.control.selectQuestion(questions, {
+                filterActiveText: emapic.utils.getI18n('js_filter_active', 'filtro activo'),
+            });
             emapic.questionSelector.addTo(emapic.map);
     	}
     };
