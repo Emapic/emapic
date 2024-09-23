@@ -179,6 +179,7 @@ module.exports = function(sequelize, DataTypes) {
         date_created: {type: DataTypes.DATE, defaultValue: sequelize.fn('now') },
         date_opened: DataTypes.DATE,
         date_closed: DataTypes.DATE,
+        latest_vote: DataTypes.DATE,
         public_statistics: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
         nr_votes: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
         already_opened: {
@@ -277,6 +278,12 @@ module.exports = function(sequelize, DataTypes) {
             votesOrdering: function() {
                 return {
                     order: Utils.createOrderArray(Survey.getVotesOrder())
+                };
+            },
+
+            latestOrdering: function() {
+                return {
+                    order: Utils.createOrderArray(Survey.getLatestOrder())
                 };
             },
 
@@ -409,6 +416,13 @@ module.exports = function(sequelize, DataTypes) {
         return order;
     };
 
+    Survey.getLatestOrder = function() {
+        var order = models.Survey.getDefaultOrder();
+        // First make sure draft surveys are shown the last
+        order.unshift([sequelize.literal('active IS NULL'), 'ASC'], ['latest_vote', 'DESC NULLS LAST']);
+        return order;
+    };
+
     Survey.getPopularityOrder = function() {
         var order = models.Survey.getDefaultOrder();
         // First make sure draft surveys are shown the last
@@ -420,6 +434,8 @@ module.exports = function(sequelize, DataTypes) {
         switch(order) {
             case 'votes':
                 return Survey.getVotesOrder();
+            case 'latest':
+                return Survey.getLatestOrder();
             case 'popular':
                 return Survey.getPopularityOrder();
             case 'dates':
@@ -871,11 +887,15 @@ module.exports = function(sequelize, DataTypes) {
                         });
                     });
                 }).then(function() {
-                    return models.Vote.create({
-                        user_id : usr_id,
-                        survey_id : survey.id,
-                        vote_date : date
-                    });
+                    survey.latest_vote = date;
+                    return Promise.join(
+                        models.Vote.create({
+                            user_id : usr_id,
+                            survey_id : survey.id,
+                            vote_date : date
+                        }),
+                        survey.save()
+                    );
                 });
             });
         });

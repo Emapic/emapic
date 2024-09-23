@@ -15,6 +15,7 @@
                 {{#query}}<option value="dates">{{#__}}order_creation_date{{/__}}</option>{{/query}}
                 <option value="votes">{{#__}}order_nr_votes{{/__}}</option>
                 <option value="popular">{{#__}}order_popularity{{/__}}</option>
+                <option value="latest">{{#__}}order_latest_answer{{/__}}</option>
             </select>
         </div>
 	</div>
