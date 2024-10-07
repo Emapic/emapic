@@ -281,6 +281,10 @@ var emapic = emapic || {};
         return baseMaps;
     };
 
+    emapic.getOverlays = function() {
+        return null;
+    };
+
     emapic.addBaseLayers = function(tryGrayScale) {
         var control,
             baseMaps = {},
@@ -310,7 +314,7 @@ var emapic = emapic || {};
                 emapic.currentBaseLayer = layer;
             }
         });
-        emapic.layerControl = emapic.addLayerSelector(baseMaps, null);
+        emapic.layerControl = emapic.addLayerSelector(baseMaps, emapic.getOverlays());
     };
 
     emapic.addLayerSelector = function(baselayers, overlays) {
