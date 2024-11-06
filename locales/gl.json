@@ -302,6 +302,7 @@
 	"password_reset_mail_text_body": "Ola %s!\n\nO contrasinal da túa conta asociada a este correo foi reseteado a %s\n\nAconsellámosche que entres na túa conta en Emapic e cambies o teu contrasinal a un novo o antes posible: %s\n\nSaúdos\nEquipo Emapic\nwww.emapic.es",
 	"password_reset_confirm_success_msg": "Enviamos a túa bandexa de correo instrucións sobre como resetear o teu contrasinal.",
 	"password_reset_success_msg": "O teu contrasinal foi reseteado correctamente. Comproba a túa bandexa de correo.",
+	"password_reset_invalid_msg": "A ligazón de reseteo de contrasinal xa non é válida. Comproba na carpeta de Spam do teu correo se xa che enviamos o teu novo contrasinal, e se inda precisas resetealo, solicítao de novo no <a href='/pwd_reset'>formulario correspondente</a>.",
 	"password_reset_error_msg": "Ocorreu un erro e non puidemos resetear o teu contrasinal.",
 	"auth_mail_invalid_user_msg": "Non atopamos ningunha conta de usuario co e-mail proporcionado.",
 	"resend_activation_mail_title": "Reenvío de e-mail de activación - Emapic",

@@ -557,7 +557,7 @@ module.exports = function(app) {
         }).then(function(){
             req.session.success = 'password_reset_success_msg';
         }).catch({ message: 'password_reset_invalid_user' }, function(err) {
-            req.session.error = 'password_reset_error_msg';
+            req.session.error = 'password_reset_invalid_msg';
             logger.debug('Requested confirmed password reset for invalid user with hash id ' + req.query.id);
         }).catch(function (err){
             req.session.error = 'password_reset_error_msg';

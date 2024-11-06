@@ -302,6 +302,7 @@
 	"password_reset_mail_text_body": "Hello %s!\n\nThe password to your account linked to this email has been reset to  %s\n\nWe advise you to enter your account in Emapic and change your password to a new one as soon as possible: %s\n\nRegards\nEmapic Team\nwww.emapic.es",
 	"password_reset_confirm_success_msg": "We have sent to your inbox the instructions on how to reset your password.",
 	"password_reset_success_msg": "Your password has been successfully reset. Check your inbox tray.",
+	"password_reset_invalid_msg": "This password reset link is no longer valid. Check in the Spam folder of your e-mail address whether we have already sent you your new password, and if you still need to reset it, request it again via <a href='/pwd_reset'>its form</a>.",
 	"password_reset_error_msg": "An error has occured and we have not been able to reset your password.",
 	"auth_mail_invalid_user_msg": "We can't find any user account with the provided e-mail.",
 	"resend_activation_mail_title": "Resend activation e-mail - Emapic",

@@ -302,6 +302,7 @@
 	"password_reset_mail_text_body": "¡Hola %s!\n\nLa contraseña de tu cuenta asociada a este correo ha sido reseteada a %s\n\nTe aconsejamos que entres a tu cuenta en Emapic y cambies tu contraseña a una nueva lo antes posible: %s\n\nSaludos\nEquipo Emapic\nwww.emapic.es",
 	"password_reset_confirm_success_msg": "Hemos enviado a tu bandeja de correo instrucciones sobre cómo resetear tu contraseña.",
 	"password_reset_success_msg": "Tu contraseña ha sido reseteada correctamente. Comprueba tu bandeja de correo.",
+	"password_reset_invalid_msg": "El enlace de reseteo de contraseña ya no es válido. Comprueba en la carpeta de Spam de tu correo si ya te hemos enviado tu nueva contraseña, y si todavía necesitas resetearla, solicítalo de nuevo en el <a href='/pwd_reset'>formulario correspondiente</a>.",
 	"password_reset_error_msg": "Ha ocurrido un error y no hemos podido resetear tu contraseña.",
 	"auth_mail_invalid_user_msg": "No encontramos ninguna cuenta de usuario con el e-mail proporcionado.",
 	"resend_activation_mail_title": "Reenvío de e-mail de activación - Emapic",
