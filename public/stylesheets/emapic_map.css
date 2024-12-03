@@ -1815,9 +1815,6 @@ button.survey-answer > div.flex-container {
 .modal-body .row {
     padding: 10px;
 }
-#stats-modal .modal-dialog {
-    max-width: 350px;
-}
 #time-filter-modal .modal-dialog {
     max-width: 450px;
 }
@@ -1842,12 +1839,40 @@ button.survey-answer > div.flex-container {
 .dc-chart g.row rect {
 	fill-opacity: 1;
 }
-.dc-chart g.row rect:hover {
+.dc-chart g.pie-slice path:hover,
+.dc-chart g.row rect:hover,
+.dc-chart g.row.highlight rect {
 	fill-opacity: .8;
 }
 .dc-legend-item {
     font-size: 14px;
     fill: white;
+}
+.dc-has-html-legend .dc-legend {
+    visibility: hidden;
+}
+.dc-legend-table table {
+    margin: auto;
+}
+.dc-legend-table table td,
+.dc-legend-table table td label {
+    cursor: pointer;
+}
+.dc-legend-table .dc-legend-table-rect {
+    vertical-align: top;
+}
+.dc-legend-table .dc-legend-table-rect > div {
+    margin-top: 4px;
+    margin-right: 4px;
+    border: 1px solid black;
+}
+.dc-legend-table .dc-legend-table-text label {
+    margin-bottom: 0;
+    font-weight: normal;
+}
+.dc-legend-table tr:not(:last-child) td {
+    margin-bottom: 4px;
+    border-bottom: 1px solid white;
 }
 #vote-chart.dc-chart {
     float: none;

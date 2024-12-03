@@ -26,9 +26,10 @@ var emapic = emapic || {};
     emapic.modules.counterStats = emapic.modules.counterStats || {};
 
     emapic.modules.counterStats.orderVotes = false;
-    emapic.modules.counterStats.pieChartWidth = 180;
+    emapic.modules.counterStats.legendRowHeight = 18;
+    emapic.modules.counterStats.useHTMLLegend = true;
+    emapic.modules.counterStats.pieChartWidth = emapic.modules.counterStats.rowChartWidth = 500;
     emapic.modules.counterStats.pieChartRadius = 81;
-    emapic.modules.counterStats.rowChartWidth = 330;
     emapic.modules.counterStats.currentChartsLegend = null;
     emapic.modules.counterStats.counterIcon = "<span class='usericon glyphicon glyphicon-user'></span>";
 
@@ -340,16 +341,13 @@ var emapic = emapic || {};
     emapic.modules.counterStats.loadStats = function(data) {
         dc.chartRegistry.clear();
 
-        var legendHeight = 18,
-            maxLen = 0,
+        var maxLen = 0,
             chartType = $('#chart-type-btn').attr('name'),
             radius = emapic.modules.counterStats.pieChartRadius,
             width = (chartType === 'pie') ? emapic.modules.counterStats.pieChartWidth : emapic.modules.counterStats.rowChartWidth,
             votesById = {},
             votes = [],
             maxDataLen = 0;
-
-        currentVoteChart = (chartType === 'pie') ? dc.pieChart("#vote-chart").cy(width/2) : dc.rowChart("#vote-chart");
 
         // Count the votes for each option
         for (var i = 0, iLen = data.length; i<iLen; i++) {
@@ -396,13 +394,18 @@ var emapic = emapic || {};
                 maxLen = el.responses_array.length;
             }
         });
-        legendHeight = legendHeight * maxLen + (radius * 2.2);
+        var legendHeight = emapic.modules.counterStats.legendRowHeight * maxLen;
 
-        (chartType == 'pie') ? configPieChart(currentVoteChart, width, radius, legendHeight, voteDimension, voteDimensionGroup, all) :
-            configRowChart(currentVoteChart, width, legendHeight, voteDimension, voteDimensionGroup, all, maxDataLen);
+        currentVoteChart = (chartType == 'pie') ? configPieChart(width, radius, legendHeight, voteDimension, voteDimensionGroup, all) :
+            configRowChart(width, legendHeight * 3 + 30, legendHeight, voteDimension, voteDimensionGroup, all, maxDataLen);
 
         //simply call renderAll() to render all charts on the page
         dc.renderAll();
+
+        // Transform the legend to HTML
+        if (emapic.modules.counterStats.useHTMLLegend) {
+            emapic.modules.counterStats.transformLegendToHTML(currentVoteChart);
+        }
     };
 
     emapic.modules.counterStats.chartTypeChanged = function(el) {
@@ -430,21 +433,25 @@ var emapic = emapic || {};
         emapic.modules.counterStats.loadStats(chartFeatures); // update chart
     };
 
-    function configPieChart(voteChart, width, radius, legendHeight, voteDimension, voteDimensionGroup, all) {
+    function configPieChart(width, radius, legendHeight, voteDimension, voteDimensionGroup, all) {
+        var voteChart = dc.pieChart("#vote-chart").cy(width/2);
+
         voteChart
-            .width(width) // (optional) define chart width, :default = 200
-            .height(legendHeight) // (optional) define chart height, :default = 200
-            .cy(radius * 1.1)
-            .radius(radius) // define pie radius
-            .dimension(voteDimension) // set dimension
-            .group(voteDimensionGroup) // set group
+            .width(width)
+            .height(radius * 2 + 30 + legendHeight)
+            .cy(radius + 15)
+            .radius(radius)
+            .dimension(voteDimension)
+            .group(voteDimensionGroup)
             .legend(dc.legend().legendText(function(d) {
                 return emapic.modules.counterStats.currentChartsLegend.color.responses[d.name].value + ': ' + d.data;
-            }).y(radius * 2.2))
+            })
+            .y(radius * 2 + 30))
             .title(function(d) {
                 var id = ('data' in d) ? d.data.key : d.key;
                 return emapic.modules.counterStats.currentChartsLegend.color.responses[id].value + ": " + d.value;
-            }).label(function (d) {
+            })
+            .label(function (d) {
                 var label = '';
                 if (voteChart.hasFilter() && !voteChart.hasFilter(d.key)) {
                     return label + ' (0%)';
@@ -454,33 +461,80 @@ var emapic = emapic || {};
                 }
                 return label;
             })
-            .colors(function(d){ return (d && emapic.modules.counterStats.currentChartsLegend && emapic.modules.counterStats.currentChartsLegend.color) ? emapic.modules.counterStats.currentChartsLegend.color.responses[d].legend : 'grey';}); // set colors function
+            .colors(function(d){
+                return (d && emapic.modules.counterStats.currentChartsLegend && emapic.modules.counterStats.currentChartsLegend.color) ?
+                    emapic.modules.counterStats.currentChartsLegend.color.responses[d].legend : 'grey';
+            });
 
         return voteChart;
     };
 
-    function configRowChart(voteChart, width, legendHeight, voteDimension, voteDimensionGroup, all, maxDataLen) {
+    function configRowChart(width, chartHeight, legendHeight, voteDimension, voteDimensionGroup, all, maxDataLen) {
+        var voteChart = dc.rowChart("#vote-chart");
+
         voteChart
-            .width(width) // (optional) define chart width, :default = 200
-            .height(legendHeight) // (optional) define chart height, :default = 200
-            .dimension(voteDimension) // set dimension
-            .group(voteDimensionGroup) // set group
+            .width(width)
+            .height(chartHeight)
+            .margins({top: 5, right: 5, bottom: legendHeight + 30, left: 5})
+            .dimension(voteDimension)
+            .group(voteDimensionGroup)
             .title(function(d) {
                 var id = ('data' in d) ? d.data.key : d.key;
                 return emapic.modules.counterStats.currentChartsLegend.color.responses[id].value + ": " + d.value;
-            }).label(function (d) {
-                var label = emapic.modules.counterStats.currentChartsLegend.color.responses[d.key].value;
-                if (voteChart.hasFilter() && !voteChart.hasFilter(d.key)) {
-                    return label + ' (0%)';
-                }
-                if (all.value()) {
-                    label += ' (' + Math.floor(d.value / all.value() * 100) + '%)';
-                }
-                return label;
             })
-            .colors(function(d){ return (d && emapic.modules.counterStats.currentChartsLegend && emapic.modules.counterStats.currentChartsLegend.color) ? emapic.modules.counterStats.currentChartsLegend.color.responses[d].legend : 'grey';}); // set colors function
+            .label(function (d) {
+                if (voteChart.hasFilter() && !voteChart.hasFilter(d.key)) {
+                    return '(0%)';
+                } else if (all.value()) {
+                    return '(' + Math.floor(d.value / all.value() * 100) + '%)';
+                } else {
+                    return '---';
+                }
+            })
+            .legend(dc.legend().legendText(function(d) {
+                return emapic.modules.counterStats.currentChartsLegend.color.responses[d.name].value + ': ' + d.data;
+            }).y(chartHeight - legendHeight))
+            .colors(function(d){
+                return (d && emapic.modules.counterStats.currentChartsLegend && emapic.modules.counterStats.currentChartsLegend.color) ?
+                    emapic.modules.counterStats.currentChartsLegend.color.responses[d].legend : 'grey';
+            });
+
             // if there are more than 3 answers in the most answered question, 4 ticks
             (maxDataLen > 3) ? voteChart.xAxis().ticks(4) : voteChart.xAxis().ticks(maxDataLen);
+
+        /**
+         * We have to add several legend-related functions manually because
+         * the row charts in DC work with legends based on stacks instead of
+         * individual rows
+         */
+
+        voteChart.legendables = function() {
+            return voteChart.data().map(function (d, i) {
+                var legendable = {name: d.key, data: d.value, others: d.others, chart: voteChart};
+                legendable.color = voteChart.getColor(d, i);
+                return legendable;
+            });
+        };
+
+        voteChart.legendToggle = function(d) {
+            this.onClick({key: d.name, others: d.others});
+        };
+
+        voteChart._highlightRowFromLegendable = function(legendable, highlighted) {
+            this.selectAll('g.row').each(function (d) {
+                if (legendable.name === d.key) {
+                    d3.select(this).classed('highlight', highlighted);
+                }
+            });
+        };
+
+        voteChart.legendHighlight = function(d) {
+            this._highlightRowFromLegendable(d, true);
+        };
+
+        voteChart.legendReset = function(d) {
+            this._highlightRowFromLegendable(d, false);
+        };
 
         return voteChart;
     };
@@ -551,5 +605,71 @@ var emapic = emapic || {};
         }
         emapic.modules.counterStats.updateChart(nr);
     };
+
+    emapic.modules.counterStats.transformLegendToHTML = function(chart) {
+        // We must parse the existing legend and copy it to an HTML table
+        var $legend = $('#vote-chart .dc-legend');
+        if (!$legend.length) {
+            return;
+        }
+        var $legendContainer = $legend.parent(),
+            originalHeight = $legend[0].getBoundingClientRect().height,
+            coords = $legend.attr('transform').replace('translate(', '').replace(')', '').split(','),
+            foreign = document.createElementNS('http://www.w3.org/2000/svg','foreignObject'),
+            $foreign = $(foreign),
+            legendRows = [];
+
+        $legendContainer.addClass('dc-has-html-legend');
+
+        $legend.find('.dc-legend-item').each(function() {
+            // For each legend entry, transform its contents to a table row
+            // and copy its event handlers
+            var $this = $(this),
+                $rect = $this.find('rect'),
+                tr = document.createElement('tr'),
+                $tr = $(tr);
+            // Copy the internal data object
+            tr.__data__ = this.__data__;
+            if (this.__on) {
+                // Copy the event handlers
+                for (var i = 0, iLen = this.__on.length; i<iLen; i++) {
+                    $tr.on(this.__on[i].type, this.__on[i].listener);
+                }
+            }
+            $tr.html('<td class="dc-legend-table-rect"><div style="width:' + $rect.attr('width') + 'px;height:' + $rect.attr('height') +
+                'px;background-color:' + $rect.attr('fill') + '"></div></td><td class="dc-legend-table-text"><label>' + $this.find('text').text() + '</label></td>');
+            legendRows.push(tr);
+        });
+
+        // Set up the foreign object location and size based on the existing
+        // legend data
+        foreign.setAttribute('class', 'dc-legend-table');
+        foreign.setAttribute('width', '100%');
+        foreign.setAttribute('x', coords[0]);
+        foreign.setAttribute('y', coords[1]);
+        var table = document.createElement('table');
+        for (var i = 0, iLen = legendRows.length; i<iLen; i++) {
+            table.appendChild(legendRows[i]);
+        }
+        foreign.appendChild(table);
+        $legendContainer.append(foreign);
+
+        // Modify the chart height accordingly by computing the difference
+        // between the old legend height and the new one
+        var newHeight = $foreign.find('table').height(),
+            heightDiff = parseFloat($legendContainer.attr('height')) + newHeight - originalHeight;
+        $foreign.attr('height', newHeight + 'px');
+        $legendContainer.attr('height', heightDiff);
+
+        // Reset the height after each redraw
+        chart.__originalRedraw = chart.redraw;
+        chart.redraw = function() {
+            this.__originalRedraw();
+            $legendContainer.attr('height', heightDiff);
+        };
+    };
+
+    function updateChartHeights() {
+    }
 
 })(emapic);
