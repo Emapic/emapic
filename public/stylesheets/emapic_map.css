@@ -1646,24 +1646,46 @@ button.survey-answer > div.flex-container {
     color: #000000;
     margin-right: 3px;
 }
-#sidebarPanel #closesidebarPanel button {
+#sidebarPanel #closesidebarPanel button,
+#sidebarPanel #opensidebarPanel button {
     background-color: #A2C73A;
     border: 1px solid white;
-    border-radius: 10px;
     color: white;
     float: left;
     height: 40px;
-    width: 37px;
+    width: 22px;
     line-height: normal;
-    margin-left: -40px;
-    padding-bottom: 5px;
     padding-left: 3px;
     position: absolute;
-    top: 50%;
+    top: calc(50% - 20px);
+}
+#sidebarPanel #closesidebarPanel button {
+    left: 0;
+    padding-bottom: 5px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-left-width: 0;
+}
+#sidebarPanel #opensidebarPanel button {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-right-width: 0;
+    transition-property: left;
+    transition-duration: 0.1s;
+    transition-delay: 0.45s;
+    left: -63px;
+    padding-left: 5px;
+}
+.leaflet-sidebar:not(.visible) #sidebarPanel {
+    overflow: visible;
+}
+.leaflet-sidebar.visible #sidebarPanel #opensidebarPanel button {
+    left: 500px;
+    transition-duration: 0s;
+    transition-delay: 0s;
 }
 #sidebarPanel #closesidebarPanel button > .glyphicon {
     margin-top: 5px;
-    margin-left: 12px;
 }
 #sidebarPanel #CurrentFeatureNumber {
     text-align: right;
