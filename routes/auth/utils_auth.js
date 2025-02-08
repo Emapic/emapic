@@ -8,36 +8,38 @@ var i18n = require('i18n-2'),
     sequelize = models.sequelize;
 
 module.exports = function(app) {
+    requireRolePromise = function(req, roles) {
+        var allowedPromise;
+        if (req.user) {
+            allowedPromise = (roles === null) ? Promise.resolve(true) :
+                req.user.getRoles().then(function(userRoles) {
+                    for (var i = 0, iLen = userRoles.length; i < iLen; i++) {
+                        for (var j = 0, jLen = roles.length; j < jLen; j++) {
+                            if (userRoles[i].name === roles[j]) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                });
+        } else {
+            allowedPromise = Promise.resolve(false);
+        }
+        return allowedPromise;
+    };
+
     requireRole = function(roles, json) {
         return function(req, res, next) {
             delete req.session.lastUnauthPage;
-            var allowedPromise;
-            if (req.user) {
-                allowedPromise = (roles === null) ? Promise.resolve(true) :
-                    req.user.getRoles().then(function(userRoles) {
-                        for (var i = 0, iLen = userRoles.length; i < iLen; i++) {
-                            for (var j = 0, jLen = roles.length; j < jLen; j++) {
-                                if (userRoles[i].name === roles[j]) {
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
-                    });
-            } else {
-                allowedPromise = Promise.resolve(false);
-            }
-            return allowedPromise.then(function(allowed) {
+            return requireRolePromise(req, roles).then(function(allowed) {
                 if (allowed) {
                     return next();
-                } else {
-                    if (json) {
-                        return res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
-                    } else {
-                        req.session.lastUnauthPage = req.path;
-                        return res.redirect('/login');
-                    }
                 }
+                if (json) {
+                    return res.status(403).json({ error_code: 'forbidden_access', error: 'you don\'t have the required permissions.' });
+                }
+                req.session.lastUnauthPage = req.path;
+                return res.redirect('/login');
             });
         };
     };
