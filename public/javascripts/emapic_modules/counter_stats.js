@@ -26,6 +26,7 @@ var emapic = emapic || {};
     emapic.modules.counterStats = emapic.modules.counterStats || {};
 
     emapic.modules.counterStats.orderVotes = false;
+    emapic.modules.counterStats.escapeAnswerText = true;
     emapic.modules.counterStats.legendRowHeight = 18;
     emapic.modules.counterStats.useHTMLLegend = true;
     emapic.modules.counterStats.pieChartWidth = emapic.modules.counterStats.rowChartWidth = 500;
@@ -193,7 +194,7 @@ var emapic = emapic || {};
 
     function addScrollBar() {
         var container = $('#app-total-counter-list-container');
-        container.find('.span-container span').each(function() {
+        container.find('.span-container > span').each(function() {
             var $this = $(this);
             $this.parents('.span-container').width($this.width() + 1);
         });
@@ -230,11 +231,12 @@ var emapic = emapic || {};
         }
         for (i in orderedVotes) {
             var btnActive = counterFilterProperty && counterFilterValues[counterFilterProperty] && counterFilterValues[counterFilterProperty].length > 0 &&
-                ($.inArray(emapic.legend.color.responses_array[orderedVotes[i].position].id, counterFilterValues[counterFilterProperty]) !== -1);
+                ($.inArray(emapic.legend.color.responses_array[orderedVotes[i].position].id, counterFilterValues[counterFilterProperty]) !== -1),
+                text = emapic.legend.color.responses[orderedVotes[i].id].value;
             specificVotesHtml += '<li><button type="button" class="btn btn-default filter-btn' + (btnActive ? ' active' : '') + '" aria-pressed="false" autocomplete="off" vote="' +
                 emapic.utils.escapeHtml(orderedVotes[i].position) + '"><div class="circle-container"><div class="filter-btn-circle" style="background-color: ' +
                 emapic.legend.color.responses[orderedVotes[i].id].legend + ';"></div></div><div class="span-container"><span>' +
-                emapic.utils.escapeHtml(emapic.legend.color.responses[orderedVotes[i].id].value) + ': ' + orderedVotes[i].nr + '</span></div></button></li>';
+                (emapic.modules.counterStats.escapeAnswerText ? emapic.utils.escapeHtml(text) : text) + ': ' + orderedVotes[i].nr + '</span></div></button></li>';
         }
         $('#app-total-counter').html("<div id='app-total-counter-header'><h4 class='text-center'>" + emapic.modules.counterStats.counterIcon + "<span id='app-total-counter-header-nr'></span> <span class='glyphicon glyphicon-stats'></span></h4></div>" +
             "<div id='app-total-counter-filter' style='display: none;'><span class='glyphicon glyphicon-filter'></span></div>\n" +

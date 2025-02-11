@@ -53,6 +53,14 @@ var emapic = emapic || {};
         }
     });
 
+    emapic.addIndivVotesLayer = emapic.utils.overrideFunction(emapic.addIndivVotesLayer, null, function() {
+        latestFeature = null;
+    });
+
+    emapic.filtersUpdated = emapic.utils.overrideFunction(emapic.filtersUpdated, null, function() {
+        latestFeature = null;
+    });
+
     emapic.getCurrentMarkerToShow = function() {
         return currentMarker;
     };
@@ -171,10 +179,8 @@ var emapic = emapic || {};
     };
 
     emapic.modules.panel.sidebarPanelReopen = function() {
-        if (latestFeature) {
-            emapic.modules.panel.goToRegister(latestFeature, true);
-            sidebarPanel.show();
-        }
+        emapic.modules.panel.goToRegister(latestFeature ? latestFeature : 0, true);
+        sidebarPanel.show();
     };
 
     emapic.indivVotesLayerOnEachFeature = function(data) {

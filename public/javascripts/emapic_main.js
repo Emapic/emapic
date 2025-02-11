@@ -443,7 +443,7 @@ var emapic = emapic || {};
     emapic.addQuestionSelector = function() {
     	var questions = [];
     	for (var i = 0, len = emapic.fullLegend.color.length; i<len; i++) {
-    		questions.push(emapic.fullLegend.color[i].text);
+    		questions.push(emapic.utils.escapeHtml(emapic.fullLegend.color[i].text));
     	}
     	if (questions.length > 0) {
             emapic.questionSelector = L.control.selectQuestion(questions, {
@@ -693,6 +693,8 @@ var emapic = emapic || {};
         if (emapic.map.hasLayer(emapic.indivVotesLayer)) {
             emapic.map.removeLayer(emapic.indivVotesLayer);
     		emapic.addIndivVotesLayer();
+        } else {
+            emapic.indivVotesLayer = emapic.loadIndivVotesLayer();
         }
     	emapic.reloadIndivVotesLayerControls();
     };
