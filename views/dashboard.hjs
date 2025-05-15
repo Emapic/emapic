@@ -33,7 +33,7 @@
 		<ul class="surveys-list answered-surveys-list">
 			{{#answered}}
 			<li>
-                <a class="survey-title" href="/survey/{{survey.encr_id}}/results">{{Survey.title}}</a>
+                <a class="survey-title" href="/survey/{{Survey.encr_id}}/results">{{Survey.title}}</a>
                 {{#Survey.description}}
                     <p><small>{{{Survey.description_markdown_to_html}}}</small></p>
                 {{/Survey.description}}
