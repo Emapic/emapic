@@ -1,7 +1,8 @@
 var Promise = require('bluebird'),
     csv = Promise.promisifyAll(require('fast-csv')),
     moment = require('moment'),
-    XLSX = require('excel4node'),
+    XL4N = require('excel4node'),
+    XLSX = require("xlsx"),
     sequelize = models.sequelize;
 
 module.exports = function(app) {
@@ -35,38 +36,8 @@ module.exports = function(app) {
         return orderedVotes;
     }
 
-    function addResultsXlsxSheet(wb, questions, results, i18n) {
-        var ws = wb.addWorksheet(i18n.__('export_sheet_answers')),
-            headerStyle = wb.createStyle({
-                font: {
-                    color: '#000000',
-                    size: 11,
-                    bold: true
-                },
-                fill: {
-                    type: 'pattern',
-                    patternType: 'solid',
-                    fgColor: '#a9a9a9'
-                },
-                alignment: {
-                    horizontal: 'center',
-                    vertical: 'center',
-                    wrapText: true
-                }
-            }),
-            border = {
-                style: 'thin',
-                color: '#000000'
-            },
-            borderStyle = wb.createStyle({
-                border: {
-                    left: border,
-                    right: border,
-                    bottom: border,
-                    top: border
-                }
-            }),
-            headers = [i18n.__('export_header_date_time'),
+    function getAoaResults(questions, results, i18n, dateAsString) {
+        let headers = [i18n.__('export_header_date_time'),
                 i18n.__('export_header_latitude'),
                 i18n.__('export_header_longitude'),
                 i18n.__('export_header_country'),
@@ -113,8 +84,9 @@ module.exports = function(app) {
 
         for (var i = 0, iLen = results.length; i < iLen; i++) {
             var result = results[i],
-                data = [];
-            data.push(new Date(parseInt(result.timestamp, 10)),
+                data = [],
+                timestampDate = new Date(parseInt(result.timestamp, 10));
+            data.push(dateAsString ? moment.utc(timestampDate.toISOString()).format(i18n.__('date_time_format_string')) : timestampDate,
                 result.lat, result.lon, result.country, result.country_iso,
                 result.province, result.province_code, result.municipality,
                 result.municipality_code);
@@ -156,36 +128,76 @@ module.exports = function(app) {
             finalResults.push(data);
         }
 
-        ws.cell(1, 1, 1, baseHeadersNr, true).string(i18n.__('export_header_metadata')).style(headerStyle).style(borderStyle);
-        ws.cell(1, baseHeadersNr + 1, 1, finalResults[0].length, true).string(i18n.__('export_header_answers')).style(headerStyle).style(borderStyle);
+        return {
+            aoa: finalResults,
+            baseHeadersNr: baseHeadersNr,
+            urlColumns: urlColumns
+        };
+    }
+
+    function addResultsXlsxSheet(wb, questions, results, i18n) {
+        var ws = wb.addWorksheet(i18n.__('export_sheet_answers')),
+            headerStyle = wb.createStyle({
+                font: {
+                    color: '#000000',
+                    size: 11,
+                    bold: true
+                },
+                fill: {
+                    type: 'pattern',
+                    patternType: 'solid',
+                    fgColor: '#a9a9a9'
+                },
+                alignment: {
+                    horizontal: 'center',
+                    vertical: 'center',
+                    wrapText: true
+                }
+            }),
+            border = {
+                style: 'thin',
+                color: '#000000'
+            },
+            borderStyle = wb.createStyle({
+                border: {
+                    left: border,
+                    right: border,
+                    bottom: border,
+                    top: border
+                }
+            }),
+            finalResults = getAoaResults(questions, results, i18n);
+
+        ws.cell(1, 1, 1, finalResults.baseHeadersNr, true).string(i18n.__('export_header_metadata')).style(headerStyle).style(borderStyle);
+        ws.cell(1, finalResults.baseHeadersNr + 1, 1, finalResults.aoa[0].length, true).string(i18n.__('export_header_answers')).style(headerStyle).style(borderStyle);
 
         ws.row(1).setHeight(25);
         ws.row(2).setHeight(50).freeze();
 
-        for (var j = 0, jLen = finalResults[0].length; j<jLen; j++) {
-            ws.cell(2, j + 1).string(finalResults[0][j]).style(headerStyle).style(borderStyle);
+        for (var j = 0, jLen = finalResults.aoa[0].length; j<jLen; j++) {
+            ws.cell(2, j + 1).string(finalResults.aoa[0][j]).style(headerStyle).style(borderStyle);
         }
 
-        for (var i = 1, iLen = finalResults.length; i<iLen; i++) {
-            ws.cell(i + 2, 1).date(finalResults[i][0]).style(borderStyle);
-            ws.cell(i + 2, 2).number(finalResults[i][1]).style(borderStyle);
-            ws.cell(i + 2, 3).number(finalResults[i][2]).style(borderStyle);
-            for (var j = 3, jLen = finalResults[i].length; j<jLen; j++) {
-                var cell = ws.cell(i + 2, j + 1).string(finalResults[i][j] !== null ? finalResults[i][j] : '').style(borderStyle);
-                if (urlColumns.indexOf(j + 1) !== -1 && finalResults[i][j] !== null) {
-                    cell.link(finalResults[i][j]);
+        for (var i = 1, iLen = finalResults.aoa.length; i<iLen; i++) {
+            ws.cell(i + 2, 1).date(finalResults.aoa[i][0]).style(borderStyle);
+            ws.cell(i + 2, 2).number(finalResults.aoa[i][1]).style(borderStyle);
+            ws.cell(i + 2, 3).number(finalResults.aoa[i][2]).style(borderStyle);
+            for (var j = 3, jLen = finalResults.aoa[i].length; j<jLen; j++) {
+                var cell = ws.cell(i + 2, j + 1).string(finalResults.aoa[i][j] !== null ? finalResults.aoa[i][j] : '').style(borderStyle);
+                if (finalResults.urlColumns.indexOf(j + 1) !== -1 && finalResults.aoa[i][j] !== null) {
+                    cell.link(finalResults.aoa[i][j]);
                 }
             }
         }
 
         var widths = {};
-        for (var i = 0, iLen = finalResults.length; i<iLen; i++) {
-            for (var j = 0, jLen = finalResults[i].length; j<jLen; j++) {
+        for (var i = 0, iLen = finalResults.aoa.length; i<iLen; i++) {
+            for (var j = 0, jLen = finalResults.aoa[i].length; j<jLen; j++) {
                 widths[j] = Math.max(widths[j] ? widths[j] : 0,
-                    finalResults[i][j] ? finalResults[i][j].toString().length : 0);
+                    finalResults.aoa[i][j] ? finalResults.aoa[i][j].toString().length : 0);
             }
         }
-        for (var i = 0, iLen = finalResults[0].length; i<iLen; i++) {
+        for (var i = 0, iLen = finalResults.aoa[0].length; i<iLen; i++) {
             ws.column(i + 1).setWidth(Math.min(widths[i] + 2, 30));
         }
     }
@@ -826,7 +838,7 @@ module.exports = function(app) {
 
     pgQueryFullResultsToXlsx = function(results, questions, i18n, addQuestionStats, addLocationStats) {
         i18n = i18n ? i18n : Utils.getI18n();
-        var wb = new XLSX.Workbook({
+        let wb = new XL4N.Workbook({
             dateFormat: i18n.__('date_time_format_string'),
             author: 'Emapic'
         });
@@ -838,6 +850,42 @@ module.exports = function(app) {
             addLocationStatsXlsxSheet(wb, results, i18n);
         }
         return wb.writeToBuffer();
+    };
+
+    pgQueryFullResultsToHtml = function(results, questions, i18n) {
+
+        let finalResults = getAoaResults(questions, results, i18n, true);
+
+        // Add top header columns
+        finalResults.aoa.splice(0, 0, [...Array(finalResults.aoa[0].length)]);
+        finalResults.aoa[0][0] = i18n.__('export_header_metadata');
+        finalResults.aoa[0][finalResults.baseHeadersNr] = i18n.__('export_header_answers');
+
+        let headerWs = XLSX.utils.aoa_to_sheet(finalResults.aoa.slice(0, 2)),
+            resultsWs = XLSX.utils.aoa_to_sheet(finalResults.aoa.slice(2));
+
+        // Merge top header columns
+        headerWs["!merges"] = [
+            { s: { r: 0, c: 0 }, e: { r: 0, c: finalResults.baseHeadersNr-1 } },
+            { s: { r: 0, c: finalResults.baseHeadersNr }, e: { r: 0, c: finalResults.aoa[0].length - 1 } }
+        ];
+
+        let headerHtml = XLSX.utils.sheet_to_html(headerWs, {
+                header: '',
+                footer: ''
+            }),
+            resultsHtml = XLSX.utils.sheet_to_html(resultsWs, {
+                header: '',
+                footer: ''
+            });
+        // Format the header rows as such and prepend them to the results table
+        return resultsHtml.toString().replace('<table>',
+            '<table id="results-table">' + headerHtml.toString()
+                .replace('<table>', '<thead>')
+                .replace('</table>', '</thead>')
+                .replace(/<td/g, '<th')
+                .replace(/<\/td>/g, '</th>')
+        );
     };
 
     pgQueryToCsv = function(queryResult) {

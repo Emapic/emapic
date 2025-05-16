@@ -6,7 +6,7 @@ var emapic = emapic || {};
 
 (function(emapic) {
 
-    var clearFiltersBtnHtml = "<a id='clear-filters' title='" + emapic.utils.getI18n('js_clear_all_filters', 'Limpiar todos los filtros') + "' href='javascript:void(0)'><span class='glyphicon glyphicon-filter'></span><span class='glyphicon glyphicon-remove' style='position: absolute; top: 55%; right: 25%; font-size: .6em;'></a>";
+    var clearFiltersBtnHtml = "<a id='clear-filters' title='" + emapic.utils.getI18n('js_clear_all_filters', 'Limpiar todos los filtros') + "' href='javascript:void(0)'><span class='glyphicon glyphicon-filter'></span><span class='glyphicon glyphicon-remove' style='position: absolute; top: 55%; right: 25%; font-size: .6em;'></span></a>";
 
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
         var clearFilterControl = L.control({position: 'topleft'});

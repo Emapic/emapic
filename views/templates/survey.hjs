@@ -175,6 +175,34 @@
     </div>
     <!-- End Stats Modal -------->
 
+    <!-- Data Table Modal -------->
+    <div class="modal" id="data-table-modal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span aria-hidden="true">&times;</span><span class="sr-only">{{#__}}close{{/__}}</span></button>
+            <h3 class="modal-title">{{#__}}data_table{{/__}}</h3>
+          </div>
+          <div class="modal-body">
+              <div class="table-container"></div>
+          </div>
+          <div class="modal-footer">
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{#__}}download_visible_data{{/__}} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                  <li><a href="javascript:void(0);" onclick="window.open(emapic.getExportFilteredURL('xlsx'), '_blank');">{{#__}}xlsx{{/__}}</a></li>
+                  <li><a href="javascript:void(0);" onclick="window.open(emapic.getExportFilteredURL('csv'), '_blank');">{{#__}}csv{{/__}}</a></li>
+                  <li><a href="javascript:void(0);" onclick="window.open(emapic.getExportFilteredURL('geojson'), '_blank');">{{#__}}geojson{{/__}}</a></li>
+                </ul>
+              </div>
+		  </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Data Table Modal -------->
+
     {{#useAddToAny}}
         {{> more_sharing_options_modal}}
     {{/useAddToAny}}
@@ -202,6 +230,9 @@
 
     <!-- Add counter & stats -->
     <script type="text/javascript" src="/javascripts/emapic_modules/counter_stats.js"></script>
+
+    <!-- Add data table -->
+    <script type="text/javascript" src="/javascripts/emapic_modules/data_table.js"></script>
 
     <!-- Add clustering -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js" integrity="sha256-WL6HHfYfbFEkZOFdsJQeY7lJG/E5airjvqbznghUzRw=" crossorigin="anonymous"></script>

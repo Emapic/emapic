@@ -427,6 +427,9 @@ module.exports = function(app) {
                             res.attachment(survey.title + '.geojson');
                             res.send(JSON.stringify(pgQueryFullResultsToGeoJson(responses, questions, i18n)));
                             break;
+                        case 'html':
+                            res.send(pgQueryFullResultsToHtml(responses, questions, i18n));
+                            break;
                         default:
                             res.attachment(survey.title + '.xlsx');
                             pgQueryFullResultsToXlsx(responses, questions, i18n, true, true).then(function(xlsx) {

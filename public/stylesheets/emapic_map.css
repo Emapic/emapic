@@ -354,16 +354,68 @@ div.alert-danger a {
     vertical-align: middle;
 }
 #geoposwarn .modal-content, #geoposwarn .panel, #geoposwarn .panel-default > .panel-heading, #geoposresult .modal-content,
-#geolocatecurrentfailed .modal-content, #stats-modal .modal-content, #time-filter-modal .modal-content, #survey-resume .modal-content, #survey-info .modal-content {
+#geolocatecurrentfailed .modal-content, #stats-modal .modal-content, #data-table-modal .modal-content,
+#time-filter-modal .modal-content, #survey-resume .modal-content, #survey-info .modal-content {
     background-color: #004F71;
 }
-#geoposwarn .modal-content a:hover, #geoposresult .modal-content a:hover, #stats-modal .modal-body a:hover, #time-filter-modal .modal-content a:hover, #survey-resume .modal-content a:hover, #survey-info .modal-content a:hover,
-#geoposwarn .modal-content a:focus, #geoposresult .modal-content a:focus, #stats-modal .modal-body a:focus, #time-filter-modal .modal-content a:hover, #survey-resume .modal-content a:focus, #survey-info .modal-content a:focus,
+#geoposwarn .modal-content a:hover, #geoposresult .modal-content a:hover, #stats-modal .modal-body a:hover, #data-table-modal .modal-body a:hover, #time-filter-modal .modal-content a:hover, #survey-resume .modal-content a:hover, #survey-info .modal-content a:hover,
+#geoposwarn .modal-content a:focus, #geoposresult .modal-content a:focus, #stats-modal .modal-body a:focus, #data-table-modal .modal-body a:focus, #time-filter-modal .modal-content a:hover, #survey-resume .modal-content a:focus, #survey-info .modal-content a:focus,
 #geolocatecurrentfailed .modal-content a:hover, #geolocatecurrentfailed .modal-content a:focus {
     color: #ADD8E6;
 }
-#geoposwarn .modal-header button, #geoposresult .modal-header button, #geolocatecurrentfailed .modal-header button, #stats-modal .modal-header button, #time-filter-modal .modal-header button, #survey-resume .modal-header button {
+#geoposwarn .modal-header button, #geoposresult .modal-header button, #geolocatecurrentfailed .modal-header button,
+#stats-modal .modal-header button, #data-table-modal .modal-header button, #time-filter-modal .modal-header button,
+#survey-resume .modal-header button {
     color: white;
+}
+#data-table-modal .modal-dialog {
+    width: auto;
+    max-width: 95%;
+}
+#data-table-modal .modal-body {
+    text-align: center;
+}
+#data-table-modal .modal-body .table-container {
+    margin: auto;
+    display: inline-block;
+    overflow: scroll;
+    border: 3px solid white;
+    max-height: calc(100vh - 230px);
+    max-width: 100%;
+}
+#data-table-modal .modal-body .table-container #results-table {
+    position: relative;
+}
+#data-table-modal .modal-body .table-container #results-table tr:last-child th {
+    position: sticky;
+    top: 0;
+}
+table#results-table td,
+table#results-table th {
+    padding: 5px;
+}
+table#results-table th {
+    text-align: center;
+    color: white;
+    background-color: #004F71;
+}
+table#results-table th + th {
+    border-left: 2px solid white;;
+}
+table#results-table thead tr + tr {
+    border-top: 2px solid white;;
+}
+table#results-table thead tr:last-child {
+    border-bottom: 2px solid white;;
+}
+table#results-table td {
+    background-color: white;
+}
+table#results-table td + td {
+    border-left: 1px solid black;
+}
+table#results-table tbody tr + tr {
+    border-top: 1px solid black;
 }
 #geoposwarn .modal-body > * > *:last-child {
     margin-bottom: 0;
@@ -378,7 +430,9 @@ div.alert-danger a {
 #geoposwarn .modal-body li p, #geoposwarn .modal-body li p a {
     font-size: 13px;
 }
-#geoposwarn .modal-footer button, #geoposresult .modal-footer button, #geolocatecurrentfailed .modal-footer button, #stats-modal .modal-footer button, #time-filter-modal .modal-footer button, #survey-resume .modal-footer button {
+#geoposwarn .modal-footer button, #geoposresult .modal-footer button, #geolocatecurrentfailed .modal-footer button,
+#stats-modal .modal-footer button, #data-table-modal .modal-footer button, #time-filter-modal .modal-footer button,
+#survey-resume .modal-footer button {
     margin-bottom: 5px;
     margin-left: 0px;
 }
