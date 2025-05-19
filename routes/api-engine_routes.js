@@ -49,12 +49,13 @@ module.exports = function(app) {
     });
 
     app.get('/survey/:id/results', function(req, res) {
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        return Promise.join(models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)),
+          ('user' in req) ? req.user.isAdmin() : Promise.resolve(false), function(survey, isAdmin) {
             if (survey === null) {
                 return res.redirect('/');
             }
-            // Survey is closed
-            if ((survey.active === false) ||
+            // Is admin or survey is closed
+            if (isAdmin || (survey.active === false) ||
             // Data required by the owner
             (req.user && survey.owner.id === req.user.id) ||
             // Survey is active and results are always public
@@ -84,12 +85,13 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:id/results', function(req, res) {
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)).then(function(survey) {
+        return Promise.join(models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.id)),
+          ('user' in req) ? req.user.isAdmin() : Promise.resolve(false), function(survey, isAdmin) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
-            // Survey is closed
-            if ((survey.active === false) ||
+            // Is admin or survey is closed
+            if (isAdmin || (survey.active === false) ||
             // Data required by the owner
             (req.user && survey.owner.id === req.user.id) ||
             // Survey is active and results are always public or shown after vote
@@ -165,12 +167,13 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:surveyId/description', function(req, res) {
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
+        return Promise.join(models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)),
+          ('user' in req) ? req.user.isAdmin() : Promise.resolve(false), function(survey, isAdmin) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
-            // Survey is closed
-            if ((survey.active === false) ||
+            // Is admin or survey is closed
+            if (isAdmin || (survey.active === false) ||
             // Data required by the owner
             (req.user && survey.owner.id === req.user.id) ||
             // Survey is active and results are always public or shown after vote
@@ -187,12 +190,13 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:surveyId/marker/single', function(req, res) {
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
+        return Promise.join(models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)),
+          ('user' in req) ? req.user.isAdmin() : Promise.resolve(false), function(survey, isAdmin) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
-            // Survey is closed
-            if ((survey.active === false) ||
+            // Is admin or survey is closed
+            if (isAdmin || (survey.active === false) ||
             // Data required by the owner
             (req.user && survey.owner.id === req.user.id) ||
             // Survey is active and results are always public or shown after vote
@@ -218,12 +222,13 @@ module.exports = function(app) {
         if (isNaN(qstnId) || isNaN(answrId)) {
             return res.send(404);   // HTTP status 404: NotFound
         }
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
+        return Promise.join(models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)),
+          ('user' in req) ? req.user.isAdmin() : Promise.resolve(false), function(survey, isAdmin) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
-            // Survey is closed
-            if ((survey.active === false) ||
+            // Is admin or survey is closed
+            if (isAdmin || (survey.active === false) ||
             // Data required by the owner
             (req.user && survey.owner.id === req.user.id) ||
             // Survey is active and results are always public or shown after vote
@@ -244,12 +249,13 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:surveyId/totals', function(req, res) {
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
+        return Promise.join(models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)),
+          ('user' in req) ? req.user.isAdmin() : Promise.resolve(false), function(survey, isAdmin) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
-            // Survey is closed
-            if ((survey.active === false) ||
+            // Is admin or survey is closed
+            if (isAdmin || (survey.active === false) ||
             // Data required by the owner
             (req.user && survey.owner.id === req.user.id) ||
             // Survey is active and results are always public or shown after vote
@@ -266,12 +272,13 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:surveyId/totals/:layer', function(req, res) {
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
+        return Promise.join(models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)),
+          ('user' in req) ? req.user.isAdmin() : Promise.resolve(false), function(survey, isAdmin) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
-            // Survey is closed
-            if ((survey.active === false) ||
+            // Is admin or survey is closed
+            if (isAdmin || (survey.active === false) ||
             // Data required by the owner
             (req.user && survey.owner.id === req.user.id) ||
             // Survey is active and results are always public or shown after vote
@@ -323,12 +330,13 @@ module.exports = function(app) {
     });
 
     app.get('/api/survey/:surveyId/legend', function(req, res) {
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
+        return Promise.join(models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)),
+          ('user' in req) ? req.user.isAdmin() : Promise.resolve(false), function(survey, isAdmin) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
-            // Survey is closed
-            if ((survey.active === false) ||
+            // Is admin or survey is closed
+            if (isAdmin || (survey.active === false) ||
             // Data required by the owner
             (req.user && survey.owner.id === req.user.id) ||
             // Survey is active and results are always public or shown after vote
@@ -345,7 +353,8 @@ module.exports = function(app) {
     });
 
     app.post('/api/survey/:surveyId/results', function(req, res) {
-        models.Survey.findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
+        return Promise.join(models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)),
+          ('user' in req) ? req.user.isAdmin() : Promise.resolve(false), function(survey, isAdmin) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
@@ -391,12 +400,13 @@ module.exports = function(app) {
     app.get('/api/survey/:surveyId/export', function(req, res) {
         var format = req.query.format ? req.query.format : 'xlsx',
             i18n = req.query.lang ? Utils.getI18n(req.query.lang) : req.i18n;
-        models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)).then(function(survey) {
+        return Promise.join(models.Survey.scope('includeAuthor').findByPk(Utils.decryptSurveyId(req.params.surveyId)),
+          ('user' in req) ? req.user.isAdmin() : Promise.resolve(false), function(survey, isAdmin) {
             if (survey === null) {
                 return res.status(404).json({ error_code: 'invalid_resource', error: 'requested survey doesn\'t exist.' });
             }
-            // Survey is closed
-            if ((survey.active === false) ||
+            // Is admin or survey is closed
+            if (isAdmin || (survey.active === false) ||
             // Data required by the owner
             (req.user && survey.owner.id === req.user.id) ||
             // Survey is active and results are always public or shown after vote
