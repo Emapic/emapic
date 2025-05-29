@@ -182,6 +182,7 @@
 	"export_header_question": "Pregunta",
 	"export_header_answer": "Opción",
 	"export_suffix_spain_only": "(só España)",
+	"js_datatables_i18n_url": "https://cdn.datatables.net/plug-ins/2.3.1/i18n/gl.json",
 	"js_geocoder_title": "Buscar na vista actual",
 	"js_geocoder_placeholder": "Dirección, cidade, provincia, C.P., país",
 	"js_geocoder_no_results": "Sen resultados.",

@@ -375,13 +375,19 @@ div.alert-danger a {
 #data-table-modal .modal-body {
     text-align: center;
 }
+#data-table-modal .modal-body.has-data-tables {
+    background-color: white;
+}
 #data-table-modal .modal-body .table-container {
     margin: auto;
     display: inline-block;
-    overflow: scroll;
     border: 3px solid white;
     max-height: calc(100vh - 230px);
     max-width: 100%;
+}
+#data-table-modal .modal-body .table-container,
+#data-table-modal .modal-body .dt-layout-table {
+    overflow: scroll;
 }
 #data-table-modal .modal-body .table-container #results-table {
     position: relative;
@@ -390,32 +396,38 @@ div.alert-danger a {
     position: sticky;
     top: 0;
 }
-table#results-table td,
-table#results-table th {
+#data-table-modal .modal-body .table-container #results-table td,
+#data-table-modal .modal-body .table-container #results-table th {
     padding: 5px;
 }
-table#results-table th {
+#data-table-modal .modal-body .table-container #results-table th {
     text-align: center;
     color: white;
     background-color: #004F71;
 }
-table#results-table th + th {
+#data-table-modal .modal-body .table-container #results-table th + th {
     border-left: 2px solid white;;
 }
-table#results-table thead tr + tr {
+#data-table-modal .modal-body .table-container #results-table thead tr + tr {
     border-top: 2px solid white;;
 }
-table#results-table thead tr:last-child {
+#data-table-modal .modal-body .table-container #results-table thead tr:last-child {
     border-bottom: 2px solid white;;
 }
-table#results-table td {
+#data-table-modal .modal-body .table-container #results-table td {
     background-color: white;
 }
-table#results-table td + td {
+#data-table-modal .modal-body .table-container #results-table td + td {
     border-left: 1px solid black;
 }
-table#results-table tbody tr + tr {
+#data-table-modal .modal-body .table-container #results-table tbody tr + tr {
     border-top: 1px solid black;
+}
+#data-table-modal .dt-container label {
+    color: #333;
+}
+#data-table-modal .dt-length label {
+    margin-left: 5px;
 }
 #geoposwarn .modal-body > * > *:last-child {
     margin-bottom: 0;

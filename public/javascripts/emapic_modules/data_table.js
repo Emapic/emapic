@@ -6,7 +6,8 @@ var emapic = emapic || {};
 
 (function(emapic) {
 
-    var openDataTableModalBtnHtml = "<a id='open-data-table' title='" + emapic.utils.getI18n('js_open_data_table', 'Ver tabla con los datos') + "' href='javascript:void(0)'><span class='glyphicon glyphicon-list-alt'></span></a>";
+    var openDataTableModalBtnHtml = "<a id='open-data-table' title='" + emapic.utils.getI18n('js_open_data_table', 'Ver tabla con los datos') + "' href='javascript:void(0)'><span class='glyphicon glyphicon-list-alt'></span></a>",
+        dataTableClass = 'has-data-tables';
 
     emapic.addViewsControls = emapic.utils.overrideFunction(emapic.addViewsControls, null, function() {
         var openDataTableControl = L.control({position: 'topleft'});
@@ -43,9 +44,35 @@ var emapic = emapic || {};
     emapic.modules.dataTable.refreshDataTablePromise = function() {
         return $.ajax({
             url: emapic.modules.dataTable.getHTMLTableURL()
-        }).done(function(html) {
-            $('#data-table-modal .modal-body .table-container').html(html);
-        });
+        }).then(emapic.modules.dataTable.updateDataTableHtmlPromise);
+    };
+
+    emapic.modules.dataTable.updateDataTableHtmlPromise = function(html) {
+        var promise = $.Deferred();
+        try {
+            if (DataTable) {
+                $('#data-table-modal .modal-body').addClass(dataTableClass).html(html);
+                DataTable.datetime(emapic.utils.getI18n('js_datatables_date_time_format', 'DD/MM/YYYY HH:mm:ss'));
+                new DataTable('#data-table-modal .modal-body table', {
+                    pageLength: 10,
+                    lengthMenu: [5, 10, 25, 50, 100],
+                    language: {
+                        url: emapic.utils.getI18n('js_datatables_i18n_url', 'https://cdn.datatables.net/plug-ins/2.3.1/i18n/es-ES.json'),
+                    },
+                    initComplete: function() {
+                        // Add a small delay to make sure DataTables
+                        // has finished adjusting the columns as well
+                        setTimeout(promise.resolve, 200);
+                    }
+                });
+            } else {
+                $('#data-table-modal .modal-body .table-container').removeClass(dataTableClass).html(html);
+                promise.resolve();
+            }
+        } catch (error) {
+            promise.reject();
+        }
+        return promise;
     };
 
     emapic.modules.dataTable.getHTMLTableURL = function() {

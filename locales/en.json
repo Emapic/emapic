@@ -182,6 +182,7 @@
 	"export_header_question": "Question",
 	"export_header_answer": "Option",
 	"export_suffix_spain_only": "(Spain only)",
+	"js_datatables_i18n_url": "https://cdn.datatables.net/plug-ins/2.3.1/i18n/en-GB.json",
 	"js_geocoder_title": "Search inside current view",
 	"js_geocoder_placeholder": "Address, city, province, ZIP, country",
 	"js_geocoder_no_results": "No results.",
