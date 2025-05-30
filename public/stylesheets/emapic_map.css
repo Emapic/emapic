@@ -429,6 +429,13 @@ div.alert-danger a {
 #data-table-modal .dt-length label {
     margin-left: 5px;
 }
+#results-table td img {
+    display: block;
+    max-width: 200px;
+    max-height: 200px;
+    width: auto !important;
+    height: auto !important;
+}
 #geoposwarn .modal-body > * > *:last-child {
     margin-bottom: 0;
 }

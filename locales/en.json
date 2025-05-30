@@ -190,7 +190,7 @@
 	"js_geocoder_country": "Country",
 	"js_geocoder_province": "Province",
 	"js_open_data_table": "See table with visible data",
-	"js_error_loading_data": "An error has occured while loading the table with the responses. Try reloading the page and if the problem persists, you can contact us at <a href='mailto:info@emapic.es'>info@emapic.es</a>.",
+	"js_error_open_data_table": "An error has occured while loading the table with the responses. Try reloading the page and if the problem persists, you can contact us at <a href='mailto:info@emapic.es'>info@emapic.es</a>.",
 	"js_anonymous_user": "Anonymous",
 	"js_grayscale_osm_baselayer": "Greyscale (OSM)",
 	"js_color_osm_baselayer": "Color (OSM)",

@@ -52,6 +52,7 @@ var emapic = emapic || {};
         try {
             if (DataTable) {
                 $('#data-table-modal .modal-body').addClass(dataTableClass).html(html);
+                $('#data-table-modal .modal-body table thead .no-sorting').attr('data-dt-order', 'disable');
                 DataTable.datetime(emapic.utils.getI18n('js_datatables_date_time_format', 'DD/MM/YYYY HH:mm:ss'));
                 new DataTable('#data-table-modal .modal-body table', {
                     pageLength: 10,

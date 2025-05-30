@@ -3,6 +3,7 @@ var Promise = require('bluebird'),
     moment = require('moment'),
     XL4N = require('excel4node'),
     XLSX = require("xlsx"),
+    parse = require('node-html-parser').parse,
     sequelize = models.sequelize;
 
 module.exports = function(app) {
@@ -877,15 +878,43 @@ module.exports = function(app) {
             resultsHtml = XLSX.utils.sheet_to_html(resultsWs, {
                 header: '',
                 footer: ''
-            });
+            }),
+            header = parse(headerHtml),
+            table = parse(resultsHtml),
+            tableNode = table.querySelector('table');
+
+        tableNode.setAttribute('id', 'results-table');
+
+        // Transform image URLs to HTML images and links
+        let resColumn = finalResults.baseHeadersNr + 1;
+        for (let i = 0, iLen = questions.length; i<iLen; i++) {
+            let hasTitle = false;
+            switch (questions[i].type) {
+                case 'image-url':
+                    hasTitle = true;
+                    // fall-through
+                case 'image-upload':
+                    header.querySelector(`td:nth-child(${resColumn})`).classList.add('no-sorting');
+                    for (let imageCell of tableNode.querySelectorAll(`td:nth-child(${resColumn})`)) {
+                        imageCell.set_content(`<a href="${imageCell.text}" target="_blank"><img width="200" ${hasTitle ? 'title="' + imageCell.text + '"' : ''} src="${imageCell.text}"></img></a>`);
+                    }
+                    break;
+                case 'list-radio-other':
+                    // Add an additional column for the "other value" field
+                    resColumn++;
+                    break;
+            }
+            resColumn++;
+        }
+
         // Format the header rows as such and prepend them to the results table
-        return resultsHtml.toString().replace('<table>',
-            '<table id="results-table">' + headerHtml.toString()
-                .replace('<table>', '<thead>')
-                .replace('</table>', '</thead>')
-                .replace(/<td/g, '<th')
-                .replace(/<\/td>/g, '</th>')
-        );
+        header.querySelector('table').tagName = 'thead';
+        for (let headerCell of header.querySelectorAll(`td`)) {
+            headerCell.tagName = 'td';
+        }
+        tableNode.prepend(header.toString());
+
+        return table.toString();
     };
 
     pgQueryToCsv = function(queryResult) {
