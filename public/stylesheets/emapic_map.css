@@ -372,7 +372,7 @@ div.alert-danger a {
     width: auto;
     max-width: 95%;
 }
-#data-table-modal .modal-body {
+#data-table-modal .modal-body:not(.has-data-tables) {
     text-align: center;
 }
 #data-table-modal .modal-body.has-data-tables {
@@ -384,6 +384,15 @@ div.alert-danger a {
     border: 3px solid white;
     max-height: calc(100vh - 230px);
     max-width: 100%;
+}
+#data-table-modal .modal-body span {
+    color: #333;
+}
+#data-table-modal .modal-body.has-data-tables ul.dtr-details li span.dtr-title {
+    margin-right: 5px;
+}
+#data-table-modal .modal-body.has-data-tables ul.dtr-details li span.dtr-title::after {
+    content: ":";
 }
 #data-table-modal .modal-body .table-container,
 #data-table-modal .modal-body .dt-layout-table {

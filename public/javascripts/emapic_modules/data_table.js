@@ -60,6 +60,7 @@ var emapic = emapic || {};
                     language: {
                         url: emapic.utils.getI18n('js_datatables_i18n_url', 'https://cdn.datatables.net/plug-ins/2.3.1/i18n/es-ES.json'),
                     },
+                    responsive: true,
                     initComplete: function() {
                         // Add a small delay to make sure DataTables
                         // has finished adjusting the columns as well
