@@ -19,6 +19,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js" integrity="sha512-QoJS4DOhdmG8kbbHkxmB/rtPdN62cGWXAdAFWWJPvUFF1/zxcPSdAnn4HhYZSIlVoLVEJ0LesfNlusgm2bPfnA==" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/2.3.1/js/dataTables.min.js" integrity="sha384-LiV1KhVIIiAY/+IrQtQib29gCaonfR5MgtWzPCTBVtEVJ7uYd0u8jFmf4xka4WVy" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.min.js" integrity="sha384-A6In5tKqlvPZKDpH+ei4A3A4TZrEsyvvN2Fe+oCB1IaQfGD5HNqDIxwjztNKSGDd" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/3.2.3/js/dataTables.buttons.min.js" integrity="sha512-d7ztVVjw5pfF2xGGhQrQk80DbVYD1vR0ls24auFGyPGNVIgGc8mk6Vw6HZpIA0ZlFYc9j9dCXZpbhwNUeQUhkQ==" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/select/3.0.1/js/dataTables.select.min.js" integrity="sha512-L/bfidVvUecl08ydSbcb0xP2IZPsSH9H/8NvQ+GcBsz93H3za0RPQaifqBdqOIT11voak0V4rQo1dQbgNWc7Ng==" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/libs/leaflet/js/L.Control.Sidebar.js"></script>
     <script type="text/javascript" src="/libs/leaflet/js/L.Control.SelectQuestion.js"></script>
     <script type="text/javascript" src="/libs/leaflet/js/TileLayer.Grayscale.js"></script>

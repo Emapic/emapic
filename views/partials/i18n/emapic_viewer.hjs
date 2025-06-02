@@ -65,6 +65,7 @@
     emapic.utils.registerI18n('js_geocoder_province', '{{#__}}js_geocoder_province{{/__}}');
     emapic.utils.registerI18n('js_open_data_table', '{{#__}}js_open_data_table{{/__}}');
     emapic.utils.registerI18n('js_error_open_data_table', "{{#__}}js_error_open_data_table{{/__}}");
+    emapic.utils.registerI18n('js_datatables_btn_see_response', "{{#__}}js_datatables_btn_see_response{{/__}}");
     emapic.utils.registerI18n('js_filters_list_tooltip_header', '{{#__}}js_filters_list_tooltip_header{{/__}}');
     emapic.utils.registerI18n('js_counter_filter_brief_description', '{{#__}}js_counter_filter_brief_description{{/__}}');
     emapic.utils.registerI18n('js_spatial_filter_brief_description', '{{#__}}js_spatial_filter_brief_description{{/__}}');

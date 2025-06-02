@@ -31,6 +31,29 @@ var emapic = emapic || {};
         }
     }
 
+    emapic.zoomAndClickOnMarker = emapic.utils.overrideFunction(emapic.zoomAndClickOnMarker, function(marker) {
+        if (clusteringActive && marker.__parent) {
+            clusterMarker = marker;
+            var timeout = 0;
+            if (currentSpiderfied && currentSpiderfied._map) {
+                currentSpiderfied.unspiderfy();
+                timeout = 500;
+            }
+            setTimeout(function() {
+                if (emapic.markerZoomLevel < marker.__parent._zoom + 1) {
+                    emapic.indivVotesLayer.zoomToShowLayer(marker);
+                } else {
+                    emapic.map.setView(marker.getLatLng(), emapic.markerZoomLevel);
+                }
+                setTimeout(function() {
+                    emapic.clickOnMarker(marker);
+                }, 100);
+            }, timeout);
+            return null;
+        }
+        return marker;
+    });
+
     emapic.showMarker = emapic.utils.overrideFunction(emapic.showMarker, null, function(dumb, marker) {
         if (clusteringActive) {
             spiderfyParent(marker);

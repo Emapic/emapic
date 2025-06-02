@@ -202,30 +202,20 @@ if (typeof $.fn.validator !== 'undefined' &&
     };
 
     emapic.utils.overrideFunction = function(originalFunction, beforeFunction, afterFunction) {
-        if (originalFunction != null) {
-            if (beforeFunction != null) {
-                if (afterFunction != null) {
-                    return function(param) {
-                        beforeFunctionReturn = beforeFunction(param);
-                        originalFunctionReturn = originalFunction(beforeFunctionReturn, param);
-                        return afterFunction(originalFunctionReturn, beforeFunctionReturn, param);
-                    }
-                } else {
-                    return function(param) {
-                        beforeFunctionReturn = beforeFunction(param);
-                        return originalFunction(beforeFunctionReturn, param);
-                    }
+        return function() {
+            if (originalFunction != null) {
+                var newArgs = [].slice.call(arguments);
+                if (beforeFunction != null) {
+                    newArgs.unshift(beforeFunction.apply(null, newArgs));
                 }
-            } else {
+                newArgs.unshift(originalFunction.apply(null, newArgs));
                 if (afterFunction != null) {
-                    return function(param) {
-                        originalFunctionReturn = originalFunction(param);
-                        return afterFunction(originalFunctionReturn, param);
-                    }
+                    newArgs.unshift(afterFunction.apply(null, newArgs));
                 }
+                return newArgs[0];
             }
+            return null;
         }
-        return null;
     };
 
     emapic.utils.i18n = emapic.utils.i18n || {};

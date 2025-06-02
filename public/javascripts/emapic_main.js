@@ -29,6 +29,7 @@ var emapic = emapic || {};
     emapic.redirectUrl = "/";
     emapic.legend = {};
     emapic.fullLegend = null;
+    emapic.markerZoomLevel = 14;
     emapic.allCountriesData = {};
     emapic.votedCountriesData = {};
     emapic.votedProvincesData = {};
@@ -426,6 +427,19 @@ var emapic = emapic || {};
         }
     };
 
+    emapic.zoomAndClickOnMarker = function(marker) {
+        if (marker) {
+            emapic.map.setView(marker.getLatLng(), emapic.markerZoomLevel);
+            emapic.clickOnMarker(marker);
+        }
+    };
+
+    emapic.clickOnMarker = function(marker) {
+        if (marker) {
+            marker.fireEvent('click');
+        }
+    };
+
     emapic.showMarker = function(marker) {
         if (emapic.map.getBounds().contains(marker.getLatLng())) {
             return;
@@ -533,7 +547,9 @@ var emapic = emapic || {};
                     emapic.allLayersLoadedPromise.done(function() {
                         setTimeout(function() {
                             emapic.showMarker(layer);
-                            layer.fireEvent('click');
+                            setTimeout(function() {
+                                layer.fireEvent('click');
+                            }, 100);
                         }, 500);
                     });
                 }
@@ -552,8 +568,9 @@ var emapic = emapic || {};
     };
 
     emapic.indivVotesLayerFeatureUnselected = function(feature) {
-        if (emapic.updateUrlWithAnswerId && window.history.pushState &&
-          parseInt(emapic.utils.getURLParameter(urlAnswerIdParam)) === feature.properties[emapic.answerIdField]) {
+        var selFeature = feature ? feature : emapic.selectedFeature;
+        if (selFeature && emapic.updateUrlWithAnswerId && window.history.pushState &&
+          parseInt(emapic.utils.getURLParameter(urlAnswerIdParam)) === selFeature.properties[emapic.answerIdField]) {
             var newUrl = emapic.utils.changeURLParameter(urlAnswerIdParam, null);
             window.history.pushState({path: newUrl}, '', newUrl);
         }

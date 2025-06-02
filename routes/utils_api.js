@@ -37,8 +37,16 @@ module.exports = function(app) {
         return orderedVotes;
     }
 
-    function getAoaResults(questions, results, i18n, dateAsString) {
-        let headers = [i18n.__('export_header_date_time'),
+    function getAoaResults(questions, results, i18n, dateAsString, includeId) {
+        let headers = [],
+            finalResults = [],
+            urlColumns = [];
+
+        if (includeId) {
+            headers.push(i18n.__('export_header_id'));
+        }
+
+        headers.push(i18n.__('export_header_date_time'),
                 i18n.__('export_header_latitude'),
                 i18n.__('export_header_longitude'),
                 i18n.__('export_header_country'),
@@ -46,10 +54,9 @@ module.exports = function(app) {
                 i18n.__('export_header_region'),
                 i18n.__('export_header_region_code'),
                 i18n.__('export_header_municipality') + ' ' + i18n.__('export_suffix_spain_only'),
-                i18n.__('export_header_municipality_code') + ' ' + i18n.__('export_suffix_spain_only')],
-            baseHeadersNr = headers.length,
-            finalResults = [],
-            urlColumns = [];
+                i18n.__('export_header_municipality_code') + ' ' + i18n.__('export_suffix_spain_only'));
+
+        let baseHeadersNr = headers.length;
 
         for (var i = 0, iLen = questions.length; i < iLen; i++) {
             switch (questions[i].type) {
@@ -87,6 +94,9 @@ module.exports = function(app) {
             var result = results[i],
                 data = [],
                 timestampDate = new Date(parseInt(result.timestamp, 10));
+            if (includeId) {
+                data.push(result.id);
+            }
             data.push(dateAsString ? moment.utc(timestampDate.toISOString()).format(i18n.__('date_time_format_string')) : timestampDate,
                 result.lat, result.lon, result.country, result.country_iso,
                 result.province, result.province_code, result.municipality,
@@ -855,7 +865,7 @@ module.exports = function(app) {
 
     pgQueryFullResultsToHtml = function(results, questions, i18n) {
 
-        let finalResults = getAoaResults(questions, results, i18n, true);
+        let finalResults = getAoaResults(questions, results, i18n, true, true);
 
         // Add top header columns
         finalResults.aoa.splice(0, 0, [...Array(finalResults.aoa[0].length)]);
@@ -907,11 +917,18 @@ module.exports = function(app) {
             resColumn++;
         }
 
+        header.querySelector('tr:nth-child(2) td:first-child').classList.add('id-cell');
+
+        for (let idCell of tableNode.querySelectorAll('td:first-child')) {
+            idCell.classList.add('id-cell');
+        }
+
         // Format the header rows as such and prepend them to the results table
         header.querySelector('table').tagName = 'thead';
         for (let headerCell of header.querySelectorAll(`td`)) {
             headerCell.tagName = 'td';
         }
+
         tableNode.prepend(header.toString());
 
         return table.toString();

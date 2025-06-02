@@ -438,6 +438,12 @@ div.alert-danger a {
 #data-table-modal .dt-length label {
     margin-left: 5px;
 }
+#data-table-modal .dt-container #results-table_info .select-info .select-item:not(:first-child) {
+    display: none;
+}
+#data-table-modal .modal-body:not(.has-data-tables) #results-table .id-cell {
+    display: none;
+}
 #results-table td img {
     display: block;
     max-width: 200px;
