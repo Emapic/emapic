@@ -1,5 +1,6 @@
 // utils.js/
-var nodemailer = require('nodemailer'),
+var areIntlLocalesSupported = require('intl-locales-supported').default,
+    nodemailer = require('nodemailer'),
     fs = require('fs'),
     nconf = require('nconf'),
     Promise = require('bluebird'),
@@ -76,6 +77,20 @@ for (var i = 0, len = localeFiles.length; i<len; i++) {
             iso: langToWebLocaleIsoInner(lang)
         });
     }
+}
+
+if (global.Intl) {
+    // Determine if the built-in `Intl` has the locale data we need.
+    if (!areIntlLocalesSupported(locales)) {
+        // `Intl` exists, but it doesn't have the data we need, so load the
+        // polyfill and patch the constructors we need with the polyfill's.
+        var IntlPolyfill    = require('intl');
+        Intl.NumberFormat   = IntlPolyfill.NumberFormat;
+        Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
+    }
+} else {
+    // No `Intl`, so use and load the polyfill.
+    global.Intl = require('intl');
 }
 
 function takeSnapshotRaw(url, imgPath, width, height, wait, minSize, tries) {
