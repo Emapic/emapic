@@ -11,6 +11,23 @@ var emapic = emapic || {};
 
     emapic.website = emapic.website || {};
 
+    emapic.website.showNotification = function(msg) {
+        $.notify({
+            message: msg
+        }, {
+            delay: 15000
+        });
+    };
+
+    emapic.website.showError = function(msg) {
+        $.notify({
+            message: msg
+        }, {
+            delay: 0,
+            type: 'danger'
+        });
+    };
+
     emapic.website.addNotification = function(msg) {
         notifications.push(msg);
     };
@@ -54,18 +71,9 @@ $(document).ready(function() {
     var errors = emapic.website.getErrors(),
         notifications = emapic.website.getNotifications();
     for (var i in errors) {
-        $.notify({
-            message: errors[i]
-        }, {
-            delay: 0,
-            type: 'danger'
-        });
+        emapic.website.showError(errors[i]);
     }
     for (i in notifications) {
-        $.notify({
-            message: notifications[i]
-        }, {
-            delay: 15000
-        });
+        emapic.website.showNotification(notifications[i]);
     }
 });
