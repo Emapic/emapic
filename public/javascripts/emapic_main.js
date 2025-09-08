@@ -244,6 +244,10 @@ var emapic = emapic || {};
                             emapic.layerControl._layerControlInputs[i].layerId = L.Util.stamp(backupOsmBW);
                             emapic.map.addLayer(backupOsmBW);
                             emapic.layerControl._layerControlInputs[i].checked = checked;
+                            // Translate replacement layer load event to the original one
+                            backupOsmBW.on('load', function() {
+                                osmBW.fire('load');
+                            });
                             break;
                         }
                     }
