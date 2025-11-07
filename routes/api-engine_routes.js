@@ -32,7 +32,8 @@ module.exports = function(app) {
             return Promise.join(survey.getHtml(req), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
                 // If the survey allows multiple answers, then we don't
                 // set an already voted position
-                var position = survey.multiple_answer ? null : responses.geometry.coordinates;
+                var position = responses && responses.geometry.coordinates && !survey.multiple_answer ?
+                    responses.geometry.coordinates.slice().reverse() : null;
                 res.render('templates/survey', {
                     title : survey.title,
                     survey : survey,
@@ -65,7 +66,8 @@ module.exports = function(app) {
                 return Promise.join(survey.getHtml(req), survey.getSubTitle(), survey.getUserFullResponses(req.user ? req.user.id : null), function(html, subTitle, responses) {
                     // If the survey allows multiple answers, then we don't
                     // set an already voted position
-                    var position = survey.multiple_answer ? null : responses.geometry.coordinates;
+                    var position = responses && responses.geometry.coordinates && !survey.multiple_answer ?
+                        responses.geometry.coordinates.slice().reverse() : null;
                     res.render('templates/survey', {
                         title : survey.title,
                         survey : survey,

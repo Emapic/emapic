@@ -44,8 +44,6 @@ var emapic = emapic || {};
         if (emapic.position !== null || emapic.surveyResults) {
             originalInitEmapic();
             if (emapic.position !== null) {
-                // Position must be reversed (x,y) -> (lat,lon)
-                emapic.position = emapic.position.reverse();
                 emapic.modules.survey.responses = emapic.oldResponses;
                 emapic.modules.survey.updateResponsesMarker(false);
                 emapic.map.setZoom(17);
