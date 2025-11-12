@@ -80,6 +80,13 @@ sed 's/:"emapic_db_user"/emapic/g' deploy/create_files_table.sql | psql -h $SERV
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_image_upload_question.sql 1> /dev/null
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/files_table_add_time.sql 1> /dev/null
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_honduras_provinces_isocodes.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/link_answers_and_municipalities.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/fix_votes_relationship.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/fix_assign_municipality.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_custom_single_marker.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_cerdedo_cotobade_munic_code.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_oza_cesuras_munic_code.sql 1> /dev/null
+psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f ./deploy/add_latest_vote.sql 1> /dev/null
 
 echo "6- Creating test user..."
 psql -h $SERVER -p $PORT -U $ADMIN_USER -d $DATABASE -f emapic_test_user.sql 1> /dev/null
