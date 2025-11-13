@@ -27,38 +27,43 @@ var emapic = emapic || {};
             "<button id='NextButton' title='" + emapic.utils.getI18n('js_go_next', 'Ir al siguiente') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToNext();'><span class='glyphicon glyphicon-step-forward'></span></button>\n" +
             "<button id='LastButton' title='" + emapic.utils.getI18n('js_go_last', 'Ir al último') + "' class='btn btn-default btn-xs' onclick='emapic.modules.panel.goToLast();'><span class='glyphicon glyphicon-fast-forward'></span></button>\n",
         currentFeature = null,
-        latestFeature = null,
+        latestFeatureLayer = null,
         oldIcon = null,
         currentMarker = null,
-        nrLayers,
         layers;
 
     emapic.modules = emapic.modules || {};
     emapic.modules.panel = emapic.modules.panel || {};
     emapic.modules.panel.allowReopen = false;
 
-    emapic.disableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.disableIndivLayerExclusiveComponents, null, function() {
-        if (currentFeature !== null) {
-            emapic.sidebarPanelClose();
+    function getFeatureNumber(feature) {
+        if (feature && layers) {
+            for (var i = 0; i < layers.length; i++) {
+                if (layers[i].feature === feature) {
+                    return i;
+                }
+            }
         }
-        oldIcon = null;
-        currentMarker = null;
+        return -1;
+    }
+
+    emapic.disableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.disableIndivLayerExclusiveComponents, null, function() {
+        oldIcon = currentMarker = currentFeature = latestFeatureLayer = null;
+        emapic.sidebarPanelClose();
     });
 
     emapic.enableIndivLayerExclusiveComponents = emapic.utils.overrideFunction(emapic.enableIndivLayerExclusiveComponents, null, function() {
-        oldIcon = null;
-        currentMarker = null;
-        if (currentFeature !== null) {
-            emapic.sidebarPanelClose();
+        layers = emapic.getIndivVotesLayerLeafletLayers();
+        if (currentFeature !== null && latestFeatureLayer !== null) {
+            currentFeature = null;
+            var currentFeatureNewNr = getFeatureNumber(latestFeatureLayer.feature);
+            if (currentFeatureNewNr !== -1) {
+                emapic.modules.panel.goToRegister(currentFeatureNewNr);
+                return;
+            }
         }
-    });
-
-    emapic.addIndivVotesLayer = emapic.utils.overrideFunction(emapic.addIndivVotesLayer, null, function() {
-        latestFeature = null;
-    });
-
-    emapic.filtersUpdated = emapic.utils.overrideFunction(emapic.filtersUpdated, null, function() {
-        latestFeature = null;
+        oldIcon = currentMarker = latestFeatureLayer = null;
+        emapic.sidebarPanelClose();
     });
 
     emapic.getCurrentMarkerToShow = function() {
@@ -91,18 +96,22 @@ var emapic = emapic || {};
         sidebarPanel.hide();
         emapic.modules.panel.getColorPanelUnselect();
         currentFeature = null;
+        if (latestFeatureLayer === null) {
+            opensidebarPanel.addClass('hidden');
+        }
     });
 
     emapic.modules.panel.getPanelTitleHTML = function(properties) {
-        return "<h3>" + emapic.utils.getI18n('js_see_answers', 'Ver respuestas') + "</h3>\n";
+        return '<h3>' + emapic.utils.getI18n('js_see_answers', 'Ver respuestas') + '</h3>\n';
     };
 
     emapic.modules.panel.updateData = function(number, silent) {
-        latestFeature = currentFeature = number;
-        var currentFeatureInput = $('#CurrentFeatureNumber');
+        currentFeature = number;
+        var currentFeatureInput = $('#CurrentFeatureNumber'),
+            nrLayers = layers.length;
         $('#TotalFeatures').text(nrLayers);
-        currentFeatureInput.attr("size", (nrLayers.toString().length < 3) ? 3 : nrLayers.toString().length);
-        currentFeatureInput.attr("maxlength", nrLayers.toString().length);
+        currentFeatureInput.attr('size', (nrLayers.toString().length < 3) ? 3 : nrLayers.toString().length);
+        currentFeatureInput.attr('maxlength', nrLayers.toString().length);
         currentFeatureInput.val(currentFeature + 1);
         $('#PrevButton').prop('disabled', currentFeature === 0);
         $('#NextButton').prop('disabled', currentFeature === (nrLayers - 1));
@@ -113,7 +122,8 @@ var emapic = emapic || {};
         } else {
             titlesidebarPanel.hide();
         }
-        $("#indivData").html(emapic.getPopupHtml(layers[number].feature.properties));
+        latestFeatureLayer = layers[number];
+        $('#indivData').html(emapic.getPopupHtml(latestFeatureLayer.feature.properties));
         if (!silent) {
             emapic.showMarker(layers[number]);
         }
@@ -179,22 +189,15 @@ var emapic = emapic || {};
     };
 
     emapic.modules.panel.sidebarPanelReopen = function() {
-        emapic.modules.panel.goToRegister(latestFeature ? latestFeature : 0, true);
+        var latestFeatureNr = latestFeatureLayer ? getFeatureNumber(latestFeatureLayer.feature) : -1;
+        emapic.modules.panel.goToRegister(latestFeatureNr !== -1 ? latestFeatureNr : 0, true);
         sidebarPanel.show();
     };
 
     emapic.indivVotesLayerOnEachFeature = function(data) {
         data.layer.on('click', function(e) {
-            layers = emapic.getIndivVotesLayerLeafletLayers();
-            nrLayers = layers.length;
-            var newFeature = null;
-            for (var i = 0; i < nrLayers; i++) {
-                if (layers[i].feature === data.feature) {
-                    newFeature = i;
-                    break;
-                }
-            }
-            if (newFeature === null) {
+            var newFeature = getFeatureNumber(data.feature);
+            if (newFeature === -1) {
                 console.error("Can't find layer for panel.");
                 return;
             }
@@ -211,11 +214,11 @@ var emapic = emapic || {};
         if (emapic.utils.filterKeydownOnlyDigits(e)) {
             var key = e.keyCode || e.which;
             if (key === 13) {
-                var valueCurrentNumber = parseInt($("#CurrentFeatureNumber").val(), 10);
+                var valueCurrentNumber = parseInt($('#CurrentFeatureNumber').val(), 10);
                 if (valueCurrentNumber <= 0) {
                     valueCurrentNumber = 1;
-                } else if (valueCurrentNumber > nrLayers) {
-                    valueCurrentNumber = nrLayers;
+                } else if (valueCurrentNumber > layers.length) {
+                    valueCurrentNumber = layers.length;
                 }
                 emapic.modules.panel.goToRegister(valueCurrentNumber - 1);
             }
