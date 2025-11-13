@@ -139,7 +139,9 @@ var emapic = emapic || {};
             for (var i = 0, iLen = features.length; i<iLen; i++) {
                 var feature = features[i];
                 for (var j = 0, jLen = emapic.filters.length; j<jLen; j++) {
-                    if (emapic.filters[j] !== emapic.modules.counterStats.filter && typeof emapic.filters[j].applyFilter === 'function' && !emapic.filters[j].applyFilter(feature)) {
+                    if (emapic.filters[j] !== emapic.modules.counterStats.filter &&
+                        typeof emapic.filters[j].isFilterActive === 'function' && emapic.filters[j].isFilterActive() &&
+                        typeof emapic.filters[j].applyFilter === 'function' && !emapic.filters[j].applyFilter(feature)) {
                         continue featureLoop;
                     }
                 }
