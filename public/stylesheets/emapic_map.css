@@ -2104,6 +2104,9 @@ button.survey-answer > div.flex-container {
     #app-total-counter-list li span {
         font-size: 9px;
     }
+    #active-filters-tooltip {
+        max-width: 100px;
+    }
     .hide-small {
         display: none;
     }
