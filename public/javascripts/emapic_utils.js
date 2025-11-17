@@ -165,7 +165,6 @@ if (typeof $.fn.validator !== 'undefined' &&
         L.DomEvent
             .on(element, 'blur', stop)
             .on(element, 'change', stop)
-            .on(element, 'click', stop)
             .on(element, 'dblclick', stop)
             .on(element, 'error', stop)
             .on(element, 'focus', stop)
