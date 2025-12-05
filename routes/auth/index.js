@@ -252,12 +252,12 @@ module.exports = function(app) {
             } else {
                 if (err && err.name === 'SequelizeUniqueConstraintError' &&
                     ((err.errors && err.errors.constructor === Array && err.errors[0].path === 'email') ||
-                    (err.message.indexOf('users_email_key') > -1))) {
+                    (err.message.indexOf('email') > -1))) {
                     req.session.error = 'email_duplicated_error_msg';
                     logger.debug('E-mail already exists: ' + err.toString());
                 } else if (err && err.name === 'SequelizeUniqueConstraintError' &&
                     ((err.errors && err.errors.constructor === Array && err.errors[0].path === 'login') ||
-                    (err.message.indexOf('users_login_key') > -1))) {
+                    (err.message.indexOf('login') > -1))) {
                     req.session.error = 'username_duplicated_error_msg';
                     logger.debug('Login already in use: ' + err.toString());
                 } else {
