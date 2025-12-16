@@ -59,7 +59,7 @@ module.exports = function(app) {
     };
 
     sendPasswordResetConfirmMail = function(req, user) {
-        var usrid = crypto.createHash('md5').update(user.salt + user.email).digest('hex');
+        var usrid = crypto.createHash('md5').update((user.salt ? user.salt : '') + user.email).digest('hex');
         return Utils.sendMail({
             to: user.email,
             subject: req.i18n.__("password_reset_confirm_mail_subject"),
