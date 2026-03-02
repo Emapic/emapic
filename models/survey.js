@@ -1,19 +1,10 @@
 var Promise = require('bluebird'),
     nconf = require('nconf'),
-    htmlToText = require('html-to-text'),
-    linkifyHtml = require('linkifyjs/html'),
     fsp = require('fs-extra'),
     path = require('path'),
     fs = require('fs'),
     logger = require('../utils/logger'),
     sequelize = require('sequelize'),
-    md = require('markdown-it')('zero') // 'zero' preset deletes all config but essential features
-        .set({ breaks: true })
-        .enable([ 'emphasis', 'link', 'newline' ]),
-        // In case we want to add more rules to be parsed, check :
-        // https://github.com/markdown-it/markdown-it/tree/8.3.1/lib
-        // parser_block.js, parser_core.js, parser_inline.js
-
     searchEngineLang = nconf.get('app').searchEngineLang,
     defaultPageSize = nconf.get('app').defaultPageSize,
     answersRequestType = {
@@ -203,12 +194,7 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.VIRTUAL,
             get: function() {
                 // HTML description must be transformed to plain text
-                return (this.description !== null && this.description.length > 0) ? htmlToText.fromString(this.description_markdown_to_html, {
-                    wordwrap: false,
-                    ignoreHref: true,
-                    ignoreImage: true,
-                    singleNewLineParagraphs: true
-                }) : this.title;
+                return (this.description !== null && this.description.length > 0) ? Utils.htmlToText(this.description_markdown_to_html) : this.title;
             }
         },
         description_markdown_to_html: {
@@ -216,12 +202,7 @@ module.exports = function(sequelize, DataTypes) {
             // Plain URLs are also linkified during this process
             type: DataTypes.VIRTUAL,
             get: function() {
-                // TUI editor raw value needs to be modified because it includes both newlines
-                // and <br> tags in some cases, resulting in an inconsistent behaviour.
-                // Can't modify it when saving because the editor itself expects that strange
-                // format when editing the previous value.
-                // See ticket #299: https://github.com/nhn/tui.editor/issues/299
-                return (this.description !== null && this.description.length > 0) ? linkifyHtml(md.renderInline(this.description.replace(/<br>[\n\r]/g , ''))) : '';
+                return Utils.renderTuiMarkdownHtml(this.description);
             }
         },
         tags_array: {

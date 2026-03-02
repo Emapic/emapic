@@ -20,6 +20,14 @@ var areIntlLocalesSupported = require('intl-locales-supported').default,
     smtpConfig = nconf.get('smtp'),
     fileType = require('file-type'),
     readChunk = require('read-chunk'),
+    htmlToText = require('html-to-text'),
+    linkifyHtml = require('linkifyjs/html'),
+    md = require('markdown-it')('zero') // 'zero' preset deletes all config but essential features
+        .set({ breaks: true })
+        .enable([ 'emphasis', 'link', 'newline' ]),
+        // In case we want to add more rules to be parsed, check :
+        // https://github.com/markdown-it/markdown-it/tree/8.3.1/lib
+        // parser_block.js, parser_core.js, parser_inline.js
     tmp = require('tmp'),
     sharp,
     Jimp,
@@ -498,6 +506,24 @@ module.exports = function(app) {
                 }
             }
             return scopeArray
+        },
+
+        renderTuiMarkdownHtml: function(text) {
+            // TUI editor raw value needs to be modified because it includes both newlines
+            // and <br> tags in some cases, resulting in an inconsistent behaviour.
+            // Can't modify it when saving because the editor itself expects that strange
+            // format when editing the previous value.
+            // See ticket #299: https://github.com/nhn/tui.editor/issues/299
+            return (text !== null && text.length > 0) ? linkifyHtml(md.renderInline(text.replace(/<br>[\n\r]/g , ''))) : '';
+        },
+
+        htmlToText: function(text) {
+            return htmlToText.fromString(text, {
+                wordwrap: false,
+                ignoreHref: true,
+                ignoreImage: true,
+                singleNewLineParagraphs: true
+            });
         }
     };
 };
