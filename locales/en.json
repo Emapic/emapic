@@ -197,6 +197,7 @@
 	"js_grayscale_osm_baselayer": "Greyscale (OSM)",
 	"js_color_osm_baselayer": "Color (OSM)",
 	"js_satellite_mapbox_baselayer": "Satellite (Mapbox)",
+	"js_satellite_streets_mapbox_baselayer": "Satellite with streets (Mapbox)",
 	"js_zoom_in": "Zoom in",
 	"js_zoom_out": "Zoom out",
 	"js_filter_active": "active filter",

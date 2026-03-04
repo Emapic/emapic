@@ -277,6 +277,16 @@ var emapic = emapic || {};
                     tileSize: 512,
                     maxZoom: 18,
                     zoomOffset: -1,
+                    id: 'mapbox/satellite-v9',
+                    accessToken: emapic.mapboxToken
+                })
+            }, {
+                label: emapic.utils.getI18n('js_satellite_streets_mapbox_baselayer'),
+                value:  new L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                    attribution: mapboxAttrib,
+                    tileSize: 512,
+                    maxZoom: 18,
+                    zoomOffset: -1,
                     id: 'mapbox/satellite-streets-v11',
                     accessToken: emapic.mapboxToken
                 })
