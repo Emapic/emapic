@@ -1,6 +1,7 @@
 // utils.js/
 var areIntlLocalesSupported = require('intl-locales-supported').default,
     nodemailer = require('nodemailer'),
+    deasync = require('deasync'),
     fs = require('fs'),
     nconf = require('nconf'),
     Promise = require('bluebird'),
@@ -418,7 +419,14 @@ module.exports = function(app) {
         },
 
         getFileMetadata: function(input) {
-            var metadata = fileType(Buffer.isBuffer(input) ? input : readChunk.sync(input, 0, fileType.minimumBytes));
+            var metadata;
+            fileType.fromBuffer(Buffer.isBuffer(input) ? input : readChunk.sync(input, 0, imageType.minimumBytes)).then(function(result) {
+                metadata = result;
+            }).catch(function(err) {
+                logger.error('Internal server error while retrieving metadata from file: ' + err);
+                metadata = null;
+            });
+            deasync.loopWhile(function(){return metadata === undefined;});
             if (isSvg(Buffer.isBuffer(input) ? input : fs.readFileSync(input))) {
                 if (metadata === null) {
                     metadata = { ext: 'svg' };
