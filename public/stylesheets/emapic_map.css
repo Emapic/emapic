@@ -600,6 +600,11 @@ div.alert-danger a {
     background-color: #EBEBEB;
     height: 100%;
 }
+/* Fix for a problem with base tiles in leaflet on certain browsers:
+   https://github.com/Leaflet/Leaflet/issues/3575 */
+.leaflet-container img.leaflet-tile {
+    mix-blend-mode: plus-lighter !important;
+}
 .leaflet-bar a.control-active {
     background-color: #e1e1e1;
 }
