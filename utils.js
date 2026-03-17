@@ -30,18 +30,10 @@ var areIntlLocalesSupported = require('intl-locales-supported').default,
         // https://github.com/markdown-it/markdown-it/tree/8.3.1/lib
         // parser_block.js, parser_core.js, parser_inline.js
     tmp = require('tmp'),
-    sharp,
-    Jimp,
+    sharp = require('sharp'),
     selectAnImageSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="150px" width="150px" version="1.0" viewBox="-300 -300 600 600" xml:space="preserve"><circle stroke="#AAA" stroke-width="10" r="280" fill="#FFF"/><text style="letter-spacing:1;text-anchor:middle;text-align:center;stroke-opacity:.5;stroke:#000;stroke-width:2;fill:#444;font-size:360px;font-family:Bitstream Vera Sans,Liberation Sans, Arial, sans-serif;line-height:125%;writing-mode:lr-tb;" transform="scale(.2)">{INNER_TEXT}</text></svg>',
     selectAnImageSVGInnerTextOneLine = '<tspan y="180" x="8">{LINE_1}</tspan>',
     selectAnImageSVGInnerTextTwoLines = '<tspan y="-40" x="8">{LINE_1}</tspan><tspan y="400" x="8">{LINE_2}</tspan>';
-
-try {
-    require.resolve('sharp');
-    sharp = require('sharp');
-} catch(e) {
-    Jimp = require('jimp');
-}
 
 // Add "allSettled" for Bluebird, like "all" but waits for all promises to finish
 // before throwing any error (first one found is thrown)
@@ -128,18 +120,6 @@ function takeSnapshotRaw(url, imgPath, width, height, wait, minSize, tries) {
                 return takeSnapshotRaw(url, imgPath, width, height, wait, minSize, tries + 1);
             }
         }
-    });
-}
-
-function transformImageJimp(input, width, height, upscale, format) {
-    return Jimp.read(input).then(function(image) {
-        var w = (width && (upscale || width < image.bitmap.width)) ? width : Jimp.AUTO,
-            h = (height && (upscale || height < image.bitmap.height)) ? height : Jimp.AUTO;
-        if (w !== Jimp.AUTO || h !== Jimp.AUTO) {
-            image = image.resize(w, h);
-        }
-
-        return image;
     });
 }
 
@@ -477,31 +457,12 @@ module.exports = function(app) {
 
         transformImage: function(input, width, height, upscale, format, outputFile) {
             var imgFormat = format ? format : null;
-            if (sharp) {
-                if (imgFormat && imgFormat.lastIndexOf('image/') === 0) {
-                    imgFormat = imgFormat.replace('image/', '');
-                }
-                return transformImageSharp(input, width, height, upscale, imgFormat).then(function(result) {
-                    return outputFile ? result.toFile(outputFile) : result.toBuffer();
-                });
-            } else {
-                if (imgFormat && imgFormat.lastIndexOf('image/') === -1) {
-                    imgFormat = 'image/' + imgFormat;
-                }
-                return transformImageJimp(input, width, height, upscale, imgFormat).then(function(result) {
-                    return new Promise(function(resolve, reject) {
-                        if (outputFile) {
-                            result.write(outputFile, function(err) {
-                                return err ? reject(err) : resolve();
-                            });
-                        } else {
-                            result.getBuffer(imgFormat || Jimp.AUTO, function(err, buffer) {
-                                return err ? reject(err) : resolve(buffer);
-                            });
-                        }
-                    });
-                });
+            if (imgFormat && imgFormat.lastIndexOf('image/') === 0) {
+                imgFormat = imgFormat.replace('image/', '');
             }
+            return transformImageSharp(input, width, height, upscale, imgFormat).then(function(result) {
+                return outputFile ? result.toFile(outputFile) : result.toBuffer();
+            });
         },
 
         createOrderArray: function(thisFields, model) {

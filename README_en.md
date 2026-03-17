@@ -30,7 +30,7 @@ You can check a throrough list of technologies, libraries and other data sources
 For launching Emapic locally you need before starting:
 
 * [git](https://git-scm.com/)
-* [Node.js](https://nodejs.org/) (>=8.0.0 <14.0) [we recommend using [nvm](https://github.com/creationix/nvm) for installing specific versions of _Node.js_]
+* [Node.js](https://nodejs.org/) (>=10.0.0 <14.0) [we recommend using [nvm](https://github.com/creationix/nvm) for installing specific versions of _Node.js_]
 * [npm](https://www.npmjs.com/) (usually installed along with Node.js)
 * [PostgreSQL](https://www.postgresql.org/) (>=9.2)
 * [PostGIS](http://postgis.net/) (>=2.0)
@@ -131,11 +131,6 @@ Now you must install the required Node.js packages before launching the applicat
 ```
 npm install
 ```
-
-> ##### Installation in 32-bit environments
->
-> If we try to install the Node.js packages in a 32-bit environment, we'll probably have some problems regarding the _sharp_ package, used for image resizing. In this case, we can ignore the error, although we should keep in mind that the application will now use _Jimp_ as a fallback package, which has a worse performance when resizing images.
-
 
 Now we can launch the application with either of these commands:
 

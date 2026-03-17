@@ -64,7 +64,6 @@
     "intl": "1.2.5",
     "intl-locales-supported": "1.8.12",
     "is-svg": "4.2.0",
-    "jimp": "0.10.3",
     "linkifyjs": "2.1.8",
     "markdown-it": "8.4.2",
     "method-override": "3.0.0",
@@ -93,6 +92,7 @@
     "sequelize": "5.3.5",
     "serve-favicon": "2.5.0",
     "session-file-store": "1.2.0",
+    "sharp": "0.28.3",
     "tmp": "0.1.0",
     "url": "0.11.0",
     "winston": "2.4.3",
@@ -101,11 +101,8 @@
   "devDependencies": {
     "supervisor": "0.12.0"
   },
-  "optionalDependencies": {
-    "sharp": "0.22.0"
-  },
   "engines": {
-    "node": ">=8.0.0 <14"
+    "node": ">=10.0.0 <14"
   },
   "private": false
 }
