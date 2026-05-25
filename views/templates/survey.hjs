@@ -266,6 +266,8 @@
 
         emapic.updateUrlWithAnswerId = true;
 
+        emapic.showResponseDate = true;
+
         {{#results}}
         emapic.surveyResults = true;
         {{#survey.already_opened}}

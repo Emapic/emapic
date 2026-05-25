@@ -571,6 +571,11 @@ if (typeof $.fn.validator !== 'undefined' &&
             return false;
         }
         return true;
-    }
+    };
+
+    emapic.utils.dateToUTC = function(date) {
+        return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+            date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.getUTCMilliseconds());
+    };
 
 })(emapic);

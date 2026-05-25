@@ -24,6 +24,7 @@ var emapic = emapic || {};
     emapic.surveyResults = null;
     emapic.resultsAfterVote = true;
     emapic.updateUrlWithAnswerId = false;
+    emapic.showResponseDate = false;
     emapic.selectedFeature = null;
     emapic.answerIdField = 'id';
     emapic.redirectUrl = "/";
@@ -523,10 +524,15 @@ var emapic = emapic || {};
     };
 
     emapic.getPopupHtml = function(data) {
-        if ('popup_msg' in data && data.popup_msg !== null) {
-            return data.popup_msg;
+        var msg = '';
+        if (emapic.showResponseDate && 'timestamp' in data && data.timestamp !== null) {
+            var dateTime = emapic.utils.dateToUTC(new Date(data.timestamp)).format(emapic.utils.getI18n('js_full_date_format', 'j/n/Y'));
+            msg += "<div class='user-answers-date'>" + dateTime + "</div>";
         }
-        return null;
+        if ('popup_msg' in data && data.popup_msg !== null) {
+            msg += data.popup_msg;
+        }
+        return msg.length > 0 ? msg : null;
     };
 
     emapic.indivVotesLayerOnEachFeature = function(data) {

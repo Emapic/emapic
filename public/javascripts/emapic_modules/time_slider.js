@@ -182,11 +182,6 @@ var emapic = emapic || {};
         }
     }
 
-    function fromUTC(date) {
-        return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-            date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.getUTCMilliseconds());
-    }
-
     function initDateStructures(level) {
         // We check if we have already stored the dates for the current level
         if (minDate !== null && typeof sliderDates[level] === 'undefined') {
@@ -209,7 +204,7 @@ var emapic = emapic || {};
                     aux = new Date(d);
                     sliderDates[level][1].push(aux);
                     // We also store the tooltip date
-                    sliderDatesTooltip[level].push(fromUTC(aux));
+                    sliderDatesTooltip[level].push(emapic.utils.dateToUTC(aux));
                 } while (d < maxDate);
             } else if (level == 2) { // Month
                 // For the min date we set month's 1st 00:00:00
@@ -229,7 +224,7 @@ var emapic = emapic || {};
                     aux = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - 1, 23, 59, 59, 999));
                     sliderDates[level][1].push(aux);
                     // We also store the tooltip date
-                    sliderDatesTooltip[level].push(fromUTC(aux));
+                    sliderDatesTooltip[level].push(emapic.utils.dateToUTC(aux));
                 } while (d <= maxDate);
             } else if (level == 1) { // Week
                 // For the min date we set week's monday 00:00:00
@@ -244,7 +239,7 @@ var emapic = emapic || {};
                     sliderDates[level][0].push(aux);
                     d.setUTCDate(d.getUTCDate() + 7);
                     // We also store the tooltip date (week's monday)
-                    sliderDatesTooltip[level].push(fromUTC(aux));
+                    sliderDatesTooltip[level].push(emapic.utils.dateToUTC(aux));
                 }
 
                 // For the max date we set week's sunday 23:59:59
@@ -273,7 +268,7 @@ var emapic = emapic || {};
                     aux = new Date(d);
                     sliderDates[level][1].push(aux);
                     // We also store the tooltip date
-                    sliderDatesTooltip[level].push(fromUTC(aux));
+                    sliderDatesTooltip[level].push(emapic.utils.dateToUTC(aux));
                 } while (d < maxDate);
             }
         }
