@@ -106,7 +106,7 @@ L.Control.SelectQuestion = L.Control.extend({
   }
 
   ,_onQuestionLiChange: function (e) {
-      var val = e.target.parentElement.id;
+      var val = e.target.closest('li').id;
       $('.leaflet-control.question-selector select').val(val).change();
   }
 
