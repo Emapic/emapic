@@ -537,7 +537,13 @@ module.exports = function(app) {
             }
             switch (layer) {
                 case 'municipalities':
-                    if ('prov' in params && !(isNaN(params.prov))) {
+                    if ('province_id' in params && !(isNaN(params.province_id))) {
+                        where.push('a.province_gid = :province_id');
+                        replacements.province_id = params.province_id;
+                    } else if ('province_adm_code' in params && params.province_adm_code) {
+                        where.push('b.adm1_code = :province_adm_code');
+                        replacements.province_adm_code = params.province_adm_code;
+                    } else if ('prov' in params && !(isNaN(params.prov))) {
                         where.push('a.cod_prov = :prov');
                         replacements.prov = params.prov;
                     } else if ('ccaa' in params && !(isNaN(params.ccaa))) {
@@ -550,7 +556,10 @@ module.exports = function(app) {
                     if (!('includeMinor' in params && params.includeMinor.toLowerCase() === 'true')) {
                         where.push('name IS NOT NULL');
                     }
-                    if ('country' in params) {
+                    if ('country_id' in params && !(isNaN(params.country_id))) {
+                        where.push('a.country_gid = :country_id');
+                        replacements.country_id = params.country_id;
+                    } else if ('country' in params) {
                         where.push('lower(a.iso_a2) = lower(:country)');
                         replacements.country = params.country;
                     }
