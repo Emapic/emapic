@@ -61,6 +61,25 @@ if (typeof $.fn.validator !== 'undefined' &&
         return baseUrl + (sURLParams.length > 0 ? '?' + sURLParams.join('&') : '') + (hashUrl.length > 0 ? '#' + hashUrl : '');
     };
 
+    emapic.utils.removeURLParameter = function(sParam) {
+        var sourceURL = window.location.href;
+        var rtn = sourceURL.split("?")[0];
+        var param;
+        var params_arr = [];
+        var queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
+        if (queryString !== "") {
+            params_arr = queryString.split("&");
+            for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+                param = params_arr[i].split("=")[0];
+                if (param === sParam) {
+                    params_arr.splice(i, 1);
+                }
+            }
+            if (params_arr.length) rtn = rtn + "?" + params_arr.join("&");
+        }
+        return rtn;
+    };
+
     emapic.utils.loadInputImage = function(input, id) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
@@ -229,7 +248,7 @@ if (typeof $.fn.validator !== 'undefined' &&
 
     emapic.utils.setLocale = function(value) {
         Cookies.set('locale', value, { expires: 30, path: '/', samesite: 'none', secure: 'true' });
-        location.reload(true);
+        window.location = emapic.utils.removeURLParameter('lang');
     };
 
     emapic.utils.checkInputNotVoid = function(input, mandatory) {
