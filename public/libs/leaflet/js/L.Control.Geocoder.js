@@ -1071,8 +1071,18 @@ module.exports = {
 			htmlTemplate: function(r) {
 				var a = r.address,
 					parts = [];
+				if (r.name) {
+					a.name = r.name;
+					parts.push('{name}');
+				}
+
 				if (a.road || a.building) {
 					parts.push('{building} {road} {house_number}');
+				}
+
+				if (parts.length === 0 && r.display_name) {
+					a.display_name = r.display_name;
+					parts.push('{display_name}');
 				}
 
 				if (a.city || a.town || a.village || a.hamlet) {
