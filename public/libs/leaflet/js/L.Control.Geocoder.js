@@ -15,6 +15,7 @@ module.exports = {
 			suggestMinLength: 3,
 			suggestTimeout: 250,
 			defaultMarkGeocode: false,
+			customBounds: null,
 			selectizePlaceholder: 'Write and select',
 			countryLabel: 'Country',
 			provinceLabel: 'Province',
@@ -247,6 +248,15 @@ module.exports = {
 			} else {
 				this._map.fire('markgeocodeprovince', {bbox: this._provincesData[provinceId].bbox, val: provinceId});
 			}
+		},
+
+		getQueryBounds: function(query) {
+			var bounds = null;
+			if (this.options.customBounds) {
+				bounds = (typeof this.options.customBounds === 'function') ?
+					this.options.customBounds(query) : this.options.customBounds;
+			}
+			return bounds ? bounds : this._map.getBounds();
 		},
 
 		_geocodeResult: function (results, suggest) {
@@ -1104,7 +1114,7 @@ module.exports = {
 		},
 
 		geocode: function(query, cb, context) {
-			var bounds = context._map.getBounds();
+			var bounds = context.getQueryBounds(query);
 			Util.jsonp(this.options.serviceUrl + 'search', L.extend({
 				q: query,
 				limit: 3,

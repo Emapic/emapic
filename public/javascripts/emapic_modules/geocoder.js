@@ -104,12 +104,19 @@ var emapic = emapic || {};
         }
     };
 
+    emapic.modules.geocoder.getBoundsForGeocoder = function(query) {
+        return null;
+    };
+
     emapic.modules.geocoder.addGeocoder = function(params) {
         emapic.modules.geocoder.removeGeocoder();
         var baseParams = $.extend({
             collapsed: false,
             showModalSmall: true,
             defaultMarkGeocode: false,
+            customBounds: function(query) {
+                return emapic.modules.geocoder.getBoundsForGeocoder(query);
+            },
             title: emapic.utils.getI18n('js_geocoder_title'),
             placeholder: emapic.utils.getI18n('js_geocoder_placeholder'),
             errorMessage: emapic.utils.getI18n('js_geocoder_no_results'),
