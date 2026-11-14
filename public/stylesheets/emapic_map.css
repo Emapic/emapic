@@ -948,6 +948,9 @@ input.form-control[type="radio"] {
 	align-items: center;
 	justify-content: center;
 }
+.leaflet-control-geocoder-container.leaflet-control-geocoder-container-modal .leaflet-control-geocoder {
+    padding-right: 25px;
+}
 .leaflet-control-geocoder,
 .leaflet-control-geocoder-form input,
 .leaflet-control-geocoder .selectize-control.single .selectize-input,

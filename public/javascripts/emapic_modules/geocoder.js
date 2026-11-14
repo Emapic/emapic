@@ -156,7 +156,11 @@ var emapic = emapic || {};
             return this;
         }, control);
 
-        emapic.utils.disableAllEventsPropagation($('.leaflet-control-geocoder')[0]);
+        var $geocoderContainer = $('.leaflet-control-geocoder');
+        emapic.utils.disableAllEventsPropagation($geocoderContainer[0]);
+        $geocoderContainer.on('click', function(e) {
+            e.stopPropagation();
+        });
         if (baseParams.showModalSmall) {
             $(control._container).addClass('hide-small');
             addGeocoderModalBtn();
@@ -173,6 +177,7 @@ var emapic = emapic || {};
         };
         geocoderModalControl.addTo(emapic.map);
         $('#control-geocoder-modal').on('click', showModal);
+        emapic.utils.disableAllEventsPropagation($('#control-geocoder-modal')[0]);
         emapic.addTooltips();
     }
 
