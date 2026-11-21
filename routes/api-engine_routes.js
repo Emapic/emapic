@@ -578,10 +578,12 @@ module.exports = function(app) {
                     return res.status(404).json({ error_code: 'invalid_resource', error: "requested layer doesn't exist." });
             }
             if (params.limit && !isNaN(parseInt(params.limit))) {
-                sql += ' LIMIT ' + params.limit;
+                sql += ' LIMIT :limit';
+                replacements.limit = parseInt(params.limit);
             }
             if (params.offset && !isNaN(parseInt(params.offset))) {
-                sql += ' OFFSET ' + params.offset;
+                sql += ' OFFSET :offset';
+                replacements.offset = parseInt(params.offset);
             }
             return sequelize.query(sql, {
                 replacements: replacements,
