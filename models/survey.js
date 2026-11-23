@@ -93,8 +93,8 @@ function getFiltersSQL(getFilters, questions) {
                         if (!qstnFound) {
                             continue;
                         }
-                        sqls.push('q' + q + ' IN (:' + param + ')');
-                        params[param] = getFilters[param];
+                        sqls.push('q' + q + ' IN (:fq' + q + ')');
+                        params['fq' + q] = getFilters[param];
                     }
             }
         }
