@@ -207,80 +207,79 @@ module.exports = function(app) {
             if (!('survey_id' in req.body) || isNaN(req.body.survey_id)) {
                 return res.redirect('/surveys/own');
             }
-            if ('clone_survey' in req.body) {
-                // Clone survey
-                models.Survey.findByPk(req.body.survey_id).then(function(surv) {
-                    if (surv === null) {
-                        return res.redirect('/surveys/own');
-                    }
-                    return surv.clone(req.user.id);
-                }).then(function(surv) {
-                    survey = surv;
-                    return extractQuestionsMapFromSurvey(survey);
-                }).then(function(questionsMap) {
-                    req.session.success = 'survey_cloned_success_msg';
-                    logger.info('Survey with id ' + req.body.survey_id + ' has been cloned successfully to survey with id ' + survey.id);
-                    res.render('edit-survey', {
-                        layout: 'layouts/survey-form',
-                        is_admin: isAdmin,
-                        survey: survey,
-                        questionsMap: JSON.stringify(questionsMap)
+            req.user.getSurveys({
+                where: {
+                    id: parseInt(req.body.survey_id)
+                }
+            }).then(function(surveys) {
+                let surv = surveys.length ? surveys[0] : null;
+                if (surv === null) {
+                    return res.redirect('/surveys/own');
+                }
+                if ('clone_survey' in req.body) {
+                    // Clone survey
+                    let survey;
+                    surv.clone(req.user.id).then(function(clonedSurvey) {
+                        survey = clonedSurvey;
+                        return extractQuestionsMapFromSurvey(clonedSurvey);
+                    }).then(function(questionsMap) {
+                        req.session.success = 'survey_cloned_success_msg';
+                        logger.info('Survey with id ' + req.body.survey_id + ' has been cloned successfully to survey with id ' + survey.id);
+                        res.render('edit-survey', {
+                            layout: 'layouts/survey-form',
+                            is_admin: isAdmin,
+                            survey: survey,
+                            questionsMap: JSON.stringify(questionsMap)
+                        });
+                    }).catch(function(err) {
+                        req.session.error = 'survey_cloned_error_msg';
+                        logger.error('Error while cloning survey with id ' + req.body.survey_id + ': ' + (err.message ? err.message : err.toString()));
+                        res.redirect('/surveys/own');
                     });
-                }).catch(function(err) {
-                    req.session.error = 'survey_cloned_error_msg';
-                    logger.error('Error while cloning survey with id ' + req.body.survey_id + ': ' + (err.message ? err.message : err.toString()));
-                    res.redirect('/surveys/own');
-                });
-            } else if ('survey_title' in req.body) {
-                // Confirm survey edition
-                models.Survey.checkValidPost(req).then(function() {
-                    return models.Survey.updateFromPost(req);
-                }).then(function(survey) {
-                    req.session.success = 'survey_updated_success_msg';
-                    logger.info('Survey with id ' + req.body.survey_id + ' has been updated successfully.');
-                    res.redirect('/surveys/own');
-                }).catch(function(err) {
-                    logger.error('Error while updating survey with id ' + req.body.survey_id + ': ' + (err.message ? err.message : err.toString()));
-                    if (err && err.code) {
-                        req.session.error = translateErrorCodeToMsg(err.code);
-                    } else {
-                        // Unexpected error
-                        logger.error(err.stack);
-                    }
-                    if (!req.session.error) {
-                        // Generic message
-                        req.session.error = 'survey_updated_error_msg';
-                    }
-                    // Retrieve the survey and refill the data in order to show the form again
-                    return models.Survey.findByPk(req.body.survey_id).then(function(surv) {
-                        Utils.copyBodyToLocals(req, res);
-                        surv.updateDataFromRequest(req);
+                } else if ('survey_title' in req.body) {
+                    // Confirm survey edition
+                    models.Survey.checkValidPost(req).then(function() {
+                        return models.Survey.updateFromPost(req);
+                    }).then(function(survey) {
+                        req.session.success = 'survey_updated_success_msg';
+                        logger.info('Survey with id ' + req.body.survey_id + ' has been updated successfully.');
+                        res.redirect('/surveys/own');
+                    }).catch(function(err) {
+                        logger.error('Error while updating survey with id ' + req.body.survey_id + ': ' + (err.message ? err.message : err.toString()));
+                        if (err && err.code) {
+                            req.session.error = translateErrorCodeToMsg(err.code);
+                        } else {
+                            // Unexpected error
+                            logger.error(err.stack);
+                        }
+                        if (!req.session.error) {
+                            // Generic message
+                            req.session.error = 'survey_updated_error_msg';
+                        }
+                        // Retrieve the survey and refill the data in order to show the form again
+                        return models.Survey.findByPk(req.body.survey_id).then(function(surv) {
+                            Utils.copyBodyToLocals(req, res);
+                            surv.updateDataFromRequest(req);
+                            res.render('edit-survey', {
+                                layout: 'layouts/survey-form',
+                                is_admin: isAdmin,
+                                survey: surv,
+                                questionsMap: JSON.stringify(extractQuestionsMapFromRequest(req))
+                            });
+                        });
+                    });
+                } else {
+                    // Edit survey
+                    extractQuestionsMapFromSurvey(surv).then(function(questionsMap) {
                         res.render('edit-survey', {
                             layout: 'layouts/survey-form',
                             is_admin: isAdmin,
                             survey: surv,
-                            questionsMap: JSON.stringify(extractQuestionsMapFromRequest(req))
+                            questionsMap: JSON.stringify(questionsMap)
                         });
                     });
-                });
-            } else {
-                // Edit survey
-                var survey;
-                models.Survey.findByPk(req.body.survey_id).then(function(surv) {
-                    if (surv === null) {
-                        return res.redirect('/surveys/own');
-                    }
-                    survey = surv;
-                    return extractQuestionsMapFromSurvey(survey);
-                }).then(function(questionsMap) {
-                    res.render('edit-survey', {
-                        layout: 'layouts/survey-form',
-                        is_admin: isAdmin,
-                        survey: survey,
-                        questionsMap: JSON.stringify(questionsMap)
-                    });
-                });
-            }
+                }
+            });
         });
     });
 
