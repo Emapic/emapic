@@ -3,6 +3,7 @@ var Promise = require('bluebird'),
     moment = require('moment'),
     XL4N = require('excel4node'),
     XLSX = require("xlsx"),
+    escape = require('escape-html'),
     parse = require('node-html-parser').parse,
     sequelize = models.sequelize;
 
@@ -602,21 +603,21 @@ module.exports = function(app) {
                         } else {
                             value = results[i]['q' + questions[j].question_order + '.id'];
                         }
-                        msg += "<li><label>" + questions[j].question + ':<br></label><span>' + value + '</span></li>';
+                        msg += "<li><label>" + escape(questions[j].question) + ':<br></label><span>' + escape(value) + '</span></li>';
                         break;
                     case 'text-answer':
                     case 'long-text-answer':
                         if (results[i]['q' + questions[j].question_order + '.value'] && results[i]['q' + questions[j].question_order + '.value'].trim()){
-                            msg += "<li><label>" + questions[j].question + ':<br></label><span>' + results[i]['q' + questions[j].question_order + '.value'].trim() + '</span></li>';
+                            msg += "<li><label>" + escape(questions[j].question) + ':<br></label><span>' + escape(results[i]['q' + questions[j].question_order + '.value'].trim()) + '</span></li>';
                         }
                         break;
                     case 'image-upload':
                     case 'image-url':
                         if (results[i]['q' + questions[j].question_order + '.value'] && results[i]['q' + questions[j].question_order + '.value'].trim()){
-                            msg += "<li><label>" + questions[j].question + ':</label><div class="survey-answer-img"><a href="' +
-                                results[i]['q' + questions[j].question_order + '.value'].trim() + '" target="_blank"><img title="' +
-                                req.i18n.__('click_image_full_size') + '"  class="' + questions[j].type + '" src="' +
-                                results[i]['q' + questions[j].question_order + '.value'].trim() + '"></img></a></div></li>';
+                            msg += "<li><label>" + escape(questions[j].question) + ':</label><div class="survey-answer-img"><a href="' +
+                                escape(results[i]['q' + questions[j].question_order + '.value'].trim()) + '" target="_blank"><img title="' +
+                                escape(req.i18n.__('click_image_full_size')) + '"  class="' + escape(questions[j].type) + '" src="' +
+                                escape(results[i]['q' + questions[j].question_order + '.value'].trim()) + '"></img></a></div></li>';
                         }
                         break;
                     case 'explanatory-text':
