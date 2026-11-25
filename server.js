@@ -374,6 +374,10 @@ var EmapicApp = function() {
                 ttl: 18000,
                 logFn: logger.notice
             }),
+            cookie: {
+                sameSite: 'lax',
+                secure: true
+            },
             secret: serverConfig.secrets.session,
             resave: false, // See https://github.com/expressjs/session#options for their values and meanings
             saveUninitialized: false // See https://github.com/expressjs/session#options for their values and meanings
