@@ -166,6 +166,7 @@
 
         <div class="col-xs-12">
             <form class="form-horizontal" data-toggle="validator" role="form" id="survey-form" method="post" autocomplete="off" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
                 <input type="hidden" name="survey_id" value="{{survey.id}}"/>
 
                 <div class="col-xs-12" id="inputs-container">

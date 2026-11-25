@@ -6,6 +6,7 @@ var passport = require('passport'),
     sequelize = require('sequelize'),
 
     defaultPageSize = nconf.get('app').defaultPageSize;
+
 const Op = sequelize.Op;
 
 function translateErrorCodeToMsg(errorCode) {
@@ -26,6 +27,8 @@ function translateErrorCodeToMsg(errorCode) {
 }
 
 module.exports = function(app) {
+
+    var csrfProtection = app.get('csrfProtection');
 
     app.get('/login', function(req, res){
         if (req.user) {
@@ -63,7 +66,7 @@ module.exports = function(app) {
         );
     });
 
-    app.get('/profile', requireRole(null), function(req, res){
+    app.get('/profile', requireRole(null), csrfProtection, function(req, res){
         Utils.copyAttributes({
             userFormData: req.user.get()
         }, res.locals);
@@ -71,6 +74,7 @@ module.exports = function(app) {
             hasPassword: req.user.password !== null,
             hasGoogleId: req.user.google_id !== null,
             hasFacebookId: req.user.facebook_id !== null,
+            csrfToken: req.csrfToken(),
             layout: 'layouts/main'
         });
     });
@@ -141,7 +145,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/surveys/own', requireRole(null), function(req, res) {
+    app.get('/surveys/own', requireRole(null), csrfProtection, function(req, res) {
         var query = req.query.q && req.query.q.trim() !== '' ? req.query.q : null,
             order = req.query.order && req.query.order.trim() !== '' ? req.query.order : null,
             pageNr = isNaN(req.query.page) ? 1 : req.query.page,
@@ -151,22 +155,24 @@ module.exports = function(app) {
                 surveys: results.rows,
                 pagination: Utils.getPaginationHtml(req, pageNr, pageSize, results.count, 'pagination_total_surveys'),
                 query: query,
+                csrfToken: req.csrfToken(),
                 layout: 'layouts/main'
             });
         });
     });
 
-    app.get('/surveys/new', requireRole(null), function(req, res){
+    app.get('/surveys/new', requireRole(null), csrfProtection, function(req, res){
         req.user.isAdmin().then(function(isAdmin) {
             res.render('new-survey', {
                 layout: 'layouts/survey-form',
+                csrfToken: req.csrfToken(),
                 max_lengths: models.Question.maxLengths,
                 is_admin: isAdmin
             });
         });
     });
 
-    app.post('/surveys/new', requireRole(null), function(req, res){
+    app.post('/surveys/new', requireRole(null), csrfProtection, function(req, res){
         req.user.isAdmin().then(function(isAdmin) {
             models.Survey.checkValidPost(req).then(function() {
                 return models.Survey.createFromPost(req);
@@ -192,6 +198,7 @@ module.exports = function(app) {
                 return res.render('new-survey', {
                     is_admin: isAdmin,
                     layout: 'layouts/survey-form',
+                    csrfToken: req.csrfToken(),
                     questionsMap: questionsMap
                 });
             });
@@ -202,7 +209,7 @@ module.exports = function(app) {
         return res.redirect('/surveys/own');
     });
 
-    app.post('/surveys/edit', requireRole(null), function(req, res){
+    app.post('/surveys/edit', requireRole(null), csrfProtection, function(req, res){
         req.user.isAdmin().then(function(isAdmin) {
             if (!('survey_id' in req.body) || isNaN(req.body.survey_id)) {
                 return res.redirect('/surveys/own');
@@ -227,6 +234,7 @@ module.exports = function(app) {
                         logger.info('Survey with id ' + req.body.survey_id + ' has been cloned successfully to survey with id ' + survey.id);
                         res.render('edit-survey', {
                             layout: 'layouts/survey-form',
+                            csrfToken: req.csrfToken(),
                             is_admin: isAdmin,
                             survey: survey,
                             questionsMap: JSON.stringify(questionsMap)
@@ -262,6 +270,7 @@ module.exports = function(app) {
                             surv.updateDataFromRequest(req);
                             res.render('edit-survey', {
                                 layout: 'layouts/survey-form',
+                                csrfToken: req.csrfToken(),
                                 is_admin: isAdmin,
                                 survey: surv,
                                 questionsMap: JSON.stringify(extractQuestionsMapFromRequest(req))
@@ -273,6 +282,7 @@ module.exports = function(app) {
                     extractQuestionsMapFromSurvey(surv).then(function(questionsMap) {
                         res.render('edit-survey', {
                             layout: 'layouts/survey-form',
+                            csrfToken: req.csrfToken(),
                             is_admin: isAdmin,
                             survey: surv,
                             questionsMap: JSON.stringify(questionsMap)
@@ -283,7 +293,7 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/survey/:id/delete', requireRole(null), function(req, res) {
+    app.post('/survey/:id/delete', requireRole(null), csrfProtection, function(req, res) {
         req.user.getSurveys({
             where: {
                 id: Utils.decryptSurveyId(req.params.id)
@@ -304,7 +314,7 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/survey/:id/open', requireRole(null), function(req, res) {
+    app.post('/survey/:id/open', requireRole(null), csrfProtection, function(req, res) {
         req.user.getSurveys({
             where: {
                 id: Utils.decryptSurveyId(req.params.id)
@@ -330,7 +340,7 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/survey/:id/close', requireRole(null), function(req, res) {
+    app.post('/survey/:id/close', requireRole(null), csrfProtection, function(req, res) {
         req.user.getSurveys({
             where: {
                 id: Utils.decryptSurveyId(req.params.id)

@@ -15,9 +15,11 @@ var passport = require('passport'),
     sequelize = models.sequelize;
 
 module.exports = function(app) {
+
     utils(app);
 
-    var oauthConfig = nconf.get('app').oAuth;
+    var csrfProtection = app.get('csrfProtection'),
+        oauthConfig = nconf.get('app').oAuth;
 
     app.oauthUrl = '/oauth/token';
 
@@ -284,7 +286,7 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/profile/delete', function(req, res) {
+    app.post('/profile/delete', requireRole(null), csrfProtection, function(req, res) {
         var user = req.user;
         req.user.destroy().then(function() {
             req.logout();
@@ -298,7 +300,7 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/profile/unlink', function(req, res) {
+    app.post('/profile/unlink', requireRole(null), csrfProtection, function(req, res) {
         var user = req.user;
         if (!req.body.service || !req.body.id || req.user.password === null) {
             return res.redirect('/profile');
@@ -332,7 +334,7 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/profile', function(req, res) {
+    app.post('/profile', requireRole(null), csrfProtection, function(req, res) {
         // Checking for the very suspicious case when the posted email
         // is different from the one logged in
         if (req.user.email !== req.body.email) {

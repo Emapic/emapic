@@ -78,14 +78,18 @@
 						</div>
 						<div class="btn-group pull-right" role="group" id="survey-action-btns">
 							<form id="edit-survey-{{encr_id}}" role="form" action="/surveys/edit" method="post">
+								<input type="hidden" name="_csrf" value="{{csrfToken}}">
 								<input type="hidden" value="{{id}}" name="survey_id"></input>
 								<input type="hidden" value="true" name="clone_survey" disabled></input>
 							</form>
 							<form id="open-survey-{{encr_id}}" role="form" action="/survey/{{encr_id}}/open" method="post">
+								<input type="hidden" name="_csrf" value="{{csrfToken}}">
 							</form>
 							<form id="close-survey-{{encr_id}}" role="form" action="/survey/{{encr_id}}/close" method="post">
+								<input type="hidden" name="_csrf" value="{{csrfToken}}">
 							</form>
 							<form id="delete-survey-{{encr_id}}" role="form" action="/survey/{{encr_id}}/delete" method="post">
+								<input type="hidden" name="_csrf" value="{{csrfToken}}">
 							</form>
 							{{^already_opened}}
 							<a onclick="openSurvey('{{encr_id}}')" href="#"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-play"></span> {{#__}}activate{{/__}}</button></a>

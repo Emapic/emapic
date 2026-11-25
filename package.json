@@ -42,6 +42,7 @@
     "connect-multiparty": "2.2.0",
     "connect-slashes": "1.4.0",
     "cookie-parser": "1.4.4",
+    "csurf": "1.11.0",
     "deasync": "0.1.31",
     "errorhandler": "1.5.0",
     "escape-html": "1.0.3",

@@ -4,6 +4,7 @@ var express = require('express'),
     session = require('express-session'),
     FileStore = require('session-file-store')(session),
     cookieParser = require('cookie-parser'),
+    csrf = require('csurf'),
     favicon = require('serve-favicon'),
     fs = require('fs'),
     http = require('http'),
@@ -487,6 +488,8 @@ var EmapicApp = function() {
             };
             next();
         });
+        // Store CSRF protection configuration for use in specific routes
+        self.app.set('csrfProtection', csrf({ cookie: true }));
 
         require('./routes')(self.app);
 
