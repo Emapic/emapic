@@ -77,18 +77,24 @@
 							{{/tags}}
 						</div>
 						<div class="btn-group pull-right" role="group" id="survey-action-btns">
-                            <form id="survey-{{encr_id}}" role="form" action="/surveys/edit" method="post">
-                                <input type="hidden" value="{{id}}" name="survey_id"></input>
-                                <input type="hidden" value="true" name="clone_survey" disabled></input>
-                            </form>
+							<form id="edit-survey-{{encr_id}}" role="form" action="/surveys/edit" method="post">
+								<input type="hidden" value="{{id}}" name="survey_id"></input>
+								<input type="hidden" value="true" name="clone_survey" disabled></input>
+							</form>
+							<form id="open-survey-{{encr_id}}" role="form" action="/survey/{{encr_id}}/open" method="post">
+							</form>
+							<form id="close-survey-{{encr_id}}" role="form" action="/survey/{{encr_id}}/close" method="post">
+							</form>
+							<form id="delete-survey-{{encr_id}}" role="form" action="/survey/{{encr_id}}/delete" method="post">
+							</form>
 							{{^already_opened}}
 							<a onclick="openSurvey('{{encr_id}}')" href="#"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-play"></span> {{#__}}activate{{/__}}</button></a>
-                            <a onclick="editSurvey('{{encr_id}}')" href="#"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span> {{#__}}edit_survey_btn{{/__}}</button></a>
+							<a onclick="editSurvey('{{encr_id}}')" href="#"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span> {{#__}}edit_survey_btn{{/__}}</button></a>
 							{{/already_opened}}
 							{{#active}}
 							<a onclick="closeSurvey('{{encr_id}}')" href="#"><button type="button" class="btn btn-default btn-close"><span class="glyphicon glyphicon-stop"></span> {{#__}}close{{/__}}</button></a>
 							{{/active}}
-                            <a onclick="cloneSurvey('{{encr_id}}')" href="#"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-duplicate"></span> {{#__}}clone_survey_btn{{/__}}</button></a>
+							<a onclick="cloneSurvey('{{encr_id}}')" href="#"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-duplicate"></span> {{#__}}clone_survey_btn{{/__}}</button></a>
 							<a onclick="deleteSurvey('{{encr_id}}')" href="#"><button type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" title="{{#__}}delete_survey{{/__}}"><span class="glyphicon glyphicon-trash"></span></button></a>
 						</div>
 					</div>
@@ -96,20 +102,20 @@
 						{{^already_opened}}
 						<div class="pull-left">
 							<a href="/survey/{{encr_id}}">
-                                <button class="btn btn-default btn-md" id="try-survey-btn" data-toggle="tooltip" data-placement="bottom" title="{{#__}}try_survey{{/__}}">
-                                    <span class="glyphicon glyphicon-ice-lolly-tasted"></span>
-                                </button>
-                            </a>
+								<button class="btn btn-default btn-md" id="try-survey-btn" data-toggle="tooltip" data-placement="bottom" title="{{#__}}try_survey{{/__}}">
+									<span class="glyphicon glyphicon-ice-lolly-tasted"></span>
+								</button>
+							</a>
 						</div>
 						{{/already_opened}}
 						{{#already_opened}}
 						{{#active}}
 						<div class="pull-left">
 							<a href="/survey/{{encr_id}}">
-                                <button class="btn btn-default btn-md" id="view-survey-btn" data-toggle="tooltip" data-placement="bottom" title="{{#__}}survey{{/__}}">
-                                    <span class="glyphicon glyphicon-play"></span>
-                                </button>
-                            </a>
+								<button class="btn btn-default btn-md" id="view-survey-btn" data-toggle="tooltip" data-placement="bottom" title="{{#__}}survey{{/__}}">
+									<span class="glyphicon glyphicon-play"></span>
+								</button>
+							</a>
 						</div>
 						{{/active}}
 						<div class="pull-left">
@@ -201,28 +207,28 @@
 
     function closeSurvey(id) {
         if (confirm('{{#__}}close_survey_confirmation{{/__}}')) {
-            window.location = '/survey/' + id + '/close';
+            $('form#close-survey-' + id).submit();
         }
     }
 
     function openSurvey(id) {
         if (confirm('{{#__}}open_survey_confirmation{{/__}}')) {
-            window.location = '/survey/' + id + '/open';
+            $('form#open-survey-' + id).submit();
         }
     }
 
     function editSurvey(id) {
-        $('form#survey-' + id).submit();
+        $('form#edit-survey-' + id).submit();
     }
 
     function cloneSurvey(id) {
-        $('form#survey-' + id + ' input[name="clone_survey"]').prop('disabled', false);
-        $('form#survey-' + id).submit();
+        $('form#edit-survey-' + id + ' input[name="clone_survey"]').prop('disabled', false);
+        $('form#edit-survey-' + id).submit();
     }
 
     function deleteSurvey(id) {
         if (confirm('{{#__}}delete_survey_confirmation{{/__}}')) {
-            window.location = '/survey/' + id + '/delete';
+            $('form#delete-survey-' + id).submit();
         }
     }
 

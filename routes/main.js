@@ -283,7 +283,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/survey/:id/delete', requireRole(null), function(req, res) {
+    app.post('/survey/:id/delete', requireRole(null), function(req, res) {
         req.user.getSurveys({
             where: {
                 id: Utils.decryptSurveyId(req.params.id)
@@ -304,7 +304,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/survey/:id/open', requireRole(null), function(req, res) {
+    app.post('/survey/:id/open', requireRole(null), function(req, res) {
         req.user.getSurveys({
             where: {
                 id: Utils.decryptSurveyId(req.params.id)
@@ -330,7 +330,7 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/survey/:id/close', requireRole(null), function(req, res) {
+    app.post('/survey/:id/close', requireRole(null), function(req, res) {
         req.user.getSurveys({
             where: {
                 id: Utils.decryptSurveyId(req.params.id)
